@@ -3,7 +3,7 @@
         xmlns:vm="using:CodeWF.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
         x:Class="CodeWF.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/logo.png"
@@ -12,13 +12,20 @@
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
+    <StackPanel Margin="20">
+        <TextBlock Text="标题别名生成器" FontSize="28" FontWeight="ExtraBold" Margin="0 20"></TextBlock>
+        <Grid RowDefinitions="100, 100, 100, *" ColumnDefinitions="Auto,300,*">
+            <TextBlock Text="中文标题：" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox Text="{Binding Chinese,Mode=OneWayToSource}" Watermark="输入文章标题" Grid.Row="0" Grid.Column="1" />
 
-	<Grid RowDefinitions="100, *" ColumnDefinitions="*,*">
-        <TextBox Text="{Binding Chinese,Mode=OneWayToSource}" Watermark="输入文章标题" />
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding English,Mode=OneWay}" Watermark="翻译后的英文标题" />
-        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Slug,Mode=OneWay}" Watermark="文章别名" />
-    </Grid>
+            <TextBlock Text="英文标题：" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding English,Mode=OneWay}" Watermark="翻译后的英文标题" />
+
+            <TextBlock Text="URL别名：" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Slug,Mode=OneWay}" Watermark="文章别名" />
+        </Grid>
+    </StackPanel>
 
 </Window>

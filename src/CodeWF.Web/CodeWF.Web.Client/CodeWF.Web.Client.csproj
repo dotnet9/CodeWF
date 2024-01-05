@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GTranslate" Version="2.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
+    <PackageReference Include="Slugify.Core" Version="5.0.0-prerelease.4" />
   </ItemGroup>
 
 </Project>
