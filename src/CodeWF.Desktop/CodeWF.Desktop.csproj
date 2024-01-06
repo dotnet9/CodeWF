@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Assets\banner.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Assets\logo.ico" />
   </ItemGroup>
 

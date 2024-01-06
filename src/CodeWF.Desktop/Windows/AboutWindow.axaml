@@ -14,11 +14,13 @@
         x:DataType="viewModels:AboutViewModel">
 
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="20">
-        <Image Width="62" HorizontalAlignment="Center" VerticalAlignment="Top" Stretch="Uniform"
+        <Image Width="96" HorizontalAlignment="Center" VerticalAlignment="Top" Stretch="Uniform"
                Source="avares://CodeWF.Desktop/Assets/logo.png" />
-        <TextBlock Classes="Headline6" Text="码界工坊" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <Button Theme="{StaticResource ButtonLink}" Margin="0,15,0,15"
+        <TextBlock Classes="Headline6" Text="码界工坊" VerticalAlignment="Center" HorizontalAlignment="Center"
+                   FontSize="35" Margin="0 10" FontWeight="ExtraBold" />
+        <Button Theme="{StaticResource ButtonLink}" Margin="0,10,0,15"
                 Content="https://github.com/dotnet9/CodeWF" Foreground="#FF5cbcd6"
-                HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="15 " />
+                HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="50 "
+                Command="{Binding Path=OpenProjectRepoLink}" />
     </StackPanel>
 </Window>

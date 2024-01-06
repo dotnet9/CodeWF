@@ -56,7 +56,7 @@
         </StackPanel.Styles>
 
         <Image Width="1004" Height="301" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,50,0,40"
-               Source="avares://CodeWF.Desktop/Assets/banner.jpg" />
+               Source="avares://CodeWF.Desktop/Assets/banner.png" />
 
 
         <StackPanel Margin="16">

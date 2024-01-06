@@ -66,10 +66,16 @@
                                            RightDrawerOpened="False" RightDrawerWidth="0">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <Grid RowDefinitions="Auto,*">
-                            <controls:ColorZone Grid.Row="0" Mode="Custom" Height="210">
-                                <Image HorizontalAlignment="Center" VerticalAlignment="Top"
-                                       Source="avares://CodeWF.Desktop/Assets/banner.jpg" Stretch="None" Width="320"
-                                       Height="210" Margin="0,0,0,8" Opacity="1" />
+                            <controls:ColorZone Grid.Row="0" Mode="Custom">
+                                <Panel>
+                                    <Image HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                                           Source="avares://CodeWF.Desktop/Assets/menuhead.png" Height="100"
+                                           Stretch="None" Margin="0,0,0,8" Opacity="1" />
+
+                                    <TextBlock Classes="Headline6" Text="码界工坊" Margin="10 0 0 0" Foreground="White"
+                                               FontSize="30" FontWeight="ExtraBold"
+                                               VerticalAlignment="Center" />
+                                </Panel>
                             </controls:ColorZone>
                             <ListBox Grid.Row="1" Name="DrawerList2"
                                      Focusable="{Binding ElementName=LeftDrawer, Path=LeftDrawerOpened}">
