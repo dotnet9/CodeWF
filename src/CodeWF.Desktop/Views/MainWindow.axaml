@@ -3,18 +3,32 @@
         xmlns:vm="using:CodeWF.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:p1="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
+        xmlns:controls="clr-namespace:Avalonia.Themes.Neumorphism.Controls;assembly=Avalonia.Themes.Neumorphism"
         mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
         Width="500" Height="500"
         x:Class="CodeWF.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/logo.png"
         Title="码界工坊">
-<Window.Styles>
-    <Style Selector="TextBox">
-        <Setter Property="TextWrapping" Value="Wrap"/>
-        <Setter Property="Margin" Value="0 5"/>
-    </Style>
-</Window.Styles>
+    <Window.Styles>
+        <Style Selector="controls|FloatingButton[IsExtended=true]">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Margin" Value="8 0" />
+            <Setter Property="CornerRadius" Value="3" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0 5" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="UseFloatingWatermark" Value="True" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Width" Value="360" />
+            <Setter Property="MinHeight" Value="50" />
+            <Setter Property="MaxHeight" Value="360" />
+            <Setter Property="Height" Value="NaN" />
+        </Style>
+    </Window.Styles>
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
@@ -22,15 +36,27 @@
     </Design.DataContext>
     <StackPanel Margin="20">
         <TextBlock Text="标题别名生成器" FontSize="28" FontWeight="ExtraBold" Margin="0 20"></TextBlock>
-        <Grid RowDefinitions="100, 100, 100, *" ColumnDefinitions="Auto,300,*">
-            <TextBlock Text="中文标题：" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
-            <TextBox Text="{Binding Chinese,Mode=OneWayToSource}" Watermark="输入文章标题" Grid.Row="0" Grid.Column="1" />
-
-            <TextBlock Text="英文标题：" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding English,Mode=OneWay}" Watermark="翻译后的英文标题" />
-
-            <TextBlock Text="URL别名：" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Slug,Mode=OneWay}" Watermark="文章别名" />
+        <StackPanel Orientation="Horizontal">
+            <controls:FloatingButton Content="中译英" IsExtended="True" Command="{Binding HandleChineseToEnglishAsync}"
+                                     Foreground="{DynamicResource MaterialDesignForeground}">
+            </controls:FloatingButton>
+            <controls:FloatingButton Content="英译中" IsExtended="True" Command="{Binding HandleEnglishToChineseAsync}"
+                                     Foreground="{DynamicResource MaterialDesignForeground}">
+            </controls:FloatingButton>
+            <controls:FloatingButton Content="英转URL" IsExtended="True" Command="{Binding HandleEnglishToUrlSlug}"
+                                     Foreground="{DynamicResource MaterialDesignForeground}">
+            </controls:FloatingButton>
+            <controls:FloatingButton Content="中转URL" IsExtended="True" Command="{Binding HandleChineseToUrlSlug}"
+                                     Foreground="{DynamicResource MaterialDesignForeground}">
+            </controls:FloatingButton>
+        </StackPanel>
+        <Grid RowDefinitions="100, 100, 100, *">
+            <TextBox Text="{Binding Chinese,Mode=OneWayToSource}" Grid.Row="0"
+                     ToolTip.Tip="请输入中文" p1:TextFieldAssist.Label="中文" />
+            <TextBox Grid.Row="1" Text="{Binding English,Mode=OneWay}"
+                     ToolTip.Tip="翻译后的英文标题或输入英文" p1:TextFieldAssist.Label="翻译后的英文标题或输入英文" />
+            <TextBox Grid.Row="2" Text="{Binding Slug,Mode=OneWay}"
+                     ToolTip.Tip="转换后URL别名" p1:TextFieldAssist.Label="转换后URL别名" />
         </Grid>
     </StackPanel>
 

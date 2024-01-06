@@ -1,6 +1,7 @@
-﻿using GTranslate.Translators;
+﻿using Avalonia.Themes.Neumorphism.Controls;
+using CodeWF.Core;
 using ReactiveUI;
-using Slugify;
+using Splat;
 using System;
 
 namespace CodeWF.Desktop.ViewModels;
@@ -10,9 +11,7 @@ namespace CodeWF.Desktop.ViewModels;
 /// </summary>
 public class MainWindowViewModel : ViewModelBase
 {
-	private readonly YandexTranslator _translator = new();
-	private readonly SlugHelper _slugHelper = new();
-
+	private readonly ITranslationService? _translationService = Locator.Current.GetService<ITranslationService>();
 	private string? _chinese;
 
 	/// <summary>
@@ -64,54 +63,48 @@ public class MainWindowViewModel : ViewModelBase
 		}
 	}
 
-	public MainWindowViewModel()
+	public async void HandleChineseToEnglishAsync()
 	{
-		this.WhenAnyValue(x => x.Chinese)
-			.Subscribe(HandleChangeChineseCommand);
-		this.WhenAnyValue(x => x.English)
-			.Subscribe(HandleChangeEnglishCommand);
-	}
-
-	/// <summary>
-	/// 将中文转为英文
-	/// </summary>
-	private async void HandleChangeChineseCommand(string? chinese)
-	{
-		if (string.IsNullOrWhiteSpace(chinese))
-		{
-			English = string.Empty;
-			return;
-		}
-
 		try
 		{
-			English = (await _translator.TranslateAsync(chinese, "en")).Translation;
+			English = await _translationService!.ChineseToEnglishAsync(Chinese);
 		}
 		catch (Exception ex)
 		{
 			English = ex.Message;
+			SnackbarHost.Post($"中译英异常，请联系作者：{ex.Message}");
 		}
 	}
 
-	/// <summary>
-	/// 将英文转为URL友好格式
-	/// </summary>
-	/// <param name="english"></param>
-	private async void HandleChangeEnglishCommand(string? english)
+	public async void HandleEnglishToChineseAsync()
 	{
-		if (string.IsNullOrWhiteSpace(english))
-		{
-			Slug = string.Empty;
-			return;
-		}
-
 		try
 		{
-			Slug = _slugHelper.GenerateSlug(english);
+			Chinese = await _translationService!.EnglishToChineseAsync(English);
+		}
+		catch (Exception ex)
+		{
+			Chinese = ex.Message;
+			SnackbarHost.Post($"英译中异常，请联系作者：{ex.Message}");
+		}
+	}
+
+	public void HandleEnglishToUrlSlug()
+	{
+		try
+		{
+			Slug = _translationService!.EnglishToUrlSlug(English);
 		}
 		catch (Exception ex)
 		{
 			Slug = ex.Message;
+			SnackbarHost.Post($"英转URL别名异常，请联系作者：{ex.Message}");
 		}
+	}
+
+	public void HandleChineseToUrlSlug()
+	{
+		HandleChineseToEnglishAsync();
+		HandleEnglishToUrlSlug();
 	}
 }

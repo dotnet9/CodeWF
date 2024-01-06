@@ -17,7 +17,7 @@ public class TranslationService : ITranslationService
 	/// </summary>
 	/// <param name="chineseText"></param>
 	/// <returns></returns>
-	public async Task<string> ChineseToEnglishAsync(string chineseText)
+	public async Task<string> ChineseToEnglishAsync(string? chineseText)
 	{
 		return string.IsNullOrWhiteSpace(chineseText)
 			? string.Empty
@@ -41,7 +41,7 @@ public class TranslationService : ITranslationService
 	/// </summary>
 	/// <param name="englishText"></param>
 	/// <returns></returns>
-	public string EnglishToUrlSlug(string englishText)
+	public string EnglishToUrlSlug(string? englishText)
 	{
 		return string.IsNullOrWhiteSpace(englishText) ? string.Empty : _slugHelper.GenerateSlug(englishText);
 	}

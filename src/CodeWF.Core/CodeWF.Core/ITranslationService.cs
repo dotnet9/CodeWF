@@ -10,19 +10,19 @@ public interface ITranslationService
 	/// </summary>
 	/// <param name="chineseText"></param>
 	/// <returns></returns>
-	public Task<string> ChineseToEnglishAsync(string chineseText);
+	public Task<string> ChineseToEnglishAsync(string? chineseText);
 
 	/// <summary>
 	/// 英中文翻译
 	/// </summary>
 	/// <param name="englishText"></param>
 	/// <returns></returns>
-	public Task<string> EnglishToChineseAsync(string englishText);
+	public Task<string> EnglishToChineseAsync(string? englishText);
 
 	/// <summary>
 	/// 英文与URL别名转换
 	/// </summary>
 	/// <param name="englishText"></param>
 	/// <returns></returns>
-	public string EnglishToUrlSlug(string englishText);
+	public string EnglishToUrlSlug(string? englishText);
 }
