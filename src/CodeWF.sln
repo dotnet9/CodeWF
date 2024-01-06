@@ -3,11 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34414.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web\CodeWF.Web.csproj", "{7A098B51-EFA0-492B-8386-55E60B302C05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web\CodeWF.Web.csproj", "{7A098B51-EFA0-492B-8386-55E60B302C05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web.Client", "CodeWF.Web\CodeWF.Web.Client\CodeWF.Web.Client.csproj", "{43F150F8-5221-4B77-AF12-DB07AF7FE055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web.Client", "CodeWF.Web\CodeWF.Web.Client\CodeWF.Web.Client.csproj", "{43F150F8-5221-4B77-AF12-DB07AF7FE055}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj", "{DA8CD643-9417-4472-9AB8-EBA016C308CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Core.Test", "CodeWF.Core\CodeWF.Core.Test\CodeWF.Core.Test.csproj", "{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{43F150F8-5221-4B77-AF12-DB07AF7FE055}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43F150F8-5221-4B77-AF12-DB07AF7FE055}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43F150F8-5221-4B77-AF12-DB07AF7FE055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8CD643-9417-4472-9AB8-EBA016C308CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8CD643-9417-4472-9AB8-EBA016C308CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8CD643-9417-4472-9AB8-EBA016C308CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8CD643-9417-4472-9AB8-EBA016C308CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
