@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:CodeWF.Desktop.Windows.ViewModels"
+        mc:Ignorable="d" x:Class="CodeWF.Desktop.Windows.AboutWindow"
+        d:DesignWidth="640" d:DesignHeight="256"
+        WindowState="Normal"
+        WindowStartupLocation="CenterOwner"
+        Width="500" Height="240"
+        Title="关于"
+        CanResize="false" ShowInTaskbar="False"
+        Icon="avares://CodeWF.Desktop/Assets/logo.ico"
+        x:CompileBindings="True"
+        x:DataType="viewModels:AboutViewModel">
+
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="20">
+        <Image Width="62" HorizontalAlignment="Center" VerticalAlignment="Top" Stretch="Uniform"
+               Source="avares://CodeWF.Desktop/Assets/logo.png" />
+        <TextBlock Classes="Headline6" Text="码界工坊" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <Button Theme="{StaticResource ButtonLink}" Margin="0,15,0,15"
+                Content="https://github.com/dotnet9/CodeWF" Foreground="#FF5cbcd6"
+                HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="15 " />
+    </StackPanel>
+</Window>

@@ -9,40 +9,40 @@ namespace CodeWF.Core;
 /// </summary>
 public class TranslationService : ITranslationService
 {
-	private readonly YandexTranslator _translator = new();
-	private readonly SlugHelper _slugHelper = new();
+    private readonly YandexTranslator _translator = new();
+    private readonly SlugHelper _slugHelper = new();
 
-	/// <summary>
-	/// 中英文翻译
-	/// </summary>
-	/// <param name="chineseText"></param>
-	/// <returns></returns>
-	public async Task<string> ChineseToEnglishAsync(string? chineseText)
-	{
-		return string.IsNullOrWhiteSpace(chineseText)
-			? string.Empty
-			: (await _translator.TranslateAsync(chineseText, "en")).Translation;
-	}
+    /// <summary>
+    /// 中英文翻译
+    /// </summary>
+    /// <param name="chineseText"></param>
+    /// <returns></returns>
+    public async Task<string> ChineseToEnglishAsync(string? chineseText)
+    {
+        return string.IsNullOrWhiteSpace(chineseText)
+            ? string.Empty
+            : (await _translator.TranslateAsync(chineseText, "en")).Translation;
+    }
 
-	/// <summary>
-	/// 英中文翻译
-	/// </summary>
-	/// <param name="englishText"></param>
-	/// <returns></returns>
-	public async Task<string> EnglishToChineseAsync(string englishText)
-	{
-		return string.IsNullOrWhiteSpace(englishText)
-			? string.Empty
-			: (await _translator.TranslateAsync(englishText, "zh-CN")).Translation;
-	}
+    /// <summary>
+    /// 英中文翻译
+    /// </summary>
+    /// <param name="englishText"></param>
+    /// <returns></returns>
+    public async Task<string> EnglishToChineseAsync(string? englishText)
+    {
+        return string.IsNullOrWhiteSpace(englishText)
+            ? string.Empty
+            : (await _translator.TranslateAsync(englishText, "zh-CN")).Translation;
+    }
 
-	/// <summary>
-	/// 英文与URL别名转换
-	/// </summary>
-	/// <param name="englishText"></param>
-	/// <returns></returns>
-	public string EnglishToUrlSlug(string? englishText)
-	{
-		return string.IsNullOrWhiteSpace(englishText) ? string.Empty : _slugHelper.GenerateSlug(englishText);
-	}
+    /// <summary>
+    /// 英文与URL别名转换
+    /// </summary>
+    /// <param name="englishText"></param>
+    /// <returns></returns>
+    public string EnglishToUrlSlug(string? englishText)
+    {
+        return string.IsNullOrWhiteSpace(englishText) ? string.Empty : _slugHelper.GenerateSlug(englishText);
+    }
 }

@@ -1,15 +1,6 @@
-﻿using Avalonia.Themes.Neumorphism.Controls;
-using CodeWF.Core;
-using ReactiveUI;
-using Splat;
-using System;
+﻿namespace CodeWF.Desktop.ViewModels;
 
-namespace CodeWF.Desktop.ViewModels;
-
-/// <summary>
-/// 中文转英文，英文转别名
-/// </summary>
-public class MainWindowViewModel : ViewModelBase
+internal sealed class TranslationSlugViewModel : ViewModelBase
 {
 	private readonly ITranslationService? _translationService = Locator.Current.GetService<ITranslationService>();
 	private string? _chinese;
@@ -63,7 +54,7 @@ public class MainWindowViewModel : ViewModelBase
 		}
 	}
 
-	public async void HandleChineseToEnglishAsync()
+	public async Task HandleChineseToEnglishAsync()
 	{
 		try
 		{
@@ -102,9 +93,9 @@ public class MainWindowViewModel : ViewModelBase
 		}
 	}
 
-	public void HandleChineseToUrlSlug()
+	public async void HandleChineseToUrlSlug()
 	{
-		HandleChineseToEnglishAsync();
+		await HandleChineseToEnglishAsync();
 		HandleEnglishToUrlSlug();
 	}
 }

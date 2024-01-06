@@ -3,6 +3,8 @@
              x:Class="CodeWF.Desktop.App"
              xmlns:themes="clr-namespace:Avalonia.Themes.Neumorphism;assembly=Avalonia.Themes.Neumorphism"
              xmlns:local="using:CodeWF.Desktop"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia" 
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
@@ -11,6 +13,11 @@
     </Application.DataTemplates>
   
     <Application.Styles>
-        <themes:NeumorphismTheme BaseTheme="Light" PrimaryColor="Purple" SecondaryColor="Lime" />
+        <!--Neumorphism theme color setup-->
+        <themes:NeumorphismTheme BaseTheme="Light" PrimaryColor="Purple" SecondaryColor="Lime"/>
+        <!--Dialogs styling setup-->
+        <dialogHostAvalonia:DialogHostStyles />
+        <!--Icons styling setup-->
+        <materialIcons:MaterialIconStyles />
     </Application.Styles>
 </Application>

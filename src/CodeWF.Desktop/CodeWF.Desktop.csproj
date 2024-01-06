@@ -6,10 +6,19 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\banner.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\logo.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,10 +28,20 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.6" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="2.1.0" />
     <PackageReference Include="Neumorphism.Avalonia" Version="0.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Pages\Home.axaml.cs">
+      <DependentUpon>Home.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\TranslationSlug.axaml.cs">
+      <DependentUpon>TranslationSlug.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
