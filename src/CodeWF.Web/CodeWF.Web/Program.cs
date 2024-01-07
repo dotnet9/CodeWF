@@ -1,8 +1,3 @@
-using CodeWF.Core;
-using CodeWF.Web.Client.Pages;
-using CodeWF.Web.Components;
-using Masa.Blazor;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,16 +5,7 @@ builder.Services.AddRazorComponents()
 	.AddInteractiveServerComponents()
 	.AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddSingleton<ITranslationService, TranslationService>();
-builder.Services.AddMasaBlazor(options =>
-{
-	options.ConfigureIcons(IconSet.MaterialDesign);
-	options.ConfigureSsr(ssr =>
-	{
-		ssr.Left = 256;
-		ssr.Top = 64;
-	});
-});
+builder.Services.RegisterCommonService();
 
 var app = builder.Build();
 

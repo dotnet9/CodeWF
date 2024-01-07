@@ -1,12 +1,116 @@
 ﻿@inherits LayoutComponentBase
 
-<MApp>
-    <NavMenu />
-    <MMain>
-        <MContainer Fluid>
+<MApp Id="inspire">
+    <MSystemBar App>
+        <MSpacer></MSpacer>
+
+        <MIcon>mdi-square</MIcon>
+
+        <MIcon>mdi-circle</MIcon>
+
+        <MIcon>mdi-triangle</MIcon>
+    </MSystemBar>
+
+    <MAppBar App
+             ClippedRight
+             Flat
+             Height="72">
+        <MContainer Fluid Class="py-0 fill-height">
+
+            <MButton Text Href="https://dotnet9.com" Target="_blank">
+                Dotnet9
+            </MButton>
+
+            <MSpacer></MSpacer>
+
+            <MResponsive MaxWidth="260">
+                <MTextField Dense
+                            Flat
+                            HideDetails="true"
+                            Rounded
+                            SoloInverted
+                            Value="@("")">
+                </MTextField>
+            </MResponsive>
+        </MContainer>
+    </MAppBar>
+
+    <MNavigationDrawer @bind-Value="_drawer"
+                       App
+                       Width="300">
+        <MNavigationDrawer @bind-Value="_drawer"
+                           Absolute
+                           Color="grey lighten-3"
+                           MiniVariant>
+            <MAvatar Class="d-block text-center mx-auto mt-4"
+                     Color="grey darken-1"
+                     Size="36">
+            </MAvatar>
+
+            <MDivider Class="mx-3 my-5"></MDivider>
+
+            @for (int i = 0; i < 6; i++)
+            {
+                <MAvatar Class="d-block text-center mx-auto mb-9"
+                         Color="grey lighten-1"
+                         Size="28">
+                </MAvatar>
+            }
+        </MNavigationDrawer>
+        
+        <MSheet Color="grey lighten-5 ml-5"
+                Height="128"
+                Width="@("100%")">
+            <MAvatar Class="mb-4"
+                     Color="grey darken-1"
+                     Size="64">
+            </MAvatar>
+
+            <div>码界工坊</div>
+        </MSheet>
+
+        <MDivider></MDivider>
+
+        <MList Class="pl-14"
+               Shaped>
+            <MListItem ActiveClass="primary--text" Href="/">
+                <MListItemIcon>
+                    <MIcon>home</MIcon>
+                </MListItemIcon>
+                <MListItemContent>
+                    <MListItemTitle>首页</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+            <MListItem Href="/generate-slug" ActiveClass="primary--text">
+                <MListItemIcon>
+                    <MIcon>add</MIcon>
+                </MListItemIcon>
+                <MListItemContent>
+                    <MListItemTitle>标题别名生成器</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+        </MList>
+    </MNavigationDrawer>
+
+    <MMain Class="grey lighten-3">
+        <MContainer Class="py-8 px-6" Fluid>
             @Body
         </MContainer>
     </MMain>
+
+    <MFooter App
+             Color="transparent"
+             Height="72"
+             Inset>
+        <MTextField BackgroundColor="grey lighten-1"
+                    Dense
+                    Flat
+                    HideDetails="@("true")"
+                    Value="@("")"
+                    Rounded
+                    Solo>
+        </MTextField>
+    </MFooter>
 </MApp>
 
 <div id="blazor-error-ui" data-nosnippet>
@@ -14,3 +118,7 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    bool? _drawer;
+}

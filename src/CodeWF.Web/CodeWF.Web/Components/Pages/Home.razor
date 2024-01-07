@@ -1,7 +1,23 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>首页</PageTitle>
 
-<h1>Hello, world!</h1>
+<MContainer>
+    <MRow>
+        @for (int i = 0; i < 4; i++)
+        {
+            <MCol Class="mt-2"
+                  Cols="12">
+                <strong>Category @i</strong>
+            </MCol>
 
-Welcome to your new app.
+            @for (int j = 0; j < 6; j++)
+            {
+                <MCol Cols="6"
+                      Md="2">
+                    <MSheet Height="150"></MSheet>
+                </MCol>
+            }
+        }
+    </MRow>
+</MContainer>
