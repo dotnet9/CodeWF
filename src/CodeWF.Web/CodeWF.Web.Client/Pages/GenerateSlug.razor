@@ -1,95 +1,93 @@
 ﻿@page "/generate-slug"
-@using GTranslate.Translators
-@using Slugify
+@using CodeWF.Core
+
 @rendermode InteractiveAuto
+@inject ITranslationService TranslationService
 
 <PageTitle>标题别名生成器</PageTitle>
 
 <h1>标题别名生成器</h1>
 
 <div>
-	<span>中文标题：</span>
-	<input type="text" style="width: 500px;height: 100px;" @bind="Chinese" @oninput="HandleChangeChineseCommand" placeholder="输入中文标题"/>
+    <span>中文标题：</span>
+    <input type="text" style="width: 500px;height: 100px;" @bind="Chinese" @oninput="HandleChangeChineseCommand" placeholder="输入中文标题"/>
 </div>
 <div>
-	<span>英文标题：</span>
-	<input type="text" style="width: 500px;height: 100px;margin: 10px 0;" @bind="English" @oninput="HandleChangeEnglishCommand" placeholder="英文标题"/>
+    <span>英文标题：</span>
+    <input type="text" style="width: 500px;height: 100px;margin: 10px 0;" @bind="English" @oninput="HandleChangeEnglishCommand" placeholder="英文标题"/>
 </div>
 <div>
-	<span>URL别名：</span>
-	<input type="text" style="width: 500px;height: 100px;" @bind="Slug" placeholder="标题URL别名"/>
+    <span>URL别名：</span>
+    <input type="text" style="width: 500px;height: 100px;" @bind="Slug" placeholder="标题URL别名"/>
 </div>
 <div>
-	<button @onclick="HandleCommand">转换</button>
+    <button @onclick="HandleCommand">转换</button>
 </div>
 
 @code {
 
-	/// <summary>
-	/// 中文标题
-	/// </summary>
-	private string? Chinese { get; set; }
+    /// <summary>
+    /// 中文标题
+    /// </summary>
+    private string? Chinese { get; set; }
 
-	/// <summary>
-	/// 英文标题
-	/// </summary>
-	private string? English { get; set; }
+    /// <summary>
+    /// 英文标题
+    /// </summary>
+    private string? English { get; set; }
 
-	/// <summary>
-	/// 别名
-	/// </summary>
-	private string? Slug { get; set; }
+    /// <summary>
+    /// 别名
+    /// </summary>
+    private string? Slug { get; set; }
 
-	private readonly YandexTranslator _translator = new();
-	private readonly SlugHelper _slugHelper = new();
+    /// <summary>
+    /// 将中文转为英文
+    /// </summary>
+    private async void HandleChangeChineseCommand()
+    {
+        if (string.IsNullOrWhiteSpace(Chinese))
+        {
+            English = string.Empty;
+            return;
+        }
 
-	/// <summary>
-	/// 将中文转为英文
-	/// </summary>
-	private async void HandleChangeChineseCommand()
-	{
-		if (string.IsNullOrWhiteSpace(Chinese))
-		{
-			English = string.Empty;
-			return;
-		}
+        try
+        {
+            English = (await TranslationService.ChineseToEnglishAsync(Chinese));
+            HandleChangeEnglishCommand();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            English = ex.Message;
+        }
+    }
 
-		try
-		{
-			English = (await _translator.TranslateAsync(Chinese, "en")).Translation;
-			HandleChangeEnglishCommand();
-			StateHasChanged();
-		}
-		catch (Exception ex)
-		{
-			English = ex.Message;
-		}
-	}
+    /// <summary>
+    /// 将英文转为URL友好格式
+    /// </summary>
+    private void HandleChangeEnglishCommand()
+    {
+        if (string.IsNullOrWhiteSpace(English))
+        {
+            Slug = string.Empty;
+            return;
+        }
 
-	/// <summary>
-	/// 将英文转为URL友好格式
-	/// </summary>
-	private void HandleChangeEnglishCommand()
-	{
-		if (string.IsNullOrWhiteSpace(English))
-		{
-			Slug = string.Empty;
-			return;
-		}
+        try
+        {
+            Slug = TranslationService.EnglishToUrlSlug(English);
+        }
+        catch (Exception ex)
+        {
+            Slug = ex.Message;
+        }
+    }
 
-		try
-		{
-			Slug = _slugHelper.GenerateSlug(English);
-		}
-		catch (Exception ex)
-		{
-			Slug = ex.Message;
-		}
-	}
-
-	private void HandleCommand()
-	{
-		HandleChangeChineseCommand();
-	}
+    private void HandleCommand()
+    {
+        HandleChangeChineseCommand();
+    }
 
 }

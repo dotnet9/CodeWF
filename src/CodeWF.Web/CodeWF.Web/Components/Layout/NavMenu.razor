@@ -1,30 +1,35 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">码界工坊</a>
-    </div>
-</div>
+﻿<MNavigationDrawer App Class="app-nav-drawer">
+    <MList Routable Nav>
+        <MListItem ActiveClass="primary--text" Href="/">
+            <MListItemIcon>
+                <MIcon>home</MIcon>
+            </MListItemIcon>
+            <MListItemContent>
+                <MListItemTitle>Home</MListItemTitle>
+            </MListItemContent>
+        </MListItem>
+        <MListItem Href="/generate-slug" ActiveClass="primary--text">
+            <MListItemIcon>
+                <MIcon>add</MIcon>
+            </MListItemIcon>
+            <MListItemContent>
+                <MListItemTitle>别名生成器</MListItemTitle>
+            </MListItemContent>
+        </MListItem>
+        <MListItem Href="/weather" Exact ActiveClass="primary--text">
+            <MListItemIcon>
+                <MIcon>cloud</MIcon>
+            </MListItemIcon>
+            <MListItemContent>
+                <MListItemTitle>Weather</MListItemTitle>
+            </MListItemContent>
+        </MListItem>
+    </MList>
+</MNavigationDrawer>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<MAppBar App>
+    <MAppBarNavIcon />
+    <MSpacer />
+</MAppBar>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> 首页
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="generate-slug">
-                <span class="bi bi-link" aria-hidden="true"></span> 标题别名生成器
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
+<PageScript Src="./Components/Layout/NavMenu.razor.js"></PageScript>
