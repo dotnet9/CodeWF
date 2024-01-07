@@ -8,8 +8,8 @@
         xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:assist="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Width="1280" Height="720" MinHeight="720"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+        Width="1280" Height="720" MinWidth="720"
         x:DataType="viewModels:ApplicationModelBase"
         x:Class="CodeWF.Desktop.Windows.MainWindow"
         Icon="/Assets/logo.ico"
@@ -89,17 +89,18 @@
                                 </ListBox.Styles>
                                 <ListBoxItem IsEnabled="True">
                                     <StackPanel Orientation="Horizontal">
-                                        <icons:MaterialIcon Kind="HomeOutline" Width="24" Height="24"
+                                        <icons:MaterialIcon Kind="HomeOutline" Width="32" Height="32"
                                                             VerticalAlignment="Center" Foreground="Gray" />
-                                        <TextBlock Text="首页" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                        <TextBlock Text="首页" VerticalAlignment="Center" Margin="8,0,0,0" FontSize="18" />
                                     </StackPanel>
                                 </ListBoxItem>
 
                                 <ListBoxItem IsEnabled="True">
                                     <StackPanel Orientation="Horizontal">
-                                        <icons:MaterialIcon Kind="ListBoxOutline" Width="24" Height="24"
+                                        <icons:MaterialIcon Kind="Web" Width="32" Height="32"
                                                             VerticalAlignment="Center" Foreground="Gray" />
-                                        <TextBlock Text="标题别名生成器" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                        <TextBlock Text="标题别名生成器" VerticalAlignment="Center" Margin="8,0,0,0"
+                                                   FontSize="18" />
                                     </StackPanel>
                                 </ListBoxItem>
 

@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d"
+             xmlns:controls="clr-namespace:Avalonia.Themes.Neumorphism.Controls;assembly=Avalonia.Themes.Neumorphism"
              xmlns:assist="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
              xmlns:viewModels="clr-namespace:CodeWF.Desktop.ViewModels"
              x:CompileBindings="True"
@@ -20,33 +21,39 @@
             <Setter Property="AcceptsReturn" Value="True" />
             <Setter Property="UseFloatingWatermark" Value="True" />
             <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="Width" Value="400" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Width" Value="420"/>
             <Setter Property="MinHeight" Value="70" />
             <Setter Property="MaxHeight" Value="360" />
             <Setter Property="Height" Value="NaN" />
         </Style>
     </UserControl.Styles>
-    <StackPanel Margin="20">
-        <TextBlock Classes="Headline4 Subheadline" Text="标题别名生成器" Foreground="{DynamicResource MaterialDesignDarkGray}" />
+    <StackPanel Margin="30" VerticalAlignment="Top">
+        <controls:Card Width="500" VerticalAlignment="Top" CornerRadius="15" Padding="30"
+                       Background="{DynamicResource MaterialDesignLinearGradient1}">
+            <StackPanel Margin="0,4" HorizontalAlignment="Stretch">
+                <TextBlock Classes="Headline6" Text="标题别名生成器" TextAlignment="Center" Foreground="#ff555555" />
 
-        <StackPanel Orientation="Horizontal">
-            <Button Content="中译英" Command="{Binding HandleChineseToEnglishAsync}"
-                    Foreground="{DynamicResource MaterialDesignForeground}" />
-            <Button Content="英译中" Command="{Binding HandleEnglishToChineseAsync}"
-                    Foreground="{DynamicResource MaterialDesignForeground}" />
-            <Button Content="英转URL" Command="{Binding HandleEnglishToUrlSlug}"
-                    Foreground="{DynamicResource MaterialDesignForeground}" />
-            <Button Content="中转URL" Command="{Binding HandleChineseToUrlSlug}"
-                    Foreground="{DynamicResource MaterialDesignForeground}" />
-        </StackPanel>
-        <Grid RowDefinitions="Auto, Auto, Auto, *" Margin="0 30 0 0">
-            <TextBox Text="{Binding Chinese,Mode=TwoWay}" Grid.Row="0"
-                     ToolTip.Tip="请输入中文" assist:TextFieldAssist.Label="中文" />
-            <TextBox Grid.Row="1" Text="{Binding English,Mode=TwoWay}"
-                     ToolTip.Tip="翻译后的英文标题或输入英文" assist:TextFieldAssist.Label="翻译后的英文标题或输入英文" />
-            <TextBox Grid.Row="2" Text="{Binding Slug,Mode=OneWay}"
-                     ToolTip.Tip="转换后URL别名" assist:TextFieldAssist.Label="转换后URL别名" />
-        </Grid>
+                <UniformGrid Columns="4" Margin="0,40,0,0">
+                    <Button Content="中译英" Command="{Binding HandleChineseToEnglishAsync}"
+                            Foreground="{DynamicResource MaterialDesignForeground}" />
+                    <Button Content="英译中" Command="{Binding HandleEnglishToChineseAsync}"
+                            Foreground="{DynamicResource MaterialDesignForeground}" />
+                    <Button Content="英转URL" Command="{Binding HandleEnglishToUrlSlug}"
+                            Foreground="{DynamicResource MaterialDesignForeground}" />
+                    <Button Content="中转URL" Command="{Binding HandleChineseToUrlSlug}"
+                            Background="#FF5cbcd6" Foreground="White" />
+                </UniformGrid>
+                <Grid RowDefinitions="Auto, Auto, Auto, *" Margin="0 30 0 0">
+                    <TextBox Text="{Binding Chinese,Mode=TwoWay}" Grid.Row="0"
+                             ToolTip.Tip="请输入中文" assist:TextFieldAssist.Label="中文" />
+                    <TextBox Grid.Row="1" Text="{Binding English,Mode=TwoWay}"
+                             ToolTip.Tip="翻译后的英文标题或输入英文" assist:TextFieldAssist.Label="翻译后的英文标题或输入英文" />
+                    <TextBox Grid.Row="2" Text="{Binding Slug,Mode=OneWay}"
+                             ToolTip.Tip="转换后URL别名" assist:TextFieldAssist.Label="转换后URL别名" />
+                </Grid>
+            </StackPanel>
+        </controls:Card>
     </StackPanel>
 
 </UserControl>
