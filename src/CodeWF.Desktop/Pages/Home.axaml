@@ -76,7 +76,7 @@
         <controls:SkiaText Margin="10" Width="700" Height="70" HorizontalAlignment="Center" Stretch="None"
                            FontFamily="avares://CodeWF.Desktop/Assets/Fonts/Cocogoose Pro-trial.ttf#Cocogoose"
                            Text="https://codewf.com" FontSize="60" ClipToBounds="False"
-                           Fill="{DynamicResource MaterialDesignPaper}" Stroke="#33666666" StrokeThickness="1">
+                           Fill="{DynamicResource MaterialDesignPaper}" Stroke="White" StrokeThickness="1">
             <controls:SkiaGeometry.BoxShadow>
                 <MultiBinding Converter="{StaticResource CustomBoxShadowsConverter}">
                     <DynamicResource ResourceKey="BoxShadowsTemplate" />

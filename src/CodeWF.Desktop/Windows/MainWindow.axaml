@@ -99,7 +99,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <icons:MaterialIcon Kind="Web" Width="24" Height="24"
                                                             VerticalAlignment="Center" Foreground="Gray" />
-                                        <TextBlock Text="标题别名生成器" VerticalAlignment="Center" Margin="8,0,0,0"
+                                        <TextBlock Text="别名生成器" VerticalAlignment="Center" Margin="8,0,0,0"
                                                    FontSize="16" />
                                     </StackPanel>
                                 </ListBoxItem>
@@ -132,8 +132,8 @@
                                 <TextBlock Grid.Column="2" Classes="Headline6" Text="码界工坊" VerticalAlignment="Center" />
                                 <!--Theme toggle switch-->
                                 <StackPanel Grid.Column="4" Orientation="Horizontal">
-                                    <ToggleSwitch Name="toggleSwitchTheme" Content="亮色主题" IsChecked="False"
-                                                  OnContent="暗色主题" OffContent="亮色主题"
+                                    <ToggleSwitch Name="toggleSwitchTheme" Content="浅色主题" IsChecked="False"
+                                                  OnContent="深色主题" OffContent="浅色主题"
                                                   Command="{Binding Path=SwitchThemeCommand}"
                                                   CommandParameter="{Binding ElementName=toggleSwitchTheme, Path=$self.IsChecked}" />
                                 </StackPanel>

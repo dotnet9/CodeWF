@@ -1,30 +1,42 @@
+using CodeWF.Web.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-	.AddInteractiveServerComponents()
-	.AddInteractiveWebAssemblyComponents();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddMasaBlazor(builder =>
+{
+    builder.ConfigureTheme(theme =>
+    {
+        theme.Themes.Light.Primary = "#4318FF";
+        theme.Themes.Light.Accent = "#4318FF";
+    });
+}).AddI18nForServer("wwwroot/i18n");
 
-builder.Services.RegisterCommonService();
+
+var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new Exception("Get the assembly root directory exception!");
+builder.Services.AddNav(Path.Combine(basePath, $"wwwroot/nav/nav.json"));
+builder.Services.AddScoped<CookieStorage>();
+builder.Services.AddScoped<GlobalConfig>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-	app.UseWebAssemblyDebugging();
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
-else
-{
-	app.UseExceptionHandler("/Error", createScopeForErrors: true);
-}
+
+app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-	.AddInteractiveServerRenderMode()
-	.AddInteractiveWebAssemblyRenderMode()
-	.AddAdditionalAssemblies(typeof(GenerateSlug).Assembly);
+app.UseRouting();
+
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 app.Run();
