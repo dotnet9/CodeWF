@@ -77,7 +77,7 @@ public sealed partial class MainWindow : Window, IMainWindow
 
 	private void TemplatedControl_OnTemplateApplied(object sender, TemplateAppliedEventArgs e)
 	{
-		SnackbarHost.Post("欢迎访问\r\n码界工坊 !");
+		SnackbarHost.Post("欢迎访问 - 码界工坊");
 	}
 
 

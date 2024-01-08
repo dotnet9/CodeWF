@@ -8,7 +8,7 @@
         xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:assist="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+        mc:Ignorable="d" d:DesignWidth="2280" d:DesignHeight="720"
         Width="1280" Height="720" MinWidth="720"
         x:DataType="viewModels:ApplicationModelBase"
         x:Class="CodeWF.Desktop.Windows.MainWindow"
@@ -62,18 +62,18 @@
                                    assist:SnackbarHostAssist.SnackbarWidth="600">
                 <controls:NavigationDrawer Name="LeftDrawer" Classes="permanent" LeftDrawerExpandThresholdWidth="2000"
                                            LeftDrawerOpened="{Binding ElementName=NavDrawerSwitch2, Path=IsChecked, Mode=TwoWay}"
-                                           LeftDrawerWidth="320"
+                                           LeftDrawerWidth="250"
                                            RightDrawerOpened="False" RightDrawerWidth="0">
                     <controls:NavigationDrawer.LeftDrawerContent>
                         <Grid RowDefinitions="Auto,*">
                             <controls:ColorZone Grid.Row="0" Mode="Custom">
                                 <Panel>
-                                    <Image HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                                           Source="avares://CodeWF.Desktop/Assets/menuhead.png" Height="100"
-                                           Stretch="None" Margin="0,0,0,8" Opacity="1" />
-
-                                    <TextBlock Classes="Headline6" Text="码界工坊" Margin="10 0 0 0" Foreground="White"
-                                               FontSize="30" FontWeight="ExtraBold"
+                                    <Svg Path="/Assets/hero-gradient.svg" Margin="0 -80 0 0 " HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                                    <TextBlock Classes="Headline6" Text="码界工坊" Margin="0 -55 0 0" Foreground="White"
+                                               FontSize="30" FontWeight="ExtraBold" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Classes="Headline1" Text="开发人员的百宝箱" Margin="0 -15 0 0" Foreground="White"
+                                               FontSize="15" FontWeight="ExtraBold" HorizontalAlignment="Center"
                                                VerticalAlignment="Center" />
                                 </Panel>
                             </controls:ColorZone>
@@ -89,18 +89,18 @@
                                 </ListBox.Styles>
                                 <ListBoxItem IsEnabled="True">
                                     <StackPanel Orientation="Horizontal">
-                                        <icons:MaterialIcon Kind="HomeOutline" Width="32" Height="32"
+                                        <icons:MaterialIcon Kind="HomeOutline" Width="28" Height="28"
                                                             VerticalAlignment="Center" Foreground="Gray" />
-                                        <TextBlock Text="首页" VerticalAlignment="Center" Margin="8,0,0,0" FontSize="18" />
+                                        <TextBlock Text="首页" VerticalAlignment="Center" Margin="8,0,0,0" FontSize="16" />
                                     </StackPanel>
                                 </ListBoxItem>
 
                                 <ListBoxItem IsEnabled="True">
                                     <StackPanel Orientation="Horizontal">
-                                        <icons:MaterialIcon Kind="Web" Width="32" Height="32"
+                                        <icons:MaterialIcon Kind="Web" Width="24" Height="24"
                                                             VerticalAlignment="Center" Foreground="Gray" />
                                         <TextBlock Text="标题别名生成器" VerticalAlignment="Center" Margin="8,0,0,0"
-                                                   FontSize="18" />
+                                                   FontSize="16" />
                                     </StackPanel>
                                 </ListBoxItem>
 
