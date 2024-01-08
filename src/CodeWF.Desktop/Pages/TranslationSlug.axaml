@@ -32,7 +32,7 @@
         <controls:Card Width="500" VerticalAlignment="Top" CornerRadius="15" Padding="30"
                        Background="{DynamicResource MaterialDesignLinearGradient1}">
             <StackPanel Margin="0,4" HorizontalAlignment="Stretch">
-                <TextBlock Classes="Headline6" Text="标题别名生成器" TextAlignment="Center" Foreground="#ff555555" />
+                <TextBlock Classes="Headline6" Text="标题别名生成器" TextAlignment="Center" />
 
                 <UniformGrid Columns="4" Margin="0,40,0,0">
                     <Button Content="中译英" Command="{Binding HandleChineseToEnglishAsync}"
