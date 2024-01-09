@@ -3,13 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34414.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj", "{DA8CD643-9417-4472-9AB8-EBA016C308CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core.Test", "CodeWF.Core\CodeWF.Core.Test\CodeWF.Core.Test.csproj", "{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web\CodeWF.Web.csproj", "{BDA1FD2A-6DF9-49B0-BDEF-E89EC69C727C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web\CodeWF.Web.csproj", "{BDA1FD2A-6DF9-49B0-BDEF-E89EC69C727C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Web", "CodeWF.Web", "{CA9D4FB8-18F8-4351-8433-5C1D65E21CA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Core", "CodeWF.Core", "{E5C1EB38-8F28-4F30-B7A2-F3D5487E06B4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Desktop", "CodeWF.Desktop", "{4826B1F3-876C-4F03-8687-41A3AE352CBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.App", "CodeWF.App", "{59CD194E-F6C9-475B-9828-ADF66AAB6176}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +44,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0C8FC329-AFAD-4454-9518-929AD4120846} = {4826B1F3-876C-4F03-8687-41A3AE352CBD}
+		{DA8CD643-9417-4472-9AB8-EBA016C308CD} = {E5C1EB38-8F28-4F30-B7A2-F3D5487E06B4}
+		{CF6D1454-1F1D-486A-B749-95D8E4AA2B80} = {E5C1EB38-8F28-4F30-B7A2-F3D5487E06B4}
+		{BDA1FD2A-6DF9-49B0-BDEF-E89EC69C727C} = {CA9D4FB8-18F8-4351-8433-5C1D65E21CA7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0EA78A09-D980-49F6-802F-0F0FC8DC2900}

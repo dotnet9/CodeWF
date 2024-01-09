@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj" />
+    <ProjectReference Include="..\..\CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

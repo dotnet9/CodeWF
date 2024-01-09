@@ -4,18 +4,85 @@
 
 <MCard
     Outlined
-    Elevation="2"
-    Width="500" MaxWidth="500" Height="200">
+    Elevation="2">
     <MListItem>
         <MListItemContent>
             <MListItemTitle Class="text-h5 mb-1">
-                程序源码-0.0.0.1
+                程序源码
             </MListItemTitle>
             <MListItemSubtitle w>目标：工具与博文一体，含网站、桌面、App、小程序</MListItemSubtitle>
         </MListItemContent>
     </MListItem>
     <MRow Class="mx-2 my-5">
         <MButton Color="primary" Class="mx-6" Href="https://github.com/dotnet9/CodeWF" Target="_blank">Github</MButton>
-        <MButton Color="primary" Href="https://github.com/dotnet9/CodeWF/releases/tag/init" Target="_blank">Windows版本-0.0.0.1版本</MButton>
     </MRow>
+
+    <MListItem>
+        <MListItemContent>
+            <MListItemTitle Class="text-h5 mb-1">
+                桌面版本
+            </MListItemTitle>
+            <MListItemSubtitle w>支持Windows、macOS、Linux</MListItemSubtitle>
+        </MListItemContent>
+    </MListItem>
+    <MRow Class="mx-2 my-5">
+        <MButton Color="primary" Class="mx-6" Href="https://github.com/dotnet9/CodeWF/releases/tag/init" Target="_blank">Release下载</MButton>
+    </MRow>
+    <MContainer Fluid>
+        <MRow Justify="@JustifyTypes.SpaceAround">
+            <MCol Cols="5">
+                <div>
+                    关于-浅色
+                </div>
+                <MImage Src="/img/desktop/about-light-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    首页-浅色
+                </div>
+                <MImage Src="/img/desktop/home-light-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    菜单-浅色
+                </div>
+                <MImage Src="/img/desktop/menu-light-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    别名生成器-浅色
+                </div>
+                <MImage Src="/img/desktop/slug-generator-light-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+            </MCol>
+
+            <MCol Cols="5">
+                <div>
+                    关于-深色
+                </div>
+                <MImage Src="/img/desktop/about-dark-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    首页-深色
+                </div>
+                <MImage Src="/img/desktop/home-dark-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    菜单-深色
+                </div>
+                <MImage Src="/img/desktop/menu-dark-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+                <div>
+                    别名生成器-深色
+                </div>
+                <MImage Src="/img/desktop/slug-generator-dark-desktop.png"
+                        AspectRatio="1.7">
+                </MImage>
+            </MCol>
+        </MRow>
+    </MContainer>
 </MCard>
