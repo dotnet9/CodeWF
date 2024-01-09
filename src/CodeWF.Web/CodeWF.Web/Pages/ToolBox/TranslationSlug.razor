@@ -7,43 +7,45 @@
 	Outlined
 	Elevation="2"
 	Width="500">
-	<MListItem>
-		<MListItemContent>
-			<MListItemTitle Class="text-h5 mb-1">
-				别名生成器
-			</MListItemTitle>
-		</MListItemContent>
-	</MListItem>
-	<MRow Class="mx-2">
-		<MButton class="ma-2 white--text"
-		         Color="blue-grey"
-		         OnClick="HandleChineseToEnglishAsync">
-			中译英
-		</MButton>
-		<MButton class="ma-2 white--text"
-		         Color="blue-grey"
-		         OnClick="HandleEnglishToChineseAsync">
-			英译中
-		</MButton>
-		<MButton class="ma-2 white--text"
-		         Color="blue-grey"
-		         OnClick="HandleEnglishToUrlSlugAsync">
-			英转URL
-		</MButton>
+    <MListItem>
+        <MListItemContent>
+            <MListItemTitle Class="text-h5 mb-1">
+                别名生成器
+            </MListItemTitle>
+        </MListItemContent>
+    </MListItem>
 
-		<MButton class="ma-2"
-		         Color="info"
-		         OnClick="HandleChineseToUrlSlugAsync">
-			<LoaderContent>
-				<span class="custom-loader">
-					<MIcon>mdi-cached</MIcon>
-				</span>
-			</LoaderContent>
-			<ChildContent>
-				中转URL
-			</ChildContent>
-		</MButton>
-	</MRow>
+    <MRow Class="mx-2 mb-5">
+        <MButton class="ma-2 white--text"
+                 Color="blue-grey"
+                 OnClick="HandleChineseToEnglishAsync">
+            中译英
+        </MButton>
+        <MButton class="ma-2 white--text"
+                 Color="blue-grey"
+                 OnClick="HandleEnglishToChineseAsync">
+            英译中
+        </MButton>
+        <MButton class="ma-2 white--text"
+                 Color="blue-grey"
+                 OnClick="HandleEnglishToUrlSlugAsync">
+            英转URL
+        </MButton>
+
+        <MButton class="ma-2"
+                 Color="info"
+                 OnClick="HandleChineseToUrlSlugAsync">
+            <LoaderContent>
+                <span class="custom-loader">
+                    <MIcon>mdi-cached</MIcon>
+                </span>
+            </LoaderContent>
+            <ChildContent>
+                中转URL
+            </ChildContent>
+        </MButton>
+    </MRow>
+
 	<MRow Class="mx-2">
 		<MTextarea Label="请输入中文"
 		           AutoGrow

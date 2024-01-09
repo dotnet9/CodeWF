@@ -2,4 +2,20 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Nav
 
-<h1>首页</h1>
+<MCard
+    Outlined
+    Elevation="2"
+    Width="500" MaxWidth="500" Height="200">
+    <MListItem>
+        <MListItemContent>
+            <MListItemTitle Class="text-h5 mb-1">
+                程序源码-0.0.0.1
+            </MListItemTitle>
+            <MListItemSubtitle w>目标：工具与博文一体，含网站、桌面、App、小程序</MListItemSubtitle>
+        </MListItemContent>
+    </MListItem>
+    <MRow Class="mx-2 my-5">
+        <MButton Color="primary" Class="mx-6" Href="https://github.com/dotnet9/CodeWF" Target="_blank">Github</MButton>
+        <MButton Color="primary" Href="https://github.com/dotnet9/CodeWF/releases/tag/init" Target="_blank">Windows版本-0.0.0.1版本</MButton>
+    </MRow>
+</MCard>
