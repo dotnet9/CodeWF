@@ -13,8 +13,8 @@
                    App>
 
     <div class="logo" @onclick="() => NavHelper.NavigateTo(GlobalVariables.DefaultRoute)">
-        <img class="hover-pointer" height="49" src="/img/mainLayout/logo.svg"/>
-        <span>码界工坊</span>
+        <img height="49" src="/img/mainLayout/logo.svg" width="36px;" Class="hover-pointer mx-4" />
+        <span style="font-size: 30px; font-weight: 800;">码界工坊</span>
     </div>
 
     <MList Nav Routable Dense Class="@($"pa-0 {(GlobalConfig.ExpandOnHover ? "mini-navigation" : "")}")">

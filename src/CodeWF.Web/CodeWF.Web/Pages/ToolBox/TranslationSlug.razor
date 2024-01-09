@@ -1,3 +1,147 @@
-﻿@page "/toolbox/translationslug"
+﻿@page "/tools/slug-generator"
+@using CodeWF.Core
+@inject ITranslationService TranslationService
+@inject IPopupService PopupService
 
-<h1>别名生成器</h1>
+<MCard
+	Outlined
+	Elevation="2"
+	Width="500">
+	<MListItem>
+		<MListItemContent>
+			<MListItemTitle Class="text-h5 mb-1">
+				别名生成器
+			</MListItemTitle>
+		</MListItemContent>
+	</MListItem>
+	<MRow Class="mx-2">
+		<MButton class="ma-2 white--text"
+		         Color="blue-grey"
+		         OnClick="HandleChineseToEnglishAsync">
+			中译英
+		</MButton>
+		<MButton class="ma-2 white--text"
+		         Color="blue-grey"
+		         OnClick="HandleEnglishToChineseAsync">
+			英译中
+		</MButton>
+		<MButton class="ma-2 white--text"
+		         Color="blue-grey"
+		         OnClick="HandleEnglishToUrlSlugAsync">
+			英转URL
+		</MButton>
+
+		<MButton class="ma-2"
+		         Color="info"
+		         OnClick="HandleChineseToUrlSlugAsync">
+			<LoaderContent>
+				<span class="custom-loader">
+					<MIcon>mdi-cached</MIcon>
+				</span>
+			</LoaderContent>
+			<ChildContent>
+				中转URL
+			</ChildContent>
+		</MButton>
+	</MRow>
+	<MRow Class="mx-2">
+		<MTextarea Label="请输入中文"
+		           AutoGrow
+		           Outlined
+		           @bind-Value="Chinese"
+		           Rows="3"
+		           RowHeight="25"
+		           Shaped
+				   Class="mx-2">
+		</MTextarea>
+
+	</MRow>
+	<MRow Class="mx-2">
+		<MTextarea Label="翻译后的英文标题或输入英文"
+		           AutoGrow
+		           Outlined
+		           @bind-Value="English"
+		           Rows="3"
+		           RowHeight="25"
+		           Shaped
+		           Class="mx-2">
+		</MTextarea>
+
+	</MRow>
+	<MRow Class="mx-2">
+		<MTextarea Label="转换后URL别名"
+		           AutoGrow
+		           Outlined
+		           @bind-Value="Slug"
+		           Rows="3"
+		           RowHeight="25"
+		           Shaped
+				   Class="mx-2">
+		</MTextarea>
+	</MRow>
+</MCard>
+
+@code
+{
+	/// <summary>
+	/// 中文标题
+	/// </summary>
+	public string? Chinese { get; set; }
+
+
+	/// <summary>
+	/// 英文标题
+	/// </summary>
+	public string? English { get; set; }
+
+
+	/// <summary>
+	/// 别名
+	/// </summary>
+	public string? Slug { get; set; }
+
+	public async Task HandleChineseToEnglishAsync()
+	{
+		try
+		{
+			English = await TranslationService!.ChineseToEnglishAsync(Chinese);
+		}
+		catch (Exception ex)
+		{
+			English = ex.Message;
+			await PopupService.EnqueueSnackbarAsync($"中译英异常，请联系作者：{ex.Message}");
+		}
+	}
+
+	public async Task HandleEnglishToChineseAsync()
+	{
+		try
+		{
+			Chinese = await TranslationService!.EnglishToChineseAsync(English);
+		}
+		catch (Exception ex)
+		{
+			Chinese = ex.Message;
+			await PopupService.EnqueueSnackbarAsync($"英译中异常，请联系作者：{ex.Message}");
+		}
+	}
+
+	public async Task HandleEnglishToUrlSlugAsync()
+	{
+		try
+		{
+			Slug = TranslationService!.EnglishToUrlSlug(English);
+		}
+		catch (Exception ex)
+		{
+			Slug = ex.Message;
+			await PopupService.EnqueueSnackbarAsync($"英转URL别名异常，请联系作者：{ex.Message}");
+		}
+	}
+
+	public async Task HandleChineseToUrlSlugAsync()
+	{
+		await HandleChineseToEnglishAsync();
+		await HandleEnglishToUrlSlugAsync();
+	}
+}

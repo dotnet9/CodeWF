@@ -1,8 +1,6 @@
-﻿using ReactiveUI;
-
-namespace CodeWF.Desktop.ViewModels
+﻿namespace CodeWF.Desktop.ViewModels
 {
-    public class ViewModelBase : ReactiveObject
+	public class ViewModelBase : ReactiveObject
     {
     }
 }

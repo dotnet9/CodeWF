@@ -7,29 +7,27 @@
            Ripple="false"
            HideSlider
            SelfPatterns="@SelfPatterns">
-    <ChildContent>
-        @ChildContent
-    </ChildContent>
+	<ChildContent>
+		@ChildContent
+	</ChildContent>
 </PPageTabs>
 
 @code {
 
-    public PPageTabs? PPageTabs { get; private set; }
+	public PPageTabs? PPageTabs { get; private set; }
 
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+	[Parameter] public RenderFragment? ChildContent { get; set; }
 
-    [Parameter]
-    public IEnumerable<string>? SelfPatterns { get; set; }
+	[Parameter] public IEnumerable<string>? SelfPatterns { get; set; }
 
-    private TabOptions TabOptions(PageTabPathValue value)
-    {
-        var item = NavHelper.PageTabItems.FirstOrDefault(u => value.IsMatch(u.Href));
-        var title = T(item?.Title);
-        var icon = item?.Icon;
-        var titleClass = $"mx-2 text-capitalize {(value.Selected ? "neutral--text" : "")}";
+	private TabOptions TabOptions(PageTabPathValue value)
+	{
+		var item = NavHelper.PageTabItems.FirstOrDefault(u => u.Href == value.AbsolutePath); //value.IsMatch(u.Href)); 
+		var title = T(item?.Title);
+		var icon = item?.Icon;
+		var titleClass = $"mx-2 text-capitalize {(value.Selected ? "neutral--text" : "")}";
 
-        return new TabOptions(title, icon, titleClass);
-    }
+		return new TabOptions(title, icon, titleClass);
+	}
 
 }

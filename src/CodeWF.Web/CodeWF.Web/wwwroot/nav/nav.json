@@ -3,7 +3,7 @@
     "Id": 1,
     "Title": "Home",
     "Icon": "mdi-home-variant-outline",
-    "Href": "home",
+    "Href": "/",
     "Target": "Self"
   },
   {
@@ -15,7 +15,7 @@
         "Id": 4,
         "Title": "TranslationSlug",
         "Icon": "mdi-web",
-        "Href": "toolbox/translationslug"
+        "Href": "/tools/slug-generator"
       }
     ]
   }
