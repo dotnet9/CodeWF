@@ -1,101 +1,125 @@
-﻿namespace CodeWF.Desktop.ViewModels;
+﻿using System.Reactive;
+
+namespace CodeWF.Desktop.ViewModels;
 
 internal sealed class TranslationSlugViewModel : ViewModelBase
 {
-	private readonly ITranslationService? _translationService = Locator.Current.GetService<ITranslationService>();
-	private string? _chinese;
+    private readonly ITranslationService? _translationService = Locator.Current.GetService<ITranslationService>();
+    private TranslationKind _kind = TranslationKind.ChineseToSlug;
 
-	/// <summary>
-	/// 中文标题
-	/// </summary>
-	public string? Chinese
-	{
-		get => _chinese;
-		set
-		{
-			if (value != _chinese)
-			{
-				this.RaiseAndSetIfChanged(ref _chinese, value);
-			}
-		}
-	}
+    /// <summary>
+    /// 中文标题
+    /// </summary>
+    public TranslationKind Kind
+    {
+        get => _kind;
+        set
+        {
+            if (value != _kind)
+            {
+                this.RaiseAndSetIfChanged(ref _kind, value);
+            }
+        }
+    }
 
-	private string? _english;
+    private string? _from;
 
-	/// <summary>
-	/// 英文标题
-	/// </summary>
-	public string? English
-	{
-		get => _english;
-		set
-		{
-			if (value != _english)
-			{
-				this.RaiseAndSetIfChanged(ref _english, value);
-			}
-		}
-	}
+    /// <summary>
+    /// 待翻译字符串
+    /// </summary>
+    public string? From
+    {
+        get => _from;
+        set
+        {
+            if (value != _from)
+            {
+                this.RaiseAndSetIfChanged(ref _from, value);
+                if (_isAutoTranslation)
+                {
+                    HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
+                }
+            }
+        }
+    }
 
-	private string? _slug;
+    private string? _to;
 
-	/// <summary>
-	/// 别名
-	/// </summary>
-	public string? Slug
-	{
-		get => _slug;
-		set
-		{
-			if (value != _slug)
-			{
-				this.RaiseAndSetIfChanged(ref _slug, value);
-			}
-		}
-	}
+    /// <summary>
+    /// 目标翻译字符串
+    /// </summary>
+    public string? To
+    {
+        get => _to;
+        set
+        {
+            if (value != _to)
+            {
+                this.RaiseAndSetIfChanged(ref _to, value);
+            }
+        }
+    }
 
-	public async Task HandleChineseToEnglishAsync()
-	{
-		try
-		{
-			English = await _translationService!.ChineseToEnglishAsync(Chinese);
-		}
-		catch (Exception ex)
-		{
-			English = ex.Message;
-			SnackbarHost.Post($"中译英异常，请联系作者：{ex.Message}");
-		}
-	}
+    private bool _isAutoTranslation = true;
 
-	public async void HandleEnglishToChineseAsync()
-	{
-		try
-		{
-			Chinese = await _translationService!.EnglishToChineseAsync(English);
-		}
-		catch (Exception ex)
-		{
-			Chinese = ex.Message;
-			SnackbarHost.Post($"英译中异常，请联系作者：{ex.Message}");
-		}
-	}
+    /// <summary>
+    /// 自动翻译
+    /// </summary>
+    public bool IsAutoTranslation
+    {
+        get => _isAutoTranslation;
+        set
+        {
+            if (value != _isAutoTranslation)
+            {
+                this.RaiseAndSetIfChanged(ref _isAutoTranslation, value);
+            }
+        }
+    }
 
-	public void HandleEnglishToUrlSlug()
-	{
-		try
-		{
-			Slug = _translationService!.EnglishToUrlSlug(English);
-		}
-		catch (Exception ex)
-		{
-			Slug = ex.Message;
-			SnackbarHost.Post($"英转URL别名异常，请联系作者：{ex.Message}");
-		}
-	}
+    public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
-	public async void HandleChineseToUrlSlug()
-	{
-		await HandleChineseToEnglishAsync();
-		HandleEnglishToUrlSlug();
-	}
+    public TranslationSlugViewModel()
+    {
+        KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
+    }
+
+    public async Task HandleTranslationAsync()
+    {
+        if (string.IsNullOrWhiteSpace(From))
+        {
+            To = string.Empty;
+            return;
+        }
+
+        try
+        {
+            switch (Kind)
+            {
+                case TranslationKind.ChineseToEnglish:
+                    To = await _translationService!.ChineseToEnglishAsync(From);
+                    break;
+                case TranslationKind.EnglishToChinese:
+                    To = await _translationService!.EnglishToChineseAsync(From);
+                    break;
+                case TranslationKind.ChineseToSlug:
+                    var english = await _translationService!.ChineseToEnglishAsync(From);
+                    To = _translationService!.EnglishToUrlSlug(english);
+                    break;
+                default:
+                    To = _translationService!.EnglishToUrlSlug(From);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            To = ex.Message;
+            SnackbarHost.Post($"翻译异常，请联系作者：{ex.Message}");
+        }
+    }
+
+    private void OnKindChanged(TranslationKind newKind)
+    {
+        Kind = newKind;
+    }
 }

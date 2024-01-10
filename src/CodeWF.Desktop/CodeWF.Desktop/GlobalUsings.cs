@@ -17,3 +17,6 @@ global using CodeWF.Desktop.Windows.ViewModels;
 global using Avalonia.VisualTree;
 global using System.Linq;
 global using Avalonia.Themes.Neumorphism;
+global using CodeWF.Desktop.Models;
+global using Avalonia.Data.Converters;
+global using System.Globalization;
