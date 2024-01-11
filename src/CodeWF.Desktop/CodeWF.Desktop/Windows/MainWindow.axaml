@@ -69,12 +69,7 @@
                             <controls:ColorZone Grid.Row="0" Mode="Custom">
                                 <Panel>
                                     <Svg Path="/Assets/hero-gradient.svg" Margin="0 -80 0 0 " HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-                                    <TextBlock Classes="Headline6" Text="码界工坊" Margin="0 -55 0 0" Foreground="White"
-                                               FontSize="30" FontWeight="ExtraBold" HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" />
-                                    <TextBlock Classes="Headline1" Text="开发人员的百宝箱" Margin="0 -15 0 0" Foreground="White"
-                                               FontSize="15" FontWeight="ExtraBold" HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" />
+									<Image Source="avares://CodeWF.Desktop/Assets/logo-banner.png" Margin="0 -65 0 0 " Width="300" VerticalAlignment="Top"/>                                    
                                 </Panel>
                             </controls:ColorZone>
                             <ListBox Grid.Row="1" Name="DrawerList2"
