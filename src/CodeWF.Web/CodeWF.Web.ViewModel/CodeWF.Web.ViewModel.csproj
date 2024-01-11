@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\CodeWF.WebAPI\CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj" />
+	</ItemGroup>
+</Project>

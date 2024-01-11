@@ -1,0 +1,9 @@
+﻿global using CodeWF.Commons;
+global using Microsoft.Extensions.DependencyInjection;
+global using MediatR;
+global using Microsoft.EntityFrameworkCore;
+global using System.Reflection;
+global using CodeWF.DomainCommons.Models;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using System.Linq.Expressions;
+global using Microsoft.EntityFrameworkCore.Metadata;

@@ -1,0 +1,13 @@
+﻿using CodeWF.Web.ViewModel.Albums;
+
+namespace CodeWF.Web.ViewModel.BlogPosts;
+
+public record BlogPostDetails(string Title, string Slug, string Description, string Content,
+    CopyRightType CopyrightType, string? Original, string? OriginalTitle, string? OriginalLink,
+    List<AlbumBrief>? Albums,
+    List<CategoryBrief> Categories,
+    List<string>? Tags,
+    DateTime CreationTime, int ViewCount, int LikeCount, BlogPostNear? Preview, BlogPostNear? Next,
+    List<BlogPostNear>? Nears);
+
+public record BlogPostNear(string Title, string Slug, string Cover, string Description, DateTime CreationTime);

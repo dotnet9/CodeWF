@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.1" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CodeWF.ASPNETCore\CodeWF.ASPNETCore.csproj" />
+	  <ProjectReference Include="..\CodeWF.Commons\CodeWF.Commons.csproj" />
+	  <ProjectReference Include="..\CodeWF.EventBus\CodeWF.EventBus.csproj" />
+	  <ProjectReference Include="..\CodeWF.Infrastructure\CodeWF.Infrastructure.csproj" />
+	  <ProjectReference Include="..\CodeWF.JWT\CodeWF.JWT.csproj" />
+	</ItemGroup>
+</Project>

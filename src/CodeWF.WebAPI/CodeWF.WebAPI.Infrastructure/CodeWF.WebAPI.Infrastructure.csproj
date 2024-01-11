@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Mapster" Version="7.4.1-pre01" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.101.1.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\CodeWF.Core\CodeWF.Infrastructure\CodeWF.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\CodeWF.Core\CodeWF.JWT\CodeWF.JWT.csproj" />
+		<ProjectReference Include="..\CodeWF.WebAPI.Domain\CodeWF.WebAPI.Domain.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.1" />
+		<PackageReference Include="RedLock.net" Version="2.3.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CodeWF.Commons\CodeWF.Commons.csproj" />
+	  <ProjectReference Include="..\CodeWF.DomainCommons\CodeWF.DomainCommons.csproj" />
+	</ItemGroup>
+
+</Project>

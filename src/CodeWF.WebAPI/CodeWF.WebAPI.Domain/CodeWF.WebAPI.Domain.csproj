@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\CodeWF.Core\CodeWF.DomainCommons\CodeWF.DomainCommons.csproj" />
+	  <ProjectReference Include="..\..\CodeWF.Core\CodeWF.JWT\CodeWF.JWT.csproj" />
+	  <ProjectReference Include="..\CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj" />
+	</ItemGroup>
+</Project>
