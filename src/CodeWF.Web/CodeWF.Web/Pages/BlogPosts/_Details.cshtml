@@ -67,10 +67,10 @@
                     <p>扫码关注@(SiteOptions.Value.WechatPublic1Name)微信公众号，第一时间获取网站更新动态</p>
                     @switch (Model?.CopyrightType)
                     {
-                        case CopyRightType.Reprint:
+                        case CopyRightType.Reprinted:
                             <p>本文来自转载，如若二次转载请联系原作者。</p>
                             break;
-                        case CopyRightType.Contribution:
+                        case CopyRightType.Contributes:
                             <p>本文来自网友投稿，如若转载请联系原作者。</p>
                             break;
                         default:
@@ -78,7 +78,7 @@
                             break;
                     }
                     <p>原文作者：<a style="color: #262626;" href="#" target="_blank">@(Model?.Original ?? @SiteOptions.Value.Owner)</a></p>
-                    @if (Model?.CopyrightType == CopyRightType.Default)
+                    @if (Model?.CopyrightType == CopyRightType.Original)
                     {
                         <p>原文标题：<a href="/@Model.CreationTime.ToString("yyyy/MM")/@Model.Slug" target="_blank">@Model.Title</a></p>
                         <p>原文链接：<a href="/@Model.CreationTime.ToString("yyyy/MM")/@Model.Slug" target="_blank">@SiteOptions.Value.Domain/@($"{Model.CreationTime:yyyy/MM}/{Model.Slug}")</a></p>

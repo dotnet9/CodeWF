@@ -178,8 +178,7 @@ internal class RabbitMQEventBus : IEventBus, IDisposable
 
         var channel = _persistentConnection.CreateChannel();
 
-        channel!.ExchangeDeclare(_exchangeName,
-            "direct");
+        channel!.ExchangeDeclare(_exchangeName, "direct", true);
 
         channel!.QueueDeclare(_queueName,
             true,

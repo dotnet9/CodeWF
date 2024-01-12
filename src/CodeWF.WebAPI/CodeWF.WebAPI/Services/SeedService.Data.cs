@@ -300,9 +300,9 @@ public partial class SeedService
     {
         var links = JsonSerializer.Deserialize<List<LinkSeedDto>>(
             await System.IO.File.ReadAllTextAsync(Path.Combine(_siteOptions.AssetsLocalPath, "site",
-                "link.json")));
+                "FriendLink.json")));
         var linksForDb = links!.Select(x =>
-            _linkManager.CreateForSeed(x.SequenceNumber, x.Name, x.Url, x.Description, x.Kind!));
+            _linkManager.CreateForSeed(x.Sort, x.SiteName, x.Url, x.Remark, x.Kind ?? "Friend"));
         await _dbContext.AddRangeAsync(linksForDb);
         await _dbContext.SaveChangesAsync();
     }

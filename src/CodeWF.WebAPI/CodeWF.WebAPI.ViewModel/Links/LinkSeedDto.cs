@@ -1,4 +1,4 @@
 ﻿namespace CodeWF.WebAPI.ViewModel.Links;
 
-public record LinkSeedDto(int SequenceNumber, string Name, string Url,
-    string? Description = null, string? Kind = null);
+public record LinkSeedDto(int Sort, string SiteName, string Url,
+    string? Remark = null, string? Kind = null);

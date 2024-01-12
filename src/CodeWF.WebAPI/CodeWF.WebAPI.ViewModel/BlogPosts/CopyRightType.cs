@@ -2,9 +2,9 @@
 
 public enum CopyRightType
 {
-    [EnumMember(Value = "default")] Default,
-    [EnumMember(Value = "contribution")] Contribution,
-    [EnumMember(Value = "reprint")] Reprint
+    [EnumMember(Value = "original")] Original,
+    [EnumMember(Value = "reprinted")] Reprinted,
+    [EnumMember(Value = "contributes")] Contributes,
 }
 
 public static class CopyRightTypeExtensions
@@ -13,8 +13,8 @@ public static class CopyRightTypeExtensions
     {
         return copyRightType switch
         {
-            CopyRightType.Default => "原创",
-            CopyRightType.Reprint => "转载",
+            CopyRightType.Original => "原创",
+            CopyRightType.Reprinted => "转载",
             _ => "投稿"
         };
     }
