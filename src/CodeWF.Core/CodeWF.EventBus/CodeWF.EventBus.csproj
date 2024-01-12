@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.1" />
 		<PackageReference Include="RabbitMQ.Client" Version="7.0.0-alpha.2" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CodeWF.Commons\CodeWF.Commons.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CodeWF.Commons\CodeWF.Commons.csproj" />
+	</ItemGroup>
 
 </Project>
