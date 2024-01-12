@@ -51,7 +51,7 @@ internal class RabbitMQEventBus : IEventBus, IDisposable
         //创建和销毁 TCP 连接的代价非常高，
         //Connection 可以创建多个 Channel ，Channel 不是线程安全的所以不能在线程间共享。
         using var channel = _persistentConnection.CreateChannel();
-        channel.ExchangeDeclare(_exchangeName, "direct");
+        channel.ExchangeDeclare(_exchangeName, "direct", true);
 
         byte[] body;
         if (eventData == null)

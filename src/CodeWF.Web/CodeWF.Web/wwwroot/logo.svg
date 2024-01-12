@@ -1,0 +1,26 @@
+<svg class="svg-canvas" viewBox="0 0 800 600" width="1600" height="1200" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <!--滤镜-->
+        <defs></defs>
+
+        <!-- 背景 -->
+        <g id="background">
+            
+            
+          </g>
+
+        <!--元素-->
+        
+                <g id="shape_hsqBNLUZLK" ref="shape_hsqBNLUZLK" key="shape_hsqBNLUZLK" transform="translate(81,94.37123252679993) rotate(0,317.76127348007526,201.30284757029682) scale(1,1)" style="opacity: 1;" filter="">
+                  <!--普通元素-->
+                  <svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 117.6 74.5" style="enable-background:new 0 0 117.6 74.5;" xml:space="preserve" width="635.5225469601505" height="402.60569514059364" class="style-removed" preserveAspectRatio="none" data-parent="shape_hsqBNLUZLK">
+
+<g>
+	<path d="M95,26.3C95,26.3,95,26.3,95,26.3L117.6,7L93,21.1C89.3,13.4,82.9,6.9,74.5,3.2C69.6,1,64.5,0,59.5,0
+		C45.2,0,31.5,8.3,25.4,22.2c-5.4,12.2-3.7,25.6,3.2,35.9L0,74.4l38.5,0l48.3-41.2L95,26.3z M37.7,45.6c-2.2-5.8-2.1-12.1,0.4-17.8
+		C41.9,19.4,50.2,14,59.5,14c3.2,0,6.4,0.7,9.4,2c5.6,2.5,9.7,6.9,12,12.1l-40.1,23C39.5,49.4,38.5,47.6,37.7,45.6z" fill="#9100da" stroke-width="0"></path>
+	<path d="M78.8,50.2c-1,1.5-2.2,2.9-3.6,4.1L57.9,74.5c0.5,0,1,0,1.5,0c14.3,0,27.9-8.3,34.1-22.2
+		c3.2-7.2,3.9-14.9,2.5-22.1L78.8,50.2z" fill="#9100da" stroke-width="0"></path>
+</g>
+</svg>
+                </g>
+      </svg>

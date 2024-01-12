@@ -27,7 +27,7 @@ span { display: inline-block }
 header { margin: 0; width: 100%; z-index: 9; transition: all 0.4s; background: #fff }
 .logo-section { padding: 10px 0; }
 .logo { overflow: hidden }
-.logo img { width: 70px; float: left; margin-right: 10px }
+.logo img { width: 200px; float: left; margin-right: 10px }
 .logo-title { font-size: 28px; color: #1487f4; }
 .logo-title span {color: #ff8A00}
 .logo-title a{color: #1487f4; }
