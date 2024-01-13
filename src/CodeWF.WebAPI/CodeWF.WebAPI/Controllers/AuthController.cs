@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
         return new UserResponse
         {
             UserId = user.Id, Name = user.UserName, Phone = user.PhoneNumber, Avatar =
-                "https://img1.CodeWF.com/site/logo.png"
+                "https://img1.dotnet9.com/site/logo.png"
         };
     }
 
@@ -96,7 +96,7 @@ public class AuthController : ControllerBase
                 Name = user.UserName,
                 Phone = user.PhoneNumber,
                 Avatar =
-                    "https://img1.CodeWF.com/site/logo.png",
+                    "https://img1.dotnet9.com/site/logo.png",
                 Token = token
             });
         }

@@ -47,15 +47,15 @@ nav { text-align: center; line-height: 50px; width: 100%; }
 nav #starlist { margin: auto; width: 1170px; }
 #starlist li { position: relative; display: inline; float: left; font-size: 15px; margin-right: 10px; }
 #starlist li a { display: inline; float: left; padding: 0 20px; color: #fff; }
-#starlist li a:hover { background: rgb(9, 118, 220); }
+#starlist li a:hover { background: #aa00da; }
 #selected { position: relative }
-#starlist ul.sub { padding: 5px 0; position: absolute; left: 0; top: 50px; background: rgb(9, 118, 220); z-index: 9; display: none; }
+#starlist ul.sub { padding: 5px 0; position: absolute; left: 0; top: 50px; background: #aa00da; z-index: 9; display: none; }
 #starlist ul.sub li { height: 34px; line-height: 34px; margin-left: 0; width: 100%; font-size: 14px; }
 #starlist ul.sub li a { padding: 0px 10px 0px 10px; display: block; width: 100%; white-space: nowrap; text-overflow: ellipsis; text-align: left; }
 #starlist ul.sub li a:hover { background: #9100da; }
 #starlist li:hover ul.sub { display: block }
-a#selected { background: rgb(9, 118, 220); }
-#starlist ul.sub:before { content: ""; height: 15px; width: 15px; background: rgb(9, 118, 220); -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); -o-transform: rotate(-45deg); transform: rotate(-45deg); border-left: 0; border-bottom: 0; position: absolute; top: -8px; left: 42%; }
+a#selected { background: #aa00da; }
+#starlist ul.sub:before { content: ""; height: 15px; width: 15px; background: #aa00da; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); -o-transform: rotate(-45deg); transform: rotate(-45deg); border-left: 0; border-bottom: 0; position: absolute; top: -8px; left: 42%; }
 #mnavh { display: none; width: 70px; height: 40px; background: #9100da; text-align: center; }
 .navicon { display: block; position: relative; width: 30px; height: 3px; background-color: #fff; margin-top: 20px; float: left; margin-left: 20px; }
 .navicon:before, .navicon:after { content: ''; display: block; width: 30px; height: 3px; position: absolute; background: #fffefe; -webkit-transition-property: margin, -webkit-transform; transition-property: margin, -webkit-transform; transition-property: margin, transform; transition-property: margin, transform, -webkit-transform; -webkit-transition-duration: 300ms; transition-duration: 300ms; }
@@ -243,7 +243,7 @@ aside .ad-small { width: 100% }
 .links ul li a:hover:after { opacity: 1; width: 100%; margin: auto; display: block; left: 0; }
 /*footer*/
 footer { background: #333; width: 100%; padding: 30px 0; color: #777; font-size: 14px; position: relative; overflow: hidden }
-footer:before { content: ""; background: #34aadc linear-gradient(to left, #9100da, #5ac8fa, #007aff, #5ac8fa); height: 10px; width: 100%; position: absolute; top: 0; left: 0; }
+footer:before { content: ""; background: #34aadc linear-gradient(to left, #9100da,#007aff, #9100da, #007aff,#9100da); height: 10px; width: 100%; position: absolute; top: 0; left: 0; }
 .wxbox { overflow: hidden; float: left; margin-right: 20px }
 .wxbox li { float: left; margin: 0 10px; text-align: center }
 .wxbox img { height: 100px }
