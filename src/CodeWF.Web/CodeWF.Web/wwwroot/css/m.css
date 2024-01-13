@@ -58,12 +58,12 @@ body { overflow-x: hidden }
 .toolbar-open, .toolbar { top: 40% }
 .logo-section { display: none }
 article { margin-top: 30px }
-.topnav { position: fixed; top: 0; z-index: 9; background: rgba(0,0,0,.6); border-top: #1487f4 40px solid; }
+.topnav { position: fixed; top: 0; z-index: 9; background: rgba(0,0,0,.6); border-top: #9100da 40px solid; }
 nav #starlist { width: 100%; }
 #mnavh { display: block; top: -40px; position: absolute; right: 0; }
 #starlist { display: none }
 #starlist li { width: 60%; margin: 0; background: #fff; border-bottom: #eee 10px solid; }
-#starlist li a:hover, #starlist #selected, .selected > a, #starlist li:hover { color: #1487f4; background: #fff; }
+#starlist li a:hover, #starlist #selected, .selected > a, #starlist li:hover { color: #9100da; background: #fff; }
 #starlist li a { text-align: left; text-indent: 2em; color: #000; width: 100%; padding: 0; }
 #starlist ul.sub { background: none; width: 100%; display: block; position: initial; padding: 0 }
 #starlist ul.sub:before { display: none }
@@ -73,7 +73,7 @@ nav #starlist { width: 100%; }
 #starlist ul.sub li:hover a, #starlist li:hover a { background: none }
 #starlist ul.sub li #selected { color: #000 !important }
 .menu:after { top: 0; right: 7px; width: 26px; height: 22px; content: "\e612"; font-family: "iconfont" !important; font-size: 18px; }
-.menu:hover:after { transform: none; color: #1487f4; }
+.menu:hover:after { transform: none; color: #9100da; }
 .menu span { display: block; ; position: absolute; width: 50px; height: 50px; background: #fff; top: 0; right: 0; border-left: #eee 1px solid; }
 #starlist li:last-child { padding-bottom: 100%; }
 #starlist ul.sub li:last-child { padding-bottom: 0 }

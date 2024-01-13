@@ -1,0 +1,36 @@
+﻿@inject IBlogPostService BlogPostService
+@inject IDistributedCacheHelper CacheHelper
+
+@{
+    const string cacheKeyForCategories = "_SharedPartial";
+
+    async Task<BannerViewModel> GetDataFromDb()
+    {
+        BannerViewModel vm = new();
+        vm.Banners = await BlogPostService.BlogPostBriefListByBanner(int.MaxValue);
+        var top7NewBlogPost = await BlogPostService.TopNewBlogPostBriefListAsync(int.MaxValue);
+        vm.TouTiao = top7NewBlogPost?.FirstOrDefault();
+        vm.New2To7 = top7NewBlogPost?.Skip(1).Take(6).ToList();
+        return vm;
+    }
+
+    var bannerDatas = await CacheHelper.GetOrCreateAsync(cacheKeyForCategories,
+        async e => await GetDataFromDb());
+}
+
+<div class="links whitebg box ">
+    <div class="news-title">
+        <h2>站长推荐</h2>
+    </div>
+    <ul>
+        @if (bannerDatas?.Banners is { Count: > 0 })
+        {
+            @foreach (var blogPost in bannerDatas.Banners)
+            {
+                <li>
+                    <a href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Description" target="_blank">@blogPost.Title</a>
+                </li>
+            }
+        }
+    </ul>
+</div>
