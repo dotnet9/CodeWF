@@ -1,6 +1,5 @@
 ﻿@page "/tag/{Name?}/"
 @inject IOptionsSnapshot<SiteOptions> SiteOptions
-@using CodeWF.Web.ViewModel.Commons
 @model IndexModel
 @{
     ViewData["Title"] = "标签云";
@@ -35,7 +34,7 @@
         <div class="pics-list-box whitebg">
 
             <div class="news-title">
-                <span class="weizhi">联系请关注微信公众号：CodeWF</span>
+                <span class="weizhi">联系请关注微信公众号：@SiteOptions.Value.WechatPublic1Name</span>
                 <h2>@Model.TagName</h2>
             </div>
             <ul>
@@ -55,7 +54,7 @@
                     }
                 }
             </ul>
-            
+
             @await Html.PartialAsync("_PaginationPartial", new PaginationModel(Model.Current, Model.Pages, Model.Total, Model.PageSize, Model.PageCount))
         </div>
     }

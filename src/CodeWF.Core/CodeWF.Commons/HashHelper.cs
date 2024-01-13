@@ -50,9 +50,16 @@ public static class HashHelper
             return ToHashString(bytes);
         }
     }
+
+    /// <summary>
+    /// TODO 用于计算短ID是有Bug的，应该以ID计算，这种方式会重复
+    /// </summary>
+    /// <param name="sourceStr"></param>
+    /// <param name="number"></param>
+    /// <returns></returns>
     public static string GetHashids(this string sourceStr, int number = 9)
     {
         var hashids = new Hashids(sourceStr);
-        return hashids.Encode(number);
+        return hashids.EncodeLong(number);
     }
 }

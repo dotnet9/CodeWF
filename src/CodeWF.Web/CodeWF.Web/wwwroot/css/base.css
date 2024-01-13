@@ -127,7 +127,7 @@ transform:scale(.3);
 .tuijian-news-list ul li { width: 50%; float: left; margin-bottom: 20px; }
 .tuijian-news-list ul li:nth-child(5), .tuijian-news-list ul li:nth-child(6) { margin-bottom: 0 }
 .tuijian-news-list ul li a { display: block; margin: 0 0 0 20px; border: #ddd 1px solid; padding: 10px; transition: all 0.5s; }
-.tuijian-news-list ul li span { width: 70px; height: 70px; font-size: 12px; text-align: center; overflow: hidden; background: #9100da; color: #fff; float: left; margin: 0 10px 0 0; transition: all 0.5s; }
+.tuijian-news-list ul li span { width: 70px; height: 70px; font-size: 12px; text-align: center; overflow: hidden; background: #c1a5c9; color: #fff; float: left; margin: 0 10px 0 0; transition: all 0.5s; }
 .tuijian-news-list ul li b { display: block; font-size: 16px; margin-top: 16px; }
 .tuijian-news-list ul li h3 { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; font-weight: normal; margin-bottom: 10px; }
 .tuijian-news-list ul li p { font-size: 14px; color: #888; overflow: hidden; text-overflow: ellipsis; -webkit-box-orient: vertical; display: -webkit-box; -webkit-line-clamp: 2; line-height: 20px; height: 40px; }
