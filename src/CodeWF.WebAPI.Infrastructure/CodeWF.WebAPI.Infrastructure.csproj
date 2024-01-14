@@ -8,8 +8,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\CodeWF.Core\CodeWF.Infrastructure\CodeWF.Infrastructure.csproj" />
-		<ProjectReference Include="..\..\CodeWF.Core\CodeWF.JWT\CodeWF.JWT.csproj" />
+		<ProjectReference Include="..\CodeWF.Infrastructure\CodeWF.Infrastructure.csproj" />
+		<ProjectReference Include="..\CodeWF.JWT\CodeWF.JWT.csproj" />
 		<ProjectReference Include="..\CodeWF.WebAPI.Domain\CodeWF.WebAPI.Domain.csproj" />
 	</ItemGroup>
 

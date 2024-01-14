@@ -5,6 +5,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\CodeWF.WebAPI\CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj" />
+	  <ProjectReference Include="..\CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj" />
 	</ItemGroup>
 </Project>

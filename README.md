@@ -1,2 +1,14 @@
-# CodeWF
-码界工坊,codewf.com, dotnetools.com, dotnet.chat
+# 码界工坊
+
+目标：使用.NET开发
+
+1. 一个网站：分享免费在线工具、技术博文分享，技术栈前台Razor Pages、后端Web API
+2. 一个跨平台桌面软件，技术栈Avalonia UI
+3. 一个跨平台App，技术栈MAUI;
+
+码界工坊，绑定域名：
+
+- https://dotnet9.com
+- https://codewf.com
+- https://dotnetools.com
+- https://dotnet.chat

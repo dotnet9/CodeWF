@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\CodeWF.WebAPI\CodeWF.WebAPI.Infrastructure\CodeWF.WebAPI.Infrastructure.csproj" />
+    <ProjectReference Include="..\CodeWF.WebAPI.Infrastructure\CodeWF.WebAPI.Infrastructure.csproj" />
     <ProjectReference Include="..\CodeWF.Web.ViewModel\CodeWF.Web.ViewModel.csproj" />
   </ItemGroup>
 </Project>

@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34414.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Desktop", "CodeWF.Desktop\CodeWF.Desktop.csproj", "{0C8FC329-AFAD-4454-9518-929AD4120846}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core\CodeWF.Core.csproj", "{DA8CD643-9417-4472-9AB8-EBA016C308CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core.csproj", "{DA8CD643-9417-4472-9AB8-EBA016C308CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core.Test", "CodeWF.Core\CodeWF.Core.Test\CodeWF.Core.Test.csproj", "{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core.Test", "CodeWF.Core.Test\CodeWF.Core.Test.csproj", "{CF6D1454-1F1D-486A-B749-95D8E4AA2B80}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Web", "CodeWF.Web", "{CA9D4FB8-18F8-4351-8433-5C1D65E21CA7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{CA9D4FB8-18F8-4351-8433-5C1D65E21CA7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Core", "CodeWF.Core", "{E5C1EB38-8F28-4F30-B7A2-F3D5487E06B4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{E5C1EB38-8F28-4F30-B7A2-F3D5487E06B4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.Desktop", "CodeWF.Desktop", "{4826B1F3-876C-4F03-8687-41A3AE352CBD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "desktop", "desktop", "{4826B1F3-876C-4F03-8687-41A3AE352CBD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.App", "CodeWF.App", "{59CD194E-F6C9-475B-9828-ADF66AAB6176}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{59CD194E-F6C9-475B-9828-ADF66AAB6176}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.App", "CodeWF.App\CodeWF.App\CodeWF.App.csproj", "{ADB61F56-0A93-40B0-89EA-42C664B069ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.App", "CodeWF.App\CodeWF.App.csproj", "{ADB61F56-0A93-40B0-89EA-42C664B069ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{0C67D538-BAE5-49C8-AD8B-FCBDAC1C9D2C}"
 	ProjectSection(SolutionItems) = preProject
@@ -25,37 +25,37 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 		Directory.build.props = Directory.build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Commons", "CodeWF.Core\CodeWF.Commons\CodeWF.Commons.csproj", "{9125D242-1D58-4D15-B42E-69BCD61128CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Commons", "CodeWF.Commons\CodeWF.Commons.csproj", "{9125D242-1D58-4D15-B42E-69BCD61128CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Commons.Test", "CodeWF.Core\CodeWF.Commons.Test\CodeWF.Commons.Test.csproj", "{F1BBCC9B-6AF5-40B3-80EE-0BAF01324FFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Commons.Test", "CodeWF.Commons.Test\CodeWF.Commons.Test.csproj", "{F1BBCC9B-6AF5-40B3-80EE-0BAF01324FFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.DomainCommons", "CodeWF.Core\CodeWF.DomainCommons\CodeWF.DomainCommons.csproj", "{C1186D43-AFA7-4EDB-9026-2FBB9C852B27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.DomainCommons", "CodeWF.DomainCommons\CodeWF.DomainCommons.csproj", "{C1186D43-AFA7-4EDB-9026-2FBB9C852B27}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.EventBus", "CodeWF.Core\CodeWF.EventBus\CodeWF.EventBus.csproj", "{FB17B492-5DD7-4969-977A-025B92889ADB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.EventBus", "CodeWF.EventBus\CodeWF.EventBus.csproj", "{FB17B492-5DD7-4969-977A-025B92889ADB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.JWT", "CodeWF.Core\CodeWF.JWT\CodeWF.JWT.csproj", "{816993A7-4999-448F-A915-B1895D5D877E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.JWT", "CodeWF.JWT\CodeWF.JWT.csproj", "{816993A7-4999-448F-A915-B1895D5D877E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Infrastructure", "CodeWF.Core\CodeWF.Infrastructure\CodeWF.Infrastructure.csproj", "{35F4D8C3-9601-4570-A2A9-F2B1BB779058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Infrastructure", "CodeWF.Infrastructure\CodeWF.Infrastructure.csproj", "{35F4D8C3-9601-4570-A2A9-F2B1BB779058}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.CommonInitializer", "CodeWF.Core\CodeWF.CommonInitializer\CodeWF.CommonInitializer.csproj", "{3D6C577B-2EE2-4897-874E-E3FEA4299669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.CommonInitializer", "CodeWF.CommonInitializer\CodeWF.CommonInitializer.csproj", "{3D6C577B-2EE2-4897-874E-E3FEA4299669}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.ASPNETCore", "CodeWF.Core\CodeWF.ASPNETCore\CodeWF.ASPNETCore.csproj", "{4498D50B-57FC-45D9-8309-AD7F2B266F2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.ASPNETCore", "CodeWF.ASPNETCore\CodeWF.ASPNETCore.csproj", "{4498D50B-57FC-45D9-8309-AD7F2B266F2E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeWF.WebAPI", "CodeWF.WebAPI", "{67375D4B-8625-48C2-B815-AC1E84F98FBF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webapi", "webapi", "{67375D4B-8625-48C2-B815-AC1E84F98FBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.WebAPI.ViewModel", "CodeWF.WebAPI\CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj", "{AE0A3EC3-A14E-4FDC-BDBB-DE8B0BE22993}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.WebAPI.ViewModel", "CodeWF.WebAPI.ViewModel\CodeWF.WebAPI.ViewModel.csproj", "{AE0A3EC3-A14E-4FDC-BDBB-DE8B0BE22993}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.WebAPI.Domain", "CodeWF.WebAPI\CodeWF.WebAPI.Domain\CodeWF.WebAPI.Domain.csproj", "{DD08D535-BC35-4ADA-AEE2-A1F68A4DC09B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.WebAPI.Domain", "CodeWF.WebAPI.Domain\CodeWF.WebAPI.Domain.csproj", "{DD08D535-BC35-4ADA-AEE2-A1F68A4DC09B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.WebAPI.Infrastructure", "CodeWF.WebAPI\CodeWF.WebAPI.Infrastructure\CodeWF.WebAPI.Infrastructure.csproj", "{800F21A8-CB10-4395-B69B-62DA71CD5095}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.WebAPI.Infrastructure", "CodeWF.WebAPI.Infrastructure\CodeWF.WebAPI.Infrastructure.csproj", "{800F21A8-CB10-4395-B69B-62DA71CD5095}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.WebAPI", "CodeWF.WebAPI\CodeWF.WebAPI\CodeWF.WebAPI.csproj", "{0E583930-C4D1-4745-9862-2555C3E67260}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.WebAPI", "CodeWF.WebAPI\CodeWF.WebAPI.csproj", "{0E583930-C4D1-4745-9862-2555C3E67260}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web.ViewModel", "CodeWF.Web\CodeWF.Web.ViewModel\CodeWF.Web.ViewModel.csproj", "{55E675A3-7B06-44BA-A8A7-A4C24D467731}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web.ViewModel", "CodeWF.Web.ViewModel\CodeWF.Web.ViewModel.csproj", "{55E675A3-7B06-44BA-A8A7-A4C24D467731}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web.Service", "CodeWF.Web\CodeWF.Web.Service\CodeWF.Web.Service.csproj", "{3BAADE14-D60E-4483-8E56-9A721F1BD8CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web.Service", "CodeWF.Web.Service\CodeWF.Web.Service.csproj", "{3BAADE14-D60E-4483-8E56-9A721F1BD8CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web\CodeWF.Web.csproj", "{0672FBF4-F52D-4BCE-8179-2D7D99BB3D8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Web", "CodeWF.Web\CodeWF.Web.csproj", "{0672FBF4-F52D-4BCE-8179-2D7D99BB3D8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
