@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:controls="clr-namespace:Avalonia.Themes.Neumorphism.Controls;assembly=Avalonia.Themes.Neumorphism"
+             xmlns:assist="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
+             xmlns:viewModels="clr-namespace:CodeWF.Tools.ViewModels"
+             xmlns:models="clr-namespace:CodeWF.Tools.Models"
+             xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:converters="clr-namespace:CodeWF.Tools.Converters"
+             x:CompileBindings="True"
+             x:DataType="viewModels:TranslationSlugViewModel"
+             x:Class="CodeWF.Tools.Pages.TranslationSlug">
+    <UserControl.Resources>
+        <converters:IsTranslationKind x:Key="IsTranslationKind" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="8 0" />
+            <Setter Property="CornerRadius" Value="3" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0 15" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="UseFloatingWatermark" Value="True" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Width" Value="250" />
+            <Setter Property="MinHeight" Value="120" />
+            <Setter Property="MaxHeight" Value="360" />
+            <Setter Property="Height" Value="NaN" />
+        </Style>
+    </UserControl.Styles>
+    <StackPanel Margin="30" VerticalAlignment="Top">
+        <controls:Card Width="600" VerticalAlignment="Top" CornerRadius="15" Padding="30"
+                       Background="{DynamicResource MaterialDesignLinearGradient1}">
+            <StackPanel Margin="0,4" HorizontalAlignment="Stretch">
+                <TextBlock Classes="Headline6" Text="别名生成器" TextAlignment="Center" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,40,0,0">
+                    <UniformGrid Columns="2">
+                        <RadioButton GroupName="translationType"
+                                     Content="中译英"
+                                     ToolTip.Tip="中文翻译为英文"
+                                     IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static models:TranslationKind.ChineseToEnglish}}"
+                                     Command="{Binding KindChanged}"
+                                     CommandParameter="{x:Static models:TranslationKind.ChineseToEnglish}" />
+                        <RadioButton GroupName="translationType"
+                                     Content="英译中" ToolTip.Tip="英文翻译为中文"
+                                     IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static models:TranslationKind.EnglishToChinese}}"
+                                     Command="{Binding KindChanged}"
+                                     CommandParameter="{x:Static models:TranslationKind.EnglishToChinese}" />
+                        <RadioButton GroupName="translationType" Content="英转别名"
+                                     ToolTip.Tip="英文转为URL别名"
+                                     IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static models:TranslationKind.EnglishToSlug}}"
+                                     Command="{Binding KindChanged}"
+                                     CommandParameter="{x:Static models:TranslationKind.EnglishToSlug}" />
+                        <RadioButton GroupName="translationType" Content="中转别名"
+                                     ToolTip.Tip="中文转为URL别名"
+                                     IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static models:TranslationKind.ChineseToSlug}}"
+                                     Command="{Binding KindChanged}"
+                                     CommandParameter="{x:Static models:TranslationKind.ChineseToSlug}" />
+                    </UniformGrid>
+                    <UniformGrid Columns="2" Margin="20 0 0 0">
+                        <ToggleButton IsChecked="{Binding IsAutoTranslation}"
+                                      assist:ToggleButtonAssist.UncheckedBackground="Transparent"
+                                      assist:ToggleButtonAssist.UncheckedForeground="DarkGray"
+                                      assist:ToggleButtonAssist.CheckedBackground="{DynamicResource PrimaryHueLightBrush}"
+                                      assist:ToggleButtonAssist.CheckedForeground="White"
+                                      CommandParameter="{Binding $self}"
+                                      ToolTip.Tip="Regular toggleButton with default theme applied and with custom colors">
+                            <ToggleButton.Styles>
+                                <Style Selector="ToggleButton:not(:checked) icons|MaterialIcon#ToggleButtons1Icon">
+                                    <Setter Property="Kind" Value="SpeakerOff" />
+                                </Style>
+                                <Style Selector="ToggleButton:checked icons|MaterialIcon#ToggleButtons1Icon">
+                                    <Setter Property="Kind" Value="Speaker" />
+                                </Style>
+                                <Style Selector="ToggleButton:checked TextBlock#ToggleButtons1Text1">
+                                    <Setter Property="Text" Value="打开" />
+                                </Style>
+                                <Style Selector="ToggleButton:checked TextBlock#ToggleButtons1Text2">
+                                    <Setter Property="Text" Value="实时翻译" />
+                                </Style>
+                                <Style Selector="ToggleButton:not(:checked) TextBlock#ToggleButtons1Text2">
+                                    <Setter Property="Text" Value="关闭" />
+                                </Style>
+                                <Style Selector="ToggleButton:not(:checked) TextBlock#ToggleButtons1Text1">
+                                    <Setter Property="Text" Value="实时翻译" />
+                                </Style>
+                            </ToggleButton.Styles>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Name="ToggleButtons1Text1" TextAlignment="Center" />
+                                <icons:MaterialIcon Name="ToggleButtons1Icon" Margin="5" Width="34" Height="34" />
+                                <TextBlock Name="ToggleButtons1Text2" TextAlignment="Center" />
+                            </StackPanel>
+                        </ToggleButton>
+                        <Button Content="点击翻译" Classes="Gradient" VerticalAlignment="Stretch"
+                                Command="{Binding HandleTranslationAsync}"
+                                ToolTip.Tip="点击翻译" Height="87" CornerRadius="20" />
+                    </UniformGrid>
+                </StackPanel>
+                <UniformGrid Columns="2" Margin="0 20 0 0">
+                    <TextBox Text="{Binding From,Mode=TwoWay}"
+                             ToolTip.Tip="请输入待翻译信息" assist:TextFieldAssist.Label="待翻译信息" />
+                    <TextBox Text="{Binding To,Mode=OneWay}"
+                             ToolTip.Tip="翻译后的信息" assist:TextFieldAssist.Label="翻译后的信息" />
+                </UniformGrid>
+            </StackPanel>
+        </controls:Card>
+    </StackPanel>
+
+</UserControl>

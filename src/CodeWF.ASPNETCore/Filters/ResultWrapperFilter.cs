@@ -36,7 +36,7 @@ public class ResultWrapperFilter : ActionFilterAttribute
             {
                 context.Result =
                     new ObjectResult(ResponseResult<object>.GetResult(false, HttpStatusCode.BadRequest, "",
-                        objectResult.Value));
+                        objectResult.Value!));
             }
         }
         else if (objectResult.Value == null)
