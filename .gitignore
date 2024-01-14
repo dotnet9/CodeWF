@@ -396,10 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-src/CodeWF.Web/CodeWF.Web.Client/wwwroot/appsettings.Development.json
-src/CodeWF.Web/CodeWF.Web/appsettings.Development.json
-src/CodeWF.WebAPI/CodeWF.WebAPI/appsettings.Development.json
-src/CodeWF.WebAPI/CodeWF.WebAPI/appsettings.Production.json
-src/CodeWF.Web/CodeWF.Web/appsettings.Production.json
-src/CodeWF.Web/CodeWF.Web/.config/
-src/CodeWF.WebAPI/CodeWF.WebAPI/.config/
+appsettings.*.json
+src/CodeWF.Web.YarpReverseProxy/.config/
