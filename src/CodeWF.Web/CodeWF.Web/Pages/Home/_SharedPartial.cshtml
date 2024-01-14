@@ -16,21 +16,52 @@
 
     var bannerDatas = await CacheHelper.GetOrCreateAsync(cacheKeyForCategories,
         async e => await GetDataFromDb());
+    var displayCount = 3;
+    var leftBlogPosts = bannerDatas?.Banners?.Take(displayCount).ToList();
+    List<BlogPostBriefForFront>? rightBlogPosts = null;
+    if(bannerDatas?.Banners?.Count>displayCount)
+    {
+        rightBlogPosts = bannerDatas.Banners.Skip(displayCount).ToList();
+    }
 }
 
-<div class="links whitebg box ">
-    <div class="news-title">
-        <h2>站长推荐</h2>
+@if (bannerDatas?.Banners is { Count: > 0 })
+{
+    <div class="wenzi whitebg box tab-num05">
+        <div class="gd-box">
+            <ul id="tab">
+                    <li class="tab-current">站长推荐</li>
+            </ul>
+        </div>
+        <div id="tab-content">
+                <section class="tab-box">
+                    <div class="wenzi-list">
+                        <ul class="wenzi-left">
+                            @if (leftBlogPosts is {Count:>0})
+                            {
+                                @foreach (var blogPost in leftBlogPosts)
+                                {
+                                    <li>
+                                        <span>@blogPost.CreationTime.ToString("yyyy-MM-dd")</span>
+                                        <a target="_blank" href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Title">@blogPost.Title</a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                        <ul class="wenzi-right">
+                            @if (rightBlogPosts is {Count:>0})
+                            {
+                                @foreach (var blogPost in rightBlogPosts)
+                                {
+                                    <li>
+                                        <span>@blogPost.CreationTime.ToString("yyyy-MM-dd")</span>
+                                        <a target="_blank" href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Title">@blogPost.Title</a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </section>
+        </div>
     </div>
-    <ul>
-        @if (bannerDatas?.Banners is { Count: > 0 })
-        {
-            @foreach (var blogPost in bannerDatas.Banners)
-            {
-                <li>
-                    <a href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Description" target="_blank">@blogPost.Title</a>
-                </li>
-            }
-        }
-    </ul>
-</div>
+}
