@@ -18,6 +18,7 @@ internal sealed class TranslationSlugViewModel : ViewModelBase
             if (value != _kind)
             {
                 this.RaiseAndSetIfChanged(ref _kind, value);
+                HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
             }
         }
     }
@@ -32,14 +33,13 @@ internal sealed class TranslationSlugViewModel : ViewModelBase
         get => _from;
         set
         {
-            if (value != _from)
+            if (value == _from)
             {
-                this.RaiseAndSetIfChanged(ref _from, value);
-                if (_isAutoTranslation)
-                {
-                    HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
-                }
+                return;
             }
+
+            this.RaiseAndSetIfChanged(ref _from, value);
+            HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
         }
     }
 
@@ -56,23 +56,6 @@ internal sealed class TranslationSlugViewModel : ViewModelBase
             if (value != _to)
             {
                 this.RaiseAndSetIfChanged(ref _to, value);
-            }
-        }
-    }
-
-    private bool _isAutoTranslation = true;
-
-    /// <summary>
-    /// 自动翻译
-    /// </summary>
-    public bool IsAutoTranslation
-    {
-        get => _isAutoTranslation;
-        set
-        {
-            if (value != _isAutoTranslation)
-            {
-                this.RaiseAndSetIfChanged(ref _isAutoTranslation, value);
             }
         }
     }
@@ -106,6 +89,7 @@ internal sealed class TranslationSlugViewModel : ViewModelBase
                     var english = await _translationService!.ChineseToEnglishAsync(From);
                     To = _translationService!.EnglishToUrlSlug(english);
                     break;
+                case TranslationKind.EnglishToSlug:
                 default:
                     To = _translationService!.EnglishToUrlSlug(From);
                     break;

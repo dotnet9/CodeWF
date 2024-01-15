@@ -9,7 +9,7 @@
         xmlns:assist="clr-namespace:Avalonia.Themes.Neumorphism.Assist;assembly=Avalonia.Themes.Neumorphism"
         xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         mc:Ignorable="d" d:DesignWidth="2280" d:DesignHeight="720"
-        Width="1280" Height="720" MinWidth="720"
+        Width="280" Height="720" MinWidth="720"
         x:DataType="viewModels:ApplicationModelBase"
         x:Class="CodeWF.Tools.Windows.MainWindow"
         Icon="/Assets/logo.ico"
