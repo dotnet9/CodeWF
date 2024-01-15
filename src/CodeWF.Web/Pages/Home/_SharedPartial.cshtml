@@ -16,7 +16,7 @@
 
     var bannerDatas = await CacheHelper.GetOrCreateAsync(cacheKeyForCategories,
         async e => await GetDataFromDb());
-    var displayCount = 3;
+    var displayCount =4;
     var leftBlogPosts = bannerDatas?.Banners?.Take(displayCount).ToList();
     List<BlogPostBriefForFront>? rightBlogPosts = null;
     if(bannerDatas?.Banners?.Count>displayCount)

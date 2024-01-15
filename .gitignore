@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 appsettings.*.json
 src/CodeWF.Web.YarpReverseProxy/.config/
+src/CodeWF.Web/.config/dotnet-tools.json
