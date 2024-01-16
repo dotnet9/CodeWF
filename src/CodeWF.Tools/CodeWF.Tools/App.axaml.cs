@@ -1,50 +1,34 @@
-namespace CodeWF.Tools
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using CodeWF.Tools.ViewModels;
+using CodeWF.Tools.Views;
+
+namespace CodeWF.Tools;
+public partial class App : Application
 {
-	public partial class App : Application, IThemeSwitch
-	{
-		private ApplicationTheme _currentTheme;
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
 
-		public override void Initialize()
-		{
-			AvaloniaXamlLoader.Load(this);
-			Name = "码界工坊";
-		}
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new MainWindow
+            {
+                DataContext = new MainViewModel()
+            };
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView
+            {
+                DataContext = new MainViewModel()
+            };
+        }
 
-		public override void OnFrameworkInitializationCompleted()
-		{
-			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-			{
-				IOC();
-				desktop.MainWindow = new MainWindow();
-				DataContext = desktop.MainWindow.DataContext;
-			}
-
-			base.OnFrameworkInitializationCompleted();
-		}
-
-		ApplicationTheme IThemeSwitch.Current => this._currentTheme;
-
-
-		void IThemeSwitch.ChangeTheme(ApplicationTheme theme)
-		{
-			if (theme == this._currentTheme)
-				return;
-
-			_currentTheme = theme;
-
-			var neumorphismTheme = Application.Current!.LocateMaterialTheme<NeumorphismTheme>();
-			if (neumorphismTheme != null)
-			{
-				neumorphismTheme.BaseTheme = theme;
-			}
-		}
-
-		/// <summary>
-		/// 注入工具需要的服务
-		/// </summary>
-		private void IOC()
-		{
-			Locator.CurrentMutable.RegisterConstant(new TranslationService(), typeof(ITranslationService));
-		}
-	}
+        base.OnFrameworkInitializationCompleted();
+    }
 }

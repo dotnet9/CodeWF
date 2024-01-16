@@ -1,6 +1,6 @@
-﻿namespace CodeWF.Tools.ViewModels
+﻿using ReactiveUI;
+
+namespace CodeWF.Tools.ViewModels;
+public class ViewModelBase : ReactiveObject
 {
-	public class ViewModelBase : ReactiveObject
-    {
-    }
 }
