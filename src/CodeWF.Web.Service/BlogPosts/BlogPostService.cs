@@ -16,18 +16,20 @@ internal class BlogPostService : IBlogPostService
     {
         IQueryable<BlogPost> query = _dbContext.BlogPosts!.AsQueryable();
         List<BlogPostBriefForFront> datasFromDb = await
-            _dbContext.BlogPosts!.Where(x => x.Banner).Take(count).Select(x => new BlogPostBriefForFront(
-                x.Title,
-                x.Slug,
-                x.Cover,
-                x.Description,
-                x.Original,
-                (from blogPostCategory in x.Categories
-                    join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
-                    select new CategoryBrief(category.Slug, category.Name,
-                        category.Description, 0, null)).ToList(),
-                x.CreationTime,
-                x.ViewCount)).ToListAsync();
+            _dbContext.BlogPosts!.Where(x => x.Banner)
+                .OrderByDescending(x => x.LastModificationTime)
+                .ThenByDescending(x => x.CreationTime).Take(count).Select(x => new BlogPostBriefForFront(
+                    x.Title,
+                    x.Slug,
+                    x.Cover,
+                    x.Description,
+                    x.Original,
+                    (from blogPostCategory in x.Categories
+                        join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
+                        select new CategoryBrief(category.Slug, category.Name,
+                            category.Description, 0, null)).ToList(),
+                    x.CreationTime, x.LastModificationTime,
+                    x.ViewCount)).ToListAsync();
         return datasFromDb;
     }
 
@@ -35,7 +37,9 @@ internal class BlogPostService : IBlogPostService
     {
         IQueryable<BlogPost> query = _dbContext.BlogPosts!.AsQueryable();
         List<BlogPostBriefForFront> datasFromDb = await
-            _dbContext.BlogPosts!.OrderByDescending(x => x.CreationTime).Take(count)
+            _dbContext.BlogPosts!
+                .OrderByDescending(x => x.LastModificationTime)
+                .ThenByDescending(x => x.CreationTime).Take(count)
                 .Select(x => new BlogPostBriefForFront(
                     x.Title,
                     x.Slug,
@@ -46,7 +50,7 @@ internal class BlogPostService : IBlogPostService
                         join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                         select new CategoryBrief(category.Slug, category.Name,
                             category.Description, 0, null)).ToList(),
-                    x.CreationTime,
+                    x.CreationTime, x.LastModificationTime,
                     x.ViewCount))
                 .ToListAsync();
         return datasFromDb;
@@ -57,7 +61,9 @@ internal class BlogPostService : IBlogPostService
     {
         IQueryable<BlogPost> query = _dbContext.BlogPosts!.AsQueryable();
         List<BlogPostBriefForFront> datasFromDb = await
-            _dbContext.BlogPosts!.OrderByDescending(x => x.ViewCount).Take(count)
+            _dbContext.BlogPosts!
+                .OrderByDescending(x => x.ViewCount)
+                .Take(count)
                 .Select(x => new BlogPostBriefForFront(
                     x.Title,
                     x.Slug,
@@ -68,7 +74,7 @@ internal class BlogPostService : IBlogPostService
                         join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                         select new CategoryBrief(category.Slug, category.Name,
                             category.Description, 0, null)).ToList(),
-                    x.CreationTime,
+                    x.CreationTime, x.LastModificationTime,
                     x.ViewCount))
                 .ToListAsync();
         return datasFromDb;
@@ -91,6 +97,7 @@ internal class BlogPostService : IBlogPostService
         int total = await query.CountAsync();
         IIncludableQueryable<BlogPost, List<BlogPostTag>?> datasFromDb =
             query.OrderByDescending(x => x.ViewCount)
+                .ThenByDescending(x => x.LastModificationTime)
                 .ThenByDescending(x => x.CreationTime)
                 .Skip((request.Current - 1) * request.PageSize)
                 .Take(request.PageSize)
@@ -107,7 +114,7 @@ internal class BlogPostService : IBlogPostService
                 join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                 select new CategoryBrief(category.Slug, category.Name,
                     category.Description, 0, null)).ToList(),
-            x.CreationTime,
+            x.CreationTime, x.LastModificationTime,
             x.ViewCount)).ToListAsync();
         return new GetBlogPostBriefListResponse(data, total, true, request.PageSize, request.Current);
     }
@@ -125,6 +132,7 @@ internal class BlogPostService : IBlogPostService
 
         IQueryable<BlogPost> datasFromDb =
             query.OrderByDescending(x => x.ViewCount)
+                .ThenByDescending(x => x.LastModificationTime)
                 .ThenByDescending(x => x.CreationTime)
                 .Include(blogPost => blogPost.Albums)
                 .Include(blogPost => blogPost.Categories)
@@ -144,7 +152,7 @@ internal class BlogPostService : IBlogPostService
                     join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                     select new CategoryBrief(category.Slug, category.Name,
                         category.Description, 0, null)).ToList(),
-                x.CreationTime,
+                x.CreationTime, x.LastModificationTime,
                 x.ViewCount)).ToListAsync();
         return new GetBlogPostBriefListByCategorySlugResponse(category.Name, data, total, true, request.PageSize,
             request.Current);
@@ -163,7 +171,8 @@ internal class BlogPostService : IBlogPostService
         }
 
         IQueryable<BlogPost> datasFromDb =
-            query.OrderBy(x => x.CreationTime)
+            query.OrderByDescending(x => x.LastModificationTime)
+                .ThenByDescending(x => x.CreationTime)
                 .Include(blogPost => blogPost.Albums)
                 .Include(blogPost => blogPost.Categories)
                 .Include(blogPost => blogPost.Tags)
@@ -182,7 +191,7 @@ internal class BlogPostService : IBlogPostService
                     join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                     select new CategoryBrief(category.Slug, category.Name,
                         category.Description, 0, null)).ToList(),
-                x.CreationTime,
+                x.CreationTime, x.LastModificationTime,
                 x.ViewCount)).ToListAsync();
         return new GetBlogPostBriefListByAlbumSlugResponse(album.Name, data, total, true, request.PageSize,
             request.Current);
@@ -202,6 +211,7 @@ internal class BlogPostService : IBlogPostService
 
         IQueryable<BlogPost> datasFromDb =
             query.OrderByDescending(x => x.ViewCount)
+                .ThenByDescending(x => x.LastModificationTime)
                 .ThenByDescending(x => x.CreationTime)
                 .Include(blogPost => blogPost.Albums)
                 .Include(blogPost => blogPost.Categories)
@@ -221,7 +231,7 @@ internal class BlogPostService : IBlogPostService
                     join category in _dbContext.Categories! on blogPostCategory.CategoryId equals category.Id
                     select new CategoryBrief(category.Slug, category.Name,
                         category.Description, 0, null)).ToList(),
-                x.CreationTime,
+                x.CreationTime, x.LastModificationTime,
                 x.ViewCount)).ToListAsync();
         return new GetBlogPostBriefListByTagNameResponse(data, total, true, request.PageSize,
             request.Current);
@@ -288,6 +298,7 @@ internal class BlogPostService : IBlogPostService
             categories,
             tags,
             blogPost.CreationTime,
+            blogPost.LastModificationTime,
             blogPost.ViewCount,
             blogPost.LikeCount,
             preview,

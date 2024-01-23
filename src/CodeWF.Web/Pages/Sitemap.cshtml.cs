@@ -51,7 +51,7 @@ public class SitemapModel : PageModel
                     LastModified = x.CreationTime,
                     Priority = 0.9,
                     Url =
-                        $"{_siteOptions.Value.Domain}/{x.CreationTime.ToString("yyyy")}/{x.CreationTime.ToString("MM")}/{x.Slug}",
+                        $"{_siteOptions.Value.Domain}/{x.CreationTime:yyyy/MM}/{x.Slug}",
                     Frequency = SitemapFrequency.Daily
                 }).ToListAsync());
 

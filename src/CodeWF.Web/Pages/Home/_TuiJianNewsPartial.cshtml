@@ -21,6 +21,7 @@
                 BlogPosts = posts.Data?.Skip(1).Take(6).ToList()
             });
         }
+
         return vm;
     }
 
@@ -58,12 +59,20 @@
                             </h2>
                             <p>@cat.TouTiao.Description</p>
                             <p>
-                                <a href="#">@(cat.TouTiao.Original ?? SiteOptions.Value.Owner)</a> - @cat.TouTiao.CreationTime.ToString("yyyy-MM-dd")
+                                <a href="#">@(cat.TouTiao.Original ?? SiteOptions.Value.Owner)</a> -
+                                @if (cat.TouTiao.LastModifyTime is not null)
+                                {
+                                    @cat.TouTiao.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                }
+                                else
+                                {
+                                    @cat.TouTiao.CreationTime.ToString("yyyy-MM-dd")
+                                }
                             </p>
                             <a target="_blank" href="@cat.TouTiao.CreationTime.ToString("/yyyy/MM")/@cat.TouTiao.Slug" class="btn-blue-border">阅读更多</a>
                         </div>
                     }
-                    @if (cat.BlogPosts is {Count:>0})
+                    @if (cat.BlogPosts is { Count: > 0 })
                     {
                         <div class="tuijian-news-list">
                             <ul>
@@ -72,7 +81,16 @@
                                     <li>
                                         <a target="_blank" href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug">
                                             <span>
-                                                <b>@blogPost.CreationTime.Day</b>@blogPost.CreationTime.ToString("yyyy-MM")
+                                                @if (blogPost.LastModifyTime is not null)
+                                                {
+                                                    <b>@blogPost.LastModifyTime.Value.Day</b>
+                                                    @blogPost.LastModifyTime.Value.ToString("yyyy-MM")
+                                                }
+                                                else
+                                                {
+                                                    <b>@blogPost.CreationTime.Day</b>
+                                                    @blogPost.CreationTime.ToString("yyyy-MM")
+                                                }
                                             </span>
                                             <h3>@blogPost.Title</h3>
                                             <p>@blogPost.Description</p>

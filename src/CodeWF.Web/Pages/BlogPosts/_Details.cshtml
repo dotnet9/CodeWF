@@ -26,7 +26,16 @@
             }
             <div class="picview-other">
                 <span class="po-from">@(Model?.Original ?? @SiteOptions.Value.Owner)</span>
-                <span class="po-date">@Model?.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                @if (Model?.LastModifyTime is not null)
+                {
+                    <span>更新时间：</span>
+                    <span class="po-date"> @Model?.LastModifyTime.Value.ToString("yyyy-MM-dd HH:mm:ss") </span>
+                }
+                else
+                {
+                    <span>更新时间：</span>
+                    <span class="po-date"> @Model?.CreationTime.ToString("yyyy-MM-dd HH:mm:ss") </span>
+                }
                 @if (Model?.Albums is { Count: > 0 })
                 {
                     <label>- 专辑：</label>

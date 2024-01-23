@@ -20,6 +20,7 @@
                 BlogPosts = posts.Data
             });
         }
+
         return vm;
     }
 
@@ -41,7 +42,7 @@
             </ul>
         </div>
         <div id="tab-content">
-            @foreach (var cat in datas.Categories.Where(cat => cat.BlogPosts is {Count:>0}))
+            @foreach (var cat in datas.Categories.Where(cat => cat.BlogPosts is { Count: > 0 }))
             {
                 <section class="tab-box">
                     <div class="videos-list">
@@ -55,7 +56,16 @@
                                         </i>
                                         <h2>@blogPost.Title</h2>
                                         <p>
-                                            <b class="datetime">@blogPost.CreationTime.ToString("yyyy-MM-dd")</b>&nbsp;&nbsp;-&nbsp;&nbsp;<span>@(blogPost.Original.IsNullOrWhiteSpace() ? SiteOptions.Value.Owner : blogPost.Original)</span><span class="viewd">@blogPost.ViewCount</span>
+                                            <b class="datetime">
+                                                @if (blogPost.LastModifyTime is not null)
+                                                {
+                                                    @blogPost.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                                }
+                                                else
+                                                {
+                                                    @blogPost.CreationTime.ToString("yyyy-MM-dd")
+                                                }
+                                            </b>&nbsp;&nbsp;-&nbsp;&nbsp;<span>@(blogPost.Original.IsNullOrWhiteSpace() ? SiteOptions.Value.Owner : blogPost.Original)</span><span class="viewd">@blogPost.ViewCount</span>
                                         </p>
                                     </a>
                                 </li>

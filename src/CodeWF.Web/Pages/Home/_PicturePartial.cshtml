@@ -9,7 +9,7 @@
     {
         BlogPostListViewModel vm = new();
         vm.Categories = new();
-        string[] categorySlugs = { "dotnet-desktop-wpf", "dotnet-mobile-maui", "dotnet-ef-core" };
+        string[] categorySlugs = { "dotnet-avalonia-ui", "dotnet-desktop-wpf", "dotnet-mobile-maui", "dotnet-ef-core" };
         foreach (var categorySlug in categorySlugs)
         {
             var posts = await BlogPostService.BlogPostBriefListByCategorySlugAsync(new BlogPostBriefListByCategorySlugRequest(categorySlug, 1, 7));
@@ -21,6 +21,7 @@
                 BlogPosts = posts.Data?.Skip(1).Take(6).ToList()
             });
         }
+
         return vm;
     }
 
@@ -57,11 +58,19 @@
                                         <span style="text-align: left;">@cat.TouTiao.Title</span>
                                     </a>
                                     <small style="text-align: left; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: block;">
-                                        <a style="display: inline;" href="#">@(cat.TouTiao.Original ?? SiteOptions.Value.Owner)</a> - @cat.TouTiao.CreationTime.ToString("yyyy-MM-dd")
+                                        <a style="display: inline;" href="#">@(cat.TouTiao.Original ?? SiteOptions.Value.Owner)</a> -
+                                        @if (cat.TouTiao.LastModifyTime is not null)
+                                        {
+                                            @cat.TouTiao.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                        }
+                                        else
+                                        {
+                                            @cat.TouTiao.CreationTime.ToString("yyyy-MM-dd")
+                                        }
                                     </small>
                                 </li>
                             }
-                            @if (cat.BlogPosts is {Count:>0})
+                            @if (cat.BlogPosts is { Count: > 0 })
                             {
                                 @foreach (var blogPost in cat.BlogPosts)
                                 {
@@ -73,7 +82,15 @@
                                             <span style="text-align: left;">@blogPost.Title</span>
                                         </a>
                                         <small style="text-align: left; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; display: block;">
-                                            <a style="display: inline;" href="#">@(blogPost.Original ?? SiteOptions.Value.Owner)</a>&nbsp;-&nbsp;@blogPost.CreationTime.ToString("yyyy-MM-dd")
+                                            <a style="display: inline;" href="#">@(blogPost.Original ?? SiteOptions.Value.Owner)</a>&nbsp;-&nbsp;
+                                            @if (blogPost.LastModifyTime is not null)
+                                            {
+                                                @blogPost.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                            }
+                                            else
+                                            {
+                                                @blogPost.CreationTime.ToString("yyyy-MM-dd")
+                                            }
                                         </small>
                                     </li>
                                 }

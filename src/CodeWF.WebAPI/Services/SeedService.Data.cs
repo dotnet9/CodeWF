@@ -210,7 +210,7 @@ public partial class SeedService
                 blogPostSeed.Description, blogPostSeed.Cover, blogPostSeed.Content, blogPostSeed.Copyright,
                 blogPostSeed.Author, null, blogPostSeed.OriginalTitle, blogPostSeed.OriginalLink, blogPostSeed.Banner,
                 true, albumIds,
-                categoryIds, tagIds, blogPostSeed.Date);
+                categoryIds, tagIds, blogPostSeed.Date, blogPostSeed.LastModifyDate);
             allBlogPosts.Add(blogPost);
         }
 
@@ -329,7 +329,7 @@ public partial class SeedService
     private async Task SeedTimelines()
     {
         var timelines = JsonSerializer.Deserialize<List<TimelineSeedDto>>(
-            await System.IO.File.ReadAllTextAsync(Path.Combine(_siteOptions.AssetsLocalPath, "site",
+            await File.ReadAllTextAsync(Path.Combine(_siteOptions.AssetsLocalPath, "site",
                 "timelines.json")));
         var timelinesForDb = timelines!.Select(x =>
             _timelineManager.CreateForSeed(x.Time, x.Title, x.Content));
@@ -340,7 +340,7 @@ public partial class SeedService
     private static BlogPostSeedDto Read(string markdownAbsolutePath)
     {
         var blogPostOfMarkdown = new BlogPostSeedDto();
-        var lines = System.IO.File.ReadAllLines(markdownAbsolutePath);
+        var lines = File.ReadAllLines(markdownAbsolutePath);
         var isReadStart = false;
         for (var i = 0; i < lines.Length; i++)
         {
@@ -357,7 +357,7 @@ public partial class SeedService
                 var contentLines = new string[contentLineLength];
                 Array.Copy(lines, contentLineStartOfAllLines, contentLines, 0, contentLineLength);
                 blogPostOfMarkdown.Content = string.Join("\n", contentLines);
-                return blogPostOfMarkdown;
+                break;
             }
 
             if (lines[i].StartsWith(Title))
@@ -423,6 +423,8 @@ public partial class SeedService
                 blogPostOfMarkdown.Banner = bool.Parse(lines[i][Banner.Length..]);
             }
         }
+
+        blogPostOfMarkdown.LastModifyDate ??= blogPostOfMarkdown.Date;
 
         return blogPostOfMarkdown;
     }

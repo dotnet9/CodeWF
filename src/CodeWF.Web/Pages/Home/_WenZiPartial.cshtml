@@ -20,6 +20,7 @@
                 BlogPosts = posts.Data
             });
         }
+
         return vm;
     }
 
@@ -43,7 +44,7 @@
             </ul>
         </div>
         <div id="tab-content">
-            @foreach (var cat in datas.Categories.Where(cat => cat.BlogPosts is {Count:>0}))
+            @foreach (var cat in datas.Categories.Where(cat => cat.BlogPosts is { Count: > 0 }))
             {
                 <section class="tab-box">
                     <div class="wenzi-list">
@@ -52,24 +53,42 @@
                             var rightBlogPosts = cat.BlogPosts!.Skip(8).ToList();
                         }
                         <ul class="wenzi-left">
-                            @if (leftBlogPosts is {Count:>0})
+                            @if (leftBlogPosts is { Count: > 0 })
                             {
                                 @foreach (var blogPost in leftBlogPosts)
                                 {
                                     <li>
-                                        <span>@blogPost.CreationTime.ToString("yyyy-MM-dd")</span>
+                                        <span>
+                                            @if (blogPost.LastModifyTime is not null)
+                                            {
+                                                @blogPost.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                            }
+                                            else
+                                            {
+                                                @blogPost.CreationTime.ToString("yyyy-MM-dd")
+                                            }
+                                        </span>
                                         <a target="_blank" href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Title">@blogPost.Title</a>
                                     </li>
                                 }
                             }
                         </ul>
                         <ul class="wenzi-right">
-                            @if (rightBlogPosts is {Count:>0})
+                            @if (rightBlogPosts is { Count: > 0 })
                             {
                                 @foreach (var blogPost in rightBlogPosts)
                                 {
                                     <li>
-                                        <span>@blogPost.CreationTime.ToString("yyyy-MM-dd")</span>
+                                        <span>
+                                            @if (blogPost.LastModifyTime is not null)
+                                            {
+                                                @blogPost.LastModifyTime.Value.ToString("yyyy-MM-dd")
+                                            }
+                                            else
+                                            {
+                                                @blogPost.CreationTime.ToString("yyyy-MM-dd")
+                                            }
+                                        </span>
                                         <a target="_blank" href="@blogPost.CreationTime.ToString("/yyyy/MM")/@blogPost.Slug" title="@blogPost.Title">@blogPost.Title</a>
                                     </li>
                                 }

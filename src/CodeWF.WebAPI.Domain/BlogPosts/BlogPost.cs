@@ -43,6 +43,7 @@ public record BlogPost : AggregateRootEntity
     }
 
     public new DateTime CreationTime { get; private set; }
+    public new DateTime? LastModificationTime { get; private set; }
     public string Title { get; private set; } = null!;
     public string Slug { get; private set; } = null!;
     public string ShortId { get; private set; } = null!;
@@ -166,6 +167,12 @@ public record BlogPost : AggregateRootEntity
     internal BlogPost SetCreationTime(DateTime creationTime)
     {
         CreationTime = creationTime;
+        return this;
+    }
+
+    internal BlogPost SetLastModificationTime(DateTime lastModifyTime)
+    {
+        LastModificationTime = lastModifyTime;
         return this;
     }
 

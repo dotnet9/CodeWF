@@ -93,7 +93,8 @@ public class BlogPostManager
         Guid[]? albumIds,
         Guid[]? categoryIds,
         Guid[]? tagIds,
-        DateTime creationTime)
+        DateTime creationTime,
+        DateTime? lastModifyTime = null)
     {
         BlogPost blogPost = new BlogPost(Guid.NewGuid(), title, slug, shortId, description, cover, content,
             copyrightType,
@@ -124,6 +125,10 @@ public class BlogPostManager
         }
 
         blogPost.SetCreationTime(creationTime);
+        if (lastModifyTime != null)
+        {
+            blogPost.SetLastModificationTime(lastModifyTime.Value);
+        }
 
         return blogPost;
     }
