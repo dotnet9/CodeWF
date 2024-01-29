@@ -1,10 +1,6 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.iOS;
-using Avalonia.Media;
-using Avalonia.ReactiveUI;
 using Foundation;
-using UIKit;
 
 namespace CodeWF.Tools.iOS;
 // The UIApplicationDelegate for the application. This class is responsible for launching the 
@@ -19,6 +15,6 @@ public partial class AppDelegate : AvaloniaAppDelegate<App>
     {
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
-            .UseReactiveUI();
+            .UseSkia();
     }
 }

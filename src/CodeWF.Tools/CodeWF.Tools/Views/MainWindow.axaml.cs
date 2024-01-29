@@ -1,7 +1,7 @@
-using SukiUI.Controls;
+using FluentAvalonia.UI.Windowing;
 
 namespace CodeWF.Tools.Views;
-public partial class MainWindow : SukiWindow
+public partial class MainWindow : AppWindow
 {
     public MainWindow()
     {
