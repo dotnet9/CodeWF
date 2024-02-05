@@ -1,10 +1,9 @@
 using Avalonia.Controls;
 
 namespace CodeWF.Tools.Views;
-
-public partial class MainView : UserControl
+public partial class HomePageView : UserControl
 {
-    public MainView()
+    public HomePageView()
     {
         InitializeComponent();
     }

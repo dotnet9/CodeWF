@@ -4,13 +4,15 @@
              x:Class="CodeWF.Tools.App"
              xmlns:sty="using:FluentAvalonia.Styling"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
 
     <Application.Styles>
-        <sty:FluentAvaloniaTheme PreferUserAccentColor="True"></sty:FluentAvaloniaTheme>
+        <sty:FluentAvaloniaTheme PreferUserAccentColor="True" />
+        <StyleInclude Source="Assets/Icons.axaml" />
+        <StyleInclude Source="Templates/ContentExample.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
