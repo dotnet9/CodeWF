@@ -2,7 +2,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="MediatR" Version="12.2.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.1.24080.9" />
 	</ItemGroup>
 
 	<ItemGroup>

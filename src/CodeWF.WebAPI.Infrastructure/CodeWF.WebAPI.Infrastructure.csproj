@@ -2,9 +2,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="7.4.1-pre01" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0-preview.1.24081.5" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.101.2.1" />
+		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.102.1" />
 	</ItemGroup>
 
 	<ItemGroup>
