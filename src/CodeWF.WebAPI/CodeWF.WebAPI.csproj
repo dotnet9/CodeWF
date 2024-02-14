@@ -3,7 +3,7 @@
 	<ItemGroup>
 		<PackageReference Include="Lazy.Captcha.Core" Version="2.0.7" />
 		<PackageReference Include="Mapster" Version="7.4.1-pre01" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-preview.1.24081.2">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
