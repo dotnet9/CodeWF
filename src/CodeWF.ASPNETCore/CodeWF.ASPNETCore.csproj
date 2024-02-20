@@ -3,9 +3,9 @@
 	<ItemGroup>
 		<PackageReference Include="MediatR" Version="12.2.0" />
 		<PackageReference Include="Mapster" Version="7.4.1-pre01" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0-preview.1.24081.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.1.24081.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-preview.1.24081.2">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
