@@ -328,12 +328,12 @@ public static class Helper
     }
 
     /// <summary>
-    ///     Get values from `MOONGLADE_TAGS` Environment Variable
+    ///     Get values from `CODEWF_TAGS` Environment Variable
     /// </summary>
     /// <returns>string values</returns>
     public static IEnumerable<string> GetEnvironmentTags()
     {
-        string? tagsEnv = Environment.GetEnvironmentVariable("MOONGLADE_TAGS");
+        string? tagsEnv = Environment.GetEnvironmentVariable("CODEWF_TAGS");
         if (string.IsNullOrWhiteSpace(tagsEnv))
         {
             yield return string.Empty;
