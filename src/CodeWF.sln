@@ -20,6 +20,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Data", "CodeWF.Data\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Configuration", "CodeWF.Configuration\CodeWF.Configuration.csproj", "{A5B28413-B670-4DE2-8EAC-BAE89AE370E8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{6573A18D-C31B-4BCB-BA55-7B82027CBDBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core.csproj", "{67A097FB-4050-4C02-9C30-BD75306BD30F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,10 @@ Global
 		{A5B28413-B670-4DE2-8EAC-BAE89AE370E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5B28413-B670-4DE2-8EAC-BAE89AE370E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5B28413-B670-4DE2-8EAC-BAE89AE370E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67A097FB-4050-4C02-9C30-BD75306BD30F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67A097FB-4050-4C02-9C30-BD75306BD30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67A097FB-4050-4C02-9C30-BD75306BD30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67A097FB-4050-4C02-9C30-BD75306BD30F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{249A1843-1600-4603-9EF6-3ABAF29D00AA} = {E0558B6C-2C15-4787-8754-BFB26E109D68}
 		{CEE09C34-6A1A-4EBE-9603-8CFAA53CC5F0} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
 		{A5B28413-B670-4DE2-8EAC-BAE89AE370E8} = {E0558B6C-2C15-4787-8754-BFB26E109D68}
+		{67A097FB-4050-4C02-9C30-BD75306BD30F} = {6573A18D-C31B-4BCB-BA55-7B82027CBDBB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}

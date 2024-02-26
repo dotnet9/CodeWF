@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+  <ItemGroup>
+    <PackageReference Include="Edi.CacheAside.InMemory" Version="1.1.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeWF.Configuration\CodeWF.Configuration.csproj" />
+  </ItemGroup>
+
+</Project>
