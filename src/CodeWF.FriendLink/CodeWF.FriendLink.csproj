@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\CodeWF.Data\CodeWF.Data.csproj" />
+    <ProjectReference Include="..\CodeWF.Utils\CodeWF.Utils.csproj" />
+  </ItemGroup>
+</Project>

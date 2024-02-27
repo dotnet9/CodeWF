@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.ImageStorage", "Code
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Email.Client", "CodeWF.Email.Client\CodeWF.Email.Client.csproj", "{EB21F2A6-6117-497F-B157-682566F29B5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.FriendLink", "CodeWF.FriendLink\CodeWF.FriendLink.csproj", "{933FB042-F5D5-478B-8F27-1B99A91A9B01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{EB21F2A6-6117-497F-B157-682566F29B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB21F2A6-6117-497F-B157-682566F29B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB21F2A6-6117-497F-B157-682566F29B5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{933FB042-F5D5-478B-8F27-1B99A91A9B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{933FB042-F5D5-478B-8F27-1B99A91A9B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{933FB042-F5D5-478B-8F27-1B99A91A9B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{933FB042-F5D5-478B-8F27-1B99A91A9B01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
 		{CB7C01E4-6ED5-4C3E-9BC7-B6CC4AF42315} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
 		{EB21F2A6-6117-497F-B157-682566F29B5D} = {6573A18D-C31B-4BCB-BA55-7B82027CBDBB}
+		{933FB042-F5D5-478B-8F27-1B99A91A9B01} = {6573A18D-C31B-4BCB-BA55-7B82027CBDBB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}
