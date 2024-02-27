@@ -20,7 +20,7 @@ public class GetRssStringQueryHandler : IRequestHandler<GetRssStringQuery, strin
             blogConfig.GeneralSettings.SiteTitle,
             blogConfig.GeneralSettings.Description,
             Helper.FormatCopyright2Html(blogConfig.GeneralSettings.Copyright).Replace("&copy;", "©"),
-            $"Moonglade v{Helper.AppVersion}",
+            $"CodeWF v{Helper.AppVersion}",
             baseUrl,
             blogConfig.GeneralSettings.DefaultLanguageCode);
     }

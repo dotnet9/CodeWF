@@ -1,0 +1,9 @@
+﻿global using CodeWF.Data.Entities;
+global using CodeWF.Data.Infrastructure;
+global using Microsoft.AspNetCore.Authentication.Cookies;
+global using CodeWF.Utils;
+global using System.ComponentModel.DataAnnotations;
+global using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Identity.Web;
