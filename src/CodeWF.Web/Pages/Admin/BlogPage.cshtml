@@ -1,0 +1,83 @@
+﻿@page "/admin/page"
+@using CodeWF.Core.PageFeature
+@inject IMediator Mediator
+@{
+    ViewBag.Title = "Pages";
+    var pageSegments = await Mediator.Send(new ListPageSegmentQuery());
+}
+
+@section scripts{
+<script>
+    function deletePage(pageid) {
+        callApi(`/api/page/${pageid}`,
+            'DELETE',
+            {},
+            (resp) => {
+                document.querySelector(`#card-${pageid}`).remove();
+                blogToast.success('Page deleted');
+            });
+    }
+
+    function deleteConfirm(pageid) {
+        var cfm = confirm("Delete Confirmation?");
+        if (cfm) deletePage(pageid);
+    }
+</script>
+}
+
+@section admintoolbar{
+    <div class="admin-toolbar pb-2 border-bottom mb-3">
+        <a class="btn btn-outline-accent" asp-page="./EditPage">
+            <i class="bi-plus-lg"></i>
+            @SharedLocalizer["New"]
+        </a>
+
+        <a asp-action="ExportDownload" asp-controller="DataPorting" asp-route-type="Pages" class="btn btn-outline-accent" target="_blank">
+            <i class="bi-upload"></i>
+            @SharedLocalizer["Export"]
+        </a>
+    </div>
+}
+
+@if (pageSegments.Any())
+{
+    <div>
+        @Html.AntiForgeryToken()
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach (var item in pageSegments.OrderByDescending(p => p.CreateTimeUtc))
+            {
+                <div class="col">
+                    <div class="card shadow-sm mb-4" id="card-@item.Id">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a asp-page="/BlogPage" asp-route-slug="@item.Slug" target="_blank">@item.Title</a>
+                            </h6>
+                            <p class="mt-2 h-30px">@item.Slug</p>
+                            <small class="text-muted">
+                                @item.CreateTimeUtc
+                            </small>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-outline-accent btn-sm btn-edit" asp-page="./EditPage" asp-route-id="@item.Id">
+                                <i class="bi-pen"></i>
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm btn-delete" href="javascript:deleteConfirm('@item.Id');">
+                                <i class="bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-recycle">
+        <div class="text-center">
+            <h4>@SharedLocalizer["No Pages"]</h4>
+            <p class="text-muted">@SharedLocalizer["no items to show"]</p>
+        </div>
+    </div>
+}

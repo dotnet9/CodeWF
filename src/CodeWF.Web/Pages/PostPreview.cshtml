@@ -1,0 +1,100 @@
+﻿@page "/post/preview/{postId:guid}"
+@model CodeWF.Web.Pages.PostPreviewModel
+@using CodeWF.Utils
+
+@{
+    ViewBag.BodyClass = "body-post-slug";
+}
+
+@section meta {
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="title" content="@Model.Post.Title" />
+    <meta name="author" content="@(string.IsNullOrWhiteSpace(Model.Post.Author) ? BlogConfig.GeneralSettings.OwnerName : Model.Post.Author) " />
+    <link href="~/css/post.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/highlighter-custom.css" rel="stylesheet" asp-append-version="true" />
+}
+
+@section scripts {
+    <script src="~/js/3rd/highlight.min.js" asp-append-version="true"></script>
+    <script type="module">
+        import * as viewpost from '/js/app/viewpost.module.js'
+
+        window.fitImageToDevicePixelRatio = @BlogConfig.ImageSettings.FitImageToDevicePixelRatio.ToString().ToLower();
+        viewpost.resizeImages();
+        viewpost.renderCodeHighlighter();
+
+        if (window.innerWidth >= 768) {
+            viewpost.applyImageZooming();
+        }
+
+        @if (BlogConfig.AdvancedSettings.WarnExternalLink)
+        {
+            <text>
+                postSlug.warnExtLink();
+            </text>
+        }
+    </script>
+}
+
+<div class="alert alert-info">
+    @SharedLocalizer["This is a preview for draft content."]
+</div>
+
+<article class="article-post-slug position-relative p-4 rounded-3 shadow-sm border bg-white mb-4" data-postid="@Model.Post.Id" lang="@Model.Post.ContentLanguageCode">
+    @if (Model.Post.Featured)
+    {
+        <partial name="_FeaturedTag" />
+    }
+
+    <header class="post-header @(BlogConfig.ContentSettings.PostTitleAlignment == PostTitleAlignment.Center ? "text-center" : null)">
+        <h1 class="post-title">
+            @Model.Post.Title
+        </h1>
+
+        <hr class="d-none d-md-block" />
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Post.HeroImageUrl))
+    {
+        <div class="post-hero-image-container text-center mb-3">
+            <img src="@Helper.SterilizeLink(Model.Post.HeroImageUrl)" class="post-hero-image img-fluid rounded-3 shadow-sm" />
+        </div>
+    }
+
+    <section class="post-content clearfix">
+        <partial name="_PostContentRender" model="Model.Post.RawPostContent" />
+    </section>
+    @if (BlogConfig.ContentSettings.ShowPostFooter)
+    {
+        <section class="post-footer clearfix">
+            @Html.Raw(BlogConfig.ContentSettings.PostFooterHtmlPitch)
+        </section>
+    }
+
+    <partial name="_PostActions" model="Model.Post" />
+    
+    @if (!string.IsNullOrWhiteSpace(Model.Post.OriginLink))
+    {
+        <a href="@Helper.SterilizeLink(Model.Post.OriginLink)" target="_blank">
+            <i class="bi-link"></i>
+            @SharedLocalizer["Read origin article"]
+        </a>
+    }
+</article>
+
+<partial name="_LightSwitch" />
+
+<div class="modal fade" id="imgzoomModal" tabindex="-1" role="dialog" aria-labelledby="imgzoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-imgzoom" role="document" style="max-width: 100%">
+        <div class="modal-content">
+            <img id="imgzoom" alt="imgzoom" class="img-fluid" />
+        </div>
+    </div>
+</div>
+
+@if (BlogConfig.AdvancedSettings.WarnExternalLink)
+{
+    <partial name="_ExternalLink" />
+}
+
+<partial name="_PostForestageAdmin" />

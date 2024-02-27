@@ -1,0 +1,74 @@
+﻿@inject IConfiguration Configuration
+
+<aside class="col-lg-3 d-none d-lg-block">
+    @if (BlogConfig.GeneralSettings.WidgetsProfile)
+    {
+        <partial name="_WidgetsProfile" />
+    }
+
+    @if (!string.IsNullOrWhiteSpace(BlogConfig.GeneralSettings.SideBarCustomizedHtmlPitch))
+    {
+        @Html.Raw(BlogConfig.GeneralSettings.SideBarCustomizedHtmlPitch)
+    }
+
+    @if (BlogConfig.GeneralSettings.WidgetsTags)
+    {
+        <section id="aside-tags" class="mt-4 mb-4">
+            <div class="aside-widget p-3 rounded-3 shadow-sm border bg-white">
+                <h6 class="card-subtitle mb-3 text-muted">@SharedLocalizer["Tags"]</h6>
+                <div>
+                    <cache expires-after="@TimeSpan.FromMinutes(int.Parse(Configuration["CacheSlidingExpirationMinutes:Widget"]!))">
+                        @await Component.InvokeAsync("Tags")
+                    </cache>
+                    <hr />
+                    <a asp-page="/Tags" class="card-link">
+                        <i class="bi-tag me-1"></i>
+                        @SharedLocalizer["All Tags"]
+                    </a>
+                </div>
+            </div>
+        </section>
+    }
+
+    @if (BlogConfig.GeneralSettings.WidgetsCategoryList)
+    {
+        <section id="aside-cats" class="mb-4">
+            <div class="aside-widget p-3 rounded-3 shadow-sm border bg-white">
+                <h6 class="card-subtitle mb-3 text-muted">@SharedLocalizer["Categories"]</h6>
+                @await Component.InvokeAsync("CategoryList", new { isMenu = false })
+            </div>
+        </section>
+    }
+
+    @if (BlogConfig.GeneralSettings.WidgetsFriendLink)
+    {
+        <section id="aside-friendlink" class="mb-4">
+            <cache expires-after="@TimeSpan.FromMinutes(int.Parse(Configuration["CacheSlidingExpirationMinutes:Widget"]!))">
+                @await Component.InvokeAsync("FriendLink")
+            </cache>
+        </section>
+    }
+
+    @if (BlogConfig.GeneralSettings.WidgetsSubscriptionButtons)
+    {
+        <section id="aside-subscription" class="text-center mb-4">
+            <a class="btn btn-sm btn-round btn-outline-secondary me-2" href="#" data-bs-toggle="modal" data-bs-target="#subscriptionmodal">
+                <i class="bi-rss"></i>
+                RSS / Atom
+            </a>
+
+            @if (BlogConfig.AdvancedSettings.EnableOpml)
+            {
+                <a asp-controller="Subscription" asp-action="Opml" class="btn btn-sm btn-round btn-outline-secondary" target="_blank">
+                    <i class="bi-code-slash"></i>
+                    OPML
+                </a>
+            }
+        </section>
+    }
+</aside>
+
+@if (BlogConfig.GeneralSettings.WidgetsSubscriptionButtons)
+{
+    <partial name="_SubscriptionModal" />
+}

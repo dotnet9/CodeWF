@@ -1,0 +1,29 @@
+﻿@model IReadOnlyList<CodeWF.Core.CategoryFeature.Category>
+
+@if (Model.Count > 0)
+{
+    <div>
+        @foreach (var item in Model.OrderBy(c => c.DisplayName))
+        {
+            <a class="d-block mb-3 mt-2"
+               asp-page="/CategoryList"
+               asp-route-routeName="@item.RouteName.ToLower()"
+               title="@item.Note">
+                <i class="bi-folder2 me-1"></i>
+                @item.DisplayName
+            </a>
+        }
+
+        <hr />
+        <a asp-page="/Featured" class="d-block">
+            <i class="bi-star-fill me-1 text-warning"></i>
+            Featured
+        </a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        No Categories
+    </div>
+}

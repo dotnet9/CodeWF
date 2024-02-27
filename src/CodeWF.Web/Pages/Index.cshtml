@@ -1,0 +1,33 @@
+﻿@page
+@model CodeWF.Web.Pages.IndexModel
+
+@{
+    ViewBag.TitlePrefix = null;
+    ViewBag.BodyClass = "body-home-index bg-gray-1";
+    ViewBag.ActionName = "Index";
+}
+
+<h3 class="d-flex align-items-center mb-4">
+    <span>
+        @SharedLocalizer["All Posts"]
+    </span>
+    
+    <span class="flex-spacer"></span>
+    
+    <a class="d-none d-md-block" asp-controller="Subscription" asp-action="Rss" target="_blank" title="@SharedLocalizer["Subscribe recent posts"]">
+        <i class="bi-rss font-125rem"></i>
+    </a>
+</h3>
+
+@if (Model.Posts.Any())
+{
+    <partial name="_PostList" model="Model.Posts" />
+}
+else
+{
+    <div class="alert alert-info">
+        @SharedLocalizer["No Posts"]
+    </div>
+}
+
+<partial name="_LightSwitch" />

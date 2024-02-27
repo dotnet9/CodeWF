@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
-		<Using Include="Microsoft.EntityFrameworkCore" />
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="MediatR" Version="12.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0-preview.1.24081.2" />

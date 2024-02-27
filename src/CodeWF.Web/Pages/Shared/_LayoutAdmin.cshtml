@@ -1,0 +1,89 @@
+﻿@{
+    if (string.IsNullOrEmpty(BlogConfig.GeneralSettings.AvatarUrl))
+    {
+        BlogConfig.GeneralSettings.AvatarUrl = Url.Action("Avatar", "Assets");
+    }
+}
+<!DOCTYPE html>
+<html lang="@BlogConfig.GeneralSettings.DefaultLanguageCode">
+
+<head>
+    <title>
+        @BlogConfig.GeneralSettings.SiteTitle @SharedLocalizer["Admin"] @(ViewBag.Title != null ? $"- {ViewBag.Title}" : null)
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="start" title="@BlogConfig.GeneralSettings.SiteTitle" href="~/" />
+    <partial name="_Favicons" />
+    <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/base.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/rwd.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/admin.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/theme.css" rel="stylesheet" />
+    @await RenderSectionAsync("head", false)
+    <script src="~/js/3rd/jquery.slim.min.js" asp-append-version="true"></script>
+</head>
+
+<body class="admin-body bg-gray-1">
+    <nav class="admin-navbar navbar sticky-top navbar-expand-lg navbar-dark bg-accent2">
+        <a class="navbar-brand font-sairas" asp-page="/Admin/Post">
+            @BlogConfig.GeneralSettings.SiteTitle
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Settings/General" title="settings link">
+                        <i class="bi-gear"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/About" title="about link">
+                        <i class="bi-info-circle"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Index" target="_blank" title="home page link">
+                        <i class="bi-house"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <span class="navbar-text me-2">
+                <img src="@BlogConfig.GeneralSettings.AvatarUrl" alt="@BlogConfig.GeneralSettings.OwnerName"
+                     class="rounded-circle admin-nav-head-pic me-1" />
+                <userinfo user="User"></userinfo>
+            </span>
+
+            <a class="navbar-text d-inline-block" asp-controller="Auth" asp-action="SignOut" title="Sign Out">
+                <i class="bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </nav>
+    <div class="d-flex admin-body-wrapper">
+        <partial name="_AsideAdmin" />
+        <div class="admin-main mt-3 mb-3 me-3 ms-3">
+            @await RenderSectionAsync("admintoolbar", false)
+
+            <div class="admin-main-body">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <partial name="_Toast" />
+
+    <script src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/app/base.js" asp-append-version="true"></script>
+    <script src="~/js/app/httpService.js"></script>
+    <script src="~/js/3rd/jquery.are-you-sure.min.js"></script>
+    @await RenderSectionAsync("scripts", false)
+</body>
+
+</html>

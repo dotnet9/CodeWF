@@ -1,0 +1,49 @@
+﻿@model CodeWF.Core.PostFeature.PostDigest
+@inject ITimeZoneResolver ZoneResolver
+
+<article class="article-post-summary d-flex p-3 rounded-3 shadow-sm border bg-white mb-4" lang="@Model.LangCode">
+    <div class="post-date-box border-end d-none d-md-block font-sairas pe-4 me-4">
+        <div class="post-date-day">
+            @ZoneResolver.ToTimeZone(Model.PubDateUtc).Day.ToString("00")
+        </div>
+        <div class="post-date-month text-accent">
+            @ZoneResolver.ToTimeZone(Model.PubDateUtc).ToString("MMM").ToUpper()
+        </div>
+    </div>
+    <div class="post-summary-box">
+        <time datetime="@Model.PubDateUtc.ToString("u")" class="d-none">
+            @Model.PubDateUtc
+        </time>
+
+        <h4 class="post-summary-title mb-3">
+            <a asp-page="/Post"
+               asp-route-year="@Model.PubDateUtc.Year"
+               asp-route-month="@Model.PubDateUtc.Month"
+               asp-route-day="@Model.PubDateUtc.Day"
+               asp-route-slug="@Model.Slug">
+                @Model.Title
+            </a>
+
+            @if (Model.IsFeatured)
+            {
+                <i class="bi-star-fill text-warning"></i>
+            }
+        </h4>
+
+        <abbr class="post-summary-text d-block mb-3">@(Model.ContentAbstract)</abbr>
+
+        @if (null != Model.Tags)
+        {
+            <div class="post-summary-tags pt-2">
+                @foreach (var tag in Model.Tags)
+                {
+                    <a asp-page="/TagList"
+                       asp-route-normalizedName="@tag.NormalizedName"
+                       class="d-inline-block me-1 mb-1 btn btn-sm btn-accent">
+                        @tag.DisplayName
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</article>

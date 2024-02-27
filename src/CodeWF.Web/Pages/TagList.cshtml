@@ -1,0 +1,22 @@
+﻿@page "/tags/{normalizedName:regex(^(?!-)([a-zA-Z0-9-]){{1,32}}$)}"
+@model CodeWF.Web.Pages.TagListModel
+@{
+    ViewBag.BodyClass = "body-tag-list bg-gray-1";
+}
+
+<h3 class="mb-4">
+    @ViewBag.TitlePrefix
+</h3>
+
+@if (Model.Posts.Any())
+{
+    <partial name="_PostList" model="Model.Posts" />
+}
+else
+{
+    <div class="text-muted text-center">
+        - @SharedLocalizer["No Posts"] -
+    </div>
+}
+
+<partial name="_LightSwitch" />

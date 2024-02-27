@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using CodeWF.Utils
+
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@{
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new { Value = c.Name, c.NativeName });
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}";
+}
+
+<footer id="blog-footer" class="bg-accent2 pt-4 pb-4 d-print-none">
+    <div class="container">
+        <div class="row">
+            <section id="footer-copyright" class="col-auto">
+                <div>
+                    @Html.Raw(Helper.FormatCopyright2Html(BlogConfig.GeneralSettings.Copyright))
+                </div>
+                <small>
+                    Powered by <a href="https://github.com/EdiWang/Moonglade" target="_blank">Moonglade</a> @Helper.AppVersion
+                </small>
+            </section>
+
+            @Html.Raw(BlogConfig.GeneralSettings.FooterCustomizedHtmlPitch)
+
+            <section id="footer-language" class="col d-none d-sm-block text-end">
+                <ul class="list-unstyled">
+                    @foreach (var item in cultureItems)
+                    {
+                        <li>
+                            <a asp-controller="Settings" asp-action="SetLanguage" asp-route-returnUrl="@returnUrl" asp-route-culture="@item.Value">@item.NativeName</a>
+                        </li>
+                    }
+                </ul>
+            </section>
+
+            <section id="footer-language-mobile" class="col d-block d-md-none text-end font-125rem">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#langselectormodal" aria-label="Choose display language"><i class="bi-globe"></i></a>
+            </section>
+        </div>
+    </div>
+</footer>
+
+<div class="modal fade" id="langselectormodal" tabindex="-1" role="dialog" aria-labelledby="langselectorLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="langselectorLabel">Languages</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-unstyled">
+                    @foreach (var item in cultureItems)
+                    {
+                        <li>
+                            <a asp-controller="Settings" asp-action="SetLanguage" asp-route-returnUrl="@returnUrl" asp-route-culture="@item.Value" rel="nofollow">@item.NativeName</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

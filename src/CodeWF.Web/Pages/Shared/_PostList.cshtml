@@ -1,0 +1,14 @@
+﻿@using CodeWF.Web.PagedList
+@model BasePagedList<CodeWF.Core.PostFeature.PostDigest>
+
+@foreach (var item in Model)
+{
+    <partial name="_PostListEntry" model="item" />
+}
+
+@Html.PagedListPager(Model, page => $"?p={page}", new()
+{
+    UlElementClasses = new[] { "pagination justify-content-end" },
+    MaximumPageNumbersToDisplay = 5,
+    DisplayEllipsesWhenNotShowingAllPageNumbers = false
+})

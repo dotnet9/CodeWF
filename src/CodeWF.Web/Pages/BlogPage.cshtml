@@ -1,0 +1,23 @@
+﻿@page "/page/{slug:regex(^(?!-)([a-zA-Z0-9-]){{1,128}}$)}"
+@model CodeWF.Web.Pages.BlogPageModel
+
+@{
+    ViewBag.TitlePrefix = Model.BlogPage.Title;
+    ViewBag.HideSideBar = Model.BlogPage.HideSidebar;
+    ViewBag.DisableLightSwitch = true;
+
+    ViewBag.MetaDescription = Model.BlogPage.MetaDescription;
+}
+
+@section head {
+    @if (!string.IsNullOrWhiteSpace(Model.BlogPage.CssId))
+    {
+        <link href="~/content.css?id=@Model.BlogPage.CssId" rel="stylesheet" asp-append-version="true" />
+    }
+}
+
+<div class="page-content">
+    @Html.Raw(Model.BlogPage.RawHtmlContent)
+</div>
+
+<partial name="_PageForestageAdmin" />

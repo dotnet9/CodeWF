@@ -1,0 +1,382 @@
+﻿@page "/admin/post/edit/{id:guid?}"
+@using Microsoft.AspNetCore.Builder
+@model CodeWF.Web.Pages.Admin.EditPostModel
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject IConfiguration Configuration
+
+@{
+    ViewBag.Title = "Edit Post";
+    var ec = Configuration.GetSection("Editor").Get<EditorChoice>();
+
+    var wsm = Model.ViewModel.WarnSlugModification;
+
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new { Value = c.Name, c.NativeName });
+
+    var langList = cultureItems
+    .Select(t => new SelectListItem
+            {
+                Text = t.NativeName,
+                Value = t.Value.ToLower()
+            });
+}
+
+@section scripts {
+    <script src="~/lib/tagify/tagify.min.js"></script>
+    <script src="~/js/3rd/bs-custom-file-input.min.js"></script>
+    @{
+        switch (ec)
+        {
+            case EditorChoice.Html:
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" integrity="sha512-6JR4bbn8rCKvrkdoTJd/VFyXAN4CE9XMtgykPWgKiHjou56YDJxWsi90hAeMTYxNwUnKSQu9JPc3SQUg+aGCHw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                break;
+            case EditorChoice.Markdown:
+                <partial name="_MonacoLoaderScript" />
+                <script src="~/js/3rd/inline-attachment.js"></script>
+                <script src="~/js/3rd/monaco.inline-attachment.js"></script>
+                break;
+        }
+    }
+
+    <script type="module">
+        import * as utils from '/js/app/utils.module.js'
+        import * as editor from '/js/app/admin.editor.module.js'
+
+        var btnSubmitPost = '#btn-save';
+        var isPreviewRequired = false;
+        
+        var editorMode = '@ec';
+
+        $(function () {
+            editor.initEvents(@((!wsm).ToString().ToLower()));
+            
+            if (editorMode == '@nameof(EditorChoice.Html)') {
+                editor.loadTinyMCE(".post-content-textarea");
+            }
+            if (editorMode == '@nameof(EditorChoice.Markdown)') {
+                require(['vs/editor/editor.main'], function () {
+                    window.mdContentEditor = initEditor('markdown-content-editor', ".post-content-textarea", 'markdown');
+                    
+                    inlineAttachment.editors.monaco.attach(
+                        window.mdContentEditor, document.getElementsByClassName('md-editor-image-upload-area')[0] ,{
+                        uploadUrl: '/image',
+                        urlText: '![file]({filename})',
+                        onFileUploadResponse: function (xhr) {
+                            var result = JSON.parse(xhr.responseText),
+                                filename = result[this.settings.jsonFieldName];
+
+                            if (result && filename) {
+                                var newValue;
+                                if (typeof this.settings.urlText === 'function') {
+                                    newValue = this.settings.urlText.call(this, filename, result);
+                                } else {
+                                    newValue = this.settings.urlText.replace(this.filenameTag, filename);
+                                }
+                                var text = this.editor.getValue().replace(this.lastValue, newValue);
+                                this.editor.setValue(text);
+                                this.settings.onFileUploaded.call(this, filename);
+                            }
+                            return false;
+                        }
+                    });
+                });
+            }
+
+            editor.keepAlive();
+        });
+
+        $(window).bind('keydown',
+            function (event) {
+                if (event.ctrlKey || event.metaKey) {
+                    switch (String.fromCharCode(event.which).toLowerCase()) {
+                        case 's':
+                            event.preventDefault();
+                            $("#btn-save").trigger('click');
+                            break;
+                    }
+                }
+            });
+
+        var heroImageModal = new bootstrap.Modal(document.getElementById('heroImageModal'));
+
+        window.ajaxImageUpload = function (oFormElement) {
+            const formData = new FormData(oFormElement);
+
+            fetch(oFormElement.action,
+                {
+                    method: 'POST',
+                    body: formData
+                }).then(async (response) => {
+                    if (!response.ok) {
+                        blogToast.error('API Boom');
+                        console.error(err);
+                    } else {
+                        var data = await response.json();
+                        document.querySelector('#ViewModel_HeroImageUrl').value = data.location;
+                    }
+                }).then(response => {
+                    document.querySelector('#form-hero-image').reset();
+                    heroImageModal.hide();
+                }).catch(err => {
+                    blogToast.error(err);
+                    console.error(err);
+                });
+        }
+
+        function handlePostSubmit(event) {
+            event.preventDefault();
+
+            isPreviewRequired = event.submitter.id == 'btn-preview';
+
+            const data = new FormData(event.target);
+            const value = Object.fromEntries(data.entries());
+
+            const content = value["ViewModel.EditorContent"];
+            if (!content) {
+                blogToast.error('Please enter content.');
+                return;
+            }
+
+            var selectedCatIds = data.getAll('SelectedCatIds');
+
+            value["SelectedCatIds"] = selectedCatIds;
+            const newValue = utils.toMagicJson(value);
+
+            document.querySelector(btnSubmitPost).classList.add('disabled');
+            document.querySelector(btnSubmitPost).setAttribute('disabled', 'disabled');
+
+            callApi(event.currentTarget.action,
+                'POST',
+                newValue,
+                async (resp) => {
+                    var respJson = await resp.json();
+                    if (respJson.postId) {
+                        $('input[name="ViewModel.PostId"]').val(respJson.postId);
+                        blogToast.success('Post saved successfully.');
+
+                        if (isPreviewRequired) {
+                            isPreviewRequired = false;
+                            window.open(`/post/preview/${respJson.postId}`);
+                        }
+                    }
+                }, function (resp) {
+                    document.querySelector(btnSubmitPost).classList.remove('disabled');
+                    document.querySelector(btnSubmitPost).removeAttribute('disabled');
+                });
+        }
+
+        const form = document.querySelector('.post-edit-form');
+        form.addEventListener('submit', handlePostSubmit);
+    </script>
+}
+
+@section head {
+    <link href="~/lib/tagify/tagify.css" rel="stylesheet" />
+    <style>
+        .tagify {
+            width: 100% !important;
+        }
+
+        @if (ec == EditorChoice.Markdown)
+        {
+            <text>
+            .monaco-target {
+                border: 1px solid #dee2e6;
+                width: 100%;
+                min-height: calc(100vh - 370px);
+            }
+
+            .md-editor-image-upload-area {
+                border-width: 2px;
+                border-style: dashed;
+            }
+
+            .md-editor-image-upload-area:focus,
+            .md-editor-image-upload-area:hover,
+            .md-editor-image-upload-area.drag-over {
+                color: var(--bs-warning-text-emphasis) !important;
+                background-color: var(--bs-warning-bg-subtle) !important;
+                border-color: var(--bs-warning-border-subtle) !important;
+            }
+            </text>
+        }
+    </style>
+}
+
+<div>
+    <form class="post-edit-form" asp-controller="Post" asp-action="CreateOrEdit">
+        <input type="hidden" asp-for="ViewModel.PostId" />
+        <input type="hidden" asp-for="ViewModel.IsPublished" />
+        <div class="row g-2">
+            <div class="col-md-9 col-xl-10">
+                <input type="text" asp-for="ViewModel.Title" class="form-control form-control-lg" placeholder="@SharedLocalizer["Title"]" required maxlength="128" />
+                <div class="mt-1">
+                    <div class="row g-1">
+                        <div class="col">
+                            <div class="input-group input-group-sm">
+                                <label class="input-group-text" asp-for="ViewModel.Slug">
+                                    <i class="bi-link-45deg"></i>
+                                </label>
+                                <input type="text" asp-for="ViewModel.Slug" class="form-control form-control-sm" placeholder="Slug" spellcheck="false" required pattern="[a-z0-9\-]+" maxlength="128" readonly="@wsm" />
+                                @if (wsm)
+                                {
+                                    <a class="btn btn-warning btn-sm btn-modify-slug">Modify</a>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-auto">
+                            <div class="input-group input-group-sm mb-2">
+                                <label class="input-group-text" asp-for="ViewModel.Author"></label>
+                                <input type="text" class="form-control form-control-sm" spellcheck="false" asp-for="ViewModel.Author" />
+                            </div>
+                        </div>
+                        <div class="col-md-auto">
+                            <div class="input-group input-group-sm mb-2">
+                                <label class="input-group-text" asp-for="ViewModel.LanguageCode">
+                                    <i class="bi-globe"></i>
+                                </label>
+                                <select class="form-select" asp-for="ViewModel.LanguageCode" asp-items="@langList"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (ec == EditorChoice.Html)
+                {
+                    <textarea asp-for="ViewModel.EditorContent" class="post-content-textarea"></textarea>
+                }
+                else
+                {
+                    <div id="markdown-content-editor" class="monaco-target overflow-y-hidden">
+                    </div>
+                    <textarea asp-for="ViewModel.EditorContent" class="post-content-textarea d-none"></textarea>
+                    <div class="md-editor-image-upload-area text-center border-secondary-subtle bg-light p-3 mt-1">
+                        Drag &amp; Drop / Paste image here to upload.
+                    </div>
+                }
+
+                <div class="mt-1 bg-white">
+                    <input type="text" asp-for="ViewModel.Tags" placeholder="@SharedLocalizer["Tags"]" />
+                </div>
+                <div class="mt-1">
+                    <div class="form-floating">
+                        <textarea asp-for="ViewModel.Abstract"
+                                  placeholder="@SharedLocalizer["Abstract"]"
+                                  class="form-control form-control-sm"
+                                  data-bs-toggle="tooltip"
+                                  data-placement="top"
+                                  maxlength="400"
+                                  title="@SharedLocalizer["The first {0} character(s) will be used as abstract if you leave this field blank.", BlogConfig.ContentSettings.PostAbstractWords]"
+                                  style="height: 90px"></textarea>
+                        <label for="ViewModel_Abstract">@SharedLocalizer["Abstract"]</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xl-2">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-2">
+                            <input type="checkbox" name="EnableComment" value="true" class="form-check-input" @(Model.ViewModel.EnableComment ? "checked" : null)>
+                            <label asp-for="ViewModel.EnableComment" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input type="checkbox" name="Featured" value="true" class="form-check-input" @(Model.ViewModel.Featured ? "checked" : null)>
+                            <label asp-for="ViewModel.Featured" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="FeedIncluded" value="true" class="form-check-input" @(Model.ViewModel.FeedIncluded ? "checked" : null)>
+                            <label asp-for="ViewModel.FeedIncluded" class="form-check-label"></label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="IsOutdated" value="true" class="form-check-input" @(Model.ViewModel.IsOutdated ? "checked" : null)>
+                            <label asp-for="ViewModel.IsOutdated" class="form-check-label"></label>
+                        </div>
+                    </div>
+                    <div class="card-body border-top">
+                        <div class="form-floating mb-2">
+                            <textarea asp-for="ViewModel.OriginLink" class="form-control form-control-sm" placeholder="@SharedLocalizer["Origin Link"]"></textarea>
+                            <label for="ViewModel_OriginLink">@SharedLocalizer["Origin Link"]</label>
+                        </div>
+                        <div class="form-floating mb-1">
+                            <textarea asp-for="ViewModel.HeroImageUrl"
+                                      class="form-control form-control-sm"
+                                      placeholder="@Html.DisplayNameFor(m => m.ViewModel.HeroImageUrl)"></textarea>
+                            <label class="form-label" asp-for="ViewModel.HeroImageUrl"></label>
+                        </div>
+                        <div>
+                            <a class="btn btn-sm btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#heroImageModal">
+                                <i class="bi-upload"></i>
+                                @SharedLocalizer["Upload Image"]
+                            </a>
+                        </div>
+
+                        @if (Model.ViewModel.PostId != Guid.Empty)
+                        {
+                            <div class="mt-2">
+                                <a class="btn btn-sm btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#changePublishDateModal">
+                                    <i class="bi-clock-history"></i>
+                                    @SharedLocalizer["Change Publish Date"]
+                                </a>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body border-top">
+                        <h6 class="card-subtitle mb-3 text-muted">
+                            <i class="bi-folder2 me-1"></i>
+                            @SharedLocalizer["Categories"]
+
+                            <a asp-page="./Category" target="_blank" class="float-end">
+                                <i class="bi-box-arrow-up-right"></i>
+                            </a>
+                        </h6>
+
+                        @if (null != Model.CategoryList && Model.CategoryList.Any())
+                        {
+                            <div class="catlist">
+                                <ul>
+                                    @foreach (var cat in Model.CategoryList)
+                                    {
+                                        <li>
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                       id="category-@cat.Id"
+                                                       name="SelectedCatIds"
+                                                       value="@cat.Id"
+                                                       class="form-check-input"
+                                                @(cat.IsChecked ? "checked" : null)>
+
+                                                <label for="category-@cat.Id" class="form-check-label">
+                                                    @cat.DisplayText
+                                                </label>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-accent ediblogeditor-save" id="btn-save">
+                @SharedLocalizer["Save"]
+            </button>
+            @if (!Model.ViewModel.IsPublished)
+            {
+                <button type="submit" class="btn btn-outline-accent ediblogeditor-publish" id="btn-publish">
+                    @SharedLocalizer["Publish"]
+                </button>
+                <button class="btn btn-outline-success ediblogeditor-preview" id="btn-preview">
+                    @SharedLocalizer["Preview"]
+                </button>
+            }
+            <a asp-page="./Post" class="btn btn-outline-secondary">@SharedLocalizer["Cancel"]</a>
+        </div>
+
+        <partial name="_EditPostPublishDateModal" />
+    </form>
+
+    <partial name="_EditPostHeroImage" />
+</div>

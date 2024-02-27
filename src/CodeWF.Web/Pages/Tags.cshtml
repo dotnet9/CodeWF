@@ -1,0 +1,79 @@
+﻿@page "/tags"
+@using System.Web
+@using CodeWF.Core.TagFeature
+@inject IMediator Mediator
+@{
+    ViewBag.TitlePrefix = "Tags";
+    ViewBag.BodyClass = "body-tags-index bg-gray-1";
+    var tags = await Mediator.Send(new GetTagCountListQuery());
+}
+
+@functions {
+    private static string Weight(double weightPercent)
+    {
+        var weight = weightPercent switch
+        {
+            >= 99 => "danger",
+            >= 70 => "success",
+            >= 40 => "accent",
+            >= 20 => "secondary",
+            _ => "outline-secondary"
+        };
+        return weight;
+    }
+}
+
+@section scripts {
+    <script>
+        $("#tagFilter").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+
+            $(".ul-tags li").filter(function () {
+                var show = $(this).text().toLowerCase().indexOf(value) > -1;
+                if (show) {
+                    $(this).addClass('d-inline-block');
+                    $(this).removeClass('d-none');
+                }
+                else {
+                    $(this).removeClass('d-inline-block');
+                    $(this).addClass('d-none');
+                }
+            });
+        });
+    </script>
+}
+
+<h3 class="mb-4">
+    @SharedLocalizer["Tags"]
+</h3>
+
+@if (tags.Any())
+{
+    var tagMax = tags.Select(p => p.Value).Max();
+
+    <input id="tagFilter" type="text" class="form-control mb-3" maxlength="32" placeholder="Filter..">
+
+    <ul class="list-unstyled ul-tags">
+        @foreach (var tag in tags.OrderBy(t => t.Key.DisplayName))
+        {
+            var weightPercent = tag.Value * 1.0 / tagMax * 100;
+            var weight = Weight(weightPercent);
+
+            <li class="d-inline-block mb-2 me-2">
+                <a asp-page="/TagList"
+                   asp-route-normalizedName="@HttpUtility.UrlDecode(tag.Key.NormalizedName.ToLower())"
+                   class="btn btn-sm btn-@weight" title="@(tag.Value)">
+                    @tag.Key.DisplayName.Replace("-", " ")
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-info">
+        @SharedLocalizer["No Tags"]
+    </div>
+}
+
+<partial name="_LightSwitch" />

@@ -1,0 +1,88 @@
+﻿@using CodeWF.Utils
+@model IReadOnlyList<CodeWF.Comments.Comment>
+
+@{
+    static string GetUserAvatarChar(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            return "N/A";
+        }
+
+        var sets = username.Split(' ').Where(t => !string.IsNullOrWhiteSpace(t)).ToArray();
+        if (sets.Length == 1)
+        {
+            return sets[0].First().ToString().ToUpper();
+        }
+        return sets.Length >= 2 ? $"{sets[0].First()}{sets[1].First()}".ToUpper() : "N/A";
+    }
+}
+
+@if (null != Model && Model.Any())
+{
+    var orderedList =
+        BlogConfig.ContentSettings.CommentOrder == CommentOrder.NewToOld ?
+            Model.OrderByDescending(m => m.CreateTimeUtc) :
+            Model.OrderBy(m => m.CreateTimeUtc);
+
+    <div class="comment-list row">
+        @foreach (var item in orderedList)
+        {
+            <div class="col-md-1 mb-3 d-none d-sm-block">
+                @if (BlogConfig.ContentSettings.EnableGravatar && !string.IsNullOrWhiteSpace(item.Email))
+                {
+                    <div class="user-avatar">
+                        <gravatar email="@item.Email" />
+                    </div>
+                }
+                else
+                {
+                    <div class="user-avatar-char">
+                        @GetUserAvatarChar(item.Username)
+                    </div>
+                }
+            </div>
+            <div class="col-md-11 mb-3">
+                <div class="card comment-item">
+                    <div class="card-header">
+                        <strong>@item.Username</strong>
+                        <span class="text-muted float-end">
+                            <time data-utc-label="@item.CreateTimeUtc.ToString("u")">@item.CreateTimeUtc</time>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        @Html.Raw(ContentProcessor.MarkdownToContent(item.CommentContent, ContentProcessor.MarkdownConvertType.Html))
+                        <div>
+                            @foreach (var reply in item.CommentReplies.OrderByDescending(t => t.ReplyTimeUtc))
+                            {
+                                <hr />
+                                <div class="reply-container">
+                                    <div>
+                                        <strong>
+                                            @SharedLocalizer["Author"]
+                                        </strong>
+                                        <span class="float-end text-muted">
+                                            @SharedLocalizer["Replied at"]
+                                            <time data-utc-label="@reply.ReplyTimeUtc.ToString("u")">@reply.ReplyTimeUtc</time>
+                                        </span>
+                                    </div>
+                                    <p>
+                                        @Html.Raw(ContentProcessor.MarkdownToContent(reply.ReplyContent, ContentProcessor.MarkdownConvertType.Html))
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-muted text-center">
+        -
+        @SharedLocalizer["No comments yet"]
+        -
+    </div>
+}

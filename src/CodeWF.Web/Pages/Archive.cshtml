@@ -1,0 +1,77 @@
+﻿@page "/archive"
+@using System.Globalization
+@using CodeWF.Core.PostFeature
+@inject IMediator Mediator
+@{
+    ViewBag.TitlePrefix = "Archive ";
+    ViewBag.BodyClass = "body-archive-index bg-gray-1";
+
+    var archives = await Mediator.Send(new GetArchiveQuery());
+    int[] yearList = null;
+    if (null != Model && archives.Any())
+    {
+        yearList = (from item in archives
+                    orderby item.Year descending
+                    select item.Year).Distinct().ToArray();
+    }
+
+    static string GetMonthNameByNumber(int number)
+    {
+        return number is > 12 or < 1 ? 
+            string.Empty : 
+            CultureInfo.CurrentUICulture.DateTimeFormat.GetMonthName(number);
+    }
+}
+
+@section head{
+    <link href="~/css/timeline.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<h3 class="mb-4">
+    @SharedLocalizer["Archive"]
+</h3>
+
+@if (null != Model && archives.Any() && null != yearList)
+{
+    <ul class="timeline" id="monthList">
+        @foreach (var item in yearList)
+        {
+            var queryMonth = archives.Where(obj => obj.Year == item);
+            var yearEndChar = item % 10;
+
+            <li class="@(item % 2 == 0 ? "timeline-inverted" : null)">
+                <div class="timeline-badge"></div>
+                <div class="timeline-panel shadow-sm bg-white">
+                    <div class="timeline-heading">
+                        <h3 class="timeline-title">
+                            <a asp-page="./ArchiveList" asp-route-year="@item">@item</a>
+                        </h3>
+                    </div>
+                    <div class="timeline-body">
+                        <div class="row g-2">
+                            @foreach (var month in queryMonth)
+                            {
+                                <div class="col-md-6 col-sm-6 col-6">
+                                    <span class="badge bg-secondary float-end">@(month.Count)</span>
+                                    <a asp-page="./ArchiveList"
+                                       asp-route-year="@month.Year"
+                                       asp-route-month="@month.Month">
+                                        @GetMonthNameByNumber(month.Month)
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="text-muted text-center">
+        - @SharedLocalizer["No Archive"] -
+    </div>
+}
+
+<partial name="_LightSwitch" />

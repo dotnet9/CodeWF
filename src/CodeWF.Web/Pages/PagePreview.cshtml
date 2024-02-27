@@ -1,0 +1,29 @@
+﻿@page "/page/preview/{pageId:guid}"
+@model CodeWF.Web.Pages.PagePreviewModel
+
+@{
+    ViewBag.TitlePrefix = Model.BlogPage.Title;
+    ViewBag.HideSideBar = Model.BlogPage.HideSidebar;
+    ViewBag.DisableLightSwitch = true;
+
+    ViewBag.MetaDescription = Model.BlogPage.MetaDescription;
+}
+
+@section head {
+    @if (!string.IsNullOrWhiteSpace(Model.BlogPage.CssId))
+    {
+        <link href="~/content.css?id=@Model.BlogPage.CssId" rel="stylesheet" asp-append-version="true" />
+    }
+}
+
+<div class="container mt-3 mb-4">
+    <div class="alert alert-info">
+        @SharedLocalizer["This is a preview for draft content."]
+    </div>
+</div>
+
+<div class="page-content">
+    @Html.Raw(Model.BlogPage.RawHtmlContent)
+</div>
+
+<partial name="_PageForestageAdmin" />

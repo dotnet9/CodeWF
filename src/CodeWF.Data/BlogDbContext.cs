@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Data;
+﻿
+
+namespace CodeWF.Data;
 
 public class BlogDbContext : DbContext
 {

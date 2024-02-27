@@ -1,0 +1,28 @@
+﻿@page "/post/{year:int:length(4)}/{month:int:range(1,12)?}"
+@model CodeWF.Web.Pages.ArchiveListModel
+@{
+    ViewBag.TitlePrefix = $"Posts in {Model.ArchiveInfo}";
+    ViewBag.BodyClass = "body-archive-list bg-gray-1";
+}
+
+<h3 class="mb-4">
+    @ViewBag.TitlePrefix
+</h3>
+
+<div>
+    @if (!Model.Posts.Any())
+    {
+        <div class="text-muted text-center">
+            - @SharedLocalizer["No Posts"] -
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model.Posts.OrderByDescending(s => s.PubDateUtc))
+        {
+            <partial name="_PostListEntry" model="item" />
+        }
+    }
+</div>
+
+<partial name="_LightSwitch" />

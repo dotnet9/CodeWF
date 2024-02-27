@@ -1,0 +1,179 @@
+﻿@page "/admin/comments"
+@using CodeWF.Utils
+@using CodeWF.Web.PagedList
+@model CodeWF.Web.Pages.Admin.CommentsModel
+@{
+    ViewBag.Title = "Comments";
+}
+@Html.AntiForgeryToken()
+
+@section scripts{
+    <script type="module">
+        import * as utils from '/js/app/utils.module.js'
+
+        $(".btn-delete").click(function () {
+            var cid = $(this).data("commentid");
+            callApi('/api/comment', 'DELETE', [cid],
+                (success) => {
+                    document.querySelector(`#panel-comment-${cid}`).remove();
+                });
+        });
+
+        $(".btn-reply").click(function () {
+            var cid = $(this).data("commentid");
+            $(`#panel-comment-${cid} .reply-ui`).show();
+        });
+
+        $(".btn-reply-post").click(function () {
+            var cid = $(this).data("commentid");
+            var replyContent = $(`#replycontent-${cid}`).val();
+
+            callApi(`/api/comment/${cid}/reply`, 'POST', replyContent,
+                async (resp) => {
+                    var data = await resp.json();
+                    $(`#panel-comment-${data.commentId} .reply-ui`).hide();
+                    $(`#panel-comment-${data.commentId} .reply-list`).prepend(
+                        `<hr /><div class="reply-container"><div><strong>Reply</strong><span class="pull-right text-muted">${data.replyTimeUtc
+                        }</span></div><p>${data.replyContentHtml}</p></div>`);
+                });
+        });
+
+        $(".btn-approve").click(function () {
+            callApi(`/api/comment/${$(this).data("commentid")}/approval/toggle`, 'PUT', {},
+                async (resp) => {
+                    var data = await resp.json();
+                    $(`#panel-comment-${data} .btn-approve`).toggleClass('btn-outline-success');
+                    $(`#panel-comment-${data} .btn-approve`).toggleClass('btn-success');
+                });
+        });
+
+        window.deleteSelectedComments = function () {
+            var cids = [];
+            $('.chk-cid:checked').each(function () {
+                cids.push($(this).data('cid'));
+            });
+
+            callApi('/api/comment', 'DELETE', cids,
+                (success) => {
+                    $.each(cids, function (index, value) {
+                        document.querySelector(`#panel-comment-${value}`).remove();
+                    });
+                });
+        }
+
+        utils.formatUtcTime();
+    </script>
+}
+
+@section head{
+    <style>
+        .mdrendered-comment-content img {
+            max-width: 720px;
+        }
+
+        .reply-container {
+            padding-left: 10px;
+            border-left: 4px solid #CECECE;
+        }
+    </style>
+}
+@section admintoolbar{
+    <div class="admin-toolbar pb-2 border-bottom mb-3">
+        <a href="javascript:window.deleteSelectedComments();" class="btn btn-outline-danger btn-delete-selected">
+            <i class="bi-trash"></i> @SharedLocalizer["Delete selected"]
+        </a>
+    </div>
+}
+
+<div>
+    @if (Model.CommentDetailedItems.Count == 0)
+    {
+        <div class="alert alert-info">
+            @SharedLocalizer["No Comments"]
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model.CommentDetailedItems)
+        {
+            <div id="panel-comment-@item.Id" class="p-3 mb-3 rounded-3 shadow-sm border bg-white row g-1">
+                <div class="form-check col-auto">
+                    <input type="checkbox" class="form-check-input chk-cid" id="comment-item-chk-@item.Id" data-cid="@item.Id" />
+                    <label class="form-check-label" for="comment-item-chk-@item.Id"></label>
+                </div>
+
+                <div class="col">
+                    <h6>
+                        @item.Username
+                        @if (!string.IsNullOrWhiteSpace(item.Email))
+                        {
+                            <text>
+                                (<a href="mailto:@item.Email" class="d-none d-sm-inline">@item.Email</a>)
+                            </text>
+                        }
+                    </h6>
+                    <div class="mdrendered-comment-content">
+                        @Html.Raw(ContentProcessor.MarkdownToContent(item.CommentContent, ContentProcessor.MarkdownConvertType.Html))
+                    </div>
+                    <div class="text-muted">
+                        @item.PostTitle
+                    </div>
+
+                    <small class="text-muted">
+                        <span>
+                            <time data-utc-label="@item.CreateTimeUtc.ToString("u")">@item.CreateTimeUtc</time>
+                        </span>
+                        <span class="text-muted d-none d-sm-inline">(@item.IpAddress)</span>
+                    </small>
+
+                    <div class="reply-ui mt-3" style="display: none;">
+                        <form>
+                            <div class="mb-2">
+                                <textarea class="form-control"
+                                          id="replycontent-@item.Id"
+                                          name="ReplyContent"
+                                          placeholder="Content" type="text"></textarea>
+                            </div>
+
+                            <a class="btn btn-outline-success btn-reply-post" href="#" data-commentid="@item.Id">
+                                @SharedLocalizer["Reply"]
+                            </a>
+                        </form>
+                    </div>
+                    <div class="reply-list">
+                        @foreach (var reply in item.CommentReplies.OrderByDescending(t => t.ReplyTimeUtc))
+                        {
+                            <hr />
+                            <div class="reply-container">
+                                <div>
+                                    @Html.Raw(ContentProcessor.MarkdownToContent(reply.ReplyContent, ContentProcessor.MarkdownConvertType.Html))
+                                </div>
+                                <small class="text-muted">
+                                    <time data-utc-label="@reply.ReplyTimeUtc.ToString("u")">@reply.ReplyTimeUtc</time>
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <a href="javascript:;" class="btn btn-sm @(item.IsApproved ? "btn-success" : "btn-outline-success") btn-approve" data-commentid="@item.Id">
+                        <i class="bi-star-fill"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-accent btn-reply" data-commentid="@item.Id">
+                        <i class="bi-reply-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger btn-delete" data-commentid="@item.Id">
+                        <i class="bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        }
+    }
+
+    @Html.PagedListPager(Model.CommentDetailedItems, page => $"?pageIndex={page}", new PagedListRenderOptions
+    {
+        UlElementClasses = new[] { "pagination mt-3" },
+        DisplayEllipsesWhenNotShowingAllPageNumbers = false
+    })
+</div>

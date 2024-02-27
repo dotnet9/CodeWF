@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackageProjectUrl>https://github.com/dotnet9/CodeWF</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnet9/CodeWF</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Edi.ChinaDetector" Version="1.1.251" />
+    <PackageReference Include="Edi.ImageWatermark" Version="2.11.3" />
+    <PackageReference Include="Edi.PasswordGenerator" Version="1.1.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.1.24081.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.0-preview.1.24081.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CdoeWF.Auth\CdoeWF.Auth.csproj" />
+    <ProjectReference Include="..\CdoeWF.Pingback\CdoeWF.Pingback.csproj" />
+    <ProjectReference Include="..\CodeWF.Comments\CodeWF.Comments.csproj" />
+    <ProjectReference Include="..\CodeWF.Core\CodeWF.Core.csproj" />
+    <ProjectReference Include="..\CodeWF.Data.MySql\CodeWF.Data.MySql.csproj" />
+    <ProjectReference Include="..\CodeWF.Data.PostgreSql\CodeWF.Data.PostgreSql.csproj" />
+    <ProjectReference Include="..\CodeWF.Data.SqlServer\CodeWF.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\CodeWF.FriendLink\CodeWF.FriendLink.csproj" />
+    <ProjectReference Include="..\CodeWF.ImageStorage\CodeWF.ImageStorage.csproj" />
+    <ProjectReference Include="..\CodeWF.Email.Client\CodeWF.Email.Client.csproj" />
+    <ProjectReference Include="..\CodeWF.MetaWeblog\CodeWF.MetaWeblog.csproj" />
+    <ProjectReference Include="..\CodeWF.Syndication\CodeWF.Syndication.csproj" />
+    <ProjectReference Include="..\CodeWF.Theme\CodeWF.Theme.csproj" />
+  </ItemGroup>
+</Project>

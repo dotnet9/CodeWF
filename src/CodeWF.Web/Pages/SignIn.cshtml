@@ -1,0 +1,80 @@
+﻿@page "/auth/signin"
+@model CodeWF.Web.Pages.SignInModel
+@using CodeWF.Utils
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        @SharedLocalizer["Admin Sign In"]
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <partial name="_Favicons" />
+    <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/base.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/theme.css" rel="stylesheet" asp-append-version="true" />
+    @if (BlogConfig.CustomStyleSheetSettings.EnableCustomCss)
+    {
+        <link href="~/custom.css" rel="stylesheet" asp-append-version="true" />
+    }
+    <style>
+        #img-captcha {
+            border-radius: 0 3px 3px 0;
+        }
+    </style>
+</head>
+<body class="pt-5 bg-gray-1">
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md-4">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">@SharedLocalizer["Sign In"]</h5>
+
+                        <form method="post">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Username" class="form-control" placeholder="@Html.DisplayNameFor(m => m.Username)" required minlength="2" maxlength="32" />
+                                <label asp-for="Username"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Password" class="form-control" required pattern="^(?=.*[a-zA-Z])(?=.*[0-9])[A-Za-z0-9._~!@@#$^&*]{8,}$" placeholder="@Html.DisplayNameFor(m => m.Password)" minlength="8" maxlength="32" />
+                                <label asp-for="Password"></label>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input asp-for="CaptchaCode"
+                                           minlength="4"
+                                           maxlength="4"
+                                           placeholder="Captcha Code"
+                                           autocomplete="off"
+                                           class="form-control" required />
+                                    <img id="img-captcha" onclick="getNewCaptcha()" src="~/captcha-image" data-bs-toggle="tooltip" data-placement="top" title="@SharedLocalizer["Can't read? Click to change another image."]" />
+                                </div>
+                            </div>
+
+                            <input type="submit" value="@SharedLocalizer["Sign In"]" class="btn w-100 btn-accent" />
+                        </form>
+                    </div>
+                </div>
+                <p class="text-muted mt-4 small text-center">
+                    CodeWF @Helper.AppVersion
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script>
+        function getNewCaptcha() {
+            d = new Date();
+            document.querySelector('#img-captcha').src = `/captcha-image?${d.getTime()}`;
+        };
+    </script>
+</body>
+</html>
