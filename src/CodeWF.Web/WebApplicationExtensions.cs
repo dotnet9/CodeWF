@@ -1,7 +1,4 @@
-﻿using CodeWF.Data.MySql;
-using CodeWF.Data.PostgreSql;
-using CodeWF.Data.SqlServer;
-using Edi.ChinaDetector;
+﻿using Edi.ChinaDetector;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodeWF.Web;
@@ -89,8 +86,10 @@ public static class WebApplicationExtensions
     {
         app.Logger.LogInformation("Seeding database...");
 
+        var auto = app.Configuration.GetSection("Seed:Auto").Get<bool>();
+        var assetDir = app.Configuration.GetSection("Seed:AssetDir").Get<string>();
         await context.ClearAllData();
-        await Seed.SeedAsync(context, app.Logger);
+        await Seed.SeedAsync(context, app.Logger, auto, assetDir);
 
         app.Logger.LogInformation("Database seeding successfully.");
     }

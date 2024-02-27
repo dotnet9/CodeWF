@@ -1,21 +1,38 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace CodeWF.Data;
 
 public class Seed
 {
-    public static async Task SeedAsync(BlogDbContext dbContext, ILogger logger, int retry = 0)
+    public static async Task SeedAsync(BlogDbContext dbContext, ILogger logger, bool auto, string? assetDir,
+        int retry = 0)
     {
+        if (!auto && (string.IsNullOrWhiteSpace(assetDir) || !Directory.Exists(assetDir)))
+        {
+            throw new Exception("Manually generate seeds, please configure asset directory");
+        }
+
         int retryForAvailability = retry;
 
         try
         {
             await dbContext.LocalAccount.AddRangeAsync(GetLocalAccounts());
             await dbContext.BlogTheme.AddRangeAsync(GetThemes());
-            await dbContext.Category.AddRangeAsync(GetCategories());
-            await dbContext.Tag.AddRangeAsync(GetTags());
-            await dbContext.FriendLink.AddRangeAsync(GetFriendLinks());
-            await dbContext.CustomPage.AddRangeAsync(GetPages());
+            if (auto)
+            {
+                await dbContext.Category.AddRangeAsync(GetCategories());
+                await dbContext.Tag.AddRangeAsync(GetTags());
+                await dbContext.FriendLink.AddRangeAsync(GetFriendLinks());
+                await dbContext.CustomPage.AddRangeAsync(GetPages());
+            }
+            else
+            {
+                await dbContext.Category.AddRangeAsync(GetCategories(assetDir!));
+                await dbContext.Tag.AddRangeAsync(GetTags());
+                await dbContext.FriendLink.AddRangeAsync(GetFriendLinks());
+                await dbContext.CustomPage.AddRangeAsync(GetPages());
+            }
 
             // Add example post
             string content = "CodeWF is the blog system for https://codewf.com. Powered by .NET 9.";
@@ -56,7 +73,7 @@ public class Seed
             retryForAvailability++;
 
             logger.LogError(e.Message);
-            await SeedAsync(dbContext, logger, retryForAvailability);
+            await SeedAsync(dbContext, logger, auto, assetDir, retryForAvailability);
             throw;
         }
     }
@@ -150,6 +167,30 @@ public class Seed
                 RouteName = "default"
             }
         };
+    }
+
+    private static IEnumerable<CategoryEntity> GetCategories(string assetDir)
+    {
+        var categoryFile = Path.Combine(assetDir, "site", "category.json");
+        if (!File.Exists(categoryFile))
+        {
+            throw new Exception($"Please config {categoryFile}");
+        }
+
+        var fileContent = File.ReadAllText(categoryFile);
+        var categories = JsonSerializer.Deserialize<IEnumerable<CategoryEntity>>(fileContent)?.ToList();
+        if (categories?.Any() != true)
+        {
+            throw new Exception($"Please config {categoryFile}");
+        }
+
+        categories.ForEach(cat =>
+        {
+            cat.Id = Guid.NewGuid();
+            cat.Note = cat.DisplayName;
+        });
+
+        return categories!;
     }
 
     private static IEnumerable<TagEntity> GetTags()

@@ -5,7 +5,7 @@ namespace CodeWF.Web.Pages;
 [AddPingbackHeader("pingback")]
 public class PostModel(IMediator mediator) : PageModel
 {
-    public Post Post { get; set; }
+    public Core.PostFeature.Post Post { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int year, int month, int day, string slug)
     {

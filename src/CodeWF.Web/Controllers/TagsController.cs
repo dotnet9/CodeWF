@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Web.Controllers;
+﻿using Tag = CodeWF.Core.TagFeature.Tag;
+
+namespace CodeWF.Web.Controllers;
 
 [Authorize]
 [ApiController]

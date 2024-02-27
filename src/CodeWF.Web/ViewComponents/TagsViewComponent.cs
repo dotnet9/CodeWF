@@ -7,7 +7,7 @@ public class TagsViewComponent(IBlogConfig blogConfig, IMediator mediator, ILogg
     {
         try
         {
-            IReadOnlyList<KeyValuePair<Tag, int>> tags =
+            IReadOnlyList<KeyValuePair<Core.TagFeature.Tag, int>> tags =
                 await mediator.Send(new GetHotTagsQuery(blogConfig.GeneralSettings.HotTagAmount));
             return View(tags);
         }
