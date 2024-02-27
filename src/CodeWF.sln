@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Data.MySql", "CodeWF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Data.PostgreSql", "CodeWF.Data.PostgreSql\CodeWF.Data.PostgreSql.csproj", "{357746B1-0BB2-417C-BEF7-D90B9DA3C807}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Data.SqlServer", "CodeWF.Data.SqlServer\CodeWF.Data.SqlServer.csproj", "{D4A18F01-A90A-4448-B73D-3B44CDBA5C01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{357746B1-0BB2-417C-BEF7-D90B9DA3C807}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{357746B1-0BB2-417C-BEF7-D90B9DA3C807}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{357746B1-0BB2-417C-BEF7-D90B9DA3C807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{67A097FB-4050-4C02-9C30-BD75306BD30F} = {6573A18D-C31B-4BCB-BA55-7B82027CBDBB}
 		{9F86646E-0B19-4B52-9CF4-3BF3F345A642} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
 		{357746B1-0BB2-417C-BEF7-D90B9DA3C807} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
+		{D4A18F01-A90A-4448-B73D-3B44CDBA5C01} = {B747FD75-E38F-4D91-A87F-B6C62A432F94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}
