@@ -4,14 +4,14 @@ public class GeneralSettings : IBlogSettings
 {
     [JsonIgnore] public static GeneralSettings DefaultValue = new()
     {
-        OwnerName = "Admin",
-        OwnerEmail = "admin@codewf.com",
-        SiteTitle = "CodeWF",
-        Description = "CodeWF Admin",
+        OwnerName = "沙漠尽头的狼",
+        OwnerEmail = "qq1012434131@gmail.com",
+        SiteTitle = "码界工坊",
+        Description = "一个热衷于互联网分享精神的网站",
         AutoDarkLightTheme = true,
-        LogoText = "codewf",
-        MetaKeyword = "codewf",
-        Copyright = $"[c] {DateTime.UtcNow.Year}",
+        LogoText = "码界工坊",
+        MetaKeyword = "码界工坊",
+        Copyright = $"[c] 2019-{DateTime.UtcNow.Year}",
         TimeZoneId = "China Standard Time",
         TimeZoneUtcOffset = TimeSpan.FromHours(8),
         ThemeId = 1,

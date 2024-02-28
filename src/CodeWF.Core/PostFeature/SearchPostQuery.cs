@@ -37,8 +37,11 @@ public class SearchPostQueryHandler(IRepository<PostEntity> repo)
         {
             // keyword: "dotnetrocks"
             string k = rst.First();
-            IQueryable<PostEntity> result = query.Where(p => p.Title.Contains(k) ||
-                                                             p.Tags.Select(t => t.DisplayName).Contains(k));
+            IQueryable<PostEntity> result = query.Where(p => p.Title.Contains(k)
+                                                             || p.ContentAbstract!.Contains(k)
+                                                             || p.Tags.Select(t => t.DisplayName).Contains(k)
+                                                             || p.PostCategory.Select(c => c.Category!.DisplayName)
+                                                                 .Contains(k));
             return result;
         }
     }
