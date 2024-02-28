@@ -50,6 +50,6 @@ public static class WebApplicationBuilderExtension
         }
 
         Console.WriteLine("----------------------------------------------------------");
-        Console.WriteLine("https://github.com/EdiWang/Moonglade");
+        Console.WriteLine("https://github.com/dotnet9/CodeWF");
     }
 }

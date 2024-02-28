@@ -30,7 +30,13 @@ public class SearchPostQueryHandler(IRepository<PostEntity> repo)
             // keyword: "dot  net rocks"
             // search for post where Title containing "dot && net && rocks"
             IQueryable<PostEntity> result =
-                rst.Aggregate(query, (current, s) => current.Where(p => p.Title.Contains(s)));
+                rst.Aggregate(query, (current, s) => current.Where(p => p.Title.Contains(s)
+                                                                        || p.ContentAbstract.Contains(s)
+                                                                        || p.Tags.Select(t => t.DisplayName).Contains(s)
+                                                                        || p.PostCategory
+                                                                            .Select(c => c.Category!.DisplayName)
+                                                                            .Contains(s)
+                                                                        || p.PostContent.Contains(s)));
             return result;
         }
         else
@@ -41,7 +47,8 @@ public class SearchPostQueryHandler(IRepository<PostEntity> repo)
                                                              || p.ContentAbstract!.Contains(k)
                                                              || p.Tags.Select(t => t.DisplayName).Contains(k)
                                                              || p.PostCategory.Select(c => c.Category!.DisplayName)
-                                                                 .Contains(k));
+                                                                 .Contains(k)
+                                                             || p.PostContent.Contains(k));
             return result;
         }
     }
