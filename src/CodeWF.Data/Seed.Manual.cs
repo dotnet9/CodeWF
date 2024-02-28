@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Data;
+﻿using CodeWF.Utils;
+
+namespace CodeWF.Data;
 
 public partial class Seed
 {
@@ -55,10 +57,10 @@ public partial class Seed
                 Slug = post.Slug,
                 Author = post.Author,
                 PostContent = post.Content,
+                ContentAbstract = post.Description,
                 CommentEnabled = true,
                 CreateTimeUtc = post.Date,
                 IsFeedIncluded = true,
-                PubDateUtc = DateTime.Now,
                 LastModifiedUtc = post.LastModifyDate,
                 IsPublished = !post.Draft,
                 IsDeleted = false,
@@ -68,6 +70,11 @@ public partial class Seed
                 HeroImageUrl = post.Cover,
                 IsFeatured = post.Banner
             };
+            newPost.PubDateUtc = newPost.LastModifiedUtc ?? newPost.CreateTimeUtc;
+            var input = $"{newPost.Slug.ToLower()}#{newPost.PubDateUtc.GetValueOrDefault():yyyyMMdd}";
+            var checkSum = Helper.ComputeCheckSum(input);
+            newPost.HashCheckSum = checkSum;
+
             post.Categories?.ForEach(cat =>
             {
                 CategoryEntity catEntity = cats.First(entity => entity.DisplayName == cat);

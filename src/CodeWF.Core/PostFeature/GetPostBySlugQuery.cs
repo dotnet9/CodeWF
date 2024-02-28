@@ -5,9 +5,9 @@ public record GetPostBySlugQuery(PostSlug Slug) : IRequest<Post>;
 public class GetPostBySlugQueryHandler(IRepository<PostEntity> repo, ICacheAside cache, IConfiguration configuration)
     : IRequestHandler<GetPostBySlugQuery, Post>
 {
-    public async Task<Post> Handle(GetPostBySlugQuery request, CancellationToken ct)
+    public async Task<Post?> Handle(GetPostBySlugQuery request, CancellationToken ct)
     {
-        DateTime date = new DateTime(request.Slug.Year, request.Slug.Month, request.Slug.Day);
+        var date = new DateTime(request.Slug.Year, request.Slug.Month, request.Slug.Day);
 
         // Try to find by checksum
         int slugCheckSum = Helper.ComputeCheckSum($"{request.Slug.Slug}#{date:yyyyMMdd}");
@@ -22,7 +22,7 @@ public class GetPostBySlugQueryHandler(IRepository<PostEntity> repo, ICacheAside
 
             if (pid == Guid.Empty)
             {
-                return null;
+                return default;
             }
 
             // Post is found, fill it's checksum so that next time the query can be run against checksum
