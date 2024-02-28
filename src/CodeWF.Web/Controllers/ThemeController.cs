@@ -19,7 +19,7 @@ public class ThemeController(IMediator mediator, ICacheAside cache, IBlogConfig 
                 // Fall back to default theme for migration
                 if (blogConfig.GeneralSettings.ThemeId == 0)
                 {
-                    blogConfig.GeneralSettings.ThemeId = 1;
+                    blogConfig.GeneralSettings.ThemeId = 4;
                     KeyValuePair<string, string> kvp = blogConfig.UpdateAsync(blogConfig.GeneralSettings);
                     await mediator.Send(new UpdateConfigurationCommand(kvp.Key, kvp.Value));
                 }

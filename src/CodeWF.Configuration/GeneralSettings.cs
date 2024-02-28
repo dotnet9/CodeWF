@@ -14,7 +14,7 @@ public class GeneralSettings : IBlogSettings
         Copyright = $"[c] 2019-{DateTime.UtcNow.Year}",
         TimeZoneId = "China Standard Time",
         TimeZoneUtcOffset = TimeSpan.FromHours(8),
-        ThemeId = 1,
+        ThemeId = 4,
         HotTagAmount = 10
     };
 
@@ -80,7 +80,7 @@ public class GeneralSettings : IBlogSettings
     [Display(Name = "Auto Light / Dark theme regarding client system settings")]
     public bool AutoDarkLightTheme { get; set; }
 
-    public int ThemeId { get; set; } = 1;
+    public int ThemeId { get; set; } = 4;
 
     [Display(Name = "Profile")] public bool WidgetsProfile { get; set; } = true;
 
