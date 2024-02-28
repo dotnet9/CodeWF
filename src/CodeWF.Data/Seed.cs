@@ -28,7 +28,7 @@ public partial class Seed
             {
                 await AddPostsAsync(dbContext, assetDir!);
                 await dbContext.FriendLink.AddRangeAsync(GetFriendLinks(assetDir!));
-                await dbContext.CustomPage.AddRangeAsync(GetPages());
+                await dbContext.CustomPage.AddRangeAsync(GetPages(assetDir!));
             }
 
 
@@ -122,25 +122,6 @@ public partial class Seed
                 CssRules =
                     "{\"--accent-color1\": \"#4E5967\",\"--accent-color2\": \"#333942\",\"--accent-color3\": \"#6e7c8e\"}",
                 ThemeType = 0
-            }
-        };
-    }
-
-    private static IEnumerable<PageEntity> GetPages()
-    {
-        return new List<PageEntity>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Title = "About",
-                Slug = "about",
-                MetaDescription = "An Empty About Page",
-                HtmlContent = "<h3>An Empty About Page</h3>",
-                HideSidebar = true,
-                IsPublished = true,
-                CreateTimeUtc = DateTime.UtcNow,
-                UpdateTimeUtc = DateTime.UtcNow
             }
         };
     }

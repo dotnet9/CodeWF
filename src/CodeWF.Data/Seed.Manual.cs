@@ -115,4 +115,26 @@ public partial class Seed
 
         return dataList;
     }
+
+
+    private static IEnumerable<PageEntity> GetPages(string assetDir)
+    {
+        return new List<PageEntity>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "About",
+                Slug = "about",
+                MetaDescription = "An Empty About Page",
+                HtmlContent =
+                    ContentProcessor.MarkdownToContent(File.ReadAllText(Path.Combine(assetDir, "site", "about.md")),
+                        ContentProcessor.MarkdownConvertType.Html, false),
+                HideSidebar = true,
+                IsPublished = true,
+                CreateTimeUtc = DateTime.UtcNow,
+                UpdateTimeUtc = DateTime.UtcNow
+            }
+        };
+    }
 }

@@ -72,4 +72,23 @@ public partial class Seed
             new() { Id = Guid.NewGuid(), Title = "码界工坊", LinkUrl = "https://codewf.com" }
         };
     }
+
+    private static IEnumerable<PageEntity> GetPages()
+    {
+        return new List<PageEntity>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "About",
+                Slug = "about",
+                MetaDescription = "An Empty About Page",
+                HtmlContent = "<h3>An Empty About Page</h3>",
+                HideSidebar = true,
+                IsPublished = true,
+                CreateTimeUtc = DateTime.UtcNow,
+                UpdateTimeUtc = DateTime.UtcNow
+            }
+        };
+    }
 }
