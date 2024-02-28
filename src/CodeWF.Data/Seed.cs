@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace CodeWF.Data;
 
-public class Seed
+public partial class Seed
 {
     public static async Task SeedAsync(BlogDbContext dbContext, ILogger logger, bool auto, string? assetDir,
         int retry = 0)
@@ -30,14 +30,14 @@ public class Seed
             {
                 await dbContext.Category.AddRangeAsync(GetCategories(assetDir!));
                 await dbContext.Tag.AddRangeAsync(GetTags());
-                await dbContext.FriendLink.AddRangeAsync(GetFriendLinks());
+                await dbContext.FriendLink.AddRangeAsync(GetFriendLinks(assetDir!));
                 await dbContext.CustomPage.AddRangeAsync(GetPages());
             }
 
             // Add example post
             string content = "CodeWF is the blog system for https://codewf.com. Powered by .NET 9.";
 
-            PostEntity post = new PostEntity
+            var post = new PostEntity
             {
                 Id = Guid.NewGuid(),
                 Title = "Welcome to CodeWF",
@@ -169,29 +169,6 @@ public class Seed
         };
     }
 
-    private static IEnumerable<CategoryEntity> GetCategories(string assetDir)
-    {
-        var categoryFile = Path.Combine(assetDir, "site", "category.json");
-        if (!File.Exists(categoryFile))
-        {
-            throw new Exception($"Please config {categoryFile}");
-        }
-
-        var fileContent = File.ReadAllText(categoryFile);
-        var categories = JsonSerializer.Deserialize<IEnumerable<CategoryEntity>>(fileContent)?.ToList();
-        if (categories?.Any() != true)
-        {
-            throw new Exception($"Please config {categoryFile}");
-        }
-
-        categories.ForEach(cat =>
-        {
-            cat.Id = Guid.NewGuid();
-            cat.Note = cat.DisplayName;
-        });
-
-        return categories!;
-    }
 
     private static IEnumerable<TagEntity> GetTags()
     {
