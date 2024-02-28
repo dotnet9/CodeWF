@@ -15,9 +15,9 @@ internal class PostConfiguration : IEntityTypeConfiguration<PostEntity>
         builder.Property(e => e.PostContent);
 
         builder.Property(e => e.Author).HasMaxLength(64);
-        builder.Property(e => e.Slug).HasMaxLength(128);
-        builder.Property(e => e.Title).HasMaxLength(128);
-        builder.Property(e => e.OriginLink).HasMaxLength(256);
-        builder.Property(e => e.HeroImageUrl).HasMaxLength(256);
+        builder.Property(e => e.Slug).HasMaxLength(PostConsts.MaxSlugLength);
+        builder.Property(e => e.Title).HasMaxLength(PostConsts.MaxTitleLength);
+        builder.Property(e => e.OriginLink).HasMaxLength(PostConsts.MaxOriginalLinkLength);
+        builder.Property(e => e.HeroImageUrl).HasMaxLength(PostConsts.MaxCoverLength);
     }
 }

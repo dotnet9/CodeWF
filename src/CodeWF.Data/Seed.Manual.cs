@@ -2,10 +2,24 @@
 
 public partial class Seed
 {
+    private static async Task AddPostsAsync(BlogDbContext dbContext, string assetDir)
+    {
+        List<CategoryEntity> cats = GetCategories(assetDir).ToList();
+        await dbContext.Category.AddRangeAsync(cats);
+
+        (BlogPostSeedDto[]? BlogPosts, string[]? Tags) postAndTags = await GetPostAsync(assetDir, cats.ToList());
+
+        List<TagEntity> tags = GetTags(postAndTags.Tags)!.ToList();
+        await dbContext.Tag.AddRangeAsync(tags);
+
+        IEnumerable<PostEntity> posts = GetPosts(postAndTags.BlogPosts!.ToList(), cats, tags);
+        await dbContext.Post.AddRangeAsync(posts);
+    }
+
     private static IEnumerable<CategoryEntity> GetCategories(string assetDir)
     {
-        var filePath = Path.Combine(assetDir, "site", "category.json");
-        var dataList = ReadFromFile<CategoryEntity>(filePath).ToList();
+        string filePath = Path.Combine(assetDir, "site", "category.json");
+        List<CategoryEntity> dataList = ReadFromFile<CategoryEntity>(filePath).ToList();
         dataList.ForEach(item =>
         {
             item.Id = Guid.NewGuid();
@@ -15,10 +29,65 @@ public partial class Seed
         return dataList!;
     }
 
+    private static IEnumerable<TagEntity>? GetTags(string[]? tagSeeds)
+    {
+        if (tagSeeds == null || !tagSeeds.Any())
+        {
+            return null;
+        }
+
+        int id = 1;
+
+        return tagSeeds
+            .Select(tagSeed => new TagEntity { Id = id++, DisplayName = tagSeed, NormalizedName = tagSeed }).ToList();
+    }
+
+    private static IEnumerable<PostEntity> GetPosts(List<BlogPostSeedDto> posts, List<CategoryEntity> cats,
+        List<TagEntity> tags)
+    {
+        List<PostEntity> postList = new List<PostEntity>();
+        foreach (BlogPostSeedDto post in posts)
+        {
+            PostEntity newPost = new PostEntity
+            {
+                Id = Guid.NewGuid(),
+                Title = post.Title,
+                Slug = post.Slug,
+                Author = post.Author,
+                PostContent = post.Content,
+                CommentEnabled = true,
+                CreateTimeUtc = post.Date,
+                IsFeedIncluded = true,
+                PubDateUtc = DateTime.Now,
+                LastModifiedUtc = post.LastModifyDate,
+                IsPublished = !post.Draft,
+                IsDeleted = false,
+                IsOriginal = post.Copyright == CopyRightType.Original,
+                IsOutdated = false,
+                OriginLink = post.OriginalLink,
+                HeroImageUrl = post.Cover,
+                IsFeatured = post.Banner
+            };
+            post.Categories?.ForEach(cat =>
+            {
+                CategoryEntity catEntity = cats.First(entity => entity.DisplayName == cat);
+                newPost.PostCategory.Add(new PostCategoryEntity { PostId = newPost.Id, CategoryId = catEntity.Id });
+            });
+            post.Tags?.ForEach(tag =>
+            {
+                TagEntity tagEntity = tags.First(entity => entity.DisplayName == tag);
+                newPost.Tags.Add(tagEntity);
+            });
+            postList.Add(newPost);
+        }
+
+        return postList;
+    }
+
     private static IEnumerable<FriendLinkEntity> GetFriendLinks(string assetDir)
     {
-        var filePath = Path.Combine(assetDir, "site", "FriendLink.json");
-        var dataList = ReadFromFile<FriendLinkEntity>(filePath).ToList();
+        string filePath = Path.Combine(assetDir, "site", "FriendLink.json");
+        List<FriendLinkEntity> dataList = ReadFromFile<FriendLinkEntity>(filePath).ToList();
         dataList.ForEach(item => item.Id = Guid.NewGuid());
         return dataList;
     }
@@ -30,8 +99,8 @@ public partial class Seed
             throw new Exception($"Please config {filePath}");
         }
 
-        var fileContent = File.ReadAllText(filePath);
-        var dataList = JsonSerializer.Deserialize<IEnumerable<T>>(fileContent)?.ToList();
+        string fileContent = File.ReadAllText(filePath);
+        List<T>? dataList = JsonSerializer.Deserialize<IEnumerable<T>>(fileContent)?.ToList();
         if (dataList?.Any() != true)
         {
             throw new Exception($"Please config {filePath}");
