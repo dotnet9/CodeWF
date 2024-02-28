@@ -8,7 +8,7 @@ public sealed class TagSpec : BaseSpecification<TagEntity>
         ApplyOrderByDescending(p => p.Posts.Count);
     }
 
-    public TagSpec(string normalizedName) : base(t => t.NormalizedName == normalizedName)
+    public TagSpec(string normalizedName) : base(t => t.NormalizedName.ToLower() == normalizedName.ToLower())
     {
     }
 }

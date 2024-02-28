@@ -5,18 +5,19 @@ namespace CodeWF.Web.Pages;
 
 public class TagListModel(IMediator mediator, IBlogConfig blogConfig, ICacheAside cache) : PageModel
 {
-    [BindProperty(SupportsGet = true)]
-    public int P { get; set; } = 1;
+    [BindProperty(SupportsGet = true)] public int P { get; set; } = 1;
     public BasePagedList<PostDigest> Posts { get; set; }
 
     public async Task<IActionResult> OnGet(string normalizedName)
     {
+        normalizedName = WebUtility.UrlDecode(normalizedName);
         var tagResponse = await mediator.Send(new GetTagQuery(normalizedName));
         if (tagResponse is null) return NotFound();
 
         var pagesize = blogConfig.ContentSettings.PostListPageSize;
         var posts = await mediator.Send(new ListByTagQuery(tagResponse.Id, pagesize, P));
-        var count = await cache.GetOrCreateAsync(BlogCachePartition.PostCountTag.ToString(), tagResponse.Id.ToString(), _ => mediator.Send(new CountPostQuery(CountType.Tag, TagId: tagResponse.Id)));
+        var count = await cache.GetOrCreateAsync(BlogCachePartition.PostCountTag.ToString(), tagResponse.Id.ToString(),
+            _ => mediator.Send(new CountPostQuery(CountType.Tag, TagId: tagResponse.Id)));
 
         ViewData["TitlePrefix"] = tagResponse.DisplayName;
 

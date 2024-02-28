@@ -1,4 +1,4 @@
-﻿@page "/tags/{normalizedName:regex(^(?!-)([a-zA-Z0-9-]){{1,32}}$)}"
+﻿@page "/tags/{normalizedName}"
 @model CodeWF.Web.Pages.TagListModel
 @{
     ViewBag.BodyClass = "body-tag-list bg-gray-1";
