@@ -400,3 +400,4 @@ appsettings.*.json
 src/CodeWF.Web.YarpReverseProxy/.config/
 src/CodeWF.Web/.config/dotnet-tools.json
 src/Binary/
+src/CodeWF/.config/dotnet-tools.json
