@@ -1,3 +1,12 @@
+using CodeWF.Tools.Desktop.MediatR;
+using DryIoc;
+using DryIoc.Messages;
+using MediatR;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Prism.Ioc;
+using System.Net.NetworkInformation;
+using System.Reflection;
+
 namespace CodeWF.Tools.Desktop;
 
 public class App : PrismApplication
@@ -38,6 +47,9 @@ public class App : PrismApplication
         // Views - Region Navigation
 
         //×¢²áMediatR
-        var assembly = AppDomain.CurrentDomain.Load("CodeWF.Tools.MediatR");
+        container.RegisterMany(
+            [AppDomain.CurrentDomain.Load("CodeWF.Tools.MediatR")], Registrator.Interfaces);
+        container.Register(typeof(IRequestHandler<,>), typeof(CopyToClipboardCommandHandle), setup: Setup.Decorator);
+        container.Register<IMediator, Mediator>(made: Made.Of(() => new Mediator(Arg.Of<IServiceProvider>())));
     }
 }

@@ -83,6 +83,9 @@
                 <Button Content="点击翻译" Classes="Gradient" VerticalAlignment="Stretch"
                         Command="{Binding HandleTranslationAsync}"
                         ToolTip.Tip="点击翻译" Height="87" CornerRadius="20" />
+                <Button Content="复制" Classes="Gradient" VerticalAlignment="Stretch"
+                        Command="{Binding ExecuteCopyAsync}"
+                        ToolTip.Tip="点击复制" Height="87" CornerRadius="20" />
             </UniformGrid>
         </StackPanel>
         <UniformGrid Columns="2" Margin="0 20 0 0">

@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using CodeWF.Tools.MediatR.Command;
+using MediatR;
+using Unit = System.Reactive.Unit;
 
 namespace CodeWF.Tools.Modules.SlugifyString.ViewModels;
 
@@ -61,7 +63,7 @@ public class SlugifyViewModel : ViewModelBase
 
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
-    public SlugifyViewModel(ITranslationService translationService)
+    public SlugifyViewModel(IMediator mediator, ITranslationService translationService) : base(mediator)
     {
         _translationService = translationService;
         KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
@@ -98,6 +100,11 @@ public class SlugifyViewModel : ViewModelBase
         {
             To = ex.Message;
         }
+    }
+
+    public async Task ExecuteCopyAsync()
+    {
+        Mediator.Publish(new CopyToClipboardCommand() { Content = To });
     }
 
     private void OnKindChanged(TranslationKind newKind)
