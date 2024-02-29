@@ -1,0 +1,13 @@
+﻿global using Avalonia;
+global using Avalonia.Markup.Xaml;
+global using Avalonia.ReactiveUI;
+global using CodeWF.Tools.Desktop.Views;
+global using CodeWF.Tools.Module.Footer;
+global using CodeWF.Tools.Modules.SlugifyString;
+global using Prism.DryIoc;
+global using Prism.Ioc;
+global using Prism.Modularity;
+global using Avalonia.Controls;
+global using Prism.Regions;
+global using CodeWF.Tools.Common;
+global using CodeWF.Tools.Desktop.Core.RegionAdapters;

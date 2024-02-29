@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.0.9" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0-preview.1.24080.9" />
+		<PackageReference Include="Prism.Avalonia" Version="8.1.97.11072" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+		<PackageReference Include="ReactiveUI" Version="19.5.41" />
+		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CodeWF.Tools.MediatR\CodeWF.Tools.MediatR.csproj" />
+	</ItemGroup>
+</Project>

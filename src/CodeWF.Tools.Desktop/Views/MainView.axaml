@@ -1,0 +1,14 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:common="clr-namespace:CodeWF.Tools.Common;assembly=CodeWF.Tools.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CodeWF.Tools.Desktop.Views.MainView">
+    <Grid RowDefinitions="*, 30">
+        <ContentControl prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
+        <StackPanel Grid.Row="1" prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"
+                    Background="LightBlue" />
+    </Grid>
+</UserControl>
