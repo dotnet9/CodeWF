@@ -1,0 +1,25 @@
+﻿@page "/slugify-string"
+@using CodeWF.Tools.Core.Translation
+@rendermode InteractiveAuto
+
+<PageTitle>别名转换</PageTitle>
+
+<MRadioGroup @bind-Value="row"
+             Row>
+    <MRadio Label="中译英"
+            Value="@(TranslationKind.ChineseToEnglish)">
+    </MRadio>
+    <MRadio Label="英译中"
+            Value="@(TranslationKind.EnglishToChinese)">
+    </MRadio>
+    <MRadio Label="英转别名"
+            Value="@(TranslationKind.EnglishToSlug)">
+    </MRadio>
+    <MRadio Label="中转别名"
+            Value="@(TranslationKind.ChineseToSlug)">
+    </MRadio>
+</MRadioGroup>
+
+@code {
+    string row;
+}

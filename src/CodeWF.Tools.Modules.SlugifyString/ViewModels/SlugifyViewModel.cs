@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Tools.Modules.SlugifyString.ViewModels;
+﻿using Avalonia;
+
+namespace CodeWF.Tools.Modules.SlugifyString.ViewModels;
 
 public class SlugifyViewModel : ViewModelBase
 {

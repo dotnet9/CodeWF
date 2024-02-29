@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Modules.SlugifyString.Models;
+﻿namespace CodeWF.Tools.Core.Translation;
 
 public enum TranslationKind
 {

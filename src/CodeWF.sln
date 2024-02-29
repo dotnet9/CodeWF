@@ -72,6 +72,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Tools.MediatR", "Cod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Tools.Module.Footer", "CodeWF.Tools.Module.Footer\CodeWF.Tools.Module.Footer.csproj", "{7C06BA28-765A-4D14-903B-23F48CD6AF08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Tools.Web", "CodeWF.Tools.Web\CodeWF.Tools.Web\CodeWF.Tools.Web.csproj", "{589D49BC-1BF5-4DCB-8024-A74A99EAB003}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Tools.Web.Client", "CodeWF.Tools.Web\CodeWF.Tools.Web.Client\CodeWF.Tools.Web.Client.csproj", "{07E5F94D-B64D-4DCA-B491-91E7D9B31458}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -178,6 +182,14 @@ Global
 		{7C06BA28-765A-4D14-903B-23F48CD6AF08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C06BA28-765A-4D14-903B-23F48CD6AF08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C06BA28-765A-4D14-903B-23F48CD6AF08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{589D49BC-1BF5-4DCB-8024-A74A99EAB003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{589D49BC-1BF5-4DCB-8024-A74A99EAB003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{589D49BC-1BF5-4DCB-8024-A74A99EAB003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{589D49BC-1BF5-4DCB-8024-A74A99EAB003}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07E5F94D-B64D-4DCA-B491-91E7D9B31458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07E5F94D-B64D-4DCA-B491-91E7D9B31458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07E5F94D-B64D-4DCA-B491-91E7D9B31458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07E5F94D-B64D-4DCA-B491-91E7D9B31458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,6 +220,8 @@ Global
 		{E57DDAE9-82A0-4AE0-A98D-4EECAF98C04B} = {015F55E1-9C7B-4D35-A524-839577D2C461}
 		{9C67D17E-120A-4F84-A949-898A5FDEAB25} = {015F55E1-9C7B-4D35-A524-839577D2C461}
 		{7C06BA28-765A-4D14-903B-23F48CD6AF08} = {5546150D-D8A9-46D9-9035-E255ECBD3596}
+		{589D49BC-1BF5-4DCB-8024-A74A99EAB003} = {844ACF80-B54A-4FDA-B6D6-00C3CC921508}
+		{07E5F94D-B64D-4DCA-B491-91E7D9B31458} = {844ACF80-B54A-4FDA-B6D6-00C3CC921508}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}
