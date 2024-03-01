@@ -1,12 +1,22 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Runtime.InteropServices
+@inherits LayoutComponentBase
 
 <MApp>
-    <NavMenu />
+    <NavMenu/>
     <MMain>
         <MContainer Fluid>
             @Body
         </MContainer>
     </MMain>
+
+    <MFooter App Color="primary lighten-1" Padless>
+        <MCard Flat Tile Width="@("100%")" Class="#ccc lighten-1 text-center">
+            <p>
+                &copy; 2019-@DateTime.Now.Year - 码界工坊 & 沙漠尽头的狼 保留所有权利.
+            </p>
+            <p>本站由<a href="https://dotnet.microsoft.com/zh-cn/" target="_blank">.NET @(RuntimeInformation.FrameworkDescription)</a>强力驱动！|&nbsp;本站源码：<a href="https://github.com/dotnet9/CodeWF" target="_blank">Github</a></p>
+        </MCard>
+    </MFooter>
 </MApp>
 
 <div id="blazor-error-ui" data-nosnippet>

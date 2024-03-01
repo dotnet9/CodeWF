@@ -4,7 +4,7 @@
 @inject ITranslationService TranslationService
 @inject IJSRuntime JSRuntime
 
-<PageTitle>别名转换</PageTitle>
+<PageTitle>别名转换 - Dotnet工具箱</PageTitle>
 
 <PEnqueuedSnackbars @ref="_enqueuedSnackbars"></PEnqueuedSnackbars>
 
@@ -25,12 +25,18 @@
 </MRadioGroup>
 
 <MRow>
+    <MButton class="ma-2" OnClick="HandleTranslationAsync">点击转换</MButton>
     <MButton class="ma-2" OnClick="ExecuteCopyAsync">复制</MButton>
 </MRow>
 
 <MRow>
-    <MTextarea Solo class="ma-2" Height="120" BackgroundColor="white" AutoGrow @bind-Value="From"/>
-    <MTextarea Solo class="ma-2" Height="120" BackgroundColor="grey lighten-2" AutoGrow @bind-Value="_to"/>
+    <MCol Sm="10" Md="12">
+        <MTextarea Solo class="ma-2" Height="120" BackgroundColor="white" Clearable
+                   ClearIcon="mdi-close-circle" Counter="true" AutoGrow @bind-Value="From"/>
+    </MCol>
+    <MCol Sm="10" Md="12">
+        <MTextarea Solo class="ma-2" Height="120" BackgroundColor="grey lighten-2" AutoGrow @bind-Value="_to"/>
+    </MCol>
 </MRow>
 
 @code {
