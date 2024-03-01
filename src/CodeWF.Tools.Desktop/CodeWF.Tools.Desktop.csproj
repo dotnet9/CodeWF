@@ -18,6 +18,7 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.9" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.9" />
+    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="8.0.0-preview-01" />
     <PackageReference Include="Irihi.Ursa" Version="0.3.0-beta20240226" />
     <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="0.3.0-beta20240226" />
     <PackageReference Include="Prism.Avalonia" Version="8.1.97.11072" />

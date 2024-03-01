@@ -1,4 +1,5 @@
 ﻿using CodeWF.Tools.MediatR.Command;
+using CodeWF.Tools.MediatR.Requests;
 using MediatR;
 using Unit = System.Reactive.Unit;
 
@@ -66,7 +67,7 @@ public class SlugifyViewModel : ViewModelBase
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
     public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
-        ITranslationService translationService) // : base(mediator)
+        ITranslationService translationService, IMediator mediator) : base(mediator)
     {
         _notificationService = notificationService;
         _clipboardService = clipboardService;
@@ -118,6 +119,12 @@ public class SlugifyViewModel : ViewModelBase
         {
             _notificationService.Show("没有可以复制内容", "请先生成后再复制");
         }
+    }
+
+    public async Task ExecuteMediatRAsync()
+    {
+        var result = Mediator.Send(new TestRequest() { Args = To });
+        _notificationService.Show("MediatR", $"收到响应：{result.Result}");
     }
 
     private void OnKindChanged(TranslationKind newKind)

@@ -1,6 +1,8 @@
 using CodeWF.Tools.Desktop.Services;
 using CodeWF.Tools.MediatR.Command;
 using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeWF.Tools.Desktop;
 
@@ -41,5 +43,44 @@ public class App : PrismApplication
 
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
+    }
+    protected override Rules CreateContainerRules()
+    {
+        return Rules.Default.WithConcreteTypeDynamicRegistrations(reuse: Reuse.Transient)
+            .With(Made.Of(FactoryMethod.ConstructorWithResolvableArguments))
+            .WithFuncAndLazyWithoutRegistration()
+            .WithTrackingDisposableTransients()
+            //.WithoutFastExpressionCompiler()
+            .WithFactorySelector(Rules.SelectLastRegisteredFactory());
+    }
+    protected override IContainerExtension CreateContainerExtension()
+    {
+        IContainer container = new Container(CreateContainerRules());
+        container.WithDependencyInjectionAdapter();
+
+        return new DryIocContainerExtension(container);
+    }
+
+    protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
+    {
+        base.RegisterRequiredTypes(containerRegistry);
+
+        IServiceCollection services = ConfigureServices();
+
+        IContainer container = ((IContainerExtension<IContainer>)containerRegistry).Instance;
+
+        container.Populate(services);
+    }
+
+    private static ServiceCollection ConfigureServices()
+    {
+        ServiceCollection services = new ServiceCollection();
+
+        services.AddMediatR(configure =>
+        {
+            configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+        });
+
+        return services;
     }
 }
