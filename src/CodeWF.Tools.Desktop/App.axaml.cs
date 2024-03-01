@@ -44,6 +44,7 @@ public class App : PrismApplication
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
     }
+
     protected override Rules CreateContainerRules()
     {
         return Rules.Default.WithConcreteTypeDynamicRegistrations(reuse: Reuse.Transient)
@@ -53,6 +54,7 @@ public class App : PrismApplication
             //.WithoutFastExpressionCompiler()
             .WithFactorySelector(Rules.SelectLastRegisteredFactory());
     }
+
     protected override IContainerExtension CreateContainerExtension()
     {
         IContainer container = new Container(CreateContainerRules());
