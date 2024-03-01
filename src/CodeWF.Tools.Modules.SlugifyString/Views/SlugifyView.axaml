@@ -12,6 +12,9 @@
         <converters:IsTranslationKind x:Key="IsTranslationKind" />
     </UserControl.Resources>
     <UserControl.Styles>
+        <Style Selector="UniformGrid > RadioButton">
+            <Setter Property="Margin" Value="0 0 5 0"></Setter>
+        </Style>
         <Style Selector="Button">
             <Setter Property="Height" Value="30" />
             <Setter Property="Margin" Value="8 0" />
@@ -28,70 +31,65 @@
             <Setter Property="MinHeight" Value="120" />
             <Setter Property="MaxHeight" Value="360" />
             <Setter Property="Height" Value="NaN" />
+            <Setter Property="BorderBrush" Value="LightBlue"></Setter>
         </Style>
     </UserControl.Styles>
-    <StackPanel Margin="0,4" HorizontalAlignment="Stretch">
-        <TextBlock Classes="Headline6" Text="别名生成器" TextAlignment="Center" />
+    <StackPanel Margin="10,4" HorizontalAlignment="Stretch">
+        <TextBlock Text="别名生成器" TextAlignment="Center" />
 
-        <StackPanel Orientation="Horizontal" Margin="0,40,0,0">
-            <UniformGrid Columns="2">
-                <RadioButton GroupName="translationType"
+        <StackPanel Margin="0,40,0,0">
+			<UniformGrid Columns="4" HorizontalAlignment="Left">
+				<RadioButton GroupName="translationType"
                              Content="中译英"
                              ToolTip.Tip="中文翻译为英文"
                              IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static translation:TranslationKind.ChineseToEnglish}}"
                              Command="{Binding KindChanged}"
                              CommandParameter="{x:Static translation:TranslationKind.ChineseToEnglish}" />
-                <RadioButton GroupName="translationType"
+				<RadioButton GroupName="translationType"
                              Content="英译中" ToolTip.Tip="英文翻译为中文"
                              IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static translation:TranslationKind.EnglishToChinese}}"
                              Command="{Binding KindChanged}"
                              CommandParameter="{x:Static translation:TranslationKind.EnglishToChinese}" />
-                <RadioButton GroupName="translationType" Content="英转别名"
+				<RadioButton GroupName="translationType" Content="英转别名"
                              ToolTip.Tip="英文转为URL别名"
                              IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static translation:TranslationKind.EnglishToSlug}}"
                              Command="{Binding KindChanged}"
                              CommandParameter="{x:Static translation:TranslationKind.EnglishToSlug}" />
-                <RadioButton GroupName="translationType" Content="中转别名"
+				<RadioButton GroupName="translationType" Content="中转别名"
                              ToolTip.Tip="中文转为URL别名"
                              IsChecked="{Binding Kind, Mode=OneWay, Converter={StaticResource IsTranslationKind}, ConverterParameter={x:Static translation:TranslationKind.ChineseToSlug}}"
                              Command="{Binding KindChanged}"
                              CommandParameter="{x:Static translation:TranslationKind.ChineseToSlug}" />
-            </UniformGrid>
-            <UniformGrid Columns="2" Margin="20 0 0 0">
+			</UniformGrid>
+            <UniformGrid Columns="3" Margin="0 20 0 0" HorizontalAlignment="Left">
                 <ToggleButton IsChecked="{Binding IsAutoTranslation}"
                               CommandParameter="{Binding $self}"
                               ToolTip.Tip="Regular toggleButton with default theme applied and with custom colors">
                     <ToggleButton.Styles>
                         <Style Selector="ToggleButton:checked TextBlock#ToggleButtons1Text1">
-                            <Setter Property="Text" Value="打开" />
-                        </Style>
-                        <Style Selector="ToggleButton:checked TextBlock#ToggleButtons1Text2">
-                            <Setter Property="Text" Value="实时翻译" />
-                        </Style>
-                        <Style Selector="ToggleButton:not(:checked) TextBlock#ToggleButtons1Text2">
-                            <Setter Property="Text" Value="关闭" />
+                            <Setter Property="Text" Value="实时" />
                         </Style>
                         <Style Selector="ToggleButton:not(:checked) TextBlock#ToggleButtons1Text1">
-                            <Setter Property="Text" Value="实时翻译" />
+                            <Setter Property="Text" Value="手动" />
                         </Style>
                     </ToggleButton.Styles>
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Name="ToggleButtons1Text1" TextAlignment="Center" />
-                        <TextBlock Name="ToggleButtons1Text2" TextAlignment="Center" />
+                        <TextBlock Name="ToggleButtons1Text2" TextAlignment="Center" Text="翻译"/>
                     </StackPanel>
                 </ToggleButton>
                 <Button Content="点击翻译" Classes="Gradient" VerticalAlignment="Stretch"
                         Command="{Binding HandleTranslationAsync}"
-                        ToolTip.Tip="点击翻译" Height="87" CornerRadius="20" />
+                        ToolTip.Tip="点击翻译"/>
                 <Button Content="复制" Classes="Gradient" VerticalAlignment="Stretch"
                         Command="{Binding ExecuteCopyAsync}"
-                        ToolTip.Tip="点击复制" Height="87" CornerRadius="20" />
+                        ToolTip.Tip="点击复制" />
             </UniformGrid>
         </StackPanel>
-        <UniformGrid Columns="2" Margin="0 20 0 0">
-            <TextBox Text="{Binding From,Mode=TwoWay}"
+        <UniformGrid Columns="2" Margin="0 10 0 0" HorizontalAlignment="Left">
+            <TextBox Text="{Binding From,Mode=TwoWay}" Background="White"
                      ToolTip.Tip="请输入待翻译信息" />
-            <TextBox Text="{Binding To,Mode=OneWay}"
+            <TextBox Text="{Binding To,Mode=OneWay}" 
                      ToolTip.Tip="翻译后的信息" />
         </UniformGrid>
     </StackPanel>

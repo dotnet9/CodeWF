@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/ssr.css" />
     <link rel="stylesheet" href="CodeWF.Tools.Web.styles.css" />
     <link href="https://cdn.masastack.com/npm/@("@mdi")/font@7.1.96/css/materialdesignicons.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
     <HeadOutlet />
     <MSsrThemeProvider />
 </head>
@@ -19,6 +19,18 @@
     <Routes />
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/BlazorComponent/js/blazor-component.js"></script>
+    <script type="text/javascript">
+        window.clipboardCopy = {
+            copyText: function (text) {
+                navigator.clipboard.writeText(text).then(function () {
+                    
+                })
+                    .catch(function (error) {
+                        alert(error);
+                    });
+            }
+        };
+    </script>
 </body>
 
 </html>

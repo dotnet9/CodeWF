@@ -1,6 +1,3 @@
-using CodeWF.Tools.Web.Client.Pages;
-using CodeWF.Tools.Web.Components;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,14 +5,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddMasaBlazor(options =>
-{
-    options.ConfigureSsr(ssr =>
-    {
-        ssr.Left = 256;
-        ssr.Top = 64;
-    });
-});
+builder.Services.AddCodeWFService();
 
 var app = builder.Build();
 
