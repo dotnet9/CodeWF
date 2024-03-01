@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CODEWF_TAGS": "local, dev"
       },
-      "applicationUrl": "https://localhost:1055"
+      "applicationUrl": "https://localhost:5005"
     }
   }
 }

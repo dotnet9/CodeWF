@@ -1,13 +1,113 @@
-﻿@{
+﻿@using System.Runtime.InteropServices
+@{
     var appInfo = AppConfig.Info(Context.Request);
-    var menus = appInfo.Menus;
 }
-<footer class="container">
-    <p class="float-end">
-        <a href="#">Back to top</a>
+<footer class="container-fluid">
+    <p>
+        友情链接：
+        <a href="https://www.youtube.com/channel/UCbkbOlw8snP93RJ2BhH44Qw" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Murat Y&#xFC;ceda&#x11F;
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.cnblogs.com/laozhang-is-phi/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            老张的哲学
+        </a>&nbsp;|&nbsp;
+        <a href="https://blog.lindexi.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            林德熙
+        </a>&nbsp;|&nbsp;
+        <a href="https://edi.wang/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Edi Wang
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.youzack.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            YouZack
+        </a>&nbsp;|&nbsp;
+        <a href="https://wtmdoc.walkingtec.cn/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            WTM
+        </a>&nbsp;|&nbsp;
+        <a href="http://www.volcore.xyz/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Vol开发框架
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.okay123.top/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            可乐不加冰
+        </a>&nbsp;|&nbsp;
+        <a href="http://randyfield.cn/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            加菲的博客
+        </a>&nbsp;|&nbsp;
+        <a href="http://feiyu.vin/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            非羽的个人空间
+        </a>&nbsp;|&nbsp;
+        <a href="https://antblazor.com" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Ant Design of Blazor
+        </a>&nbsp;|&nbsp;
+        <a href="https://blazor.masastack.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            MASA Blazor
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.blazor.zone/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Bootstrap Blazor
+        </a>&nbsp;|&nbsp;
+        <a href="http://furion.baiqian.ltd/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Furion
+        </a>&nbsp;|&nbsp;
+        <a href="https://ldqk.xyz/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            懒得勤快
+        </a>&nbsp;|&nbsp;
+        <a href="https://hunji.xyz/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            迷恋自留地
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.whuanle.cn/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            痴者工良
+        </a>&nbsp;|&nbsp;
+        <a href="https://www.52abp.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            52ABP
+        </a>&nbsp;|&nbsp;
+        <a href="https://blog.csdn.net/kebi007" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            dotnet全栈开发
+        </a>&nbsp;|&nbsp;
+        <a href="http://www.hzhcontrols.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            HZHControls
+        </a>&nbsp;|&nbsp;
+        <a href="http://blog.deali.cn" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            程序设计实验室
+        </a>&nbsp;|&nbsp;
+        <a href="https://jhrs.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            江湖人士
+        </a>&nbsp;|&nbsp;
+        <a href="https://blog.tokengo.top/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Token
+        </a>&nbsp;|&nbsp;
+        <a href="https://znlive.com/" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            Code Life
+        </a>&nbsp;|&nbsp;
+        <a href="https://menglou.github.io/king-abpvnext-pro" target="_blank" class="mb-3 mt-2">
+            <i class="bi-link-45deg me-1"></i>
+            King-AbpVnext-Pro
+        </a>
     </p>
     <p>
-        &copy; 2019-@DateTime.Now.Year - @appInfo.Title & @appInfo.Author 版权所有.
+        &copy; 2019-@DateTime.Now.Year - @appInfo.Title & @appInfo.Author 保留所有权利.&nbsp;|&nbsp;备案号：<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">蜀ICP备19038256号-1</a>
     </p>
-    <p>备案号：<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">蜀ICP备19038256号-1</a></p>
+    <p>本站由<a href="https://dotnet.microsoft.com/zh-cn/" target="_blank">.NET @(RuntimeInformation.FrameworkDescription)</a>强力驱动！|&nbsp;本站源码：<a href="https://github.com/dotnet9/CodeWF" target="_blank">Github</a></p>
 </footer>

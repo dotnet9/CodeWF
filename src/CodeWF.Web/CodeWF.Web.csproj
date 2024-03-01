@@ -29,5 +29,6 @@
     <ProjectReference Include="..\CodeWF.MetaWeblog\CodeWF.MetaWeblog.csproj" />
     <ProjectReference Include="..\CodeWF.Syndication\CodeWF.Syndication.csproj" />
     <ProjectReference Include="..\CodeWF.Theme\CodeWF.Theme.csproj" />
+    <ProjectReference Include="..\CodeWF.ViewModel\CodeWF.ViewModel.csproj" />
   </ItemGroup>
 </Project>

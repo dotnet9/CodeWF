@@ -35,6 +35,16 @@ public class FriendLinkController(IMediator mediator) : ControllerBase
         return Ok(list);
     }
 
+    [HttpGet("list2")]
+    [ProducesResponseType<List<FriendLinkDto>>(StatusCodes.Status200OK)]
+    [AllowAnonymous]
+    public async Task<IActionResult> List2()
+    {
+        IReadOnlyList<FriendLinkEntity> list = await mediator.Send(new GetAllLinksQuery());
+        return Ok(list.Select(link =>
+            new FriendLinkDto() { Title = link.Title, Rank = link.Rank, LinkUrl = link.LinkUrl }));
+    }
+
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Update([NotEmpty] Guid id, UpdateLinkCommand command)

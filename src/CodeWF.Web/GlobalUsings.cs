@@ -65,3 +65,4 @@ global using Microsoft.AspNetCore.Rewrite;
 global using SixLabors.Fonts;
 global using System.Net;
 global using System.Text.Json.Serialization;
+global using CodeWF.ViewModel.FriendLinks;
