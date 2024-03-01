@@ -1,0 +1,13 @@
+﻿@{
+    var appInfo = AppConfig.Info(Context.Request);
+    var menus = appInfo.Menus;
+}
+<footer class="container">
+    <p class="float-end">
+        <a href="#">Back to top</a>
+    </p>
+    <p>
+        &copy; 2019-@DateTime.Now.Year - @appInfo.Title & @appInfo.Author 版权所有.
+    </p>
+    <p>备案号：<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">蜀ICP备19038256号-1</a></p>
+</footer>
