@@ -3,7 +3,7 @@
 //[AddINotifyPropertyChangedInterface]
 public class ViewModelBase : BindableBase, INavigationAware, IActivatableViewModel, IDestructible
 {
-    protected readonly IMediator Mediator;
+    //protected readonly IMediator Mediator;
 
     private string _title;
 
@@ -25,14 +25,14 @@ public class ViewModelBase : BindableBase, INavigationAware, IActivatableViewMod
 
     public ViewModelActivator Activator { get; } = new ViewModelActivator();
 
-    public ViewModelBase(IMediator mediator)
-    {
-        Mediator = mediator;
+    //public ViewModelBase(IMediator mediator)
+    //{
+    //    Mediator = mediator;
 
 
-        //_isLoading = this.WhenAnyObservable(x => x.Login.IsExecuting)
-        //                   .ToProperty(this, x => x.IsLoading, initialValue: false);
-    }
+    //    //_isLoading = this.WhenAnyObservable(x => x.Login.IsExecuting)
+    //    //                   .ToProperty(this, x => x.IsLoading, initialValue: false);
+    //}
 
 
     public bool IsNavigationTarget(NavigationContext navigationContext)

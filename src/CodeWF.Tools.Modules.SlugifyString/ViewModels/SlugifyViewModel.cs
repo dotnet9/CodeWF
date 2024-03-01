@@ -6,7 +6,9 @@ namespace CodeWF.Tools.Modules.SlugifyString.ViewModels;
 
 public class SlugifyViewModel : ViewModelBase
 {
-    private readonly ITranslationService _translationService;
+    private readonly INotificationService _notificationService;
+    private readonly IClipboardService? _clipboardService;
+    private readonly ITranslationService? _translationService;
     private TranslationKind _kind = TranslationKind.ChineseToSlug;
 
     /// <summary>
@@ -63,8 +65,11 @@ public class SlugifyViewModel : ViewModelBase
 
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
-    public SlugifyViewModel(IMediator mediator, ITranslationService translationService) : base(mediator)
+    public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
+        ITranslationService translationService) // : base(mediator)
     {
+        _notificationService = notificationService;
+        _clipboardService = clipboardService;
         _translationService = translationService;
         KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
     }
@@ -104,7 +109,15 @@ public class SlugifyViewModel : ViewModelBase
 
     public async Task ExecuteCopyAsync()
     {
-        Mediator.Publish(new CopyToClipboardCommand() { Content = To });
+        if (!string.IsNullOrWhiteSpace(To))
+        {
+            await _clipboardService?.CopyToAsync(To);
+            _notificationService.Show("成功", "已复制");
+        }
+        else
+        {
+            _notificationService.Show("没有可以复制内容", "请先生成后再复制");
+        }
     }
 
     private void OnKindChanged(TranslationKind newKind)
