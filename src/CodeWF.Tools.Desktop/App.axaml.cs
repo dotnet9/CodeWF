@@ -1,9 +1,3 @@
-using CodeWF.Tools.Desktop.Services;
-using CodeWF.Tools.MediatR.Command;
-using DryIoc;
-using DryIoc.Microsoft.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace CodeWF.Tools.Desktop;
 
 public class App : PrismApplication
@@ -45,6 +39,12 @@ public class App : PrismApplication
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
     }
 
+    /// <summary>
+    /// 1、DryIoc.Microsoft.DependencyInjection低版本可不要这个方法（5.1.0及以下）
+    /// 2、高版本必须，否则会抛出异常：System.MissingMethodException:“Method not found: 'DryIoc.Rules DryIoc.Rules.WithoutFastExpressionCompiler()'.”
+    /// 参考issues：https://github.com/dadhi/DryIoc/issues/529
+    /// </summary>
+    /// <returns></returns>
     protected override Rules CreateContainerRules()
     {
         return Rules.Default.WithConcreteTypeDynamicRegistrations(reuse: Reuse.Transient)
@@ -76,11 +76,17 @@ public class App : PrismApplication
 
     private static ServiceCollection ConfigureServices()
     {
-        ServiceCollection services = new ServiceCollection();
+        var services = new ServiceCollection();
 
+        // 注入MediatR
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+
+        // 添加模块注入，未显示调用模块类型前，模块程序集是未加载到当前程序域`AppDomain.CurrentDomain`的
+        var assembly = typeof(SlugifyStringModule).GetAssembly();
+        assemblies.Add(assembly);
         services.AddMediatR(configure =>
         {
-            configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            configure.RegisterServicesFromAssemblies(assemblies.ToArray());
         });
 
         return services;

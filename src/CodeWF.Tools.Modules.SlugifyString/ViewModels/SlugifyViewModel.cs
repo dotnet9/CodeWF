@@ -1,7 +1,4 @@
-﻿using CodeWF.Tools.MediatR.Command;
-using CodeWF.Tools.MediatR.Requests;
-using MediatR;
-using Unit = System.Reactive.Unit;
+﻿using Unit = System.Reactive.Unit;
 
 namespace CodeWF.Tools.Modules.SlugifyString.ViewModels;
 
@@ -67,7 +64,7 @@ public class SlugifyViewModel : ViewModelBase
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
     public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
-        ITranslationService translationService, IMediator mediator) : base(mediator)
+        ITranslationService translationService, ISender sender, IPublisher publisher) : base(sender, publisher)
     {
         _notificationService = notificationService;
         _clipboardService = clipboardService;
@@ -121,10 +118,15 @@ public class SlugifyViewModel : ViewModelBase
         }
     }
 
-    public async Task ExecuteMediatRAsync()
+    public async Task ExecuteMediatRRequestAsync()
     {
-        var result = Mediator.Send(new TestRequest() { Args = To });
+        var result = Sender.Send(new TestRequest() { Args = To });
         _notificationService.Show("MediatR", $"收到响应：{result.Result}");
+    }
+
+    public async Task ExecuteMediatRNotificationAsync()
+    {
+        await Publisher.Publish(new TestNotification() { Args = To });
     }
 
     private void OnKindChanged(TranslationKind newKind)

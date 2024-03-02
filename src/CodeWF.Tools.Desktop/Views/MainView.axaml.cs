@@ -1,5 +1,3 @@
-using CodeWF.Tools.MediatR.Command;
-
 namespace CodeWF.Tools.Desktop.Views;
 
 public partial class MainView : UserControl

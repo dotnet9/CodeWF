@@ -11,3 +11,7 @@ global using Prism.Regions;
 global using ReactiveUI;
 global using System.Globalization;
 global using System.Reactive;
+global using CodeWF.Tools.MediatR.Notifications;
+global using CodeWF.Tools.MediatR.Services;
+global using MediatR;
+global using CodeWF.Tools.MediatR.Requests;

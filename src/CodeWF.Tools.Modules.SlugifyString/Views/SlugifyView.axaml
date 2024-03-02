@@ -84,9 +84,12 @@
                 <Button Content="复制" Classes="Gradient" VerticalAlignment="Stretch"
                         Command="{Binding ExecuteCopyAsync}"
                         ToolTip.Tip="点击复制" />
-                <Button Content="测试MediatR" Classes="Gradient" VerticalAlignment="Stretch"
-                        Command="{Binding ExecuteMediatRAsync}"
+                <Button Content="测试MediatR-Request" Classes="Gradient" VerticalAlignment="Stretch"
+                        Command="{Binding ExecuteMediatRRequestAsync}"
                          />
+                <Button Content="测试MediatR-Notification" Classes="Gradient" VerticalAlignment="Stretch"
+                        Command="{Binding ExecuteMediatRNotificationAsync}"
+                />
             </UniformGrid>
         </StackPanel>
         <UniformGrid Columns="2" Margin="0 10 0 0" HorizontalAlignment="Left">

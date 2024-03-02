@@ -1,6 +1,4 @@
-﻿using Avalonia.Controls;
-
-namespace CodeWF.Tools.MediatR.Command;
+﻿namespace CodeWF.Tools.MediatR.Services;
 
 public interface INotificationService
 {
