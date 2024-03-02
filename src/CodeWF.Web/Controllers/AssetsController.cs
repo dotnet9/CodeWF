@@ -98,7 +98,7 @@ public class AssetsController(
     public async Task<IActionResult> SiteIconOrigin()
     {
         string data = await mediator.Send(new GetAssetQuery(AssetId.SiteIconBase64));
-        string fallbackImageFile = Path.Join($"{env.WebRootPath}", "images", "siteicon-default.png");
+        string fallbackImageFile = Path.Join($"{env.WebRootPath}", "images", "logo.png");
         if (string.IsNullOrWhiteSpace(data))
         {
             return PhysicalFile(fallbackImageFile, "image/png");

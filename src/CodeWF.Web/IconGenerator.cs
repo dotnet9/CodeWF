@@ -13,8 +13,8 @@ public static class MemoryStreamIconGenerator
         {
             logger.LogWarning("SiteIconBase64 is empty or not valid, fall back to default image.");
 
-            // Credit: Vector Market (siteicon-default.png)
-            string defaultIconImage = Path.Join($"{webRootPath}", "images", "siteicon-default.png");
+            // Credit: Vector Market (logo.png)
+            string defaultIconImage = Path.Join($"{webRootPath}", "images", "logo.png");
             if (!File.Exists(defaultIconImage))
             {
                 throw new FileNotFoundException("Can not find source image for generating favicons.", defaultIconImage);
