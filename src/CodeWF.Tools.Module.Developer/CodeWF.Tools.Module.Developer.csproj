@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.0.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CodeWF.Tools.Common\CodeWF.Tools.Common.csproj" />
+		<ProjectReference Include="..\CodeWF.Tools.IServices\CodeWF.Tools.IServices.csproj" />
+		<ProjectReference Include="..\CodeWF.Tools.Prism\CodeWF.Tools.Prism.csproj" />
+	</ItemGroup>
+
+</Project>

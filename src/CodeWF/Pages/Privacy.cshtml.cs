@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿namespace CodeWF.Pages;
 
-namespace CodeWF.Pages;
 public class PrivacyModel : PageModel
 {
     private readonly ILogger<PrivacyModel> _logger;
@@ -15,4 +13,3 @@ public class PrivacyModel : PageModel
     {
     }
 }
-

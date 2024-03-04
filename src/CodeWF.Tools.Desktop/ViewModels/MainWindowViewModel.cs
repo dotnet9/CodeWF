@@ -1,6 +1,9 @@
 ﻿namespace CodeWF.Tools.Desktop.ViewModels;
 
-public class MainWindowViewModel(ISender sender, IPublisher publisher) : ViewModelBase(sender, publisher)
+public class MainWindowViewModel : ViewModelBase
 {
-    public string Title => "Dotnet工具箱";
+    public MainWindowViewModel()
+    {
+        Title = AppInfo.Name;
+    }
 }

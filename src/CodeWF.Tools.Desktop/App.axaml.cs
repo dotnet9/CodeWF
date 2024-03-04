@@ -12,8 +12,9 @@ public class App : PrismApplication
     {
         base.ConfigureModuleCatalog(moduleCatalog);
 
-        moduleCatalog.AddModule<SlugifyStringModule>();
-        moduleCatalog.AddModule<FooterModule>();
+        moduleCatalog.AddModule<DeveloperModule>();
+        moduleCatalog.AddModule<WebModule>();
+        moduleCatalog.AddModule<TestModule>();
     }
 
     protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
@@ -35,8 +36,14 @@ public class App : PrismApplication
         // Views - Generic
         containerRegistry.Register<MainWindow>();
 
+        var regionManager = Container.Resolve<IRegionManager>();
+        regionManager.RegisterViewWithRegion(RegionNames.FooterRegion, typeof(FooterView));
+
+        containerRegistry.RegisterSingleton(typeof(FooterViewModel));
+
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
+        containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
     }
 
     /// <summary>
@@ -82,7 +89,7 @@ public class App : PrismApplication
         var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 
         // 添加模块注入，未显示调用模块类型前，模块程序集是未加载到当前程序域`AppDomain.CurrentDomain`的
-        var assembly = typeof(SlugifyStringModule).GetAssembly();
+        var assembly = typeof(TestModule).GetAssembly();
         assemblies.Add(assembly);
         services.AddMediatR(configure =>
         {

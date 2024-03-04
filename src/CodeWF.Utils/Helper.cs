@@ -1,15 +1,4 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Win32;
-using System.Net;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace CodeWF.Utils;
+﻿namespace CodeWF.Utils;
 
 public static class Helper
 {
@@ -123,7 +112,7 @@ public static class Helper
             return string.Empty;
         }
 
-        Uri uri = new Uri(cdnEndpoint);
+        Uri uri = new(cdnEndpoint);
         return $"{uri.Scheme}://{uri.Host}/";
     }
 
@@ -134,7 +123,7 @@ public static class Helper
 
         // Create a new Stringbuilder to collect the bytes
         // and create a string.
-        StringBuilder sBuilder = new StringBuilder();
+        StringBuilder sBuilder = new();
 
         // Loop through each byte of the hashed data
         // and format each one as a hexadecimal string.
@@ -236,7 +225,7 @@ public static class Helper
             return IsUnderLocalSlash() ? rawUrl : invalidReturn;
         }
 
-        Uri uri = new Uri(rawUrl);
+        Uri uri = new(rawUrl);
         if (uri.IsLoopback)
         {
             // localhost, 127.0.0.1
@@ -269,7 +258,7 @@ public static class Helper
             throw new UriFormatException($"Prefix '{prefix}' is not a valid URL.");
         }
 
-        Uri prefixUri = new Uri(prefix);
+        Uri prefixUri = new(prefix);
         return Uri.TryCreate(prefixUri, path, out Uri? newUri) ? newUri.ToString() : string.Empty;
     }
 
@@ -340,7 +329,7 @@ public static class Helper
             yield break;
         }
 
-        Regex tagRegex = new Regex(@"^[a-zA-Z0-9-#@$()\[\]/]+$");
+        Regex tagRegex = new(@"^[a-zA-Z0-9-#@$()\[\]/]+$");
         string[] tags = tagsEnv.Split(',');
         foreach (string tag in tags)
         {

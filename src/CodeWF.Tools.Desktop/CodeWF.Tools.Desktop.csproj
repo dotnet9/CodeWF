@@ -28,7 +28,19 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\CodeWF.Tools.Module.Footer\CodeWF.Tools.Module.Footer.csproj" />
-    <ProjectReference Include="..\CodeWF.Tools.Modules.SlugifyString\CodeWF.Tools.Modules.SlugifyString.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.IServices\CodeWF.Tools.IServices.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.MediatR\CodeWF.Tools.MediatR.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.Module.Developer\CodeWF.Tools.Module.Developer.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.Module.Test\CodeWF.Tools.Module.Test.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.Modules.Web\CodeWF.Tools.Modules.Web.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.Prism\CodeWF.Tools.Prism.csproj" />
+    <ProjectReference Include="..\CodeWF.Utils\CodeWF.Utils.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Compile Update="Views\FooterView.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,12 @@
 ﻿namespace CodeWF.Tools.Common;
 
-public class ViewModelBase(ISender sender, IPublisher publisher) : BindableBase
+public class ViewModelBase : BindableBase
 {
-    public ISender Sender { get; } = sender;
-    public IPublisher Publisher { get; } = publisher;
+    private string? _title;
+
+    public string? Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
 }

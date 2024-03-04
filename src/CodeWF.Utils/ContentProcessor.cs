@@ -1,8 +1,4 @@
-﻿using Markdig;
-using NUglify;
-using System.Text.RegularExpressions;
-
-namespace CodeWF.Utils;
+﻿namespace CodeWF.Utils;
 
 public static class ContentProcessor
 {
@@ -21,7 +17,7 @@ public static class ContentProcessor
         }
 
         endpoint = endpoint.TrimEnd('/');
-        Regex imgSrcRegex = new Regex("<img.+?(src)=[\"'](.+?)[\"'].+?>");
+        Regex imgSrcRegex = new("<img.+?(src)=[\"'](.+?)[\"'].+?>");
         string newStr = imgSrcRegex.Replace(html,
             match => match.Value.Contains("src=\"/image/")
                 ? match.Value.Replace("/image/", $"{endpoint}/")
@@ -115,7 +111,7 @@ public static class ContentProcessor
             }
         }
 
-        string stringResult = new string(result, 0, cursor);
+        string stringResult = new(result, 0, cursor);
 
         return stringResult.Replace("&nbsp;", " ");
     }

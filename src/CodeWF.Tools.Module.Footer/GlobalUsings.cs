@@ -1,9 +1,0 @@
-﻿global using CodeWF.Tools.Common;
-global using MediatR;
-global using Avalonia.Controls;
-global using Avalonia.Markup.Xaml;
-global using CodeWF.Tools.Module.Footer.ViewModels;
-global using Prism.Ioc;
-global using Prism.Modularity;
-global using Prism.Regions;
-global using CodeWF.Tools.Module.Footer.Views;

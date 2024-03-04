@@ -16,6 +16,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF", "CodeWF\CodeWF.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.YarpReverseProxy", "CodeWF.YarpReverseProxy\CodeWF.YarpReverseProxy.csproj", "{68A3AA18-5CEE-4894-9DA9-991DE334910E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{8C8A8E52-4C2A-42E6-A177-EE23A6E3207D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Utils", "CodeWF.Utils\CodeWF.Utils.csproj", "{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +34,10 @@ Global
 		{68A3AA18-5CEE-4894-9DA9-991DE334910E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68A3AA18-5CEE-4894-9DA9-991DE334910E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68A3AA18-5CEE-4894-9DA9-991DE334910E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +45,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D818A21F-C512-4B77-9EFE-9AF90406B32B} = {844ACF80-B54A-4FDA-B6D6-00C3CC921508}
 		{68A3AA18-5CEE-4894-9DA9-991DE334910E} = {844ACF80-B54A-4FDA-B6D6-00C3CC921508}
+		{9BFAA2FF-5545-4429-ABE1-7BDA7E74E236} = {8C8A8E52-4C2A-42E6-A177-EE23A6E3207D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}

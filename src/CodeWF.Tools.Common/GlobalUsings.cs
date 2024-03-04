@@ -1,9 +1,7 @@
-﻿global using MediatR;
+﻿global using Avalonia.Controls;
+global using MediatR;
+global using Prism.Events;
 global using Prism.Mvvm;
-global using Prism.Navigation;
 global using Prism.Regions;
-global using ReactiveUI;
-global using ReactiveUI.Fody.Helpers;
-global using System.Reactive.Disposables;
-global using Avalonia.Controls;
 global using System.Collections.Specialized;
+global using System.ComponentModel;

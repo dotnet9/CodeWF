@@ -1,0 +1,13 @@
+﻿global using Avalonia.Controls;
+global using CodeWF.Tools.Common;
+global using CodeWF.Tools.IServices;
+global using CodeWF.Tools.Module.Test.ViewModels;
+global using Prism.Ioc;
+global using Prism.Modularity;
+global using Prism.Regions;
+global using CodeWF.Tools.MediatR.Notifications;
+global using MediatR;
+global using CodeWF.Tools.MediatR.Requests;
+global using CodeWF.Tools.Prism;
+global using Prism.Events;
+global using CodeWF.Tools.Module.Test.Views;

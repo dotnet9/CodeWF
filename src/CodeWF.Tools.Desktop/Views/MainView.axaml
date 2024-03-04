@@ -2,13 +2,80 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:u="https://irihi.tech/ursa"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:common="clr-namespace:CodeWF.Tools.Common;assembly=CodeWF.Tools.Common"
+             xmlns:vm="clr-namespace:CodeWF.Tools.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:CodeWF.Tools.Desktop.Converters"
+             xmlns:services="clr-namespace:CodeWF.Tools.IServices;assembly=CodeWF.Tools.IServices"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:MainViewModel"
              x:Class="CodeWF.Tools.Desktop.Views.MainView">
-    <Grid RowDefinitions="*, 30">
-        <ContentControl prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
-        <StackPanel Grid.Row="1" prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"
+    <UserControl.Resources>
+        <converters:IconNameToPathConverter x:Key="IconConverter" />
+    </UserControl.Resources>
+    <Grid RowDefinitions="*, Auto" ColumnDefinitions="200, *">
+        <Grid RowDefinitions="Auto, *">
+            <Grid HorizontalAlignment="Center" ColumnDefinitions="Auto, Auto">
+                <Image Width="24" Height="24" Margin="4,12" RenderOptions.BitmapInterpolationMode="HighQuality"
+                       Source="../Assets/logo.png" />
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" Classes="H5" Text="{Binding Title}"
+                           Theme="{DynamicResource TitleTextBlock}">
+                </TextBlock>
+            </Grid>
+            <Border Grid.Row="1"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    Theme="{DynamicResource CardBorder}">
+                <u:NavMenu
+                    Name="menu"
+                    HeaderBinding="{Binding Header}"
+                    IconBinding="{Binding IconIndex}"
+                    ItemsSource="{Binding MenuItems}"
+                    SelectedItem="{Binding SelectedMenuItem}"
+                    SubMenuBinding="{Binding Children}">
+                    <u:NavMenu.Styles>
+                        <Style x:DataType="services:ToolMenuItem" Selector="u|NavMenuItem">
+                            <Setter Property="IsSeparator" Value="{Binding IsSeparator}" />
+                        </Style>
+                    </u:NavMenu.Styles>
+                    <u:NavMenu.IconTemplate>
+                        <DataTemplate DataType="{x:Type x:Int32}">
+                            <u:TwoTonePathIcon
+                                Width="16"
+                                Height="16"
+                                ActiveForeground="{DynamicResource SemiBlue5}"
+                                ActiveStrokeBrush="{DynamicResource SemiBlue5}"
+                                Data="{Binding Converter={StaticResource IconConverter}}"
+                                Foreground="{DynamicResource SemiGrey5}"
+                                IsActive="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=u:NavMenuItem}, Path=IsHighlighted, Mode=TwoWay}"
+                                StrokeBrush="{DynamicResource SemiGrey5}" />
+                        </DataTemplate>
+                    </u:NavMenu.IconTemplate>
+                    <u:NavMenu.Header>
+                        <AutoCompleteBox
+                            ItemsSource="{Binding SearchMenuItems}"
+                            ValueMemberBinding="{Binding Header}"
+                            Watermark="请选择工具"
+                            FilterMode="ContainsOrdinalCaseSensitive">
+                            <AutoCompleteBox.ItemTemplate>
+                                <DataTemplate DataType="services:ToolMenuItem">
+                                    <Grid RowDefinitions="Auto, Auto">
+                                        <TextBlock Grid.Row="0" Text="{Binding Header}" FontSize="14" />
+                                        <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="13" />
+                                    </Grid>
+                                </DataTemplate>
+                            </AutoCompleteBox.ItemTemplate>
+                        </AutoCompleteBox>
+                    </u:NavMenu.Header>
+                </u:NavMenu>
+            </Border>
+        </Grid>
+        <ContentControl Grid.Row="0" Grid.Column="1"
+                        prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                    prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"
                     Background="LightBlue" />
     </Grid>
 </UserControl>
