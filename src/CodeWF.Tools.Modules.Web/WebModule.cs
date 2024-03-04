@@ -12,7 +12,7 @@ public class WebModule : IModule
     public void OnInitialized(IContainerProvider containerProvider)
     {
         var regionManager = containerProvider.Resolve<IRegionManager>();
-        regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(SlugifyView));
+        regionManager.RegisterViewWithRegion<SlugifyView>(RegionNames.ContentRegion);
     }
 
     public void RegisterTypes(IContainerRegistry containerRegistry)

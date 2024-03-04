@@ -39,6 +39,9 @@
 
 
   <ItemGroup>
+    <Compile Update="Views\DashboardView.axaml.cs">
+      <DependentUpon>DashboardView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\FooterView.axaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>

@@ -6,13 +6,14 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:views="clr-namespace:CodeWF.Tools.Desktop.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        Width="1000" Height="600"
         x:Class="CodeWF.Tools.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/favicon.ico"
         Title="{Binding Title}">
     <Design.DataContext>
-		<vm:MainWindowViewModel />
+        <vm:MainWindowViewModel />
     </Design.DataContext>
     <views:MainView />
 

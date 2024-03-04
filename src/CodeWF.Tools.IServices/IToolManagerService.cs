@@ -2,14 +2,16 @@
 
 public interface IToolManagerService
 {
-    void AddTool(ToolType type, string toolName, string toolDescription, string toolRouteKey);
-    void RemoveTool(ToolType type, string toolName);
+    void AddTool(string name, string description, string viewName);
+    void AddTool(ToolType group, string name, string description, string viewName);
+    void RemoveTool(string name);
 
     ObservableCollection<ToolMenuItem> MenuItems { get; set; }
 }
 
 public enum ToolType
 {
+    [Description("Home")] Home,
     [Description("开发类")] Developer,
     [Description("网站开发")] Web,
     [Description("测试")] Test,
@@ -18,34 +20,13 @@ public enum ToolType
 
 public class ToolMenuItem
 {
-    public ToolType ToolType { get; set; }
+    public ToolType Group { get; set; }
+    public int Level { get; set; }
     public string? Header { get; set; }
     public string? Description { get; set; }
-    public int IconIndex { get; set; }
+    public string? ViewName { get; set; }
+    public int IconIndex { get; set; } = DateTime.Now.Microsecond;
     public bool IsSeparator { get; set; }
 
-    public ToolMenuItem()
-    {
-        IconIndex = DateTime.Now.Microsecond;
-    }
-
     public ObservableCollection<ToolMenuItem> Children { get; set; } = new();
-
-    public IEnumerable<ToolMenuItem> GetLeaves()
-    {
-        if (this.Children.Count == 0)
-        {
-            yield return this;
-            yield break;
-        }
-
-        foreach (var child in Children)
-        {
-            var items = child.GetLeaves();
-            foreach (var item in items)
-            {
-                yield return item;
-            }
-        }
-    }
 }

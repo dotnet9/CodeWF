@@ -33,12 +33,12 @@
             <Setter Property="MinHeight" Value="120" />
             <Setter Property="MaxHeight" Value="360" />
             <Setter Property="Height" Value="NaN" />
-            <Setter Property="BorderBrush" Value="LightBlue"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="BorderBrush" Value="LightBlue" />
         </Style>
     </UserControl.Styles>
     <StackPanel Margin="10,4" HorizontalAlignment="Stretch">
-        <TextBlock Text="别名生成器" TextAlignment="Center" />
-
         <StackPanel Margin="0,40,0,0">
             <UniformGrid Columns="4" HorizontalAlignment="Left">
                 <RadioButton GroupName="translationType"
@@ -86,7 +86,7 @@
                 <Button Content="复制" Classes="Gradient" VerticalAlignment="Stretch"
                         Command="{Binding ExecuteCopyAsync}"
                         ToolTip.Tip="点击复制" />
-                
+
             </UniformGrid>
         </StackPanel>
         <UniformGrid Columns="2" Margin="0 10 0 0" HorizontalAlignment="Left">

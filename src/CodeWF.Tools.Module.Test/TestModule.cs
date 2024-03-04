@@ -12,7 +12,7 @@ public class TestModule : IModule
     public void OnInitialized(IContainerProvider containerProvider)
     {
         var regionManager = containerProvider.Resolve<IRegionManager>();
-        regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(TestView));
+        regionManager.RegisterViewWithRegion<TestView>(RegionNames.ContentRegion);
     }
 
     public void RegisterTypes(IContainerRegistry containerRegistry)

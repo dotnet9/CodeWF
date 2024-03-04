@@ -31,13 +31,10 @@ public class SlugifyViewModel : ViewModelBase
         get => _from;
         set
         {
-            if (value != _from)
+            SetProperty(ref _from, value);
+            if (_isAutoTranslation)
             {
-                SetProperty(ref _from, value);
-                if (_isAutoTranslation)
-                {
-                    HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
-                }
+                HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
             }
         }
     }

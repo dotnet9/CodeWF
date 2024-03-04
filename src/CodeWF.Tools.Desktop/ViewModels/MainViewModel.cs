@@ -7,9 +7,9 @@ public class MainViewModel : ViewModelBase
     private readonly IRegionManager _regionManager;
 
     public ObservableCollection<ToolMenuItem> SearchMenuItems { get; set; }
-    private MenuItem? _selectedMenuItem;
+    private ToolMenuItem? _selectedMenuItem;
 
-    public MenuItem? SelectedMenuItem
+    public ToolMenuItem? SelectedMenuItem
     {
         get => _selectedMenuItem;
         set
@@ -53,10 +53,32 @@ public class MainViewModel : ViewModelBase
                 firstMenuItem.Children.ForEach(secondMenuItem => SearchMenuItems.Add(secondMenuItem));
             }
         });
+        SelectedMenuItem = SelectedMenuItem == null ? MenuItems.First() : GetMenuItem(SelectedMenuItem.Header!);
+    }
+
+    private ToolMenuItem? GetMenuItem(string name)
+    {
+        foreach (var firstMenuItem in MenuItems)
+        {
+            if (name == firstMenuItem.Header)
+            {
+                return firstMenuItem;
+            }
+
+            foreach (var secondMenuItem in firstMenuItem.Children)
+            {
+                if (name == secondMenuItem.Header)
+                {
+                    return secondMenuItem;
+                }
+            }
+        }
+
+        return default;
     }
 
     private void ChangeTool()
     {
-        //_regionManager.RequestNavigate(RegionNames.ContentRegion, _selectedMenuItem.Header);
+        _regionManager.RequestNavigate(RegionNames.ContentRegion, _selectedMenuItem?.ViewName);
     }
 }

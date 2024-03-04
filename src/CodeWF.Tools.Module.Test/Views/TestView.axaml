@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CodeWF.Tools.Module.Test.Views.TestView">
-    <UniformGrid Columns="3">
+    <UniformGrid Columns="3" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Button Content="测试MediatR-Request" Classes="Gradient" VerticalAlignment="Stretch"
                 Command="{Binding ExecuteMediatRRequestAsync}" />
         <Button Content="测试MediatR-Notification" Classes="Gradient" VerticalAlignment="Stretch"

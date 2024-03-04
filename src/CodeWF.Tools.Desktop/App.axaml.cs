@@ -20,6 +20,7 @@ public class App : PrismApplication
     protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
     {
         base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+
         regionAdapterMappings.RegisterMapping(typeof(StackPanel), Container.Resolve<StackPanelRegionAdapter>());
         regionAdapterMappings.RegisterMapping(typeof(Grid), Container.Resolve<GridRegionAdapter>());
         regionAdapterMappings.RegisterMapping(typeof(TabControl), Container.Resolve<TabControlAdapter>());
@@ -37,13 +38,17 @@ public class App : PrismApplication
         containerRegistry.Register<MainWindow>();
 
         var regionManager = Container.Resolve<IRegionManager>();
-        regionManager.RegisterViewWithRegion(RegionNames.FooterRegion, typeof(FooterView));
+        regionManager.RegisterViewWithRegion<DashboardView>(RegionNames.ContentRegion);
+        regionManager.RegisterViewWithRegion<FooterView>(RegionNames.FooterRegion);
 
         containerRegistry.RegisterSingleton(typeof(FooterViewModel));
 
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
         containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
+
+        var toolManagerService = container.Resolve<IToolManagerService>();
+        toolManagerService.AddTool("Ê×Ò³", "", nameof(DashboardView));
     }
 
     /// <summary>
