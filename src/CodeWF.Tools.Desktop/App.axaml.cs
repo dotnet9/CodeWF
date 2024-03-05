@@ -14,7 +14,7 @@ public class App : PrismApplication
 
         moduleCatalog.AddModule<DeveloperModule>();
         moduleCatalog.AddModule<WebModule>();
-        moduleCatalog.AddModule<TestModule>();
+        moduleCatalog.AddModule<TestModule>(); 
     }
 
     protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)

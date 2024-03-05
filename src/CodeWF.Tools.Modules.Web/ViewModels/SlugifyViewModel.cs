@@ -18,7 +18,7 @@ public class SlugifyViewModel : ViewModelBase
     public TranslationKind Kind
     {
         get => _kind;
-        set => SetProperty(ref _kind, value);
+        set => this.RaiseAndSetIfChanged(ref _kind, value);
     }
 
     private string? _from;
@@ -31,7 +31,7 @@ public class SlugifyViewModel : ViewModelBase
         get => _from;
         set
         {
-            SetProperty(ref _from, value);
+            this.RaiseAndSetIfChanged(ref _from, value);
             if (_isAutoTranslation)
             {
                 HandleTranslationAsync().WaitAsync(TimeSpan.FromSeconds(3));
@@ -47,7 +47,7 @@ public class SlugifyViewModel : ViewModelBase
     public string? To
     {
         get => _to;
-        set => SetProperty(ref _to, value);
+        set => this.RaiseAndSetIfChanged(ref _to, value);
     }
 
     private bool _isAutoTranslation = true;
@@ -58,7 +58,7 @@ public class SlugifyViewModel : ViewModelBase
     public bool IsAutoTranslation
     {
         get => _isAutoTranslation;
-        set => SetProperty(ref _isAutoTranslation, value);
+        set => this.RaiseAndSetIfChanged(ref _isAutoTranslation, value);
     }
 
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }

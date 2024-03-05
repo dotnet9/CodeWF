@@ -21,8 +21,7 @@
                 <Image Width="24" Height="24" Margin="4,12" RenderOptions.BitmapInterpolationMode="HighQuality"
                        Source="../Assets/logo.png" />
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Title}"
-                           Classes="H4" Theme="{DynamicResource TitleTextBlock}" Margin="0 0 10 0">
-                </TextBlock>
+                           Classes="H4" Theme="{DynamicResource TitleTextBlock}" Margin="0 0 10 0"/>
             </Grid>
             <Border Grid.Row="1"
                     Padding="0"

@@ -24,8 +24,5 @@ public partial class MainView : UserControl
 
         var notificationService = ContainerLocator.Current.Resolve<INotificationService>();
         notificationService.SetHostWindow(level);
-
-        var clipboardService = ContainerLocator.Current.Resolve<IClipboardService>();
-        clipboardService.SetHostWindow(level);
     }
 }

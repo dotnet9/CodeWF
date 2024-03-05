@@ -1,4 +1,7 @@
-﻿namespace CodeWF.Tools.Desktop.ViewModels;
+﻿using ReactiveUI;
+using System.Globalization;
+
+namespace CodeWF.Tools.Desktop.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -14,7 +17,7 @@ public class MainViewModel : ViewModelBase
         get => _selectedMenuItem;
         set
         {
-            SetProperty(ref _selectedMenuItem, value);
+            this.RaiseAndSetIfChanged(ref _selectedMenuItem, value);
             ChangeTool();
         }
     }
@@ -24,7 +27,7 @@ public class MainViewModel : ViewModelBase
     public NotificationType SelectedMenuStatus
     {
         get => _selectedMenuStatus;
-        set => SetProperty(ref _selectedMenuStatus, value);
+        set => this.RaiseAndSetIfChanged(ref _selectedMenuStatus, value);
     }
 
     public ObservableCollection<ToolMenuItem> MenuItems { get; private set; }

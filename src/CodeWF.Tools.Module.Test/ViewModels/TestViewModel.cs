@@ -32,6 +32,7 @@ public class TestViewModel : ViewModelBase
     {
         var result = _sender.Send(new TestRequest() { Args = "ExecuteMediatRRequestAsync" });
         _notificationService.Show("MediatR", $"收到响应：{result.Result}");
+        await Task.CompletedTask;
     }
 
     public async Task ExecuteMediatRNotificationAsync()

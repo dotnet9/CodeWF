@@ -2,21 +2,12 @@
 
 internal class ClipboardService : IClipboardService
 {
-    private IClipboard? _clipboard;
-
-
-    public void SetHostWindow(TopLevel hostWindow)
-    {
-        _clipboard = hostWindow.Clipboard;
-    }
-
     public async Task CopyToAsync(string content)
     {
-        if (_clipboard is not null)
-        {
-            var dataObject = new DataObject();
-            dataObject.Set(DataFormats.Text, content);
-            await _clipboard.SetDataObjectAsync(dataObject);
-        }
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop ||
+            desktop.MainWindow?.Clipboard is not { } provider)
+            throw new NullReferenceException("Missing Clipboard instance.");
+
+        await provider.SetTextAsync(content);
     }
 }

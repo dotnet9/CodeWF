@@ -16,5 +16,6 @@ internal sealed class Program
         .With(new X11PlatformOptions { EnableMultiTouch = false, UseDBusMenu = true })
         .UseSkia()
         .UseReactiveUI()
+        .WithInterFont()
         .LogToTrace();
 }
