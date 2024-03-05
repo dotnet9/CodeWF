@@ -2,7 +2,7 @@
 
 internal class ToolManagerService : IToolManagerService
 {
-    public void AddTool(string name, string description, string viewName)
+    public void AddTool(string name, string description, string viewName, ToolStatus status)
     {
         MenuItems.Add(new ToolMenuItem
         {
@@ -10,11 +10,12 @@ internal class ToolManagerService : IToolManagerService
             Level = 0,
             Header = name,
             Description = description,
-            ViewName = viewName
+            ViewName = viewName,
+            Status = status
         });
     }
 
-    public void AddTool(ToolType group, string name, string description, string viewName)
+    public void AddTool(ToolType group, string name, string description, string viewName, ToolStatus status)
     {
         var toolGroup = MenuItems.FirstOrDefault(item => item.Group == group);
         if (toolGroup == null)
@@ -30,7 +31,8 @@ internal class ToolManagerService : IToolManagerService
             Level = 1,
             Header = name,
             Description = description,
-            ViewName = viewName
+            ViewName = viewName,
+            Status = status
         });
     }
 

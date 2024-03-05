@@ -17,11 +17,11 @@
     </UserControl.Resources>
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="Auto,1, *">
         <Grid RowDefinitions="Auto, *">
-            <Grid HorizontalAlignment="Center" ColumnDefinitions="Auto, Auto" Margin="5">
-                <Image Width="36" Height="36" Margin="4,12" RenderOptions.BitmapInterpolationMode="HighQuality"
+            <Grid HorizontalAlignment="Center" ColumnDefinitions="Auto, Auto">
+                <Image Width="24" Height="24" Margin="4,12" RenderOptions.BitmapInterpolationMode="HighQuality"
                        Source="../Assets/logo.png" />
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Title}"
-                           Classes="H4" Theme="{DynamicResource TitleTextBlock}">
+                           Classes="H4" Theme="{DynamicResource TitleTextBlock}" Margin="0 0 10 0">
                 </TextBlock>
             </Grid>
             <Border Grid.Row="1"
@@ -29,14 +29,14 @@
                     HorizontalAlignment="Left"
                     Theme="{DynamicResource CardBorder}">
                 <Grid>
-                    <u:NavMenu 
-                               Name="menu"
-                               HeaderBinding="{Binding Header}"
-                               IconBinding="{Binding IconIndex}"
-                               ItemsSource="{Binding MenuItems}"
-                               SelectedItem="{Binding SelectedMenuItem}"
-                               SubMenuBinding="{Binding Children}"
-                               HorizontalAlignment="Stretch">
+                    <u:NavMenu
+                        Name="menu"
+                        HeaderBinding="{Binding Header}"
+                        IconBinding="{Binding IconIndex}"
+                        ItemsSource="{Binding MenuItems}"
+                        SelectedItem="{Binding SelectedMenuItem}"
+                        SubMenuBinding="{Binding Children}"
+                        HorizontalAlignment="Stretch">
                         <u:NavMenu.Styles>
                             <Style x:DataType="services:ToolMenuItem" Selector="u|NavMenuItem">
                                 <Setter Property="IsSeparator" Value="{Binding IsSeparator}" />
@@ -81,18 +81,21 @@
             </Border>
         </Grid>
         <GridSplitter Grid.Column="1" Grid.Row="0" VerticalAlignment="Stretch" />
-        <Border Grid.Row="0" Grid.Column="2" Classes="Hover" Theme="{StaticResource CardBorder}">
+        <Border Grid.Row="0" Grid.Column="2" Classes="Hover" Theme="{StaticResource CardBorder}" Padding="10">
             <Grid RowDefinitions="Auto, *">
-                <TextBlock Text="{Binding SelectedMenuItem.Header,Mode=OneWay}"
-                           VerticalAlignment="Top" Margin="0 0 0 10" Classes="H5"
-                           Theme="{DynamicResource TitleTextBlock}" Grid.Row="0" />
-                <ContentControl Grid.Row="1"
+                <u:Banner Grid.Row="0"
+                          Classes.Bordered="False"
+                          Content="{Binding SelectedMenuItem.Description,Mode=OneWay}"
+                          HorizontalContentAlignment="Left" VerticalContentAlignment="Top"
+                          Header="{Binding SelectedMenuItem.Header,Mode=OneWay}"
+                          Type="{Binding SelectedMenuStatus,Mode =OneWay}" />
+                <ContentControl Grid.Row="1" Margin="0 10 0 0"
                                 prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
             </Grid>
         </Border>
 
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                    prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"
-                    Background="LightBlue" />
+                        prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"
+                        Background="LightBlue" />
     </Grid>
 </UserControl>

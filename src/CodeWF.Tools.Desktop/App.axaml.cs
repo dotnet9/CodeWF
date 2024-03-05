@@ -48,7 +48,7 @@ public class App : PrismApplication
         containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
 
         var toolManagerService = container.Resolve<IToolManagerService>();
-        toolManagerService.AddTool("Ê×Ò³", "", nameof(DashboardView));
+        toolManagerService.AddTool("Ê×Ò³", "", nameof(DashboardView), ToolStatus.Planned);
     }
 
     /// <summary>

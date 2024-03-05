@@ -38,8 +38,8 @@
             <Setter Property="BorderBrush" Value="LightBlue" />
         </Style>
     </UserControl.Styles>
-    <StackPanel Margin="10,4" HorizontalAlignment="Stretch">
-        <StackPanel Margin="0,40,0,0">
+    <StackPanel HorizontalAlignment="Stretch">
+        <StackPanel>
             <UniformGrid Columns="4" HorizontalAlignment="Left">
                 <RadioButton GroupName="translationType"
                              Content="中译英"

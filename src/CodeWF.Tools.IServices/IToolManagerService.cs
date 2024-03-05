@@ -2,8 +2,8 @@
 
 public interface IToolManagerService
 {
-    void AddTool(string name, string description, string viewName);
-    void AddTool(ToolType group, string name, string description, string viewName);
+    void AddTool(string name, string description, string viewName, ToolStatus status);
+    void AddTool(ToolType group, string name, string description, string viewName, ToolStatus status);
     void RemoveTool(string name);
 
     ObservableCollection<ToolMenuItem> MenuItems { get; set; }
@@ -18,6 +18,13 @@ public enum ToolType
     [Description("未分类")] Other
 }
 
+public enum ToolStatus
+{
+    [Description("计划中")] Planned,
+    [Description("开发中")] Developing,
+    [Description("开发完成")] Complete
+}
+
 public class ToolMenuItem
 {
     public ToolType Group { get; set; }
@@ -25,6 +32,7 @@ public class ToolMenuItem
     public string? Header { get; set; }
     public string? Description { get; set; }
     public string? ViewName { get; set; }
+    public ToolStatus Status { get; set; }
     public int IconIndex { get; set; } = DateTime.Now.Microsecond;
     public bool IsSeparator { get; set; }
 

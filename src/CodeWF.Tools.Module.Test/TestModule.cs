@@ -6,7 +6,7 @@ public class TestModule : IModule
     {
         toolManagerService.AddTool(ToolType.Test, "测试使用",
             "测试AvaloniaUI中使用Prism及MediatR",
-            nameof(TestView));
+            nameof(TestView), ToolStatus.Complete);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)

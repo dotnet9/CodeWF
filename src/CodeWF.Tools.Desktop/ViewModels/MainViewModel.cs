@@ -19,6 +19,14 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    private NotificationType _selectedMenuStatus;
+
+    public NotificationType SelectedMenuStatus
+    {
+        get => _selectedMenuStatus;
+        set => SetProperty(ref _selectedMenuStatus, value);
+    }
+
     public ObservableCollection<ToolMenuItem> MenuItems { get; private set; }
 
     public MainViewModel(IToolManagerService toolManagerService, INotificationService notificationService,
@@ -80,5 +88,12 @@ public class MainViewModel : ViewModelBase
     private void ChangeTool()
     {
         _regionManager.RequestNavigate(RegionNames.ContentRegion, _selectedMenuItem?.ViewName);
+        SelectedMenuStatus = _selectedMenuItem?.Status switch
+        {
+            ToolStatus.Planned => NotificationType.Warning,
+            ToolStatus.Developing => NotificationType.Information,
+            ToolStatus.Complete => NotificationType.Success,
+            _ => NotificationType.Information
+        };
     }
 }

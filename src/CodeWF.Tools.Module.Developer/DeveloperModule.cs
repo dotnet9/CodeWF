@@ -6,7 +6,7 @@ public class DeveloperModule : IModule
     {
         toolManagerService.AddTool(ToolType.Developer, "时间戳转换",
             "Unix 时间戳是从1970年1月1日（UTC/GMT的午夜）开始所经过的秒数，不考虑闰秒。",
-            nameof(TimestampView));
+            nameof(TimestampView), ToolStatus.Planned);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)
