@@ -15,19 +15,18 @@
         </Style>
     </UserControl.Styles>
     <StackPanel>
-        <Grid RowDefinitions="40, 40, 40" ColumnDefinitions="50, 210, *" VerticalAlignment="Center">
+        <Grid RowDefinitions="50, 50, 50" ColumnDefinitions="50, 210, *" VerticalAlignment="Center">
             <TextBlock Text="现在：" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" />
-            <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-                <Run Text="{Binding CurrentUtcTime, StringFormat=yyyy-MM-dd HH:mm:ss fff}" />
-                <Run Text="|" />
-                <Run Text="{Binding CurrentTimestamp}" Foreground="Green" />
-                <Run Text="s"></Run>
-            </TextBlock>
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2"
-                        VerticalAlignment="Center">
-                <TextBlock Text="控制：" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2">
+                <TextBlock VerticalAlignment="Center">
+                    <Run Text="{Binding CurrentUtcTime, StringFormat=yyyy-MM-dd HH:mm:ss fff}" />
+                    <Run Text="|" />
+                    <Run Text="{Binding CurrentTimestamp}" Foreground="Green" />
+                    <Run Text="s"></Run>
+                </TextBlock>
+                <TextBlock Text="控制：" VerticalAlignment="Center"  Margin="10 0 0 0"/>
                 <Button Content="{Binding CalcButtonContent}" Foreground="{Binding CalcButtonForeground}"
-                        Command="{Binding ExecuteRunCalcTimestampCommand}" />
+                        Command="{Binding ExecuteRunCalcTimestampCommand}" VerticalAlignment="Center"/>
             </StackPanel>
 
             <TextBlock Text="时间戳" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />

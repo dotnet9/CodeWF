@@ -6,6 +6,9 @@ namespace CodeWF.Tools.Module.Developer.ViewModels;
 
 public class TimestampViewModel : ViewModelBase
 {
+    private const string SecondDatetimeFormat = "yyyy-MM-dd HH:mm:ss";
+    private const string MillisecondDatetimeFormat = "yyyy-MM-dd HH:mm:ss fff";
+
     #region 当前时间
 
     private bool _isCalcTimestamp;
@@ -77,7 +80,21 @@ public class TimestampViewModel : ViewModelBase
     public int TimestampToTimeKindIndex
     {
         get => _timestampToTimeKindIndex;
-        set => this.RaiseAndSetIfChanged(ref _timestampToTimeKindIndex, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _timestampToTimeKindIndex, value);
+
+            var kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timestampToTimeKindIndex.ToString());
+            TimestampToTimeFormat = kind == TimestampType.Second ? SecondDatetimeFormat : MillisecondDatetimeFormat;
+        }
+    }
+
+    private string? _timestampToTimeFormat;
+
+    public string? TimestampToTimeFormat
+    {
+        get => _timestampToTimeFormat;
+        set => this.RaiseAndSetIfChanged(ref _timestampToTimeFormat, value);
     }
 
     private DateTimeOffset _timeTo;
@@ -92,6 +109,14 @@ public class TimestampViewModel : ViewModelBase
 
     #region 时间转时间戳
 
+    private string? _timeToTimestampFormat;
+
+    public string? TimeToTimestampFormat
+    {
+        get => _timeToTimestampFormat;
+        set => this.RaiseAndSetIfChanged(ref _timeToTimestampFormat, value);
+    }
+
     private DateTimeOffset _timeFrom;
 
     public DateTimeOffset TimeFrom
@@ -105,7 +130,14 @@ public class TimestampViewModel : ViewModelBase
     public int TimeToTimestampKindIndex
     {
         get => _timeToTimestampKindIndex;
-        set => this.RaiseAndSetIfChanged(ref _timeToTimestampKindIndex, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _timeToTimestampKindIndex, value);
+
+
+            var kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timeToTimestampKindIndex.ToString());
+            TimeToTimestampFormat = kind == TimestampType.Second ? SecondDatetimeFormat : MillisecondDatetimeFormat;
+        }
     }
 
     private long _timestampTo;
@@ -121,9 +153,12 @@ public class TimestampViewModel : ViewModelBase
     public TimestampViewModel()
     {
         _ = RunCalcTimestamp();
+
         this.WhenAnyValue(x => x.IsCalcTimestamp).Subscribe(newValue => CalcButtonContent = newValue ? "停止" : "开始");
         this.WhenAnyValue(x => x.IsCalcTimestamp)
             .Subscribe(newValue => CalcButtonForeground = newValue ? Brushes.Red : Brushes.Green);
+
+        TimestampToTimeFormat = TimeToTimestampFormat = SecondDatetimeFormat;
         TimestampFrom = TimestampHelper.GetCurrentTimestamp();
         TimeFrom = DateTimeOffset.UtcNow;
         ExecuteTimestampToTimeCommand();
