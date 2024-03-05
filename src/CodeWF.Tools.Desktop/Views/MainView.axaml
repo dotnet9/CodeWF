@@ -21,7 +21,7 @@
                 <Image Width="24" Height="24" Margin="4,12" RenderOptions.BitmapInterpolationMode="HighQuality"
                        Source="../Assets/logo.png" />
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Title}"
-                           Classes="H4" Theme="{DynamicResource TitleTextBlock}" Margin="0 0 10 0"/>
+                           Classes="H4" Theme="{DynamicResource TitleTextBlock}" Margin="0 0 10 0" />
             </Grid>
             <Border Grid.Row="1"
                     Padding="0"
@@ -80,19 +80,36 @@
             </Border>
         </Grid>
         <GridSplitter Grid.Column="1" Grid.Row="0" VerticalAlignment="Stretch" />
-        <Border Grid.Row="0" Grid.Column="2" Classes="Hover" Theme="{StaticResource CardBorder}" Padding="10">
-            <Grid RowDefinitions="Auto, *">
-                <u:Banner Grid.Row="0"
-                          Classes.Bordered="False"
-                          HorizontalContentAlignment="Left" VerticalContentAlignment="Top"
-                          Header="{Binding SelectedMenuItem.Header,Mode=OneWay}"
-                          Type="{Binding SelectedMenuStatus,Mode =OneWay}">
-                    <TextBlock Text="{Binding SelectedMenuItem.Description,Mode=OneWay}" TextWrapping="Wrap" />
-                </u:Banner>
-                <ContentControl Grid.Row="1" Margin="0 10 0 0"
-                                prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
-            </Grid>
-        </Border>
+
+        <Panel Grid.Row="0" Grid.Column="2">
+            <ExperimentalAcrylicBorder IsHitTestVisible="False">
+                <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial
+                        TintOpacity="1"
+                        MaterialOpacity="0.65">
+
+                    </ExperimentalAcrylicMaterial>
+                </ExperimentalAcrylicBorder.Material>
+            </ExperimentalAcrylicBorder>
+
+            <Panel Margin="0 30 0 0">
+
+                <Border Classes="Hover" Theme="{StaticResource CardBorder}" Padding="10">
+                    <Grid RowDefinitions="Auto, *">
+                        <u:Banner Grid.Row="0"
+                                  Classes.Bordered="False"
+                                  HorizontalContentAlignment="Left" VerticalContentAlignment="Top"
+                                  Header="{Binding SelectedMenuItem.Header,Mode=OneWay}"
+                                  Type="{Binding SelectedMenuStatus,Mode =OneWay}">
+                            <TextBlock Text="{Binding SelectedMenuItem.Description,Mode=OneWay}" TextWrapping="Wrap" />
+                        </u:Banner>
+                        <ContentControl Grid.Row="1" Margin="0 10 0 0"
+                                        prism:RegionManager.RegionName="{x:Static common:RegionNames.ContentRegion}" />
+                    </Grid>
+                </Border>
+            </Panel>
+        </Panel>
+
 
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                         prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}"

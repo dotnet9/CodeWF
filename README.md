@@ -16,3 +16,5 @@
 ## 感谢
 
 - [edi.wang](https://github.com/EdiWang/Moonglade)
+- [Semi.Avalonia](https://github.com/irihitech/Semi.Avalonia)
+- [Ursa.Avalonia](https://github.com/irihitech/Ursa.Avalonia)
