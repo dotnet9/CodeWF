@@ -42,13 +42,16 @@ public class App : PrismApplication
         regionManager.RegisterViewWithRegion<FooterView>(RegionNames.FooterRegion);
 
         containerRegistry.RegisterSingleton(typeof(FooterViewModel));
+        containerRegistry.RegisterSingleton(typeof(DashboardViewModel));
 
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
         containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
 
         var toolManagerService = container.Resolve<IToolManagerService>();
-        toolManagerService.AddTool("首页", "", nameof(DashboardView), ToolStatus.Planned);
+        toolManagerService.AddTool("首页",
+            "这是一个基于Avalonia UI + Prism框架打造的模块化跨平台工具平台，汇聚了众多开发实用小工具，目前已开发或即将开发的如编码解码、数据加密等，轻量且强大，开箱即用，助力开发者提升工作效率。",
+            nameof(DashboardView), ToolStatus.Complete);
     }
 
     /// <summary>

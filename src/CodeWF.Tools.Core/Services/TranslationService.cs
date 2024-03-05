@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Core.Translation;
+﻿namespace CodeWF.Tools.Core.Services;
 
 /// <summary>
 /// 中英互译使用Yandex Translation，Yandex使用了神经网络机器翻译技术（NMT），

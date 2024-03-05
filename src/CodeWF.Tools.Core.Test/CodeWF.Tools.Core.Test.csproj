@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CodeWF.Tools.Core.Translation\CodeWF.Tools.Core.Translation.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj" />
   </ItemGroup>
 
 </Project>

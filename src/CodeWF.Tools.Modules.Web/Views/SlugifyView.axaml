@@ -6,7 +6,7 @@
              xmlns:vm="using:CodeWF.Tools.Modules.Web.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:converters="clr-namespace:CodeWF.Tools.Modules.Web.Converters"
-             xmlns:translation="clr-namespace:CodeWF.Tools.Core.Translation;assembly=CodeWF.Tools.Core.Translation"
+             xmlns:translation="clr-namespace:CodeWF.Tools.Core.Models;assembly=CodeWF.Tools.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="vm:SlugifyViewModel"
              x:Class="CodeWF.Tools.Modules.Web.Views.SlugifyView">

@@ -16,9 +16,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Desktop", "Cod
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{5546150D-D8A9-46D9-9035-E255ECBD3596}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Core.Translation", "CodeWF.Tools.Core.Translation\CodeWF.Tools.Core.Translation.csproj", "{1D932F11-01BD-455A-B491-563022655036}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Core", "CodeWF.Tools.Core\CodeWF.Tools.Core.csproj", "{1D932F11-01BD-455A-B491-563022655036}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Core.Translation.Test", "CodeWF.Tools.Core.Translation.Test\CodeWF.Tools.Core.Translation.Test.csproj", "{C50AB59F-F660-4075-B72C-F907F156EAC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Core.Test", "CodeWF.Tools.Core.Test\CodeWF.Tools.Core.Test.csproj", "{C50AB59F-F660-4075-B72C-F907F156EAC9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Common", "CodeWF.Tools.Common\CodeWF.Tools.Common.csproj", "{E57DDAE9-82A0-4AE0-A98D-4EECAF98C04B}"
 EndProject

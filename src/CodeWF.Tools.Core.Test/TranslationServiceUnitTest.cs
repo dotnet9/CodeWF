@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace CodeWF.Tools.Core.Translation.Test;
+﻿namespace CodeWF.Tools.Core.Test;
 
 [TestClass]
 public class TranslationServiceUnitTest

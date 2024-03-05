@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Core.Translation;
+﻿namespace CodeWF.Tools.Core.IServices;
 
 /// <summary>
 /// 文章标题翻译

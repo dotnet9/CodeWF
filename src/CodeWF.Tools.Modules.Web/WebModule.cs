@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Tools.Modules.Web;
+﻿using CodeWF.Tools.Core.Services;
+
+namespace CodeWF.Tools.Modules.Web;
 
 public class WebModule : IModule
 {

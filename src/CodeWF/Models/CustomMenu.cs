@@ -1,6 +1,4 @@
-﻿
-
-namespace CodeWF.Models;
+﻿namespace CodeWF.Models;
 
 public class AppConfig
 {
@@ -26,7 +24,7 @@ public class AppConfig
                 toolsDomain);
         menus[MenuType.BlazorTool] =
             new CustomMenuItem(MenuType.BlazorTool.Description(),
-                "这是一个基于Blazor框架打造的在线工具平台，汇聚了众多开发实用小工具，目前已开发或即将开发的如编码解码、数据加密等，轻量且强大，开箱即用，助力开发者提升工作效率。源码地址：https://github.com/dotnet9/CodeWF",
+                "基于Blazor(在线版)/Avalonia UI(跨平台桌面版)框架打造的工具平台，汇聚了众多开发实用小工具，目前已开发或即将开发的如编码解码、数据加密等，轻量且强大，开箱即用，助力开发者提升工作效率。源码地址：https://github.com/dotnet9/CodeWF",
                 "前往看看", btoolsDomain);
 
         return _info = new AppInfo("码界工坊", "一个热衷于互联网分享精神的网站", "沙漠尽头的狼", menus);

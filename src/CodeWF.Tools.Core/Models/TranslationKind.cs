@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Core.Translation;
+﻿namespace CodeWF.Tools.Core.Models;
 
 public enum TranslationKind
 {

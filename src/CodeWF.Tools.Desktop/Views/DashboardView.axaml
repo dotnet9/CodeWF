@@ -2,7 +2,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:viewModels="clr-namespace:CodeWF.Tools.Desktop.ViewModels"
+             xmlns:u="https://irihi.tech/ursa"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DashboardViewModel"
              x:Class="CodeWF.Tools.Desktop.Views.DashboardView">
-  首页面板
+    <ItemsControl ItemsSource="{Binding MenuItems}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Expander Header="{Binding Header}" IsExpanded="True">
+                    <ItemsControl ItemsSource="{Binding Children}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="Hover" Theme="{StaticResource CardBorder}" Padding="10">
+                                    <u:Banner
+                                        Classes.Bordered="False"
+                                        HorizontalContentAlignment="Left" VerticalContentAlignment="Top"
+                                        Header="{Binding Header,Mode=OneWay}"
+                                        Type="{Binding Status,Mode =OneWay}">
+                                        <TextBlock Text="{Binding Description,Mode=OneWay}" TextWrapping="Wrap" />
+                                    </u:Banner>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Expander>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>
