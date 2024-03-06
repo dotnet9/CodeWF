@@ -1,3 +1,5 @@
+
+
 namespace CodeWF.Tools.Desktop.Views;
 
 public partial class MainView : UserControl
@@ -24,5 +26,15 @@ public partial class MainView : UserControl
 
         var notificationService = ContainerLocator.Current.Resolve<INotificationService>();
         notificationService.SetHostWindow(level);
+    }
+
+    private void ToggleButton_OnIsCheckedChanged(object sender, RoutedEventArgs e)
+    {
+        var app = Application.Current;
+        if (app is not null)
+        {
+            var theme = app.ActualThemeVariant;
+            app.RequestedThemeVariant = theme == ThemeVariant.Dark ? ThemeVariant.Light : ThemeVariant.Dark;
+        }
     }
 }

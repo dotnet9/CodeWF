@@ -29,3 +29,7 @@ global using Prism.Modularity;
 global using Prism.Regions;
 global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
+global using Avalonia.Interactivity;
+global using Avalonia.Styling;
+global using CodeWF.Tools.Core.Helpers;
+global using System.Runtime.InteropServices;

@@ -2,5 +2,16 @@
 
 public class FooterViewModel
 {
-    public string Message => "Powered by 沙漠尽头的狼 | .NET 9";
+    public int CurrentYear => DateTime.Now.Year;
+    public string DotnetVersion => RuntimeInformation.FrameworkDescription;
+
+    public void OpenCodeWFWebSite()
+    {
+        ProcessHelper.OpenBrowserForVisitSite("https://codewf.com");
+    }
+
+    public void OpenCodeWFRepository()
+    {
+        ProcessHelper.OpenBrowserForVisitSite("https://github.com/dotnet9/CodeWF");
+    }
 }

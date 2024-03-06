@@ -10,6 +10,18 @@ public class MainViewModel : ViewModelBase
     private readonly IRegionManager _regionManager;
 
     public ObservableCollection<ToolMenuItem> SearchMenuItems { get; set; }
+    private ToolMenuItem? _searchSelectedItem;
+
+    public ToolMenuItem? SearchSelectedItem
+    {
+        get => _searchSelectedItem;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _searchSelectedItem, value);
+            ChangeSearchMenu();
+        }
+    }
+
     private ToolMenuItem? _selectedMenuItem;
 
     public ToolMenuItem? SelectedMenuItem
@@ -98,5 +110,22 @@ public class MainViewModel : ViewModelBase
             ToolStatus.Complete => NotificationType.Success,
             _ => NotificationType.Information
         };
+    }
+
+    private void ChangeSearchMenu()
+    {
+        foreach (var firstMenuItem in MenuItems)
+        {
+            foreach (var secondMenuItem in firstMenuItem.Children)
+            {
+                if (secondMenuItem.Header != _searchSelectedItem?.Header)
+                {
+                    continue;
+                }
+
+                SelectedMenuItem = secondMenuItem;
+                return;
+            }
+        }
     }
 }
