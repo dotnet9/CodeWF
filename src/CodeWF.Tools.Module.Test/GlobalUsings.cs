@@ -11,3 +11,5 @@ global using CodeWF.Tools.MediatR.Requests;
 global using CodeWF.Tools.Prism;
 global using Prism.Events;
 global using CodeWF.Tools.Module.Test.Views;
+global using CodeWF.Tools.Core.Tools;
+global using CodeWF.Tools.Core.Helpers;

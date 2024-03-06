@@ -4,19 +4,20 @@ public class TestModule : IModule
 {
     public TestModule(IToolManagerService toolManagerService)
     {
-        toolManagerService.AddTool(ToolType.Test, "测试使用",
-            "测试AvaloniaUI中使用Prism及MediatR",
-            nameof(TestView), ToolStatus.Complete);
+        toolManagerService.AddTool(ToolType.Test, TestToolInfo.MessageTestName,
+            TestToolInfo.MessageTestDescription, nameof(MessageTestView),
+            IconHelper.MessageTest,
+            ToolStatus.Complete);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)
     {
         var regionManager = containerProvider.Resolve<IRegionManager>();
-        regionManager.RegisterViewWithRegion<TestView>(RegionNames.ContentRegion);
+        regionManager.RegisterViewWithRegion<MessageTestView>(RegionNames.ContentRegion);
     }
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.RegisterSingleton(typeof(TestViewModel));
+        containerRegistry.RegisterSingleton(typeof(MessageTestViewModel));
     }
 }

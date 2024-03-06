@@ -4,9 +4,8 @@ public class DeveloperModule : IModule
 {
     public DeveloperModule(IToolManagerService toolManagerService)
     {
-        toolManagerService.AddTool(ToolType.Developer, "时间戳转换",
-            "Unix 时间戳是从1970年1月1日（UTC/GMT的午夜）开始所经过的秒数，不考虑闰秒。",
-            nameof(TimestampView), ToolStatus.Developing);
+        toolManagerService.AddTool(ToolType.Developer, DeveloperToolInfo.TimestampName,
+            DeveloperToolInfo.TimestampTitle, nameof(TimestampView), IconHelper.Timestamp, ToolStatus.Developing);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)

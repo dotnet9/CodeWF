@@ -1,3 +1,4 @@
+@using CodeWF.Tools.Core.Tools
 <MNavigationDrawer App Class="app-nav-drawer">
     <MList Routable Nav>
         <MListItem ActiveClass="primary--text" Href="/">
@@ -13,15 +14,23 @@
                 <MIcon>mdi-plus</MIcon>
             </MListItemIcon>
             <MListItemContent>
-                <MListItemTitle>±ðÃû×ª»»</MListItemTitle>
+                <MListItemTitle>@WebToolInfo.SlugifyTitle</MListItemTitle>
+            </MListItemContent>
+        </MListItem>
+        <MListItem Href="/timestamp" ActiveClass="primary--text">
+            <MListItemIcon>
+                <MIcon>mdi-plus</MIcon>
+            </MListItemIcon>
+            <MListItemContent>
+                <MListItemTitle>@DeveloperToolInfo.TimestampTitle</MListItemTitle>
             </MListItemContent>
         </MListItem>
     </MList>
 </MNavigationDrawer>
 
 <MAppBar App>
-    <MAppBarNavIcon />
-    <MSpacer />
+    <MAppBarNavIcon/>
+    <MSpacer/>
 </MAppBar>
 
 <PageScript Src="./Components/Layout/NavMenu.razor.js"></PageScript>

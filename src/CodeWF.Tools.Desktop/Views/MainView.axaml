@@ -13,7 +13,7 @@
              x:DataType="vm:MainViewModel"
              x:Class="CodeWF.Tools.Desktop.Views.MainView">
     <UserControl.Resources>
-        <converters:IconNameToPathConverter x:Key="IconConverter" />
+        <converters:IconConverter x:Key="IconConverter" />
     </UserControl.Resources>
     <Border BorderThickness="1" BorderBrush="LightGray">
         <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="Auto, *">
@@ -79,9 +79,8 @@
                     Theme="{DynamicResource CardBorder}">
                 <Grid>
                     <u:NavMenu
-                        Name="menu"
                         HeaderBinding="{Binding Header}"
-                        IconBinding="{Binding IconIndex}"
+                        IconBinding="{Binding Icon}"
                         ItemsSource="{Binding MenuItems}"
                         SelectedItem="{Binding SelectedMenuItem}"
                         SubMenuBinding="{Binding Children}"
@@ -92,7 +91,7 @@
                             </Style>
                         </u:NavMenu.Styles>
                         <u:NavMenu.IconTemplate>
-                            <DataTemplate DataType="{x:Type x:Int32}">
+                            <DataTemplate DataType="{x:Type x:String}">
                                 <u:TwoTonePathIcon
                                     Width="16"
                                     Height="16"

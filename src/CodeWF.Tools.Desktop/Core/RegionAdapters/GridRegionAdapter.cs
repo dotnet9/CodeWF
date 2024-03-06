@@ -11,7 +11,7 @@ public class GridRegionAdapter : RegionAdapterBase<Grid>
     {
         region.Views.CollectionChanged += (sender, e) =>
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e is { Action: NotifyCollectionChangedAction.Add, NewItems: not null })
             {
                 foreach (Control item in e.NewItems)
                 {
@@ -19,7 +19,7 @@ public class GridRegionAdapter : RegionAdapterBase<Grid>
                 }
             }
 
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            if (e is { Action: NotifyCollectionChangedAction.Remove, OldItems: not null })
             {
                 foreach (Control item in e.OldItems)
                 {

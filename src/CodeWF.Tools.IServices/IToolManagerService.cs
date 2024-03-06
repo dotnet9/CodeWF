@@ -2,8 +2,11 @@
 
 public interface IToolManagerService
 {
-    void AddTool(string name, string description, string viewName, ToolStatus status);
-    void AddTool(ToolType group, string name, string description, string viewName, ToolStatus status);
+    void AddTool(string name, string description, string viewName, string icon, ToolStatus status);
+
+    void AddTool(ToolType group, string name, string description, string viewName, string icon,
+        ToolStatus status);
+
     void RemoveTool(string name);
 
     ObservableCollection<ToolMenuItem> MenuItems { get; set; }
@@ -33,7 +36,7 @@ public class ToolMenuItem
     public string? Description { get; set; }
     public string? ViewName { get; set; }
     public ToolStatus Status { get; set; }
-    public int IconIndex { get; set; } = DateTime.Now.Microsecond;
+    public string? Icon { get; set; }
     public bool IsSeparator { get; set; }
 
     public ObservableCollection<ToolMenuItem> Children { get; set; } = new();

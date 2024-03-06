@@ -1,13 +1,13 @@
 ﻿namespace CodeWF.Tools.Module.Test.ViewModels;
 
-public class TestViewModel : ViewModelBase
+public class MessageTestViewModel : ViewModelBase
 {
     private readonly INotificationService _notificationService;
     private readonly ISender _sender;
     private readonly IPublisher _publisher;
     private readonly IEventAggregator _eventAggregator;
 
-    public TestViewModel(INotificationService notificationService,
+    public MessageTestViewModel(INotificationService notificationService,
         ISender sender, IPublisher publisher,
         IEventAggregator eventAggregator)
     {

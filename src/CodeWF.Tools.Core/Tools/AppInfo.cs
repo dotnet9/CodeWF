@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Common;
+﻿namespace CodeWF.Tools.Core.Tools;
 
 public class AppInfo
 {

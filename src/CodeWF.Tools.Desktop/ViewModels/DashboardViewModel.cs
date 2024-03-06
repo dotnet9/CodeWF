@@ -1,15 +1,17 @@
 ﻿namespace CodeWF.Tools.Desktop.ViewModels;
 
-internal class DashboardViewModel : ViewModelBase
+public class DashboardViewModel : ViewModelBase
 {
     private readonly IToolManagerService _toolManagerService;
+    private readonly IEventAggregator _eventAggregator;
 
     public ObservableCollection<ToolMenuItem> MenuItems { get; } =
         new ObservableCollection<ToolMenuItem>();
 
-    public DashboardViewModel(IToolManagerService toolManagerService)
+    public DashboardViewModel(IToolManagerService toolManagerService, IEventAggregator eventAggregator)
     {
         _toolManagerService = toolManagerService;
+        _eventAggregator = eventAggregator;
         toolManagerService.MenuItems.CollectionChanged += ToolListChanged;
     }
 
@@ -23,5 +25,11 @@ internal class DashboardViewModel : ViewModelBase
                 MenuItems.Add(firstMenuItem);
             }
         });
+    }
+
+    public void ExecuteChangeToolHandle(ToolMenuItem menuItem)
+    {
+        _eventAggregator.GetEvent<ChangeToolEvent>()
+            .Publish(new ChangeToolEventParameter() { ToolHeader = menuItem.Header });
     }
 }

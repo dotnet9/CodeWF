@@ -7,3 +7,4 @@ global using Prism.Ioc;
 global using Prism.Modularity;
 global using Prism.Regions;
 global using CodeWF.Tools.Core.Helpers;
+global using CodeWF.Tools.Core.Tools;

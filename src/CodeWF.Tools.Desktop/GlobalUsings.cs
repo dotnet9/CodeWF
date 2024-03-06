@@ -33,3 +33,8 @@ global using Avalonia.Interactivity;
 global using Avalonia.Styling;
 global using CodeWF.Tools.Core.Helpers;
 global using System.Runtime.InteropServices;
+global using ReactiveUI;
+global using CodeWF.Tools.Core.Tools;
+global using Avalonia.Media;
+global using Avalonia.Data.Converters;
+global using System.Globalization;

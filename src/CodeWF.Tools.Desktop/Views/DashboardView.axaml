@@ -8,7 +8,8 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:DashboardViewModel"
-             x:Class="CodeWF.Tools.Desktop.Views.DashboardView">
+             x:Class="CodeWF.Tools.Desktop.Views.DashboardView"
+             x:Name="dashboard">
     <ItemsControl ItemsSource="{Binding MenuItems}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
@@ -21,14 +22,21 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Classes="Hover" Theme="{StaticResource CardBorder}" Padding="10">
-                                    <u:Banner
-                                        Classes.Bordered="False"
-                                        HorizontalContentAlignment="Left" VerticalContentAlignment="Top"
-                                        Header="{Binding Header,Mode=OneWay}"
-                                        Type="{Binding Status,Mode =OneWay}">
-                                        <TextBlock Text="{Binding Description,Mode=OneWay}" TextWrapping="Wrap" />
-                                    </u:Banner>
+                                <Border Classes="Hover" Theme="{StaticResource CardBorder}">
+                                    <Button Classes="Secondary" Theme="{DynamicResource BorderlessButton}"
+                                            Command="{Binding $parent[UserControl].((viewModels:DashboardViewModel)DataContext).ExecuteChangeToolHandle}"
+                                            CommandParameter="{Binding}">
+                                        <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *">
+                                            <PathIcon Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Width="48"
+                                                      Height="48"
+                                                      Data="{Binding Icon}" Margin="0 0 10 0"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" />
+                                            <TextBlock Text="{Binding Header}" Grid.Row="0" Grid.Column="1"
+                                                       Classes="H6" Theme="{DynamicResource TitleTextBlock}" />
+                                            <TextBlock Text="{Binding Description}" Grid.Row="1" Grid.Column="1" />
+                                        </Grid>
+                                    </Button>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

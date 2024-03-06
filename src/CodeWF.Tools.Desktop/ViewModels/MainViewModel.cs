@@ -1,7 +1,4 @@
-﻿using ReactiveUI;
-using System.Globalization;
-
-namespace CodeWF.Tools.Desktop.ViewModels;
+﻿namespace CodeWF.Tools.Desktop.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -64,6 +61,10 @@ public class MainViewModel : ViewModelBase
             _notificationService?.Show("Prism Event",
                 $"主工程Prism事件处理程序：Args = {args.Args}, Now = {DateTime.Now}");
         });
+        _eventAggregator.GetEvent<ChangeToolEvent>().Subscribe(args =>
+        {
+            ChangeSearchMenu(args.ToolHeader!);
+        });
     }
 
     private void ToolListChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -114,11 +115,16 @@ public class MainViewModel : ViewModelBase
 
     private void ChangeSearchMenu()
     {
+        ChangeSearchMenu(_searchSelectedItem?.Header);
+    }
+
+    private void ChangeSearchMenu(string name)
+    {
         foreach (var firstMenuItem in MenuItems)
         {
             foreach (var secondMenuItem in firstMenuItem.Children)
             {
-                if (secondMenuItem.Header != _searchSelectedItem?.Header)
+                if (secondMenuItem.Header != name)
                 {
                     continue;
                 }
