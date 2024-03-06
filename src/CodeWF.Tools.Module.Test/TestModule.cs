@@ -6,8 +6,7 @@ public class TestModule : IModule
     {
         toolManagerService.AddTool(ToolType.Test, TestToolInfo.MessageTestName,
             TestToolInfo.MessageTestDescription, nameof(MessageTestView),
-            IconHelper.MessageTest,
-            ToolStatus.Complete);
+            IconHelper.MessageTest, ToolStatus.Complete);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)

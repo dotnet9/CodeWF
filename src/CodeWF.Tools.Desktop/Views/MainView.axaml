@@ -25,14 +25,16 @@
                 </ExperimentalAcrylicBorder.Material>
             </ExperimentalAcrylicBorder>
 
-            <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" ColumnDefinitions="Auto, Auto">
+            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"
+                  ColumnDefinitions="Auto, Auto">
                 <Image Width="20" Height="20" Margin="3,2 0 0" RenderOptions.BitmapInterpolationMode="HighQuality"
                        Source="../Assets/logo.png" />
                 <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding Title}"
                            Classes="H5" Theme="{DynamicResource TitleTextBlock}" Margin="2 2 10 0" />
             </Grid>
 
-            <AutoCompleteBox Grid.Row="0" Grid.Column="1" Width="300" HorizontalAlignment="Left" Margin="4 5 0 0"
+            <AutoCompleteBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Width="300" HorizontalAlignment="Left"
+                             Margin="185 5 0 0"
                              ItemsSource="{Binding SearchMenuItems}"
                              SelectedItem="{Binding SearchSelectedItem}"
                              ValueMemberBinding="{Binding Header}"
@@ -81,6 +83,7 @@
                     <u:NavMenu
                         HeaderBinding="{Binding Header}"
                         IconBinding="{Binding Icon}"
+                        IsHorizontalCollapsed="{Binding #Collapse.IsChecked, Mode=OneWay}"
                         ItemsSource="{Binding MenuItems}"
                         SelectedItem="{Binding SelectedMenuItem}"
                         SubMenuBinding="{Binding Children}"
@@ -124,6 +127,25 @@
                     </Grid>
                 </Border>
             </Panel>
+
+            <ToggleSwitch Name="Collapse" Classes="Primary" Background="Blue" Foreground="White"
+                          Theme="{DynamicResource ButtonToggleSwitch}"
+                          Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"
+                          VerticalAlignment="Bottom" CornerRadius="20"
+                          Padding="2" Margin="0 5 -18 50">
+                <ToggleSwitch.OnContent>
+                    <PathIcon
+                        Width="16"
+                        Height="16"
+                        Data="M867.1 141.17H156.08c-17.67 0-32 14.33-32 32s14.33 32 32 32H867.1c17.67 0 32-14.33 32-32s-14.33-32-32-32zM867.92 367.52H403.2c-17.67 0-32 14.33-32 32s14.33 32 32 32h464.73c17.67 0 32-14.33 32-32s-14.33-32-32.01-32zM867.92 573.87H403.2c-17.67 0-32 14.33-32 32s14.33 32 32 32h464.73c17.67 0 32-14.33 32-32s-14.33-32-32.01-32zM867.92 800.22H156.9c-17.67 0-32 14.33-32 32s14.33 32 32 32h711.02c17.67 0 32-14.33 32-32 0-17.68-14.32-32-32-32zM137.47 637.87V367.52l174.54 148.15z" />
+                </ToggleSwitch.OnContent>
+                <ToggleSwitch.OffContent>
+                    <PathIcon
+                        Width="16"
+                        Height="16"
+                        Data="M867.1 141.17H156.08c-17.67 0-32 14.33-32 32s14.33 32 32 32H867.1c17.67 0 32-14.33 32-32s-14.33-32-32-32zM867.92 367.52H403.2c-17.67 0-32 14.33-32 32s14.33 32 32 32h464.73c17.67 0 32-14.33 32-32s-14.33-32-32.01-32zM867.92 573.87H403.2c-17.67 0-32 14.33-32 32s14.33 32 32 32h464.73c17.67 0 32-14.33 32-32s-14.33-32-32.01-32zM867.92 800.22H156.9c-17.67 0-32 14.33-32 32s14.33 32 32 32h711.02c17.67 0 32-14.33 32-32 0-17.68-14.32-32-32-32zM312.01 367.52v270.35L137.47 489.71z" />
+                </ToggleSwitch.OffContent>
+            </ToggleSwitch>
 
             <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                             prism:RegionManager.RegionName="{x:Static common:RegionNames.FooterRegion}" />
