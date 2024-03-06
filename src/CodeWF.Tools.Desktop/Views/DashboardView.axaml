@@ -8,8 +8,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:DashboardViewModel"
-             x:Class="CodeWF.Tools.Desktop.Views.DashboardView"
-             x:Name="dashboard">
+             x:Class="CodeWF.Tools.Desktop.Views.DashboardView" Margin="0">
     <ItemsControl ItemsSource="{Binding MenuItems}">
         <ItemsControl.ItemTemplate>
             <DataTemplate>
@@ -22,7 +21,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Classes="Hover" Theme="{StaticResource CardBorder}">
+                                <Border Classes="Hover" Padding="0" Theme="{StaticResource CardBorder}">
                                     <Button Classes="Secondary" Theme="{DynamicResource BorderlessButton}"
                                             Command="{Binding $parent[UserControl].((viewModels:DashboardViewModel)DataContext).ExecuteChangeToolHandle}"
                                             CommandParameter="{Binding}">

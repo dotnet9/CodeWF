@@ -77,7 +77,6 @@
 
             <Border Grid.Row="1" Grid.Column="0"
                     Padding="0"
-                    HorizontalAlignment="Left"
                     Theme="{DynamicResource CardBorder}">
                 <Grid>
                     <u:NavMenu
@@ -128,11 +127,11 @@
                 </Border>
             </Panel>
 
-            <ToggleSwitch Name="Collapse" Classes="Primary" Background="Blue" Foreground="White"
+            <ToggleSwitch Name="Collapse" Classes="Primary" Background="Teal" Foreground="White"
                           Theme="{DynamicResource ButtonToggleSwitch}"
                           Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"
-                          VerticalAlignment="Bottom" CornerRadius="20"
-                          Padding="2" Margin="0 5 -18 50">
+                          VerticalAlignment="Bottom" CornerRadius="20" Height="40" Width="40"
+                          Padding="4" Margin="0 5 -20 50">
                 <ToggleSwitch.OnContent>
                     <PathIcon
                         Width="16"

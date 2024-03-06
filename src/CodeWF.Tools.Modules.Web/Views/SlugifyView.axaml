@@ -89,11 +89,11 @@
 
             </UniformGrid>
         </StackPanel>
-        <UniformGrid Columns="2" Margin="0 10 0 0" HorizontalAlignment="Left">
+        <UniformGrid Columns="2" Margin="0 20 0 0" HorizontalAlignment="Left">
             <TextBox Text="{Binding From,Mode=TwoWay}" Background="White"
-                     ToolTip.Tip="请输入待翻译信息" />
+                     ToolTip.Tip="请输入待翻译信息" Margin="0 0 5 0" />
             <TextBox Text="{Binding To,Mode=OneWay}"
-                     ToolTip.Tip="翻译后的信息" />
+                     ToolTip.Tip="翻译后的信息" Margin="5 0 0 0" />
         </UniformGrid>
     </StackPanel>
 </UserControl>
