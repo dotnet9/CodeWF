@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using CodeWF.AppInfo
+@using CodeWF.Utils
+@inject IJSRuntime jsRunTime
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,16 +17,70 @@
     <link rel="icon" type="image/png" href="logo.png" />
     <HeadOutlet />
     <MSsrThemeProvider />
+    <script>
+        window.getDomain = function () {
+            return window.location.host;
+        };
+    </script>
+
+    @code {
+        private string currentDomain = string.Empty;
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            currentDomain= await jsRunTime.InvokeAsync<string>("getDomain");
+            await base.OnAfterRenderAsync(firstRender);
+        }
+    }
     <environment include="Production">
-        <script>
-            var _hmt = _hmt || [];
-            (function () {
-                var hm = document.createElement("script");
-                hm.src = "https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b";
-                var s = document.getElementsByTagName("script")[0];
-                s.parentNode.insertBefore(hm, s);
-            })();
-        </script>
+        @if (currentDomain.EndsWith(DomainType.Dotnet9Com.Description()))
+        {
+            <script>
+                var _hmt = _hmt || [];
+                (function () {
+                    var hm = document.createElement("script");
+                    hm.src = "https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hm, s);
+                })();
+            </script>
+        }
+        else if (currentDomain.EndsWith(DomainType.DotnetToolsCom.Description()))
+        {
+            <script>
+                var _hmt = _hmt || [];
+                (function () {
+                    var hm = document.createElement("script");
+                    hm.src = "https://hm.baidu.com/hm.js?96b0fbecf9bc9efb7e5d7be8345dcb38";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hm, s);
+                })();
+            </script>
+        }
+        else if (currentDomain.EndsWith(DomainType.CodeWFCom.Description()))
+        {
+            <script>
+                var _hmt = _hmt || [];
+                (function () {
+                    var hm = document.createElement("script");
+                    hm.src = "https://hm.baidu.com/hm.js?4cdd01eed538a43a4ce5afca09af222e";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hm, s);
+                })();
+            </script>
+        }
+        else
+        {
+            <script>
+                var _hmt = _hmt || [];
+                (function () {
+                    var hm = document.createElement("script");
+                    hm.src = "https://hm.baidu.com/hm.js?dea4adc26987eabf06159a32b674efd0";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hm, s);
+                })();
+            </script>
+        }
+
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8748951917303002"
                 crossorigin="anonymous"></script>
     </environment>

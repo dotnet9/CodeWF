@@ -66,3 +66,4 @@ global using SixLabors.Fonts;
 global using System.Net;
 global using System.Text.Json.Serialization;
 global using CodeWF.ViewModel.FriendLinks;
+global using System.ComponentModel;

@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CdoeWF.Auth\CdoeWF.Auth.csproj" />
     <ProjectReference Include="..\CdoeWF.Pingback\CdoeWF.Pingback.csproj" />
+    <ProjectReference Include="..\CodeWF.AppInfo\CodeWF.AppInfo.csproj" />
     <ProjectReference Include="..\CodeWF.Comments\CodeWF.Comments.csproj" />
     <ProjectReference Include="..\CodeWF.Core\CodeWF.Core.csproj" />
     <ProjectReference Include="..\CodeWF.Data.MySql\CodeWF.Data.MySql.csproj" />
