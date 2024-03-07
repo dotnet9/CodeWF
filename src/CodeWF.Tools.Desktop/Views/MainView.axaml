@@ -131,7 +131,7 @@
                           Theme="{DynamicResource ButtonToggleSwitch}"
                           Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"
                           VerticalAlignment="Bottom" CornerRadius="20" Height="40" Width="40"
-                          Padding="4" Margin="0 5 -20 50">
+                          Padding="4" Margin="0 5 -15 50">
                 <ToggleSwitch.OnContent>
                     <PathIcon
                         Width="16"

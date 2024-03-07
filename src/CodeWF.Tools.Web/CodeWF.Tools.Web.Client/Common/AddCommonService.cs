@@ -11,6 +11,11 @@ public static class AddCommonService
                 ssr.Left = 256;
                 ssr.Top = 64;
             });
+            options.ConfigureTheme(theme =>
+            {
+                theme.Themes.Light.Primary = "#4318FF";
+                theme.Themes.Light.Accent = "#4318FF";
+            });
         });
 
         services.AddSingleton<ITranslationService, TranslationService>();
