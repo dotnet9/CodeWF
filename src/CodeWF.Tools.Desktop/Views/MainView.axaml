@@ -15,6 +15,11 @@
     <UserControl.Resources>
         <converters:IconConverter x:Key="IconConverter" />
     </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource NunitoFont}"></Setter>
+        </Style>
+    </UserControl.Styles>
     <Border BorderThickness="1" BorderBrush="LightGray">
         <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="Auto, *">
 

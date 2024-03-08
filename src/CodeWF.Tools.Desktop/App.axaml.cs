@@ -1,5 +1,3 @@
-using Avalonia.Media;
-
 namespace CodeWF.Tools.Desktop;
 
 public class App : PrismApplication
