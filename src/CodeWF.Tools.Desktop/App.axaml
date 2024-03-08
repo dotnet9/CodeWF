@@ -7,7 +7,4 @@
         <StyleInclude Source="avares://Semi.Avalonia/Themes/Index.axaml" />
         <u-semi:SemiTheme Locale="zh-CN" />
     </prism:PrismApplication.Styles>
-    <Application.Resources>
-        <FontFamily x:Key="NunitoFont">avares://CodeWF.Tools.Desktop/Assets/Fonts#Nunito</FontFamily>
-    </Application.Resources>
 </prism:PrismApplication>
