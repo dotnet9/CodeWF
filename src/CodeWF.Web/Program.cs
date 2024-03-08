@@ -99,19 +99,23 @@ void ConfigureServices(IServiceCollection services)
     services.AddEmailSending();
     services.AddContentModerator(builder.Configuration);
 
-    string dbType = builder.Configuration.GetConnectionString("DatabaseType");
-    string connStr = builder.Configuration.GetConnectionString("CodeWFDatabase");
-    switch (dbType!.ToLower())
+    var dbType =
+        (DatabaseType)Enum.Parse(typeof(DatabaseType), builder.Configuration.GetConnectionString("DatabaseType")!,
+            true);
+    var connStr = builder.Configuration.GetConnectionString("CodeWFDatabase");
+    switch (dbType)
     {
-        case "mysql":
+        case DatabaseType.MySql:
             services.AddMySqlStorage(connStr!);
             break;
-        case "postgresql":
+        case DatabaseType.PostgreSQL:
             services.AddPostgreSqlStorage(connStr!);
             break;
-        case "sqlserver":
-        default:
+        case DatabaseType.SqlServer:
             services.AddSqlServerStorage(connStr!);
+            break;
+        default:
+            services.AddSQLiteStorage(connStr!);
             break;
     }
 }

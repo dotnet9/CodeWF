@@ -67,3 +67,7 @@ global using System.Net;
 global using System.Text.Json.Serialization;
 global using CodeWF.ViewModel.FriendLinks;
 global using System.ComponentModel;
+global using CodeWF.Data.Consts;
+global using CodeWF.Data.SQLite;
+global using Edi.ChinaDetector;
+global using Microsoft.EntityFrameworkCore;

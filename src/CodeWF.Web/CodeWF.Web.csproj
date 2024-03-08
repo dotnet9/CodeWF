@@ -23,6 +23,7 @@
     <ProjectReference Include="..\CodeWF.Core\CodeWF.Core.csproj" />
     <ProjectReference Include="..\CodeWF.Data.MySql\CodeWF.Data.MySql.csproj" />
     <ProjectReference Include="..\CodeWF.Data.PostgreSql\CodeWF.Data.PostgreSql.csproj" />
+    <ProjectReference Include="..\CodeWF.Data.SQLite\CodeWF.Data.SQLite.csproj" />
     <ProjectReference Include="..\CodeWF.Data.SqlServer\CodeWF.Data.SqlServer.csproj" />
     <ProjectReference Include="..\CodeWF.FriendLink\CodeWF.FriendLink.csproj" />
     <ProjectReference Include="..\CodeWF.ImageStorage\CodeWF.ImageStorage.csproj" />

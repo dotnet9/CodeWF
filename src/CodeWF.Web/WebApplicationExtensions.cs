@@ -1,7 +1,4 @@
-﻿using Edi.ChinaDetector;
-using Microsoft.EntityFrameworkCore;
-
-namespace CodeWF.Web;
+﻿namespace CodeWF.Web;
 
 public static class WebApplicationExtensions
 {
@@ -11,12 +8,15 @@ public static class WebApplicationExtensions
         IServiceProvider services = scope.ServiceProvider;
         IWebHostEnvironment env = services.GetRequiredService<IWebHostEnvironment>();
 
-        string dbType = app.Configuration.GetConnectionString("DatabaseType")!;
-        BlogDbContext context = dbType.ToLowerInvariant() switch
+        var dbType =
+            (DatabaseType)Enum.Parse(typeof(DatabaseType), app.Configuration.GetConnectionString("DatabaseType")!,
+                true);
+        BlogDbContext context = dbType switch
         {
-            "mysql" => services.GetRequiredService<MySqlBlogDbContext>(),
-            "sqlserver" => services.GetRequiredService<SqlServerBlogDbContext>(),
-            "postgresql" => services.GetRequiredService<PostgreSqlBlogDbContext>(),
+            DatabaseType.MySql => services.GetRequiredService<MySqlBlogDbContext>(),
+            DatabaseType.SqlServer => services.GetRequiredService<SqlServerBlogDbContext>(),
+            DatabaseType.PostgreSQL => services.GetRequiredService<PostgreSqlBlogDbContext>(),
+            DatabaseType.SQLite => services.GetRequiredService<SQLiteBlogDbContext>(),
             _ => throw new ArgumentOutOfRangeException(nameof(dbType))
         };
 
