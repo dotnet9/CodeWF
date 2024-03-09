@@ -25,7 +25,7 @@ public class TabControlAdapter : RegionAdapterBase<TabControl>
             throw new ArgumentNullException(nameof(regionTarget));
 
         // Detect a Tab Selection Changed
-        regionTarget.SelectionChanged += (object s, SelectionChangedEventArgs e) =>
+        regionTarget.SelectionChanged += (object? s, SelectionChangedEventArgs e) =>
         {
             // The view navigating away from
             foreach (var item in e.RemovedItems)
@@ -47,7 +47,7 @@ public class TabControlAdapter : RegionAdapterBase<TabControl>
         // Detect when a TabItem has been added/removed to the TabControl
         region.Views.CollectionChanged += (s, e) =>
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            if (e is { Action: NotifyCollectionChangedAction.Add, NewItems: not null })
             {
                 foreach (UserControl item in e.NewItems)
                 {
@@ -57,7 +57,7 @@ public class TabControlAdapter : RegionAdapterBase<TabControl>
                     //// regionTarget.Items.Set(items);   // Avalonia v11
                 }
             }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            else if (e is { Action: NotifyCollectionChangedAction.Remove, OldItems: not null })
             {
                 foreach (UserControl item in e.OldItems)
                 {
@@ -65,7 +65,7 @@ public class TabControlAdapter : RegionAdapterBase<TabControl>
                     // regionTarget.Items.Remove(tabToDelete);  // WPF
 
                     var items = regionTarget.Items.Cast<TabItem>().ToList();
-                    items.Remove(tabToDelete);
+                    items.Remove(tabToDelete!);
                     //regionTarget.Items = items;
                     //// regionTarget.Items.Set(items);   // Avalonia v11
                 }
@@ -85,7 +85,7 @@ public class TabControlAdapter : RegionAdapterBase<TabControl>
         // The selected item isn't always a TabItem.
         // In some cases, it could be the Region's ListBox item
 
-        TabItem item = itemChanged as TabItem;
+        var item = itemChanged as TabItem;
         if (item is null)
             return;
 

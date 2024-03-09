@@ -40,4 +40,9 @@ public class ToolMenuItem
     public bool IsSeparator { get; set; }
 
     public ObservableCollection<ToolMenuItem> Children { get; set; } = new();
+
+    public override string ToString()
+    {
+        return $"{Header}";
+    }
 }

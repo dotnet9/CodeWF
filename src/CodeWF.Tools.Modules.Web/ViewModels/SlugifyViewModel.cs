@@ -7,8 +7,6 @@ public class SlugifyViewModel : ViewModelBase
     private readonly INotificationService? _notificationService;
     private readonly IClipboardService? _clipboardService;
     private readonly ITranslationService? _translationService;
-    private readonly ISender _sender;
-    private readonly IPublisher _publisher;
     private readonly IEventAggregator _eventAggregator;
     private TranslationKind _kind = TranslationKind.ChineseToSlug;
 
@@ -64,14 +62,12 @@ public class SlugifyViewModel : ViewModelBase
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
 
     public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
-        ITranslationService translationService, ISender sender, IPublisher publisher,
+        ITranslationService translationService,
         IEventAggregator eventAggregator)
     {
         _notificationService = notificationService;
         _clipboardService = clipboardService;
         _translationService = translationService;
-        _sender = sender;
-        _publisher = publisher;
         _eventAggregator = eventAggregator;
         KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
 

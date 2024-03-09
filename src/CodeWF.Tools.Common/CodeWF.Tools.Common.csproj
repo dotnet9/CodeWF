@@ -9,8 +9,4 @@
 		<PackageReference Include="ReactiveUI" Version="19.5.41" />
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\CodeWF.Tools.MediatR\CodeWF.Tools.MediatR.csproj" />
-	</ItemGroup>
 </Project>

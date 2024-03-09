@@ -8,13 +8,15 @@ public class App : PrismApplication
         base.Initialize(); // <-- Required
     }
 
-    protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
+    protected override IModuleCatalog CreateModuleCatalog()
     {
-        base.ConfigureModuleCatalog(moduleCatalog);
+        const string modulePath = "./Modules";
+        if (!Directory.Exists(modulePath))
+        {
+            throw new Exception($"请生成模块到目录{modulePath}");
+        }
 
-        moduleCatalog.AddModule<DeveloperModule>();
-        moduleCatalog.AddModule<WebModule>();
-        moduleCatalog.AddModule<TestModule>();
+        return new DirectoryModuleCatalog() { ModulePath = modulePath };
     }
 
     protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
@@ -78,34 +80,5 @@ public class App : PrismApplication
         container.WithDependencyInjectionAdapter();
 
         return new DryIocContainerExtension(container);
-    }
-
-    protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
-    {
-        base.RegisterRequiredTypes(containerRegistry);
-
-        IServiceCollection services = ConfigureServices();
-
-        IContainer container = ((IContainerExtension<IContainer>)containerRegistry).Instance;
-
-        container.Populate(services);
-    }
-
-    private static ServiceCollection ConfigureServices()
-    {
-        var services = new ServiceCollection();
-
-        // 注入MediatR
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-
-        // 添加模块注入，未显示调用模块类型前，模块程序集是未加载到当前程序域`AppDomain.CurrentDomain`的
-        var assembly = typeof(TestModule).GetAssembly();
-        assemblies.Add(assembly);
-        services.AddMediatR(configure =>
-        {
-            configure.RegisterServicesFromAssemblies(assemblies.ToArray());
-        });
-
-        return services;
     }
 }

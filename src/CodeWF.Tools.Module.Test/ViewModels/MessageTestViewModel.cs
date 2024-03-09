@@ -3,17 +3,12 @@
 public class MessageTestViewModel : ViewModelBase
 {
     private readonly INotificationService _notificationService;
-    private readonly ISender _sender;
-    private readonly IPublisher _publisher;
     private readonly IEventAggregator _eventAggregator;
 
     public MessageTestViewModel(INotificationService notificationService,
-        ISender sender, IPublisher publisher,
         IEventAggregator eventAggregator)
     {
         _notificationService = notificationService;
-        _sender = sender;
-        _publisher = publisher;
         _eventAggregator = eventAggregator;
 
         RegisterPrismEvent();
@@ -28,17 +23,6 @@ public class MessageTestViewModel : ViewModelBase
         });
     }
 
-    public async Task ExecuteMediatRRequestAsync()
-    {
-        var result = _sender.Send(new TestRequest() { Args = "ExecuteMediatRRequestAsync" });
-        _notificationService.Show("MediatR", $"收到响应：{result.Result}");
-        await Task.CompletedTask;
-    }
-
-    public async Task ExecuteMediatRNotificationAsync()
-    {
-        await _publisher.Publish(new TestNotification() { Args = "ExecuteMediatRNotificationAsync" });
-    }
 
     public Task ExecutePrismEventAsync()
     {

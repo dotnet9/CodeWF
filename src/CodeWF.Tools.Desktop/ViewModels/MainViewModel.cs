@@ -115,7 +115,7 @@ public class MainViewModel : ViewModelBase
 
     private void ChangeSearchMenu()
     {
-        ChangeSearchMenu(_searchSelectedItem?.Header);
+        ChangeSearchMenu(_searchSelectedItem!.Header!);
     }
 
     private void ChangeSearchMenu(string name)
