@@ -12,10 +12,10 @@ public class DashboardViewModel : ViewModelBase
     {
         _toolManagerService = toolManagerService;
         _eventAggregator = eventAggregator;
-        toolManagerService.MenuItems.CollectionChanged += ToolListChanged;
+        toolManagerService.ToolMenuChanged += MenuChangedHandler;
     }
 
-    private void ToolListChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void MenuChangedHandler(object sender, EventArgs e)
     {
         MenuItems.Clear();
         _toolManagerService.MenuItems.ForEach(firstMenuItem =>

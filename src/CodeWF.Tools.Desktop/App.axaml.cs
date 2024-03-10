@@ -73,12 +73,4 @@ public class App : PrismApplication
             //.WithoutFastExpressionCompiler()
             .WithFactorySelector(Rules.SelectLastRegisteredFactory());
     }
-
-    protected override IContainerExtension CreateContainerExtension()
-    {
-        IContainer container = new Container(CreateContainerRules());
-        container.WithDependencyInjectionAdapter();
-
-        return new DryIocContainerExtension(container);
-    }
 }

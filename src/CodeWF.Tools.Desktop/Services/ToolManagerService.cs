@@ -23,6 +23,7 @@ internal class ToolManagerService : IToolManagerService
             Icon = icon,
             Status = status
         });
+        SendMenuChangedEvent();
     }
 
     public void AddTool(ToolType group, string name, string description, string viewName, string icon,
@@ -53,6 +54,7 @@ internal class ToolManagerService : IToolManagerService
             Icon = icon,
             Status = status
         });
+        SendMenuChangedEvent();
     }
 
     public void RemoveTool(string name)
@@ -70,11 +72,19 @@ internal class ToolManagerService : IToolManagerService
                 }
             }
         }
+
+        SendMenuChangedEvent();
     }
 
     public void RemoveTool(ToolType type, string toolName)
     {
     }
 
+    private void SendMenuChangedEvent()
+    {
+        ToolMenuChanged?.Invoke(this, default);
+    }
+
     public ObservableCollection<ToolMenuItem> MenuItems { get; set; } = new();
+    public event EventHandler? ToolMenuChanged;
 }

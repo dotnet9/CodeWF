@@ -51,7 +51,7 @@ public class MainViewModel : ViewModelBase
         RegisterPrismEvent();
         SearchMenuItems = new ObservableCollection<ToolMenuItem>();
         MenuItems = toolManagerService.MenuItems;
-        MenuItems.CollectionChanged += ToolListChanged;
+        toolManagerService.ToolMenuChanged += MenuChangedHandler;
     }
 
     private void RegisterPrismEvent()
@@ -67,7 +67,7 @@ public class MainViewModel : ViewModelBase
         });
     }
 
-    private void ToolListChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void MenuChangedHandler(object sender, EventArgs e)
     {
         SearchMenuItems.Clear();
         MenuItems.ForEach(firstMenuItem =>

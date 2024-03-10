@@ -10,6 +10,7 @@ public interface IToolManagerService
     void RemoveTool(string name);
 
     ObservableCollection<ToolMenuItem> MenuItems { get; set; }
+    event EventHandler ToolMenuChanged;
 }
 
 public enum ToolType

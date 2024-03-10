@@ -19,8 +19,6 @@ global using CodeWF.Tools.IServices;
 global using CodeWF.Tools.Prism;
 global using CodeWF.Utils;
 global using DryIoc;
-global using DryIoc.Microsoft.DependencyInjection;
-global using Microsoft.Extensions.DependencyInjection;
 global using NUglify.Helpers;
 global using Prism.DryIoc;
 global using Prism.Events;
