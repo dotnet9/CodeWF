@@ -34,6 +34,7 @@
 
 
 	<ItemGroup>
+		<ProjectReference Include="..\CodeWF.AppInfo\CodeWF.AppInfo.csproj" />
 		<ProjectReference Include="..\CodeWF.Tools.Common\CodeWF.Tools.Common.csproj" />
 		<ProjectReference Include="..\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj" />
 		<ProjectReference Include="..\CodeWF.Tools.IServices\CodeWF.Tools.IServices.csproj" />

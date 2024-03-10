@@ -4,6 +4,6 @@ public class MainWindowViewModel : ViewModelBase
 {
     public MainWindowViewModel()
     {
-        Title = AppInfo.Name;
+        Title = AppInfo.AppInfo.ToolName;
     }
 }

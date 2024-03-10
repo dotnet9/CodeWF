@@ -44,7 +44,7 @@ public class MainViewModel : ViewModelBase
     public MainViewModel(IToolManagerService toolManagerService, INotificationService notificationService,
         IEventAggregator eventAggregator, IRegionManager regionManager)
     {
-        Title = AppInfo.Name;
+        Title = AppInfo.AppInfo.ToolName;
         _notificationService = notificationService;
         _eventAggregator = eventAggregator;
         _regionManager = regionManager;

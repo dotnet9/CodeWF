@@ -18,7 +18,7 @@ public partial class Seed
     {
         return new List<TagEntity>
         {
-            new() { DisplayName = "码界工坊", NormalizedName = "codewf" },
+            new() { DisplayName = AppInfo.AppInfo.BlogName, NormalizedName = "codewf" },
             new() { DisplayName = ".NET", NormalizedName = "dot-net" }
         };
     }
@@ -69,7 +69,7 @@ public partial class Seed
     {
         return new List<FriendLinkEntity>
         {
-            new() { Id = Guid.NewGuid(), Title = "码界工坊", LinkUrl = "https://codewf.com" }
+            new() { Id = Guid.NewGuid(), Title = AppInfo.AppInfo.BlogName, LinkUrl = DomainType.CodeWFCom.Description() }
         };
     }
 

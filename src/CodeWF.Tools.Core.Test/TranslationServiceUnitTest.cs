@@ -8,7 +8,7 @@ public class TranslationServiceUnitTest
     [TestMethod]
     public async Task Test_ChineseToEnglishAsync_SUCCESS()
     {
-        const string chineseText = "码界工坊";
+        const string chineseText = AppInfo.AppInfo.ToolName;
 
         var englishText = await _translationService.ChineseToEnglishAsync(chineseText);
 
@@ -38,7 +38,7 @@ public class TranslationServiceUnitTest
     [TestMethod]
     public async Task Test_ChineseToSlugAsync_SUCCESS()
     {
-        const string chineseText = "码界工坊";
+        const string chineseText = AppInfo.AppInfo.ToolName;
 
         var englishText = await _translationService.ChineseToEnglishAsync(chineseText);
 

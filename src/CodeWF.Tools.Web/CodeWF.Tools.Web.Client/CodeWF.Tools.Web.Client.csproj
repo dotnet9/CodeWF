@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CodeWF.AppInfo\CodeWF.AppInfo.csproj" />
     <ProjectReference Include="..\..\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj" />
   </ItemGroup>
 
