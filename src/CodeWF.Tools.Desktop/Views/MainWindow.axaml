@@ -19,4 +19,11 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
     <views:MainView />
+    <Window.Styles>
+        <!--可配置字体
+		<Style Selector="Window">
+            <Setter Property="FontFamily" Value="{StaticResource Douyin}"></Setter>
+        </Style>
+		/-->
+    </Window.Styles>
 </Window>

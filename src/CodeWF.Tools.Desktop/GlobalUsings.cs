@@ -10,7 +10,6 @@ global using Avalonia.ReactiveUI;
 global using Avalonia.Styling;
 global using CodeWF.Tools.Common;
 global using CodeWF.Tools.Core.Helpers;
-global using CodeWF.Tools.Core.Tools;
 global using CodeWF.Tools.Desktop.Core.RegionAdapters;
 global using CodeWF.Tools.Desktop.Services;
 global using CodeWF.Tools.Desktop.ViewModels;
