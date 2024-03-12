@@ -12,7 +12,7 @@ public class WebModule : IModule
         toolManagerService.AddTool(ToolType.Web, WebToolInfo.IPQueryName, WebToolInfo.IPQueryDescription,
             nameof(IPQueryView),
             IconHelper.IPQuery,
-            ToolStatus.Developing);
+            ToolStatus.Complete);
     }
 
     public void OnInitialized(IContainerProvider containerProvider)
@@ -24,7 +24,14 @@ public class WebModule : IModule
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.Register(typeof(ITranslationService), typeof(TranslationService));
+        containerRegistry.Register<ITranslationService, TranslationService>();
+
+        containerRegistry.Register<IIPQueryService, IPTaoBaoQueryService>();
+        containerRegistry.Register<IIPQueryService, IPBaiDuQueryService>();
+        containerRegistry.Register<IIPQueryService, IPTencentQueryService>();
+        containerRegistry.Register<IIPQueryService, IPAMapQueryService>();
+        containerRegistry.Register<IIPQueryService, IPPCOnlineQueryService>();
+
         containerRegistry.RegisterSingleton(typeof(SlugifyViewModel));
         containerRegistry.RegisterSingleton(typeof(IPQueryViewModel));
     }

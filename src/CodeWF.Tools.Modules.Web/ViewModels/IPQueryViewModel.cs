@@ -2,6 +2,8 @@
 
 public class IPQueryViewModel : ViewModelBase
 {
+    private readonly List<IIPQueryService> _services;
+    private readonly INotificationService _notificationService;
     private string? _ipAddress;
 
     /// <summary>
@@ -16,12 +18,43 @@ public class IPQueryViewModel : ViewModelBase
         }
     }
 
+    public ObservableCollection<IPQueryInfo> IPQueryInfos { get; private set; } = new();
+
+    public IPQueryViewModel(List<IIPQueryService> services, INotificationService _notificationService)
+    {
+        _services = services;
+        this._notificationService = _notificationService;
+    }
+
     /// <summary>
     /// 查房输入的IP信息
     /// </summary>
     /// <returns></returns>
     public async Task ExecuteQueryAsync()
     {
+        async Task QueryIP(IIPQueryService service, CancellationToken token)
+        {
+            var info = await service.QueryAsync(IPAddress, token);
+            IPQueryInfos.Add(info);
+        }
+
+        if (string.IsNullOrWhiteSpace(IPAddress))
+        {
+            _notificationService?.Show("IP地址为空", "请填写IP地址再查询");
+            return;
+        }
+
+        if (!System.Net.IPAddress.TryParse(IPAddress, out _))
+        {
+            _notificationService?.Show("IP地址格式错误", "请填写正确的IP地址");
+            return;
+        }
+
+        IPQueryInfos.Clear();
+        var tasks = new List<Task>();
+        var cancellationTokenSource = new CancellationTokenSource();
+        _services.ForEach(service => tasks.Add(QueryIP(service, cancellationTokenSource.Token)));
+        await Task.WhenAll(tasks);
     }
 
     /// <summary>
@@ -30,5 +63,7 @@ public class IPQueryViewModel : ViewModelBase
     /// <returns></returns>
     public async Task ExecuteQueryLocalAsync()
     {
+        IPAddress = await IPHelper.GetLocalIPAsync();
+        await ExecuteQueryAsync();
     }
 }

@@ -16,10 +16,11 @@
             <Button Content="本机IP地址" Width="120" Command="{Binding ExecuteQueryLocalAsync}" />
         </StackPanel>
         <DataGrid Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="False"
-                  CanUserSortColumns="False" CanUserResizeColumns="False" Margin="0 10 0 0"
-                  CanUserReorderColumns="False" ItemsSource="{Binding Providers}">
+                  CanUserSortColumns="True" CanUserResizeColumns="True" Margin="0 10 0 0"
+                  CanUserReorderColumns="True" HeadersVisibility="Column"
+                  ItemsSource="{Binding IPQueryInfos, Mode=OneWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="来源" Width="130" Binding="{Binding Name}" IsReadOnly="True" />
+                <DataGridTextColumn Header="来源" Width="130" Binding="{Binding QueryFrom}" IsReadOnly="True" />
                 <DataGridTextColumn Header="IP" Width="130" Binding="{Binding IP}" IsReadOnly="True" />
                 <DataGridTextColumn Header="结果" Width="*" Binding="{Binding Result}" />
             </DataGrid.Columns>

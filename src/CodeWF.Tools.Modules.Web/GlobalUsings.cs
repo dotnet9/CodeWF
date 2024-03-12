@@ -17,3 +17,5 @@ global using Prism.Modularity;
 global using Prism.Regions;
 global using ReactiveUI;
 global using System.Globalization;
+global using CodeWF.Tools.Core.Services.IPQuery;
+global using System.Collections.ObjectModel;

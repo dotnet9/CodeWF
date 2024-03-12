@@ -8,3 +8,4 @@ global using Prism.Modularity;
 global using Prism.Regions;
 global using CodeWF.Tools.Core.Helpers;
 global using CodeWF.Tools.Core.Tools;
+global using Avalonia.Markup.Xaml;
