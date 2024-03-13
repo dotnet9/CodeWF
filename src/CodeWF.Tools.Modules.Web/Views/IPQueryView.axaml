@@ -20,9 +20,10 @@
                   CanUserReorderColumns="True" HeadersVisibility="Column"
                   ItemsSource="{Binding IPQueryInfos, Mode=OneWay}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="来源" Width="130" Binding="{Binding QueryFrom}" IsReadOnly="True" />
-                <DataGridTextColumn Header="IP" Width="130" Binding="{Binding IP}" IsReadOnly="True" />
-                <DataGridTextColumn Header="结果" Width="*" Binding="{Binding Result}" />
+                <DataGridTextColumn Header="来源" Width="130" Binding="{Binding QueryFrom, Mode=OneWay}"
+                                    IsReadOnly="True" />
+                <DataGridTextColumn Header="IP" Width="130" Binding="{Binding IP, Mode=OneWay}" IsReadOnly="True" />
+                <DataGridTextColumn Header="结果" Width="*" Binding="{Binding Result, Mode=OneWay}" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

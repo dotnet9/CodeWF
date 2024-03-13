@@ -11,8 +11,18 @@ public class IPPCOnlineQueryService : IIPQueryService
 
     public async Task<IPQueryInfo> QueryAsync(string ip, CancellationToken cancellationToken)
     {
-        var url = $"http://whois.pconline.com.cn/ip.jsp?ip={ip}";
-        var str = await _httpClient.GetStringAsync(url, cancellationToken);
-        return new IPQueryInfo("太平洋电脑网", ip, str.Trim());
+        var result = string.Empty;
+        try
+        {
+            var url = $"http://whois.pconline.com.cn/ip.jsp?ip={ip}";
+            var str = await _httpClient.GetStringAsync(url, cancellationToken);
+            result = str.Trim();
+        }
+        catch (Exception ex)
+        {
+            result = ex.Message;
+        }
+
+        return new IPQueryInfo("太平洋电脑网", ip, result);
     }
 }

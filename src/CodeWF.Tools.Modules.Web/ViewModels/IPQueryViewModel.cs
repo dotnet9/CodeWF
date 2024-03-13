@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Tools.Modules.Web.ViewModels;
+﻿using System.Reactive.Linq;
+
+namespace CodeWF.Tools.Modules.Web.ViewModels;
 
 public class IPQueryViewModel : ViewModelBase
 {
@@ -24,6 +26,15 @@ public class IPQueryViewModel : ViewModelBase
     {
         _services = services;
         this._notificationService = _notificationService;
+        this.WhenAnyValue(x => x.IPAddress)
+            .Throttle(TimeSpan.FromMilliseconds(400))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(DoSearch!);
+    }
+
+    private async void DoSearch(string ip)
+    {
+        await ExecuteQueryAsync();
     }
 
     /// <summary>
@@ -40,7 +51,6 @@ public class IPQueryViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(IPAddress))
         {
-            _notificationService?.Show("IP地址为空", "请填写IP地址再查询");
             return;
         }
 
