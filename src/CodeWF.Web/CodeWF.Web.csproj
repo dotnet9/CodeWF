@@ -9,11 +9,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Edi.ChinaDetector" Version="1.1.251" />
-    <PackageReference Include="Edi.ImageWatermark" Version="2.11.3" />
+    <PackageReference Include="Edi.ImageWatermark" Version="2.11.4" />
     <PackageReference Include="Edi.PasswordGenerator" Version="1.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.1.24081.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.0-preview.1.24081.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.2.24128.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="9.0.0-preview.2.24128.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CdoeWF.Auth\CdoeWF.Auth.csproj" />

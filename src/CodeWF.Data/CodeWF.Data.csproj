@@ -2,7 +2,7 @@
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="MediatR" Version="12.2.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0-preview.1.24081.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0-preview.2.24128.4" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\CodeWF.AppInfo\CodeWF.AppInfo.csproj" />
