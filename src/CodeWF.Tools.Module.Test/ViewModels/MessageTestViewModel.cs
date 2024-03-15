@@ -2,8 +2,8 @@
 
 public class MessageTestViewModel : ViewModelBase
 {
-    private readonly INotificationService _notificationService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly INotificationService _notificationService;
 
     public MessageTestViewModel(INotificationService notificationService,
         IEventAggregator eventAggregator)
@@ -26,8 +26,8 @@ public class MessageTestViewModel : ViewModelBase
 
     public Task ExecutePrismEventAsync()
     {
-        var prismEvent = _eventAggregator.GetEvent<TestEvent>();
-        prismEvent.Publish(new TestEventParameter() { Args = "ExecutePrismEventAsync" });
+        TestEvent? prismEvent = _eventAggregator.GetEvent<TestEvent>();
+        prismEvent.Publish(new TestEventParameter { Args = "ExecutePrismEventAsync" });
         return Task.CompletedTask;
     }
 }

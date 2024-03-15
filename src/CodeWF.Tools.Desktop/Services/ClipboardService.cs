@@ -6,7 +6,9 @@ internal class ClipboardService : IClipboardService
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop ||
             desktop.MainWindow?.Clipboard is not { } provider)
+        {
             throw new NullReferenceException("Missing Clipboard instance.");
+        }
 
         await provider.SetTextAsync(content);
     }

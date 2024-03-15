@@ -16,7 +16,7 @@ public static class EnumExtensions
         }
 
         // 3、位域枚举获取每个标志的描述并用逗号分隔  
-        List<string> descriptions = new List<string>();
+        List<string> descriptions = new();
         foreach (Enum enumValue in Enum.GetValues(enumType))
         {
             // 跳过值为0的枚举成员，因为任何数与0进行“或”运算都不会改变该数的值

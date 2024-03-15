@@ -10,7 +10,7 @@ public class TranslationServiceUnitTest
     {
         const string chineseText = AppInfo.AppInfo.ToolName;
 
-        var englishText = await _translationService.ChineseToEnglishAsync(chineseText);
+        string englishText = await _translationService.ChineseToEnglishAsync(chineseText);
 
         Assert.AreEqual(englishText, "Code World Workshop");
     }
@@ -20,7 +20,7 @@ public class TranslationServiceUnitTest
     {
         const string englishText = "Code World Workshop";
 
-        var chineseText = await _translationService.EnglishToChineseAsync(englishText);
+        string chineseText = await _translationService.EnglishToChineseAsync(englishText);
 
         Assert.AreEqual(chineseText, "代码世界工作坊");
     }
@@ -30,7 +30,7 @@ public class TranslationServiceUnitTest
     {
         const string englishText = "Code World Workshop";
 
-        var urlSlug = _translationService.EnglishToUrlSlug(englishText);
+        string urlSlug = _translationService.EnglishToUrlSlug(englishText);
 
         Assert.AreEqual(urlSlug, "code-world-workshop");
     }
@@ -40,9 +40,9 @@ public class TranslationServiceUnitTest
     {
         const string chineseText = AppInfo.AppInfo.ToolName;
 
-        var englishText = await _translationService.ChineseToEnglishAsync(chineseText);
+        string englishText = await _translationService.ChineseToEnglishAsync(chineseText);
 
-        var urlSlug = _translationService.EnglishToUrlSlug(englishText);
+        string urlSlug = _translationService.EnglishToUrlSlug(englishText);
 
         Assert.AreEqual(urlSlug, "code-world-workshop");
     }

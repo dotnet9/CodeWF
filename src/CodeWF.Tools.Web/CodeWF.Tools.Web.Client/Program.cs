@@ -1,4 +1,4 @@
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
+WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddCodeWFService();
 

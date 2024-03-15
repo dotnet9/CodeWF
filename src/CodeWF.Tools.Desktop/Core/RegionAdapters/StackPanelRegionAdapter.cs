@@ -16,7 +16,9 @@ public class StackPanelRegionAdapter : RegionAdapterBase<StackPanel>
                 foreach (Control item in e.NewItems)
                 {
                     if (e.NewItems != null)
+                    {
                         regionTarget.Children.Add(item);
+                    }
                 }
             }
 
@@ -25,11 +27,16 @@ public class StackPanelRegionAdapter : RegionAdapterBase<StackPanel>
                 foreach (Control item in e.OldItems)
                 {
                     if (e.OldItems != null)
+                    {
                         regionTarget.Children.Remove(item);
+                    }
                 }
             }
         };
     }
 
-    protected override IRegion CreateRegion() => new SingleActiveRegion() { };
+    protected override IRegion CreateRegion()
+    {
+        return new SingleActiveRegion();
+    }
 }

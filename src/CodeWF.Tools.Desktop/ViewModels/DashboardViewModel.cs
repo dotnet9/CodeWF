@@ -2,11 +2,8 @@
 
 public class DashboardViewModel : ViewModelBase
 {
-    private readonly IToolManagerService _toolManagerService;
     private readonly IEventAggregator _eventAggregator;
-
-    public ObservableCollection<ToolMenuItem> MenuItems { get; } =
-        new ObservableCollection<ToolMenuItem>();
+    private readonly IToolManagerService _toolManagerService;
 
     public DashboardViewModel(IToolManagerService toolManagerService, IEventAggregator eventAggregator)
     {
@@ -14,6 +11,8 @@ public class DashboardViewModel : ViewModelBase
         _eventAggregator = eventAggregator;
         toolManagerService.ToolMenuChanged += MenuChangedHandler;
     }
+
+    public ObservableCollection<ToolMenuItem> MenuItems { get; } = new();
 
     private void MenuChangedHandler(object sender, EventArgs e)
     {
@@ -30,6 +29,6 @@ public class DashboardViewModel : ViewModelBase
     public void ExecuteChangeToolHandle(ToolMenuItem menuItem)
     {
         _eventAggregator.GetEvent<ChangeToolEvent>()
-            .Publish(new ChangeToolEventParameter() { ToolHeader = menuItem.Header });
+            .Publish(new ChangeToolEventParameter { ToolHeader = menuItem.Header });
     }
 }

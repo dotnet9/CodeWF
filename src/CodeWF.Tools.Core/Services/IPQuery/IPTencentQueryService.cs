@@ -11,10 +11,10 @@ public class IPTencentQueryService : IIPQueryService
 
     public async Task<IPQueryInfo> QueryAsync(string ip, CancellationToken cancellationToken)
     {
-        var key = "TAOBZ-YQ3KU-R4NVU-BT4IA-2P2MF-RDBVJ";
-        var url = $"https://apis.map.qq.com/ws/location/v1/ip?ip={ip}&key={key}";
-        var json = await _httpClient.GetStringAsync(url, cancellationToken);
-        var e = JsonSerializer.Deserialize<TencentLbsResponse>(json);
+        string key = "TAOBZ-YQ3KU-R4NVU-BT4IA-2P2MF-RDBVJ";
+        string url = $"https://apis.map.qq.com/ws/location/v1/ip?ip={ip}&key={key}";
+        string json = await _httpClient.GetStringAsync(url, cancellationToken);
+        TencentLbsResponse? e = JsonSerializer.Deserialize<TencentLbsResponse>(json);
 
         return new IPQueryInfo("腾讯地图", ip, e.ToString());
     }
@@ -73,13 +73,13 @@ public partial class TencentLbsResponse
             return Message ?? string.Empty;
         }
 
-        var list = new List<string>();
+        List<string> list = new List<string>();
         if (Result?.AdInfo == null)
         {
             return string.Join(" ", list);
         }
 
-        var info = Result.AdInfo;
+        AdInfo? info = Result.AdInfo;
         list.Add(info.Nation ?? string.Empty);
         list.Add(info.Province ?? string.Empty);
         list.Add(info.City ?? string.Empty);

@@ -2,14 +2,13 @@
 
 public interface IToolManagerService
 {
+    ObservableCollection<ToolMenuItem> MenuItems { get; set; }
     void AddTool(string name, string description, string viewName, string icon, ToolStatus status);
 
     void AddTool(ToolType group, string name, string description, string viewName, string icon,
         ToolStatus status);
 
     void RemoveTool(string name);
-
-    ObservableCollection<ToolMenuItem> MenuItems { get; set; }
     event EventHandler ToolMenuChanged;
 }
 

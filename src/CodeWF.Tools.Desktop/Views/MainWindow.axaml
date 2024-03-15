@@ -20,8 +20,8 @@
     </Design.DataContext>
     <views:MainView />
     <Window.Styles>
-		<Style Selector="Window">
-            <Setter Property="FontFamily" Value="{StaticResource Douyin}"></Setter>
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="{StaticResource Douyin}" />
         </Style>
     </Window.Styles>
 </Window>

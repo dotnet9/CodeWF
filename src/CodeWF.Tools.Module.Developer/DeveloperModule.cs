@@ -10,7 +10,7 @@ public class DeveloperModule : IModule
 
     public void OnInitialized(IContainerProvider containerProvider)
     {
-        var regionManager = containerProvider.Resolve<IRegionManager>();
+        IRegionManager? regionManager = containerProvider.Resolve<IRegionManager>();
         regionManager.RegisterViewWithRegion<TimestampView>(RegionNames.ContentRegion);
     }
 

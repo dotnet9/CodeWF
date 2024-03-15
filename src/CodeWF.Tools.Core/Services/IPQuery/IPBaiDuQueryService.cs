@@ -12,10 +12,10 @@ public class IPBaiDuQueryService : IIPQueryService
     public async Task<IPQueryInfo> QueryAsync(string ip, CancellationToken cancellationToken)
     {
         const string ak = "yBaSv2qHR4r540yBDWGPpC1bLZYK17ni";
-        var url = $"http://api.map.baidu.com/location/ip?ak={ak}&ip={ip}";
-        var json = await _httpClient.GetStringAsync(url, cancellationToken);
-        var obj = JsonSerializer.Deserialize<BaiduResponse>(json);
-        var result = obj.Address;
+        string url = $"http://api.map.baidu.com/location/ip?ak={ak}&ip={ip}";
+        string json = await _httpClient.GetStringAsync(url, cancellationToken);
+        BaiduResponse? obj = JsonSerializer.Deserialize<BaiduResponse>(json);
+        string result = obj.Address;
         if (obj.Status != 0)
         {
             result = obj.Message;

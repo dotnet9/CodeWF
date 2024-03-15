@@ -1,22 +1,21 @@
-﻿@using CodeWF.AppInfo
-@using CodeWF.Utils
+﻿@using CodeWF.Utils
 @inject IJSRuntime jsRunTime
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />
-    <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="css/ssr.css" />
-    <link rel="stylesheet" href="CodeWF.Tools.Web.styles.css" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <base href="/"/>
+    <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="css/ssr.css"/>
+    <link rel="stylesheet" href="CodeWF.Tools.Web.styles.css"/>
     <link href="https://cdn.masastack.com/npm/@("@mdi")/font@7.1.96/css/materialdesignicons.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="logo.png" />
-    <HeadOutlet />
-    <MSsrThemeProvider />
+    <link rel="icon" type="image/png" href="logo.png"/>
+    <HeadOutlet/>
+    <MSsrThemeProvider/>
     <script>
         window.getDomain = function () {
             return window.location.host;
@@ -25,12 +24,15 @@
 
     @code {
         private string currentDomain = string.Empty;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            currentDomain= await jsRunTime.InvokeAsync<string>("getDomain");
+            currentDomain = await jsRunTime.InvokeAsync<string>("getDomain");
             await base.OnAfterRenderAsync(firstRender);
         }
+
     }
+
     <environment include="Production">
         @if (currentDomain.EndsWith(DomainType.Dotnet9Com.Description()))
         {
@@ -87,10 +89,10 @@
 </head>
 
 <body>
-    <Routes />
-    <script src="_framework/blazor.web.js"></script>
-    <script src="_content/BlazorComponent/js/blazor-component.js"></script>
-    <script type="text/javascript">
+<Routes/>
+<script src="_framework/blazor.web.js"></script>
+<script src="_content/BlazorComponent/js/blazor-component.js"></script>
+<script type="text/javascript">
         window.clipboardCopy = {
             copyText: function (text) {
                 navigator.clipboard.writeText(text).then(function () {

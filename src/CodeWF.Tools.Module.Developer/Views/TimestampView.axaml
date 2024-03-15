@@ -22,11 +22,11 @@
                     <Run Text="{Binding CurrentUtcTime, StringFormat=yyyy-MM-dd HH:mm:ss fff}" />
                     <Run Text="|" />
                     <Run Text="{Binding CurrentTimestamp}" Foreground="Green" />
-                    <Run Text="s"></Run>
+                    <Run Text="s" />
                 </TextBlock>
-                <TextBlock Text="控制：" VerticalAlignment="Center"  Margin="10 0 0 0"/>
+                <TextBlock Text="控制：" VerticalAlignment="Center" Margin="10 0 0 0" />
                 <Button Content="{Binding CalcButtonContent}" Foreground="{Binding CalcButtonForeground}"
-                        Command="{Binding ExecuteRunCalcTimestampCommand}" VerticalAlignment="Center"/>
+                        Command="{Binding ExecuteRunCalcTimestampCommand}" VerticalAlignment="Center" />
             </StackPanel>
 
             <TextBlock Text="时间戳" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />

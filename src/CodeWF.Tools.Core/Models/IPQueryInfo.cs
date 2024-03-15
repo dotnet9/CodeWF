@@ -1,7 +1,7 @@
 ﻿namespace CodeWF.Tools.Core.Models;
 
 /// <summary>
-/// IP查询信息
+///     IP查询信息
 /// </summary>
 /// <param name="QueryFrom">查询源</param>
 /// <param name="IP">查询IP</param>

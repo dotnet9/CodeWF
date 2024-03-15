@@ -1,5 +1,3 @@
-
-
 namespace CodeWF.Tools.Desktop.Views;
 
 public partial class MainView : UserControl
@@ -18,22 +16,22 @@ public partial class MainView : UserControl
     {
         base.OnAttachedToVisualTree(e);
 
-        var level = TopLevel.GetTopLevel(this);
+        TopLevel? level = TopLevel.GetTopLevel(this);
         if (level == null)
         {
             return;
         }
 
-        var notificationService = ContainerLocator.Current.Resolve<INotificationService>();
+        INotificationService? notificationService = ContainerLocator.Current.Resolve<INotificationService>();
         notificationService.SetHostWindow(level);
     }
 
     private void ToggleButton_OnIsCheckedChanged(object sender, RoutedEventArgs e)
     {
-        var app = Application.Current;
+        Application? app = Application.Current;
         if (app is not null)
         {
-            var theme = app.ActualThemeVariant;
+            ThemeVariant theme = app.ActualThemeVariant;
             app.RequestedThemeVariant = theme == ThemeVariant.Dark ? ThemeVariant.Light : ThemeVariant.Dark;
         }
     }

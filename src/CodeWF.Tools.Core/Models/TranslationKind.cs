@@ -5,5 +5,5 @@ public enum TranslationKind
     ChineseToEnglish,
     ChineseToSlug,
     EnglishToChinese,
-    EnglishToSlug,
+    EnglishToSlug
 }

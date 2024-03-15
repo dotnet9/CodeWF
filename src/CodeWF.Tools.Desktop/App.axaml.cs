@@ -16,7 +16,7 @@ public class App : PrismApplication
             throw new Exception($"请生成模块到目录{modulePath}");
         }
 
-        return new DirectoryModuleCatalog() { ModulePath = modulePath };
+        return new DirectoryModuleCatalog { ModulePath = modulePath };
     }
 
     protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
@@ -35,11 +35,11 @@ public class App : PrismApplication
 
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        var container = containerRegistry.GetContainer();
+        IContainer? container = containerRegistry.GetContainer();
         // Views - Generic
         containerRegistry.Register<MainWindow>();
 
-        var regionManager = Container.Resolve<IRegionManager>();
+        IRegionManager? regionManager = Container.Resolve<IRegionManager>();
         regionManager.RegisterViewWithRegion<DashboardView>(RegionNames.ContentRegion);
         regionManager.RegisterViewWithRegion<FooterView>(RegionNames.FooterRegion);
 
@@ -50,7 +50,7 @@ public class App : PrismApplication
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
         containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
 
-        var toolManagerService = container.Resolve<IToolManagerService>();
+        IToolManagerService? toolManagerService = container.Resolve<IToolManagerService>();
         toolManagerService.AddTool("首页",
             "这是一个基于Avalonia UI + Prism框架打造的模块化跨平台工具平台，汇聚了众多开发实用小工具，目前已开发或即将开发的如编码解码、数据加密等，轻量且强大，开箱即用，助力开发者提升工作效率。",
             nameof(DashboardView),
@@ -59,9 +59,10 @@ public class App : PrismApplication
     }
 
     /// <summary>
-    /// 1、DryIoc.Microsoft.DependencyInjection低版本可不要这个方法（5.1.0及以下）
-    /// 2、高版本必须，否则会抛出异常：System.MissingMethodException:“Method not found: 'DryIoc.Rules DryIoc.Rules.WithoutFastExpressionCompiler()'.”
-    /// 参考issues：https://github.com/dadhi/DryIoc/issues/529
+    ///     1、DryIoc.Microsoft.DependencyInjection低版本可不要这个方法（5.1.0及以下）
+    ///     2、高版本必须，否则会抛出异常：System.MissingMethodException:“Method not found: 'DryIoc.Rules
+    ///     DryIoc.Rules.WithoutFastExpressionCompiler()'.”
+    ///     参考issues：https://github.com/dadhi/DryIoc/issues/529
     /// </summary>
     /// <returns></returns>
     protected override Rules CreateContainerRules()

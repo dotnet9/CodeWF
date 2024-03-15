@@ -29,11 +29,11 @@ internal class ToolManagerService : IToolManagerService
     public void AddTool(ToolType group, string name, string description, string viewName, string icon,
         ToolStatus status)
     {
-        var toolGroup = MenuItems.FirstOrDefault(item => item.Group == group);
+        ToolMenuItem? toolGroup = MenuItems.FirstOrDefault(item => item.Group == group);
         if (toolGroup == null)
         {
-            var desc = group.Description();
-            toolGroup = new ToolMenuItem()
+            string desc = group.Description();
+            toolGroup = new ToolMenuItem
             {
                 Group = group,
                 Level = 0,
@@ -59,11 +59,14 @@ internal class ToolManagerService : IToolManagerService
 
     public void RemoveTool(string name)
     {
-        for (var i = MenuItems.Count; i >= 0; i--)
+        for (int i = MenuItems.Count; i >= 0; i--)
         {
             if (MenuItems[i].Header == name)
+            {
                 MenuItems.RemoveAt(i);
-            var firstMenuItem = MenuItems[i];
+            }
+
+            ToolMenuItem firstMenuItem = MenuItems[i];
             for (int j = 0; j < firstMenuItem.Children.Count; j++)
             {
                 if (firstMenuItem.Children[j].Header == name)
@@ -76,6 +79,9 @@ internal class ToolManagerService : IToolManagerService
         SendMenuChangedEvent();
     }
 
+    public ObservableCollection<ToolMenuItem> MenuItems { get; set; } = new();
+    public event EventHandler? ToolMenuChanged;
+
     public void RemoveTool(ToolType type, string toolName)
     {
     }
@@ -84,7 +90,4 @@ internal class ToolManagerService : IToolManagerService
     {
         ToolMenuChanged?.Invoke(this, default);
     }
-
-    public ObservableCollection<ToolMenuItem> MenuItems { get; set; } = new();
-    public event EventHandler? ToolMenuChanged;
 }

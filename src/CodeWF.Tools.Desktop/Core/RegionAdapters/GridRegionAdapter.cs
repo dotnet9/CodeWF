@@ -29,5 +29,8 @@ public class GridRegionAdapter : RegionAdapterBase<Grid>
         };
     }
 
-    protected override IRegion CreateRegion() => new SingleActiveRegion() { };
+    protected override IRegion CreateRegion()
+    {
+        return new SingleActiveRegion();
+    }
 }

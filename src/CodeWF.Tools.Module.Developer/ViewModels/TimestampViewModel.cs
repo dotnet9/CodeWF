@@ -9,6 +9,76 @@ public class TimestampViewModel : ViewModelBase
     private const string SecondDatetimeFormat = "yyyy-MM-dd HH:mm:ss";
     private const string MillisecondDatetimeFormat = "yyyy-MM-dd HH:mm:ss fff";
 
+    private CancellationTokenSource? _cancellationCalcTimestampTokenSource;
+
+    public TimestampViewModel()
+    {
+        _ = RunCalcTimestamp();
+
+        this.WhenAnyValue(x => x.IsCalcTimestamp).Subscribe(newValue => CalcButtonContent = newValue ? "停止" : "开始");
+        this.WhenAnyValue(x => x.IsCalcTimestamp)
+            .Subscribe(newValue => CalcButtonForeground = newValue ? Brushes.Red : Brushes.Green);
+
+        TimestampToTimeFormat = TimeToTimestampFormat = SecondDatetimeFormat;
+        TimestampFrom = TimestampHelper.GetCurrentTimestamp();
+        TimeFrom = DateTimeOffset.UtcNow;
+        ExecuteTimestampToTimeCommand();
+        ExecuteTimeToTimestampCommand();
+    }
+
+    public IEnumerable<string> TimestampTypeDescriptions { get; } =
+        Enum.GetValues<TimestampType>().Select(t => t.Description());
+
+    public async Task ExecuteRunCalcTimestampCommand()
+    {
+        if (_isCalcTimestamp)
+        {
+            await StopCalcTimestampAsync();
+        }
+        else
+        {
+            await RunCalcTimestamp();
+        }
+    }
+
+    public void ExecuteTimestampToTimeCommand()
+    {
+        TimestampType kind = (TimestampType)Enum.Parse(typeof(TimestampType), TimestampToTimeKindIndex.ToString());
+        TimeTo = TimestampHelper.GetTime(TimestampFrom, kind);
+    }
+
+    public void ExecuteTimeToTimestampCommand()
+    {
+        TimestampType kind = (TimestampType)Enum.Parse(typeof(TimestampType), TimeToTimestampKindIndex.ToString());
+        TimestampTo = TimestampHelper.GetTimestamp(TimeFrom, kind);
+    }
+
+    private async Task RunCalcTimestamp()
+    {
+        await StopCalcTimestampAsync();
+        _cancellationCalcTimestampTokenSource = new CancellationTokenSource();
+        IsCalcTimestamp = true;
+        await Task.Run(async () =>
+        {
+            while (_cancellationCalcTimestampTokenSource.IsCancellationRequested == false)
+            {
+                CurrentUtcTime = DateTimeOffset.UtcNow;
+                CurrentTimestamp = TimestampHelper.GetTimestamp(CurrentUtcTime, CurrentTimestampType);
+                await Task.Delay(TimeSpan.FromSeconds(1));
+            }
+        }, _cancellationCalcTimestampTokenSource.Token);
+    }
+
+    private async Task StopCalcTimestampAsync()
+    {
+        if (_cancellationCalcTimestampTokenSource != null)
+        {
+            await _cancellationCalcTimestampTokenSource.CancelAsync();
+        }
+
+        IsCalcTimestamp = false;
+    }
+
     #region 当前时间
 
     private bool _isCalcTimestamp;
@@ -61,9 +131,6 @@ public class TimestampViewModel : ViewModelBase
 
     #endregion
 
-    public IEnumerable<string> TimestampTypeDescriptions { get; } =
-        Enum.GetValues<TimestampType>().Select(t => t.Description());
-
     #region 时间戳转时间
 
     private long _timestampFrom;
@@ -84,7 +151,7 @@ public class TimestampViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _timestampToTimeKindIndex, value);
 
-            var kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timestampToTimeKindIndex.ToString());
+            TimestampType kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timestampToTimeKindIndex.ToString());
             TimestampToTimeFormat = kind == TimestampType.Second ? SecondDatetimeFormat : MillisecondDatetimeFormat;
         }
     }
@@ -135,7 +202,7 @@ public class TimestampViewModel : ViewModelBase
             this.RaiseAndSetIfChanged(ref _timeToTimestampKindIndex, value);
 
 
-            var kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timeToTimestampKindIndex.ToString());
+            TimestampType kind = (TimestampType)Enum.Parse(typeof(TimestampType), _timeToTimestampKindIndex.ToString());
             TimeToTimestampFormat = kind == TimestampType.Second ? SecondDatetimeFormat : MillisecondDatetimeFormat;
         }
     }
@@ -149,71 +216,4 @@ public class TimestampViewModel : ViewModelBase
     }
 
     #endregion
-
-    public TimestampViewModel()
-    {
-        _ = RunCalcTimestamp();
-
-        this.WhenAnyValue(x => x.IsCalcTimestamp).Subscribe(newValue => CalcButtonContent = newValue ? "停止" : "开始");
-        this.WhenAnyValue(x => x.IsCalcTimestamp)
-            .Subscribe(newValue => CalcButtonForeground = newValue ? Brushes.Red : Brushes.Green);
-
-        TimestampToTimeFormat = TimeToTimestampFormat = SecondDatetimeFormat;
-        TimestampFrom = TimestampHelper.GetCurrentTimestamp();
-        TimeFrom = DateTimeOffset.UtcNow;
-        ExecuteTimestampToTimeCommand();
-        ExecuteTimeToTimestampCommand();
-    }
-
-    private CancellationTokenSource? _cancellationCalcTimestampTokenSource;
-
-    public async Task ExecuteRunCalcTimestampCommand()
-    {
-        if (_isCalcTimestamp)
-        {
-            await StopCalcTimestampAsync();
-        }
-        else
-        {
-            await RunCalcTimestamp();
-        }
-    }
-
-    public void ExecuteTimestampToTimeCommand()
-    {
-        var kind = (TimestampType)Enum.Parse(typeof(TimestampType), TimestampToTimeKindIndex.ToString());
-        TimeTo = TimestampHelper.GetTime(TimestampFrom, kind);
-    }
-
-    public void ExecuteTimeToTimestampCommand()
-    {
-        var kind = (TimestampType)Enum.Parse(typeof(TimestampType), TimeToTimestampKindIndex.ToString());
-        TimestampTo = TimestampHelper.GetTimestamp(TimeFrom, kind);
-    }
-
-    private async Task RunCalcTimestamp()
-    {
-        await StopCalcTimestampAsync();
-        _cancellationCalcTimestampTokenSource = new CancellationTokenSource();
-        IsCalcTimestamp = true;
-        await Task.Run(async () =>
-        {
-            while (_cancellationCalcTimestampTokenSource.IsCancellationRequested == false)
-            {
-                CurrentUtcTime = DateTimeOffset.UtcNow;
-                CurrentTimestamp = TimestampHelper.GetTimestamp(CurrentUtcTime, CurrentTimestampType);
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-        }, _cancellationCalcTimestampTokenSource.Token);
-    }
-
-    private async Task StopCalcTimestampAsync()
-    {
-        if (_cancellationCalcTimestampTokenSource != null)
-        {
-            await _cancellationCalcTimestampTokenSource.CancelAsync();
-        }
-
-        IsCalcTimestamp = false;
-    }
 }

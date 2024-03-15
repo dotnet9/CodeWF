@@ -11,10 +11,10 @@ public class IPAMapQueryService : IIPQueryService
 
     public async Task<IPQueryInfo> QueryAsync(string ip, CancellationToken cancellationToken)
     {
-        var key = "0f48c54461148ea1e670b676cbd1700b";
-        var url = $"https://restapi.amap.com/v5/ip?key={key}&ip={ip}&type=4";
-        var json = await _httpClient.GetStringAsync(url, cancellationToken);
-        var obj = JsonSerializer.Deserialize<AmapResponse>(json);
+        string key = "0f48c54461148ea1e670b676cbd1700b";
+        string url = $"https://restapi.amap.com/v5/ip?key={key}&ip={ip}&type=4";
+        string json = await _httpClient.GetStringAsync(url, cancellationToken);
+        AmapResponse? obj = JsonSerializer.Deserialize<AmapResponse>(json);
         return new IPQueryInfo("高德地图", ip, obj.ToString());
     }
 }
@@ -48,13 +48,13 @@ public class AmapResponse
             return Info;
         }
 
-        var list = new List<string>
+        List<string> list = new List<string>
         {
             Country ?? string.Empty,
             Province ?? string.Empty,
             City ?? string.Empty,
             District ?? string.Empty,
-            Isp ?? string.Empty,
+            Isp ?? string.Empty
         };
         list.RemoveAll(string.IsNullOrWhiteSpace);
         return string.Join(" ", list);

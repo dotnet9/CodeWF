@@ -9,7 +9,7 @@ internal class IsTranslationKind : IValueConverter
             return false;
         }
 
-        var checkValue = parameter.ToString();
+        string? checkValue = parameter.ToString();
         return value.ToString() == checkValue;
     }
 

@@ -2,44 +2,14 @@
 
 public class MainViewModel : ViewModelBase
 {
-    private readonly INotificationService _notificationService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly INotificationService _notificationService;
     private readonly IRegionManager _regionManager;
-
-    public ObservableCollection<ToolMenuItem> SearchMenuItems { get; set; }
     private ToolMenuItem? _searchSelectedItem;
-
-    public ToolMenuItem? SearchSelectedItem
-    {
-        get => _searchSelectedItem;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _searchSelectedItem, value);
-            ChangeSearchMenu();
-        }
-    }
 
     private ToolMenuItem? _selectedMenuItem;
 
-    public ToolMenuItem? SelectedMenuItem
-    {
-        get => _selectedMenuItem;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _selectedMenuItem, value);
-            ChangeTool();
-        }
-    }
-
     private NotificationType _selectedMenuStatus;
-
-    public NotificationType SelectedMenuStatus
-    {
-        get => _selectedMenuStatus;
-        set => this.RaiseAndSetIfChanged(ref _selectedMenuStatus, value);
-    }
-
-    public ObservableCollection<ToolMenuItem> MenuItems { get; private set; }
 
     public MainViewModel(IToolManagerService toolManagerService, INotificationService notificationService,
         IEventAggregator eventAggregator, IRegionManager regionManager)
@@ -53,6 +23,36 @@ public class MainViewModel : ViewModelBase
         MenuItems = toolManagerService.MenuItems;
         toolManagerService.ToolMenuChanged += MenuChangedHandler;
     }
+
+    public ObservableCollection<ToolMenuItem> SearchMenuItems { get; set; }
+
+    public ToolMenuItem? SearchSelectedItem
+    {
+        get => _searchSelectedItem;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _searchSelectedItem, value);
+            ChangeSearchMenu();
+        }
+    }
+
+    public ToolMenuItem? SelectedMenuItem
+    {
+        get => _selectedMenuItem;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedMenuItem, value);
+            ChangeTool();
+        }
+    }
+
+    public NotificationType SelectedMenuStatus
+    {
+        get => _selectedMenuStatus;
+        set => this.RaiseAndSetIfChanged(ref _selectedMenuStatus, value);
+    }
+
+    public ObservableCollection<ToolMenuItem> MenuItems { get; }
 
     private void RegisterPrismEvent()
     {
@@ -82,14 +82,14 @@ public class MainViewModel : ViewModelBase
 
     private ToolMenuItem? GetMenuItem(string name)
     {
-        foreach (var firstMenuItem in MenuItems)
+        foreach (ToolMenuItem firstMenuItem in MenuItems)
         {
             if (name == firstMenuItem.Header)
             {
                 return firstMenuItem;
             }
 
-            foreach (var secondMenuItem in firstMenuItem.Children)
+            foreach (ToolMenuItem secondMenuItem in firstMenuItem.Children)
             {
                 if (name == secondMenuItem.Header)
                 {
@@ -120,9 +120,9 @@ public class MainViewModel : ViewModelBase
 
     private void ChangeSearchMenu(string name)
     {
-        foreach (var firstMenuItem in MenuItems)
+        foreach (ToolMenuItem firstMenuItem in MenuItems)
         {
-            foreach (var secondMenuItem in firstMenuItem.Children)
+            foreach (ToolMenuItem secondMenuItem in firstMenuItem.Children)
             {
                 if (secondMenuItem.Header != name)
                 {

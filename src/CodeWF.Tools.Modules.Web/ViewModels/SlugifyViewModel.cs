@@ -4,14 +4,33 @@ namespace CodeWF.Tools.Modules.Web.ViewModels;
 
 public class SlugifyViewModel : ViewModelBase
 {
-    private readonly INotificationService? _notificationService;
     private readonly IClipboardService? _clipboardService;
-    private readonly ITranslationService? _translationService;
     private readonly IEventAggregator _eventAggregator;
+    private readonly INotificationService? _notificationService;
+    private readonly ITranslationService? _translationService;
+
+    private string? _from;
+
+    private bool _isAutoTranslation = true;
     private TranslationKind _kind = TranslationKind.ChineseToSlug;
 
+    private string? _to;
+
+    public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
+        ITranslationService translationService,
+        IEventAggregator eventAggregator)
+    {
+        _notificationService = notificationService;
+        _clipboardService = clipboardService;
+        _translationService = translationService;
+        _eventAggregator = eventAggregator;
+        KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
+
+        RegisterPrismEvent();
+    }
+
     /// <summary>
-    /// 中文标题
+    ///     中文标题
     /// </summary>
     public TranslationKind Kind
     {
@@ -19,10 +38,8 @@ public class SlugifyViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _kind, value);
     }
 
-    private string? _from;
-
     /// <summary>
-    /// 待翻译字符串
+    ///     待翻译字符串
     /// </summary>
     public string? From
     {
@@ -37,10 +54,8 @@ public class SlugifyViewModel : ViewModelBase
         }
     }
 
-    private string? _to;
-
     /// <summary>
-    /// 目标翻译字符串
+    ///     目标翻译字符串
     /// </summary>
     public string? To
     {
@@ -48,10 +63,8 @@ public class SlugifyViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _to, value);
     }
 
-    private bool _isAutoTranslation = true;
-
     /// <summary>
-    /// 自动翻译
+    ///     自动翻译
     /// </summary>
     public bool IsAutoTranslation
     {
@@ -60,19 +73,6 @@ public class SlugifyViewModel : ViewModelBase
     }
 
     public ReactiveCommand<TranslationKind, Unit> KindChanged { get; }
-
-    public SlugifyViewModel(INotificationService notificationService, IClipboardService clipboardService,
-        ITranslationService translationService,
-        IEventAggregator eventAggregator)
-    {
-        _notificationService = notificationService;
-        _clipboardService = clipboardService;
-        _translationService = translationService;
-        _eventAggregator = eventAggregator;
-        KindChanged = ReactiveCommand.Create<TranslationKind>(OnKindChanged);
-
-        RegisterPrismEvent();
-    }
 
     private void RegisterPrismEvent()
     {
@@ -102,7 +102,7 @@ public class SlugifyViewModel : ViewModelBase
                     To = await _translationService!.EnglishToChineseAsync(From);
                     break;
                 case TranslationKind.ChineseToSlug:
-                    var english = await _translationService!.ChineseToEnglishAsync(From);
+                    string english = await _translationService!.ChineseToEnglishAsync(From);
                     To = _translationService!.EnglishToUrlSlug(english);
                     break;
                 default:

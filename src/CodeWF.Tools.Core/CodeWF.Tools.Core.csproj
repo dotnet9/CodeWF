@@ -2,6 +2,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="GTranslate" Version="2.1.6" />
+		<PackageReference Include="NewLife.XCode" Version="11.11.2024.315-beta0558" />
 		<PackageReference Include="Slugify.Core" Version="5.0.0-prerelease.4" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.6.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CodeWF.AppInfo\CodeWF.AppInfo.csproj" />
 	</ItemGroup>
 </Project>

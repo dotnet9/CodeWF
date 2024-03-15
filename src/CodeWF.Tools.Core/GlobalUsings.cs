@@ -6,3 +6,6 @@ global using System.Diagnostics;
 global using CodeWF.Tools.Core.Models;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using ImageMagick;
+global using NewLife;
+global using NewLife.Log;

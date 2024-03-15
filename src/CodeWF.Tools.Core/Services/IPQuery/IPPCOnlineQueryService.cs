@@ -11,11 +11,11 @@ public class IPPCOnlineQueryService : IIPQueryService
 
     public async Task<IPQueryInfo> QueryAsync(string ip, CancellationToken cancellationToken)
     {
-        var result = string.Empty;
+        string result = string.Empty;
         try
         {
-            var url = $"http://whois.pconline.com.cn/ip.jsp?ip={ip}";
-            var str = await _httpClient.GetStringAsync(url, cancellationToken);
+            string url = $"http://whois.pconline.com.cn/ip.jsp?ip={ip}";
+            string str = await _httpClient.GetStringAsync(url, cancellationToken);
             result = str.Trim();
         }
         catch (Exception ex)
