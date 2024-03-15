@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools.Modules.Web", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.AppInfo", "CodeWF.AppInfo\CodeWF.AppInfo.csproj", "{2EE615BB-5E44-4A14-AC7C-680A3E0D2FDF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Tools.Module.Image", "CodeWF.Tools.Module.Image\CodeWF.Tools.Module.Image.csproj", "{48406244-4931-4C07-B57E-48F839A73F00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,6 +102,10 @@ Global
 		{2EE615BB-5E44-4A14-AC7C-680A3E0D2FDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EE615BB-5E44-4A14-AC7C-680A3E0D2FDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EE615BB-5E44-4A14-AC7C-680A3E0D2FDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48406244-4931-4C07-B57E-48F839A73F00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48406244-4931-4C07-B57E-48F839A73F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48406244-4931-4C07-B57E-48F839A73F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48406244-4931-4C07-B57E-48F839A73F00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,7 @@ Global
 		{DF13E2D2-6979-4CD8-BF1C-B7FA8B74D460} = {5546150D-D8A9-46D9-9035-E255ECBD3596}
 		{5BDB154C-ED37-4CEE-BFC7-A4A233664204} = {5546150D-D8A9-46D9-9035-E255ECBD3596}
 		{2EE615BB-5E44-4A14-AC7C-680A3E0D2FDF} = {CB089559-07F7-4E28-965C-6EB1F44522A9}
+		{48406244-4931-4C07-B57E-48F839A73F00} = {5546150D-D8A9-46D9-9035-E255ECBD3596}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {47147C4F-8BF8-4E62-82C5-A5B969940F69}

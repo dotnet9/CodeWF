@@ -29,3 +29,4 @@ global using System.Collections.ObjectModel;
 global using System.Collections.Specialized;
 global using System.Globalization;
 global using System.Runtime.InteropServices;
+global using Avalonia.Platform.Storage;

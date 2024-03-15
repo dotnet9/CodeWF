@@ -22,8 +22,10 @@ public partial class MainView : UserControl
             return;
         }
 
-        INotificationService? notificationService = ContainerLocator.Current.Resolve<INotificationService>();
+        var notificationService = ContainerLocator.Current.Resolve<INotificationService>();
+        var fileChooserService = ContainerLocator.Current.Resolve<IFileChooserService>();
         notificationService.SetHostWindow(level);
+        fileChooserService.SetHostWindow(level);
     }
 
     private void ToggleButton_OnIsCheckedChanged(object sender, RoutedEventArgs e)

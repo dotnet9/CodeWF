@@ -7,6 +7,7 @@ internal class ToolManagerService : IToolManagerService
         { ToolType.Home, IconHelper.Home },
         { ToolType.Developer, IconHelper.Developer },
         { ToolType.Web, IconHelper.Web },
+        { ToolType.Image, IconHelper.Image },
         { ToolType.Test, IconHelper.Test },
         { ToolType.Other, IconHelper.Other }
     };

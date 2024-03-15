@@ -49,6 +49,7 @@ public class App : PrismApplication
         containerRegistry.RegisterSingleton<INotificationService, NotificationService>();
         containerRegistry.RegisterSingleton<IClipboardService, ClipboardService>();
         containerRegistry.RegisterSingleton<IToolManagerService, ToolManagerService>();
+        containerRegistry.RegisterSingleton<IFileChooserService, FileChooserService>();
 
         IToolManagerService? toolManagerService = container.Resolve<IToolManagerService>();
         toolManagerService.AddTool("首页",
