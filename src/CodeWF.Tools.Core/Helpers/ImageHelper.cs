@@ -1,8 +1,11 @@
-﻿namespace CodeWF.Tools.Core.Helpers;
+﻿using System.Drawing;
+
+namespace CodeWF.Tools.Core.Helpers;
 
 public static class ImageHelper
 {
-    public static async Task ToIconAsync(string sourceImagePath, string? outputDirectory = default,
+    public static async Task ToIconAsync(string sourceImagePath,
+        ExportIconKind exportKind = ExportIconKind.Merge, string? outputDirectoryOrIconPath = default,
         IconSizeKind sizeKind = IconSizeKind.Size16X16 | IconSizeKind.Size24X24 | IconSizeKind.Size32X32 |
                                 IconSizeKind.Size48X48 |
                                 IconSizeKind.Size64X64 | IconSizeKind.Size96X96 | IconSizeKind.Size128X128 |
@@ -13,9 +16,9 @@ public static class ImageHelper
             throw new FileNotFoundException("Source image file not found.", sourceImagePath);
         }
 
-        outputDirectory ??= Path.GetDirectoryName(sourceImagePath)!;
         string sourceFileNameWithoutExtension = Path.GetFileNameWithoutExtension(sourceImagePath);
 
+        var files = new Dictionary<Enum, string>();
         foreach (Enum enumValue in Enum.GetValues(typeof(IconSizeKind)))
         {
             if (!sizeKind.HasFlag(enumValue))
@@ -26,18 +29,41 @@ public static class ImageHelper
             string sizeInfo = enumValue.GetDescription()!;
             int width = sizeInfo.Split('x')[0].ToInt();
 
-            string resizeImagePath = Path.Combine(outputDirectory, $"{sourceFileNameWithoutExtension}_{sizeInfo}.png");
-            string targetIconPath = Path.Combine(outputDirectory, $"{sourceFileNameWithoutExtension}_{sizeInfo}.ico");
+            var tmp = FileHelper.GetTempFileName() + ".png";
+            await ResizeImageSaveAsAsync(sourceImagePath, tmp, MagickFormat.Png32, width, width);
+            files[enumValue] = tmp;
+        }
 
-            FileHelper.DeleteFileIfExist(resizeImagePath);
-            FileHelper.DeleteFileIfExist(targetIconPath);
+        if (exportKind == ExportIconKind.Merge)
+        {
+            outputDirectoryOrIconPath ??= Path.Combine(Path.GetDirectoryName(sourceImagePath)!,
+                $"{sourceFileNameWithoutExtension}.ico");
+            var images = files.Select(file => Image.FromFile(file.Value)).ToList();
+            await using (var fs = File.OpenWrite(outputDirectoryOrIconPath)) IconFactory.SavePngsAsIcon(images, fs);
+            images.ForEach(i => i.Dispose());
+            foreach (var file in files)
+            {
+                FileHelper.DeleteFileIfExist(file.Value);
+            }
+        }
+        else
+        {
+            outputDirectoryOrIconPath ??= Path.GetDirectoryName(sourceImagePath)!;
+            foreach (var file in files)
+            {
+                string sizeInfo = file.Key.GetDescription()!;
 
-            await ResizeImageSaveAsAsync(sourceImagePath, resizeImagePath, MagickFormat.Png32, width, width);
+                string targetIconPath =
+                    Path.Combine(outputDirectoryOrIconPath, $"{sourceFileNameWithoutExtension}_{sizeInfo}.ico");
 
-            using MagickImage img = new MagickImage(resizeImagePath);
-            await img.WriteAsync(targetIconPath, MagickFormat.Ico);
+                FileHelper.DeleteFileIfExist(targetIconPath);
 
-            File.Delete(resizeImagePath);
+
+                using MagickImage img = new MagickImage(file.Value);
+                await img.WriteAsync(targetIconPath, MagickFormat.Ico);
+
+                File.Delete(file.Value);
+            }
         }
     }
 
@@ -51,6 +77,12 @@ public static class ImageHelper
         image.BackgroundColor = MagickColors.Transparent;
         await image.WriteAsync(targetImagePath, imageFormat);
     }
+}
+
+public enum ExportIconKind
+{
+    Merge,
+    Separate
 }
 
 [Flags]
