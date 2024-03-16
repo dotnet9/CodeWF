@@ -7,5 +7,7 @@
     <UniformGrid Columns="3" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Button Content="测试Prism-Event" Classes="Gradient" VerticalAlignment="Stretch"
                 Command="{Binding ExecutePrismEventAsync}" />
+        <Button Content="全局异常" Classes="Gradient" VerticalAlignment="Stretch"
+                Command="{Binding ExecuteThrowExceptionAsync}" />
     </UniformGrid>
 </UserControl>

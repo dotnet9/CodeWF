@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.1.0-beta1" />
-		<PackageReference Include="Irihi.Ursa" Version="0.3.0-beta20240226" />
+		<PackageReference Include="Irihi.Ursa" Version="0.3.0-beta20240316" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -17,5 +17,11 @@
 		<ProjectReference Include="..\CodeWF.Tools.IServices\CodeWF.Tools.IServices.csproj" />
 		<ProjectReference Include="..\CodeWF.Tools.Prism\CodeWF.Tools.Prism.csproj" />
 		<ProjectReference Include="..\CodeWF.Utils\CodeWF.Utils.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\GifToImagesView.axaml.cs">
+	    <DependentUpon>GifToImagesView.axaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 </Project>

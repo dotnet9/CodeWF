@@ -17,6 +17,6 @@ public class ImageModule : IModule
 
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.RegisterSingleton(typeof(IconConverterViewModel));
+        containerRegistry.RegisterSingleton(typeof(GifToImagesViewModel));
     }
 }

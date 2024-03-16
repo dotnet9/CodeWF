@@ -30,4 +30,9 @@ public class MessageTestViewModel : ViewModelBase
         prismEvent.Publish(new TestEventParameter { Args = "ExecutePrismEventAsync" });
         return Task.CompletedTask;
     }
+
+    public Task ExecuteThrowExceptionAsync()
+    {
+        throw new Exception("这是测试抛出的异常");
+    }
 }
