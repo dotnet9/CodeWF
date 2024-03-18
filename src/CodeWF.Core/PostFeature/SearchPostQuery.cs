@@ -23,32 +23,35 @@ public class SearchPostQueryHandler(IRepository<PostEntity> repo)
         IQueryable<PostEntity> query = repo.AsQueryable()
             .Where(p => !p.IsDeleted && p.IsPublished).AsNoTracking();
 
-        string str = Regex.Replace(keyword, @"\s+", " ");
+        string str = Regex.Replace(keyword, @"\s+", " ").ToLower();
         string[] rst = str.Split(' ');
         if (rst.Length > 1)
         {
             // keyword: "dot  net rocks"
             // search for post where Title containing "dot && net && rocks"
             IQueryable<PostEntity> result =
-                rst.Aggregate(query, (current, s) => current.Where(p => p.Title.Contains(s)
-                                                                        || p.ContentAbstract.Contains(s)
-                                                                        || p.Tags.Select(t => t.DisplayName).Contains(s)
-                                                                        || p.PostCategory
-                                                                            .Select(c => c.Category!.DisplayName)
+                rst.Aggregate(query, (current, s) => current.Where(p => p.Title.ToLower().Contains(s)
+                                                                        || p.ContentAbstract.ToLower().Contains(s)
+                                                                        || p.Tags.Select(t => t.DisplayName.ToLower())
                                                                             .Contains(s)
-                                                                        || p.PostContent.Contains(s)));
+                                                                        || p.PostCategory
+                                                                            .Select(c =>
+                                                                                c.Category!.DisplayName.ToLower())
+                                                                            .Contains(s)
+                                                                        || p.PostContent.ToLower().Contains(s)));
             return result;
         }
         else
         {
             // keyword: "dotnetrocks"
             string k = rst.First();
-            IQueryable<PostEntity> result = query.Where(p => p.Title.Contains(k)
-                                                             || p.ContentAbstract!.Contains(k)
-                                                             || p.Tags.Select(t => t.DisplayName).Contains(k)
-                                                             || p.PostCategory.Select(c => c.Category!.DisplayName)
+            IQueryable<PostEntity> result = query.Where(p => p.Title.ToLower().Contains(k)
+                                                             || p.ContentAbstract!.ToLower().Contains(k)
+                                                             || p.Tags.Select(t => t.DisplayName.ToLower()).Contains(k)
+                                                             || p.PostCategory
+                                                                 .Select(c => c.Category!.DisplayName.ToLower())
                                                                  .Contains(k)
-                                                             || p.PostContent.Contains(k));
+                                                             || p.PostContent.ToLower().Contains(k));
             return result;
         }
     }
