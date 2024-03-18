@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="Edi.Captcha" Version="3.21.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CodeWF.Configuration\CodeWF.Configuration.csproj" />
-  </ItemGroup>
-</Project>
