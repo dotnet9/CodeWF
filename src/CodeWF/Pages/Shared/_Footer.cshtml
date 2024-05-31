@@ -1,0 +1,6 @@
+﻿@inject IOptions<SiteOption> SiteInfo
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; @SiteInfo.Value.Start - 2024 @SiteInfo.Value.Name - <a asp-area="" asp-page="/Privacy">隐私</a>
+    </div>
+</footer>
