@@ -39,4 +39,14 @@ public class SiteInfo
     ///     网站创建起始年份
     /// </summary>
     public int Start { get; set; }
+
+    /// <summary>
+    ///     工具网站地址
+    /// </summary>
+    public string? ToolUrl { get; set; }
+
+    /// <summary>
+    ///     博文网站地址
+    /// </summary>
+    public string? BlogPostUrl { get; set; }
 }

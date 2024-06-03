@@ -31,7 +31,9 @@ public class HomeController(
                 Owner = siteOptions.Value.Owner,
                 OwnerWeChat = siteOptions.Value.OwnerWeChat,
                 WeChatPublic = siteOptions.Value.WeChatPublic,
-                Start = siteOptions.Value.Start
+                Start = siteOptions.Value.Start,
+                ToolUrl = siteOptions.Value.ToolUrl,
+                BlogPostUrl = siteOptions.Value.BlogPostUrl
             },
             Tools = new List<ToolItem>
             {
