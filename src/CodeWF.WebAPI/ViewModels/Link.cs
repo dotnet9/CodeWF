@@ -1,4 +1,4 @@
-namespace CodeWF.WebAPI;
+namespace CodeWF.WebAPI.ViewModels;
 
 /// <summary>
 ///     ”—«È¡¥Ω”
