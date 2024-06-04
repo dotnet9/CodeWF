@@ -26,7 +26,10 @@ public class LinkController(
         if (memoryCache.TryGetValue(cacheKey, out List<Link>? links)) return links;
 
         var file = Path.Combine(siteOptions.Value.Assets!, "site", "FriendLink.json");
-        if (!System.IO.File.Exists(file)) return null;
+        if (!System.IO.File.Exists(file))
+        {
+            throw new Exception("没有数据！");
+        }
 
         var jsonContent = await System.IO.File.ReadAllTextAsync(file);
         links = JsonSerializer.Deserialize<List<Link>>(jsonContent)!;

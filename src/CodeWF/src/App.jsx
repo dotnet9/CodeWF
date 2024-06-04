@@ -98,6 +98,7 @@ function App() {
 
   const [FriendshipLink, setFriendshipLink] = useState([])
   const [correlationTool, setcorrelationTool] = useState({ tools: [], blogPosts: [], base: {} })
+  const [menu, setMenu] = useState([])
 
 
   const requestLinks = async () => {
@@ -146,7 +147,26 @@ function App() {
             {correlationTool.base.name}
           </a>
           <div className='navbarNav'>
-
+            <a href='/' className='decoration'>
+                首页
+            </a>
+            {
+              correlationTool.menu?.map((item,index) => {
+                return <Dropdown
+                key={index}
+                menu={{
+                  items
+                }}
+              >
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    分类
+                    <DownOutlined />
+                  </Space>
+                </a>
+              </Dropdown>
+              })
+            }
             <Dropdown
               menu={{
                 items,
@@ -160,31 +180,9 @@ function App() {
               </a>
             </Dropdown>
 
-            <a onClick={showDrawer} className='decoration'>
-              标签
+            <a href='/about' className='decoration'>
+              关于
             </a>
-
-            <a className='decoration'>
-              归档
-            </a>
-            <a className='decoration'>
-              ABout
-            </a>
-          </div>
-          <div className='navbarSearch'>
-
-            <Popover
-              content={<a onClick={hide}>Close</a>}
-              title="Title"
-              trigger="click"
-              open={PopoverState}
-              onOpenChange={handleOpenChange}
-            >
-              <Space.Compact>
-                <Search placeholder="input search text" allowClear />
-              </Space.Compact>
-            </Popover>
-
           </div>
         </div>
 
@@ -278,7 +276,9 @@ function App() {
           <div className='footerLeft'>
             <div className='iconBox'>
               <img src={logo} />
-              dotnet9
+              {
+                correlationTool.base.name
+              }
             </div>
 
             <div className='iconInfo'>
@@ -287,13 +287,6 @@ function App() {
               }
             </div>
 
-            <div className='emallBox'>
-              <p>Contact blogger</p>
-              <Space.Compact>
-                <Input placeholder="input search text" allowClear />
-                <Button type="primary" className='basicBtnColor'>Submit</Button>
-              </Space.Compact>
-            </div>
             <div className='copyright'> 本站由 .NET 9.0 + Vue 3.0 强力驱动！| ©Copyright {correlationTool.base.owner} 保留所有权利</div>
 
 
@@ -304,7 +297,7 @@ function App() {
               <h5>友情链接：</h5>
               <div className='footerList'>
                 {
-                  FriendshipLink.map((item) => {
+                  FriendshipLink.map((item, index) => {
                     return <p key={item.rank} className='footerP'>{item.title}</p>
                   })
                 }
@@ -316,17 +309,27 @@ function App() {
 
           <div>
             <p className='footerP'>
-              Contact Us
+              联系
             </p>
+            <img style={{ marginTop: "40px" }} width={"150px"} src={correlationTool.base.ownerWeChat} />
             <div className='address decoration'>
-              email@dotnet9.com
+              微信号：codewf
             </div>
+            
+            <p className='footerP'>
+              公众号
+            </p>
+            {
+              correlationTool.base.weChatPublic?.map((item, index) => {
+                return <div>
+                  <img style={{ marginTop: "40px" }} width={"150px"} src={item.qrCode} />
+                  <div style={{ color: "#ccc", marginTop: "10px" }}>
+                    {item.name}
+                  </div>
+                </div>
+              })
+            }
 
-            <img style={{ marginTop: "40px" }} width={"150px"} src={QRCode_icon} />
-
-            <div style={{ color: "#ccc", marginTop: "10px" }}>
-              微信号
-            </div>
 
           </div>
 

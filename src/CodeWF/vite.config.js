@@ -14,7 +14,6 @@ export default defineConfig({
       '/api': {
         target: 'https://dotnet9.com', // 目标服务器地址"http://localhost:5100",//
         changeOrigin: true, // 是否改变源地址
-        rewrite: (path) => path.replace(/^\/api/, ''), // 重写路径
       },
     },
   },

@@ -10,6 +10,11 @@ public class SiteBase
     public SiteInfo? Base { get; set; }
 
     /// <summary>
+    /// 菜单
+    /// </summary>
+    public List<MenuItem>? Menu { get; set; }
+
+    /// <summary>
     ///     推荐工具
     /// </summary>
     public List<ToolItem>? Tools { get; set; }

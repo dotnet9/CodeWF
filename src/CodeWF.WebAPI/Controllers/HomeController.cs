@@ -21,7 +21,10 @@ public class HomeController(
     [HttpGet(Name = "GetBase")]
     public async Task<SiteBase?> GetAsync()
     {
-        var baseInfo = new SiteBase
+        const string cacheKey = $"{nameof(HomeController)}_{nameof(GetAsync)}";
+        if (memoryCache.TryGetValue(cacheKey, out SiteBase? baseInfo)) return baseInfo;
+
+        baseInfo = new SiteBase
         {
             Base = new SiteInfo
             {
@@ -36,33 +39,95 @@ public class HomeController(
                 ToolUrl = siteOptions.Value.ToolUrl,
                 BlogPostUrl = siteOptions.Value.BlogPostUrl
             },
+            Menu=new List<MenuItem> { 
+                new MenuItem{ 
+                    Name="在线工具",
+                    Children=new List<MenuItem>
+                    {
+                        new()
+                        {
+                            Name = "二维码生成器",
+                            Url = "https://tools.dotnet9.com/qrcode-generator",
+                        },
+
+                        new()
+                        {
+                            Name = "日期时间转换器", 
+                            Url = "https://tools.dotnet9.com/date-converter",
+                        },
+
+                        new()
+                        {
+                            Name = "整数基转换器", 
+                            Url = "https://tools.dotnet9.com/base-converter",
+                        },
+                        new()
+                        {
+                            Name = "打乱字符串", 
+                            Url = "https://tools.dotnet9.com/slugify-string",
+                        }
+                    }
+                },
+                new MenuItem{
+                    Name="博客",
+                    Children=new List<MenuItem>{
+                        new(){ 
+                            Name=".NET",
+                            Url="https://blog.dotnet9.com/category/dotnet"
+                        },new(){ 
+                            Name="分享",
+                            Url="https://blog.dotnet9.com/category/share"
+                        },
+                        new(){
+                            Name="更多语言",
+                            Url="https://blog.dotnet9.com/category/morelanguage"
+                        },
+                        new(){
+                            Name="课程",
+                            Url="https://blog.dotnet9.com/category/course"
+                        },
+                        new(){
+                            Name="前端",
+                            Url="https://blog.dotnet9.com/category/frontend"
+                        },
+                        new(){
+                            Name="数据库",
+                            Url="https://blog.dotnet9.com/category/database"
+                        },
+                        new(){
+                            Name="Python",
+                            Url="https://blog.dotnet9.com/category/python"
+                        },
+                    }
+                },
+            },
             Tools = new List<ToolItem>
             {
                 new()
                 {
                     Name = "二维码生成器", Memo = "生成并下载url或文本的QR代码，并自定义背景和前景颜色。",
                     Url = "https://tools.dotnet9.com/qrcode-generator",
-                    Cover = "https://img1.dotnet9.com/site/wechatpublic.jpg"
+                    Cover = "https://img1.dotnet9.com/site/tools/qrcode-generator.png"
                 },
 
                 new()
                 {
                     Name = "日期时间转换器", Memo = "将日期和时间转换为各种不同的格式",
                     Url = "https://tools.dotnet9.com/date-converter",
-                    Cover = "https://img1.dotnet9.com/site/wechatpublic.jpg"
+                    Cover = "https://img1.dotnet9.com/site/tools/date-converter.png"
                 },
 
                 new()
                 {
                     Name = "整数基转换器", Memo = "在不同的基数（十进制、十六进制、二进制、八进制、base64…）之间转换数字",
                     Url = "https://tools.dotnet9.com/base-converter",
-                    Cover = "https://img1.dotnet9.com/site/wechatpublic.jpg"
+                    Cover = "https://img1.dotnet9.com/site/tools/base-converter.png"
                 },
                 new()
                 {
                     Name = "打乱字符串", Memo = "确保字符串 url、文件名和 id 安全。",
                     Url = "https://tools.dotnet9.com/slugify-string",
-                    Cover = "https://img1.dotnet9.com/site/wechatpublic.jpg"
+                    Cover = "https://img1.dotnet9.com/site/tools/slugify-string.png"
                 }
             },
             BlogPosts = new List<BlogPostItem>
@@ -104,6 +169,7 @@ public class HomeController(
             }
         };
 
+        memoryCache.Set(cacheKey, baseInfo);
         return baseInfo;
     }
 }

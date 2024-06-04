@@ -1,4 +1,6 @@
-﻿namespace CodeWF.WebAPI.Options;
+﻿using CodeWF.WebAPI.ViewModels;
+
+namespace CodeWF.WebAPI.Options;
 
 /// <summary>
 ///     网站基本信息
@@ -38,7 +40,7 @@ public class SiteInfo
     /// <summary>
     ///     网站公众号
     /// </summary>
-    public string[]? WeChatPublic { get; set; }
+    public List<WeChatPublic>? WeChatPublic { get; set; }
 
     /// <summary>
     ///     网站创建起始年份
