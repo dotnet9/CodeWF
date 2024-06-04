@@ -16,6 +16,11 @@ public class SiteInfo
     public string? Memo { get; set; }
 
     /// <summary>
+    /// 特色关键字
+    /// </summary>
+    public string[]? FeatureKeywords { get; set; }
+
+    /// <summary>
     ///     网站Logo
     /// </summary>
     public string? Logo { get; set; }

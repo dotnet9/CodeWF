@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace CodeWF.WebAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class LinkController(
     ILogger<LinkController> logger,
     IOptions<SiteOption> siteOptions,

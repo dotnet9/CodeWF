@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 namespace CodeWF.WebAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class HomeController(
     ILogger<HomeController> logger,
     IOptions<SiteOption> siteOptions,
@@ -27,6 +27,7 @@ public class HomeController(
             {
                 Name = siteOptions.Value.Name,
                 Memo = siteOptions.Value.Memo,
+                FeatureKeywords = siteOptions.Value.FeatureKeywords,
                 Logo = siteOptions.Value.Logo,
                 Owner = siteOptions.Value.Owner,
                 OwnerWeChat = siteOptions.Value.OwnerWeChat,

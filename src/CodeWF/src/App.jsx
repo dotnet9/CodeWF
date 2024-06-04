@@ -1,14 +1,9 @@
-
-
-
 import { Button, ConfigProvider, Row, Col, Dropdown, Space, Drawer, Input, Popover, QRCode } from 'antd';
 import { TinyColor } from '@ctrl/tinycolor';
 import { useState, useEffect } from 'react';
 import { DownOutlined, GithubFilled, RobotFilled, MergeFilled, Html5Filled, DatabaseFilled, ProductFilled, } from '@ant-design/icons';
 import './index.scss'
 import './antDesign.scss'
-
-
 import { getHomeLinks, getHomeTool } from "@/services/Home";
 
 //img
@@ -17,29 +12,13 @@ import logo from "./assets/avatar.png";
 import hero from "./assets/hero-bg.png";
 import QRCode_icon from "./assets/wechatpublic.jpg";
 
-
-
-
-
-
-
-
 const { Search } = Input;
 const colors1 = ['#6253E1', '#04BEFE'];
 const getHoverColors = (colors) =>
   colors.map((color) => new TinyColor(color).lighten(5).toString());
 
-
-
 const getActiveColors = (colors) =>
   colors.map((color) => new TinyColor(color).darken(5).toString());
-
-
-
-
-
-
-
 
 function App() {
 
@@ -48,10 +27,6 @@ function App() {
     requestLinks()
     requestTool()
   }, [])
-
-
-
-  const arrayList = ['在线工具', '博客文章', '开源分享', '小栖息']
 
   const items = [
     {
@@ -156,6 +131,10 @@ function App() {
     setPopoverState(newOpen);
   };
 
+  const openNewLink = (link) => {
+    window.open(link, '_blank');
+  }
+
 
 
   return (
@@ -230,10 +209,10 @@ function App() {
                   },
                 }}
               >
-                <Button type="primary" size="large">
+                <Button type="primary" size="large" onClick={openNewLink(correlationTool.base.toolUrl)}>
                   在线工具
                 </Button>
-                <Button type="primary" size="large">
+                <Button type="primary" size="large" onClick={openNewLink(correlationTool.base.blogPostUrl)}>
                   浏览博客
                 </Button>
               </ConfigProvider>
@@ -248,7 +227,7 @@ function App() {
               </div>
               <div className='Content'>
                 {
-                  arrayList.map((item,index) => {
+                  correlationTool.base.featureKeywords?.map((item,index) => {
                     return <div className='Box' key={index}>
                       <span>{item}</span>
                     </div>
@@ -315,7 +294,7 @@ function App() {
                 <Button type="primary" className='basicBtnColor'>Submit</Button>
               </Space.Compact>
             </div>
-            <div className='copyright'>© All rights reserved. Made by Createx Studio</div>
+            <div className='copyright'> 本站由 .NET 9.0 + Vue 3.0 强力驱动！| ©Copyright {correlationTool.base.owner} 保留所有权利</div>
 
 
           </div>
