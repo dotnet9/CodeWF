@@ -1,0 +1,28 @@
+.ant-dropdown .ant-dropdown-menu {
+    background-color: #182035;
+
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: #fff;
+    top: 5px;
+
+    .ant-dropdown-menu-item {
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+}
+
+
+
+.navbarSearch {
+    .ant-input-search-button {
+        color: #fff !important;
+        background: #6366f1;
+
+        &:hover {
+            color: #fff !important;
+            background: #6366f1 !important;
+            border-color: #6366f1 !important
+        }
+    }
+}
