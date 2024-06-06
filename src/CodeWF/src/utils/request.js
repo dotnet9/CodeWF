@@ -1,32 +1,25 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const baseURL = '/';
-
+const baseURL = "/";
 
 const instance = axios.create({
-    baseURL,
-    timeout: 1000 * 60 * 1000,
+  baseURL,
+  timeout: 1000 * 60 * 1000,
 });
 
-
-instance.interceptors.request.use(config => {
-
-    /** */
-    return config;
+instance.interceptors.request.use((config) => {
+  /** */
+  return config;
 });
-
 
 instance.interceptors.response.use(
-    response => {
-        return response.data;
-    },
-    r => {
-        let resultError = { response: r };
+  (response) => {
+    return response.data;
+  },
+  (r) => {
+    let resultError = { response: r };
 
-        return Promise.reject(resultError);
-    },
+    return Promise.reject(resultError);
+  }
 );
-export default instance
-
-
+export default instance;

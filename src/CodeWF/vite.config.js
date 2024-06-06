@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://dotnet9.com', // 目标服务器地址"http://localhost:5100",//
+        target: 'https://codewf.com', // 目标服务器地址"http://localhost:5100",//
         changeOrigin: true, // 是否改变源地址
       },
     },

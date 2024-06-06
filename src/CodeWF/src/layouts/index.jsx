@@ -1,15 +1,3 @@
-
-
-
-
-
-
 function Layout() {
-
-    return (
-        <div>
-
-        </div>
-    )
-
+  return <div></div>;
 }
