@@ -1,18 +1,14 @@
 import { Button, ConfigProvider, Row, Col, Dropdown, Space, Drawer, Input, Popover, QRCode } from 'antd';
 import { TinyColor } from '@ctrl/tinycolor';
 import { useState, useEffect } from 'react';
-import { DownOutlined, GithubFilled, RobotFilled, MergeFilled, Html5Filled, DatabaseFilled, ProductFilled, } from '@ant-design/icons';
 import './index.scss'
 import './antDesign.scss'
-import { getHomeLinks, getHomeTool } from "@/services/Home";
+import { getHomeTool } from "@/services/Home";
 
-//img
 
-import logo from "./assets/avatar.png";
+
 import hero from "./assets/hero-bg.png";
-import QRCode_icon from "./assets/wechatpublic.jpg";
 
-const { Search } = Input;
 const colors1 = ['#6253E1', '#04BEFE'];
 const getHoverColors = (colors) =>
   colors.map((color) => new TinyColor(color).lighten(5).toString());
@@ -20,173 +16,34 @@ const getHoverColors = (colors) =>
 const getActiveColors = (colors) =>
   colors.map((color) => new TinyColor(color).darken(5).toString());
 
+
+
+import Head from '@/layouts/component/head/index';
+import Footer from '@/layouts/component/footer/index';
+import Links from './Links';
+import { openNewLink } from "@/utils/publicMethod";
+
+
+
 function App() {
 
-
   useEffect(() => {
-    requestLinks()
     requestTool()
   }, [])
 
-  const items = [
-    {
-      key: '1',
-      label: (
-        <span>
-          .NET
-        </span>
-      ),
-      icon: <GithubFilled />,
-    },
-    {
-      key: '2',
-      label: (
-        <span>
-          分享
-        </span>
-      ),
-      icon: <MergeFilled />
-    },
-    {
-      key: '3',
-      label: (
-        <span>
-          更多语言
-        </span>
-      ),
-      icon: <ProductFilled />
-    },
-    {
-      key: '3',
-      label: (
-        <span>
-          课程
-        </span>
-      ),
-      icon: <DatabaseFilled />
-    },
-    {
-      key: '3',
-      label: (
-        <span>
-          前端
-        </span>
-      ),
-      icon: <Html5Filled />,
-    },
-    {
-      key: '3',
-      label: (
-        <span>
-          数据库
-        </span>
-      ),
-      icon: <MergeFilled />
-    },
-    {
-      key: '3',
-      label: (
-        <span>
-          Python
-        </span>
-      ),
-      icon: <RobotFilled />
-    },
-
-  ];
-
-
-  const [FriendshipLink, setFriendshipLink] = useState([])
   const [correlationTool, setcorrelationTool] = useState({ tools: [], blogPosts: [], base: {} })
-  const [menu, setMenu] = useState([])
-
-
-  const requestLinks = async () => {
-    let data = await getHomeLinks()
-    FriendshipLink.length = 0
-    setFriendshipLink([...data])
-  }
-
   const requestTool = async () => {
     let data = await getHomeTool()
     setcorrelationTool(data)
+
   }
 
-  const [open, setOpen] = useState(false);
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  const [PopoverState, setPopoverState] = useState(false);
-
-
-  const hide = () => {
-    setPopoverState(false);
-  };
-
-  const handleOpenChange = (newOpen) => {
-    setPopoverState(newOpen);
-  };
-
-  const openNewLink = (link) => {
-    window.open(link, '_blank');
-  }
 
 
 
   return (
     <div className="App">
-      <header>
-        <div className='header basicLayout basicContent'>
-          <a className='iconBox'>
-            <img src={correlationTool.base.logo} />
-            {correlationTool.base.name}
-          </a>
-          <div className='navbarNav'>
-            <a href='/' className='decoration'>
-                首页
-            </a>
-            {
-              correlationTool.menu?.map((item,index) => {
-                return <Dropdown
-                key={index}
-                menu={{
-                  items
-                }}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <Space>
-                    分类
-                    <DownOutlined />
-                  </Space>
-                </a>
-              </Dropdown>
-              })
-            }
-            <Dropdown
-              menu={{
-                items,
-              }}
-            >
-              <a onClick={(e) => e.preventDefault()}>
-                <Space>
-                  分类
-                  <DownOutlined />
-                </Space>
-              </a>
-            </Dropdown>
-
-            <a href='/about' className='decoration'>
-              关于
-            </a>
-          </div>
-        </div>
-
-      </header>
+      <Head base={correlationTool.base} menu={correlationTool.menu} />
 
 
       <div className='Carousel'>
@@ -207,10 +64,10 @@ function App() {
                   },
                 }}
               >
-                <Button type="primary" size="large" onClick={openNewLink(correlationTool.base.toolUrl)}>
+                <Button type="primary" size="large" onClick={() => { openNewLink(correlationTool.base.toolUrl) }}>
                   在线工具
                 </Button>
-                <Button type="primary" size="large" onClick={openNewLink(correlationTool.base.blogPostUrl)}>
+                <Button style={{ marginLeft: "2rem" }} type="primary" size="large" onClick={() => { openNewLink(correlationTool.base.blogPostUrl) }}>
                   浏览博客
                 </Button>
               </ConfigProvider>
@@ -225,7 +82,7 @@ function App() {
               </div>
               <div className='Content'>
                 {
-                  correlationTool.base.featureKeywords?.map((item,index) => {
+                  correlationTool.base.featureKeywords?.map((item, index) => {
                     return <div className='Box' key={index}>
                       <span>{item}</span>
                     </div>
@@ -269,90 +126,19 @@ function App() {
         </div>
       </div>
 
+      <Links />
 
-
-      <footer>
-        <div className='footer basicLayout basicContent'>
-          <div className='footerLeft'>
-            <div className='iconBox'>
-              <img src={logo} />
-              {
-                correlationTool.base.name
-              }
-            </div>
-
-            <div className='iconInfo'>
-              {
-                correlationTool.base.memo
-              }
-            </div>
-
-            <div className='copyright'> 本站由 .NET 9.0 + Vue 3.0 强力驱动！| ©Copyright {correlationTool.base.owner} 保留所有权利</div>
-
-
-          </div>
-
-          <div className='footerContent'>
-            <div>
-              <h5>友情链接：</h5>
-              <div className='footerList'>
-                {
-                  FriendshipLink.map((item, index) => {
-                    return <p key={item.rank} className='footerP'>{item.title}</p>
-                  })
-                }
-
-              </div>
-            </div>
-
-          </div>
-
-          <div>
-            <p className='footerP'>
-              联系
-            </p>
-            <img style={{ marginTop: "40px" }} width={"150px"} src={correlationTool.base.ownerWeChat} />
-            <div className='address decoration'>
-              微信号：codewf
-            </div>
-            
-            <p className='footerP'>
-              公众号
-            </p>
-            {
-              correlationTool.base.weChatPublic?.map((item, index) => {
-                return <div>
-                  <img style={{ marginTop: "40px" }} width={"150px"} src={item.qrCode} />
-                  <div style={{ color: "#ccc", marginTop: "10px" }}>
-                    {item.name}
-                  </div>
-                </div>
-              })
-            }
-
-
-          </div>
+      <Footer base={correlationTool.base} />
 
 
 
-        </div>
-
-      </footer>
 
 
-      <Drawer title="Basic Drawer" onClose={onClose} open={open}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Drawer>
+
     </div >
-
-
 
   );
 }
-
-
 
 
 

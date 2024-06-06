@@ -94,7 +94,6 @@ body {
                 color: #6366f1;
                 font-size: 4.5rem;
                 display: inline-block;
-                margin-left: 1rem;
             }
         }
 
@@ -212,7 +211,7 @@ body {
 
 
 .header {
-
+    justify-content: space-between;
     top: 0;
     left: 0;
     z-index: 1030;
@@ -247,19 +246,33 @@ body {
     display: flex;
     flex-wrap: inherit;
     align-items: center;
-    justify-content: space-between;
 
 }
 
+footer {
+
+    background-color: #0b0f19;
+
+    .copyright {
+        opacity: 0.5;
+        color: #fff;
+        font-size: 0.75rem;
+        text-align: left;
+        margin-top: 3rem;
+        text-align: center;
+        height: 40px;
+        line-height: 40px;
+        border-top: 1px solid #fff;
+    }
+}
 
 .footer {
-    background-color: #0b0f19;
     margin-top: 3rem;
     align-items: normal;
 
 
     .footerLeft {
-        width: 23%;
+        width: 67%;
 
         .iconBox {
             margin-bottom: 1.5rem;
@@ -290,57 +303,80 @@ body {
     }
 
 
-    .copyright {
-        opacity: 0.5;
-        color: #fff;
-        font-size: 0.75rem;
-        text-align: left;
-        margin-top: 3rem;
-    }
 
-    .footerP {
-        color: #fff;
-        padding-top: .5rem;
-        padding-bottom: 1rem;
-        font-size: 1rem;
-        cursor: pointer;
-        font-weight: bold;
 
-        &:hover {
-            color: #6366f1;
-        }
 
-        margin-right: .7rem;
-    }
 
-    .footerContent {
-        display: flex;
-        width: 55%;
-        margin: 0 5rem;
+    // .address {
+    //     color: #6366f1;
+    //     font-weight: bold;
+    //     border-color: #6366f1;
+    // }
 
-        h5 {
-            font-size: 1.2rem;
-            color: #fff;
-            border-bottom: 1px solid #fff;
-            padding-bottom: .3rem;
-            margin-bottom: .75rem;
-        }
-
-        .footerList {
+    .footerRight {
+        .footerRightBox {
             display: flex;
-            flex-wrap: wrap;
-
 
         }
 
+        .QRCodeBpx {
+            text-align: center;
+            color: #fff;
+            margin-right: 6rem;
+
+            div {
+                margin-top: .5rem;
+            }
+
+            img {
+                width: 150px;
+
+            }
+        }
+    }
+
+
+
+}
+
+
+
+.linkContent {
+    display: flex;
+
+    h5 {
+        font-size: 1.5rem;
+        color: #565973;
+        border-bottom: 1px solid #565973;
+        padding-bottom: .3rem;
+        margin-bottom: .75rem;
+    }
+
+    .footerList {
+        display: flex;
+        flex-wrap: wrap;
+
+        p {
+            color: #565973;
+            transition-duration: 0.3s;
+            padding-top: .5rem;
+            padding-bottom: 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 1rem;
+
+            &:hover {
+                color: #6366f1;
+                transform: translateY(-8px);
+
+            }
+        }
 
     }
 
-    .address {
-        color: #6366f1;
-        font-weight: bold;
-        border-color: #6366f1;
-    }
+
+
 }
 
 
@@ -363,7 +399,7 @@ body {
             width: 306px;
             margin-right: 24px;
             padding: 3rem 1.5rem;
-
+            cursor: pointer;
             img {
                 width: 40px;
                 margin-bottom: 1rem;
@@ -371,19 +407,29 @@ body {
 
             .title {
                 color: #0b0f19;
-                font-size: 1.5rem;
+                font-size: 1rem;
                 margin-bottom: 1rem;
                 font-weight: bold;
+                overflow: hidden;
+                -webkit-line-clamp: 1;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
             }
 
             .content {
                 color: #565973;
-                font-size: 1rem;
+                font-size: .8rem;
                 line-height: 1.6;
                 overflow: hidden;
-                -webkit-line-clamp: 4;
+                -webkit-line-clamp: 2;
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
+            }
+
+            transition-duration: 0.3s;
+
+            &:hover {
+                box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.5);
             }
         }
     }
