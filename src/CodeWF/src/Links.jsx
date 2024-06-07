@@ -1,23 +1,10 @@
 import { changeAllLinksAction } from "@/store/actionCreactors";
 import { useSelector, useDispatch } from "react-redux";
-// import { connect } from 'react-redux';
 
 import { getHomeLinks } from "@/services/Home";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { openNewLink } from "@/utils/publicMethod";
-
-// const mapStateToProps = (state) => {
-//     return {
-//         AllLinks: state.AllLinks
-//     }
-// }
-
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         changeAllLinks: (e) => { dispatch(changeAllLinksAction(e)) }
-//     }
-// }
 
 function Links() {
   const AllLinks = useSelector((state) => state.AllLinks);

@@ -57,11 +57,7 @@ function head({ base, menuItems }) {
           {base.name}
         </a>
         <div className="navbarNav">
-          <div className="responsiveBox">
-            Light&nbsp;&nbsp;
-            <Switch checked={theme} onChange={onChange} />
-            &nbsp;&nbsp;Dark
-          </div>
+          
           <a href="/" className="decoration">
             首页
           </a>
@@ -82,6 +78,12 @@ function head({ base, menuItems }) {
           <a href="/about" className="decoration">
             关于
           </a>
+
+          <div className="responsiveBox">
+            Light&nbsp;&nbsp;
+            <Switch checked={theme} onChange={onChange} />
+            &nbsp;&nbsp;Dark
+          </div>
         </div>
       </div>
     </header>
