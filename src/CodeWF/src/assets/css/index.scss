@@ -51,7 +51,9 @@ body {
 
 
 .basicContent {
-    padding: 2rem 13rem !important;
+    // padding: 2rem 13rem;
+    padding-left: 13rem;
+    padding-right: 13rem;
 }
 
 
@@ -77,7 +79,9 @@ body {
 
 .Carousel {
     background-color: #0b0f19;
-    padding: 200px 0;
+    padding: 200px 13rem;
+    display: flex;
+    justify-content: space-between;
 
     .CarouselLeft {
         h1 {
@@ -107,7 +111,8 @@ body {
     }
 
     .CarouselRight {
-        width: 100%;
+        width: 38%;
+        margin-right: 10rem;
         position: relative;
 
         .Content {
@@ -218,7 +223,7 @@ body {
     width: 100%;
     position: absolute;
     box-shadow: 0 .275rem 1.25rem rgba(11, 15, 25, .05), 0 .25rem .5625rem rgba(11, 15, 25, .03);
-    padding: 0.5rem 0;
+    padding-top: 1rem;
 
 
 
@@ -226,6 +231,11 @@ body {
     .navbarNav {
 
         display: flex;
+
+        .responsiveBox {
+            color: #fff;
+            margin-right: 1rem;
+        }
 
         >a {
             justify-content: center;
@@ -269,7 +279,10 @@ footer {
 .footer {
     margin-top: 3rem;
     align-items: normal;
-
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    padding-top: 1rem;
+    border-top: 1px solid #fff;
 
     .footerLeft {
         width: 67%;
@@ -342,11 +355,12 @@ footer {
 
 .linkContent {
     display: flex;
+    margin-top: 3rem;
 
     h5 {
         font-size: 1.5rem;
-        color: #565973;
-        border-bottom: 1px solid #565973;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--text-color);
         padding-bottom: .3rem;
         margin-bottom: .75rem;
     }
@@ -356,7 +370,7 @@ footer {
         flex-wrap: wrap;
 
         p {
-            color: #565973;
+            color: var(--text-color);
             transition-duration: 0.3s;
             padding-top: .5rem;
             padding-bottom: 1rem;
@@ -381,7 +395,7 @@ footer {
 
 .main {
     text-align: center;
-    color: #000;
+    color: var(--text-color);
 
     h4 {
         font-size: 2.5rem;
@@ -399,6 +413,7 @@ footer {
             margin-right: 24px;
             padding: 3rem 1.5rem;
             cursor: pointer;
+
             img {
                 width: 40px;
                 margin-bottom: 1rem;
@@ -416,7 +431,7 @@ footer {
             }
 
             .content {
-                color: #565973;
+                color: var(--text-color);
                 font-size: .8rem;
                 line-height: 1.6;
                 overflow: hidden;
@@ -426,9 +441,8 @@ footer {
             }
 
             transition-duration: 0.3s;
-
             &:hover {
-                box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 20px 20px -10px var(--hover-color);
             }
         }
     }

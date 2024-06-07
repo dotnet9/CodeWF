@@ -6,10 +6,7 @@ import {
 } from "antd";
 import { TinyColor } from "@ctrl/tinycolor";
 import { useState, useEffect } from "react";
-import "./index.scss";
-import "./antDesign.scss";
 import { getHomeTool } from "@/services/Home";
-
 import hero from "./assets/hero-bg.png";
 
 const colors1 = ["#6253E1", "#04BEFE"];
@@ -43,73 +40,68 @@ function App() {
     <div className="App">
       <Head base={correlationTool.base} menuItems={correlationTool.menu} />
 
-      <div className="Carousel">
-        <Row>
-          <Col span={6} offset={4}>
-            <div className="CarouselLeft">
-              <h1>
-                <span>{correlationTool.base.name}</span>{" "}
-              </h1>
-              <p>{correlationTool.base.memo}</p>
-              <ConfigProvider
-                theme={{
-                  components: {
-                    Button: {
-                      colorPrimary: `linear-gradient(135deg, ${colors1.join(
-                        ", "
-                      )})`,
-                      colorPrimaryHover: `linear-gradient(135deg, ${getHoverColors(
-                        colors1
-                      ).join(", ")})`,
-                      colorPrimaryActive: `linear-gradient(135deg, ${getActiveColors(
-                        colors1
-                      ).join(", ")})`,
-                      lineWidth: 0,
-                    },
-                  },
-                }}
-              >
-                <Button
-                  type="primary"
-                  size="large"
-                  onClick={() => {
-                    openNewLink(correlationTool.base.toolUrl);
-                  }}
-                >
-                  在线工具
-                </Button>
-                <Button
-                  style={{ marginLeft: "2rem" }}
-                  type="primary"
-                  size="large"
-                  onClick={() => {
-                    openNewLink(correlationTool.base.blogPostUrl);
-                  }}
-                >
-                  浏览博客
-                </Button>
-              </ConfigProvider>
+      <div className="Carousel basicContent">
+        <div className="CarouselLeft">
+          <h1>
+            <span>{correlationTool.base.name}</span>{" "}
+          </h1>
+          <p>{correlationTool.base.memo}</p>
+          <ConfigProvider
+            theme={{
+              components: {
+                Button: {
+                  colorPrimary: `linear-gradient(135deg, ${colors1.join(
+                    ", "
+                  )})`,
+                  colorPrimaryHover: `linear-gradient(135deg, ${getHoverColors(
+                    colors1
+                  ).join(", ")})`,
+                  colorPrimaryActive: `linear-gradient(135deg, ${getActiveColors(
+                    colors1
+                  ).join(", ")})`,
+                  lineWidth: 0,
+                },
+              },
+            }}
+          >
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => {
+                openNewLink(correlationTool.base.toolUrl);
+              }}
+            >
+              在线工具
+            </Button>
+            <Button
+              style={{ marginLeft: "2rem" }}
+              type="primary"
+              size="large"
+              onClick={() => {
+                openNewLink(correlationTool.base.blogPostUrl);
+              }}
+            >
+              浏览博客
+            </Button>
+          </ConfigProvider>
+        </div>
+
+        <div className="CarouselRight">
+          <div className="Masking">
+            <div>
+              <img src={hero} />
             </div>
-          </Col>
-          <Col span={7} offset={3}>
-            <div className="CarouselRight">
-              <div className="Masking">
-                <div>
-                  <img src={hero} />
+          </div>
+          <div className="Content">
+            {correlationTool.base.featureKeywords?.map((item, index) => {
+              return (
+                <div className="Box" key={index}>
+                  <span>{item}</span>
                 </div>
-              </div>
-              <div className="Content">
-                {correlationTool.base.featureKeywords?.map((item, index) => {
-                  return (
-                    <div className="Box" key={index}>
-                      <span>{item}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Col>
-        </Row>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="basicContent main">

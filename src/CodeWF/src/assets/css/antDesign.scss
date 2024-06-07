@@ -26,3 +26,11 @@
         }
     }
 }
+
+:where(.css-dev-only-do-not-override-3rel02).ant-switch.ant-switch-checked {
+    background: #6366f1 !important
+}
+
+.ant-switch {
+    border: 1px solid #fff;
+}

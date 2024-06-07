@@ -1,0 +1,39 @@
+@media (max-width: 998px) {
+    .basicContent {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        // display: block;
+        text-align: center;
+        flex-wrap: wrap;
+        padding-bottom: 2rem;
+    }
+
+
+    .CarouselLeft {
+        width: 100%;
+
+        p,
+        h1 {
+            text-align: center !important;
+        }
+    }
+
+    .CarouselRight {
+
+        width: 90% !important;
+        margin: 0 auto !important;
+        margin-top: 2rem !important;
+
+        .Masking>div {
+            width: 81% !important;
+
+            img {
+                width: 100% !important;
+            }
+        }
+    }
+
+    .iconBox {
+        justify-content: center;
+    }
+}
