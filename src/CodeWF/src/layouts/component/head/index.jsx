@@ -77,7 +77,7 @@ function head({ base, menuItems }) {
             </Dropdown>
           ))}
 
-          <Link to="/Home/about" className="decoration">
+          <Link to="/about" className="decoration">
             关于
           </Link>
 
