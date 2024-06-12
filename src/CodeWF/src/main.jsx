@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
 
 import "@/assets/css/index.scss";
 import "@/assets/css/index.css";
@@ -20,14 +19,10 @@ console.log(Routes, 'Routes');
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 
-  <React.StrictMode>
-    {/* <RouterProvider router={Routes}>
-      <Provider store={storeData}>
-        <App />
-      </Provider>
-    </RouterProvider> */}
-    <Provider store={storeData}>
-      <App />
-    </Provider>
-  </React.StrictMode>
+  <Provider store={storeData}>
+    <React.StrictMode>
+      <RouterProvider router={Routes}>
+      </RouterProvider>
+    </React.StrictMode>
+  </Provider>
 );

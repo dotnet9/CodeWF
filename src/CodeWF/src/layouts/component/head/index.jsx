@@ -1,6 +1,8 @@
 import { Dropdown, Space, Switch } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { Link, Outlet } from "react-router-dom";
+
 
 function converMenu(menuItems) {
   let formatMenuItems = menuItems.map((menuItem, index) => {
@@ -57,10 +59,10 @@ function head({ base, menuItems }) {
           {base.name}
         </a>
         <div className="navbarNav">
-          
-          <a href="/" className="decoration">
+
+        <Link to="/home" className="decoration">
             首页
-          </a>
+          </Link>
           {menuItems?.map((menuItem, index) => (
             <Dropdown
               key={index}
@@ -75,9 +77,9 @@ function head({ base, menuItems }) {
             </Dropdown>
           ))}
 
-          <a href="/about" className="decoration">
+          <Link to="/Home/about" className="decoration">
             关于
-          </a>
+          </Link>
 
           <div className="responsiveBox">
             Light&nbsp;&nbsp;

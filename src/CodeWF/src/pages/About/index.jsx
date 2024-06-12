@@ -2,10 +2,11 @@ import {NavLink,useRoutes} from 'react-router-dom'
 
 
 function App() {
-    const element = useRoutes(routes)
+    // const element = useRoutes(routes)
     return (
         <div>
-            {element}
+            {/* {element} */}
+            998
         </div>
     )
 }

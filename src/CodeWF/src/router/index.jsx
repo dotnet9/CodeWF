@@ -3,20 +3,31 @@ import { createBrowserRouter } from 'react-router-dom'
 
 import About from '@/pages/About/index'
 import Home from '@/pages/Home/index'
-// import Home from '@/pages/Home/index'
-
-import App from '../App'
+import Layouts from '@/layouts/index'
 
 const router = createBrowserRouter(
     [
         {
-            path: '/',
-            element: <Home />
+            path: '/Home',
+            element: <Layouts />,
+            children: [
+                {
+                    path: '/Home',
+                    
+                    element: <Home />
+                },
+                {
+                    path: '/Home/About',
+                    element: <About />
+                },
+            ]
         },
         {
-            path: '/About',
-            element: <About />
-        }
+            path: '/',
+            element: <Layouts />,
+    
+        },
+
     ]
 )
 
