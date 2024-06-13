@@ -8,11 +8,11 @@ import Layouts from '@/layouts/index'
 const router = createBrowserRouter(
     [
         {
-            path: '/Home',
+            path: '/',
             element: <Layouts />,
             children: [
                 {
-                    path: '/Home',
+                    path: '/',
                     
                     element: <Home />
                 },
@@ -28,12 +28,6 @@ const router = createBrowserRouter(
                 },
             ]
         },
-        {
-            path: '/',
-            element: <Layouts />,
-    
-        },
-
     ]
 )
 

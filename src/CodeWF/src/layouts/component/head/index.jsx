@@ -60,7 +60,7 @@ function head({ base, menuItems }) {
         </a>
         <div className="navbarNav">
 
-        <Link to="/home" className="decoration">
+        <Link to="/" className="decoration">
             首页
           </Link>
           {menuItems?.map((menuItem, index) => (
