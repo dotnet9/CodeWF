@@ -7,6 +7,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.WebAPI", "CodeWF.WebAPI\CodeWF.WebAPI.csproj", "{840DCEEE-CD0F-41E8-9397-7AE6DA020879}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{3235E133-C8AB-46A5-84C1-74B16E7DBC25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Data", "CodeWF.Data\CodeWF.Data.csproj", "{43A8E616-A55B-4F23-BA76-3121CF1027AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{B4E0C8D5-6A0C-4216-89C4-9554CB73820A}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +26,17 @@ Global
 		{840DCEEE-CD0F-41E8-9397-7AE6DA020879}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{840DCEEE-CD0F-41E8-9397-7AE6DA020879}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{840DCEEE-CD0F-41E8-9397-7AE6DA020879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A8E616-A55B-4F23-BA76-3121CF1027AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A8E616-A55B-4F23-BA76-3121CF1027AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A8E616-A55B-4F23-BA76-3121CF1027AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A8E616-A55B-4F23-BA76-3121CF1027AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{840DCEEE-CD0F-41E8-9397-7AE6DA020879} = {6D5D67FD-2EA6-4EEA-BFC8-B6A548254448}
+		{43A8E616-A55B-4F23-BA76-3121CF1027AB} = {3235E133-C8AB-46A5-84C1-74B16E7DBC25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0F801025-09A0-4A6E-BBFD-BAF96CDB633D}
