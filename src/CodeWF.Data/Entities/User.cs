@@ -4,8 +4,8 @@ public class User
 {
     public Guid Id { get; set; }
 
-    public string UserName { get; set; }
-    public string Password { get; set; }
+    public string UserName { get; set; } = null!;
+    public string Password { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
 
@@ -31,15 +31,9 @@ public class User
 
     public DateTime UpdateTime { get; set; }
 
-    public string? UpdateBy { get; set; }
+    public Guid UpdateBy { get; set; }
 
     public EnabledKind Deleted { get; set; }
-}
-
-public enum EnabledKind
-{
-    No = 0,
-    Yes = 1
 }
 
 public enum GenderKind
