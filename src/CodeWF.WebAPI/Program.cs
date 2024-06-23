@@ -1,3 +1,5 @@
+using CodeWF.Data.MySql;
+using CodeWF.Data.PostgreSQL;
 using CodeWF.Data.SQLite;
 using CodeWF.WebAPI;
 using CodeWF.WebAPI.Options;
@@ -35,12 +37,18 @@ void ConfigureServices(IServiceCollection services)
     // ÃÌº”MemoryCache÷ß≥÷
     services.AddMemoryCache();
 
-    var dbType = builder.Configuration.GetConnectionString("DatabaseType");
-    var connStr = builder.Configuration.GetConnectionString("CodeWFDatabase");
-    switch (dbType!.ToLower())
+    var databaseType = builder.Configuration.GetConnectionString("DatabaseType");
+    var connectionString = builder.Configuration.GetConnectionString("CodeWFDatabase");
+    switch (databaseType!.ToLower())
     {
+        case "mysql":
+            services.AddMySqlStorage(connectionString!);
+            break;
+        case "postgresql":
+            services.AddPostgreSQLStorage(connectionString!);
+            break;
         default:
-            services.AddSQLiteStorage(connStr!);
+            services.AddSQLiteStorage(connectionString!);
             break;
     }
 }

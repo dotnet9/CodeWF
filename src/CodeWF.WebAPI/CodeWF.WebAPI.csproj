@@ -8,10 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-preview.5.24306.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.5.24306.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeWF.Data.MySql\CodeWF.Data.MySql.csproj" />
+    <ProjectReference Include="..\CodeWF.Data.PostgreSQL\CodeWF.Data.PostgreSQL.csproj" />
     <ProjectReference Include="..\CodeWF.Data.SQLite\CodeWF.Data.SQLite.csproj" />
   </ItemGroup>
 
