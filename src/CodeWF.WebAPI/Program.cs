@@ -1,3 +1,5 @@
+using CodeWF.AspNetCore.EventBus;
+using CodeWF.Core.Abouts;
 using CodeWF.Data.MySql;
 using CodeWF.Data.PostgreSQL;
 using CodeWF.Data.SQLite;
@@ -10,16 +12,7 @@ ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseAuthorization();
-
-app.MapControllers();
+Configure();
 
 app.Run();
 
@@ -51,4 +44,20 @@ void ConfigureServices(IServiceCollection services)
             services.AddSQLiteStorage(connectionString!);
             break;
     }
+
+    services.AddEventBus(typeof(GetAboutQuery).Assembly);
+}
+
+void Configure()
+{
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseAuthorization();
+    app.MapControllers();
+    app.UseEventBus(typeof(GetAboutQuery).Assembly);
 }

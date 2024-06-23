@@ -405,3 +405,4 @@ src/CodeWF.Web/codewf.db
 src/CodeWF.Web/codewf.db-shm
 src/CodeWF.Web/codewf.db-wal
 src/Build/
+src/CodeWF.WebAPI/CodeWF.db
