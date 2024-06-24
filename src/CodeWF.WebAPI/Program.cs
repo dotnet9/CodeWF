@@ -12,6 +12,8 @@ ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
+await app.InitStartUp();
+
 Configure();
 
 app.Run();
@@ -40,6 +42,7 @@ void ConfigureServices(IServiceCollection services)
         case "postgresql":
             services.AddPostgreSQLStorage(connectionString!);
             break;
+        case "sqlite":
         default:
             services.AddSQLiteStorage(connectionString!);
             break;

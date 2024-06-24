@@ -2,7 +2,6 @@
 using CodeWF.Data.Entities;
 using CodeWF.Data.Specifications;
 using CodeWF.EventBus;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CodeWF.Core.Abouts;
@@ -21,15 +20,12 @@ public class GetAboutQuery : Query<GetAboutResponse>
 }
 
 [Event]
-public class GetAboutQueryHandler(IServiceScopeFactory scopeFactory, ILogger<GetAboutQueryHandler> logger)
+public class GetAboutQueryHandler(CodeWFRepository<About> repository, ILogger<GetAboutQueryHandler> logger)
 {
     [EventHandler]
     public async Task Handle(GetAboutQuery request)
     {
-        var repository =
-            scopeFactory.CreateScope().ServiceProvider.GetRequiredService<CodeWFRepository<About>>();
-        var spec = new AboutSpec();
-        var result = await repository.FirstOrDefaultAsync(spec);
+        var result = await repository.FirstOrDefaultAsync(new AboutSpec());
         request.Result = new GetAboutResponse()
         {
             Title = result?.Title,
