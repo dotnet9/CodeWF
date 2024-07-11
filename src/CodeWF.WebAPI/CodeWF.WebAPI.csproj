@@ -6,9 +6,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="CodeWF.AspNetCore.EventBus" Version="3.4.3" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-preview.5.24306.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.5.24306.3" />
+		<PackageReference Include="CodeWF.AspNetCore.EventBus" Version="3.4.4" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0-preview.6.24327.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-preview.6.24327.4" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	</ItemGroup>
 

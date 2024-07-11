@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0-preview.5.24306.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.0-preview.6.24327.4" />
   </ItemGroup>
 
   <ItemGroup>
