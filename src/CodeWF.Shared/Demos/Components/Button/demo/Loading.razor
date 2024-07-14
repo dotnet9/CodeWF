@@ -1,0 +1,51 @@
+﻿<div>
+    <Button Type="@ButtonType.Primary" Loading>Loading</Button>
+    <Button Type="@ButtonType.Primary" Size="@ButtonSize.Small" Loading>Loading</Button>
+    <Button Type="@ButtonType.Primary" Icon="@IconType.Outline.Poweroff" Loading />
+    
+    <br />
+    
+    <Button Type="@ButtonType.Primary"
+            Loading="_noIconLoading"
+            OnClick="EnterNoIconLoading">
+        Click me!
+    </Button>
+    <Button Type="@ButtonType.Primary"
+            Icon="@IconType.Outline.Poweroff"
+            Loading="_withIconLoading"
+            OnClick="EnterWithIconLoading">
+        Click me!
+    </Button>
+    <Button Type="@ButtonType.Primary"
+            Icon="@IconType.Outline.Poweroff"
+            Loading="_onlyIconLoading"
+            OnClick="EnterOnlyIconLoading" />
+</div>
+
+@code
+{
+    private bool _noIconLoading;
+    private bool _withIconLoading;
+    private bool _onlyIconLoading;
+
+    private async Task EnterNoIconLoading()
+    {
+        _noIconLoading = true;
+        await Task.Delay(8000);
+        _noIconLoading = false;
+    }
+
+    private async Task EnterWithIconLoading()
+    {
+        _withIconLoading = true;
+        await Task.Delay(8000);
+        _withIconLoading = false;
+    }
+
+    private async Task EnterOnlyIconLoading()
+    {
+        _onlyIconLoading = true;
+        await Task.Delay(8000);
+        _onlyIconLoading = false;
+    }
+}

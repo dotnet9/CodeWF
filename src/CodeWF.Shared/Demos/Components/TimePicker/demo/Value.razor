@@ -1,0 +1,11 @@
+﻿<TimePicker TValue="TimeOnly?" Value="_value" OnChange="OnChange" />
+
+@code
+{
+    private TimeOnly? _value = TimeOnly.FromDateTime(DateTime.Now);
+
+    private void OnChange(DateTimeChangedEventArgs<TimeOnly?> args)
+    {
+        _value = args.Date;
+    }
+}

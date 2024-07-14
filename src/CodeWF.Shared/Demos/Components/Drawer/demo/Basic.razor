@@ -1,0 +1,18 @@
+﻿<div>
+    <Button Type="primary" @onclick="_=>open()">Open</Button>
+    <Drawer Closable="true" @bind-Visible="visible" Placement="right" Title='("Basic Drawer")' >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+    </Drawer>
+</div>
+
+   @code{
+
+    bool visible = false;
+
+    void open()
+    {
+        this.visible = true;
+    }
+}

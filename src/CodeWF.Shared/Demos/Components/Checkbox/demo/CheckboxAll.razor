@@ -1,0 +1,32 @@
+<div>
+    <Checkbox Indeterminate="@indeterminate" Checked="@checkAll" CheckedChange="@CheckAllChanged">
+    Check all
+    </Checkbox>
+    <br />
+    <AntDesign.CheckboxGroup Options="@ckeckAllOptions" ValueChanged="@OnChanged" TValue="string"/>
+</div>
+
+@code{
+
+    static CheckboxOption<string>[] ckeckAllOptions = new CheckboxOption<string>[]{
+        new() { Label="Apple",Value="Apple" ,Checked=true},
+        new() { Label="Pear", Value="Pear" },
+        new(){ Label="Orange", Value="Orange",Checked=true },
+    };
+
+    void CheckAllChanged()
+    {
+        bool allChecked = checkAll;
+        ckeckAllOptions.ForEach(o => o.Checked = !allChecked);
+    }
+
+    void OnChanged()
+    {
+
+    }
+
+    bool indeterminate => ckeckAllOptions.Count(o => o.Checked) > 0 && ckeckAllOptions.Count(o => o.Checked) < ckeckAllOptions.Count();
+
+    bool checkAll => ckeckAllOptions.All(o => o.Checked);
+
+}

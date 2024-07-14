@@ -1,0 +1,57 @@
+﻿<div>
+  <Cascader Size="large" Options="@options"></Cascader>
+  <br />
+  <br />
+  <Cascader Options="@options"></Cascader>
+  <br />
+  <br />
+  <Cascader Size="small" Options="@options"></Cascader>
+</div>
+
+@code {
+  List<CascaderNode> options = new List<CascaderNode>()
+  {
+      new()
+      {
+          Value = "zhejiang",
+          Label = "Zhejiang",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "hangzhou",
+                  Label = "Hangzhou",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "xihu",
+                          Label = "West Lake",
+                      },
+                  }
+              },
+          },
+      },
+      new()
+      {
+          Value = "jiangsu",
+          Label = "Jiangsu",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "nanjing",
+                  Label = "Nanjing",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "zhonghuamen",
+                          Label = "Zhong Hua Men",
+                      },
+                  }
+              },
+          },
+      }
+  };
+}

@@ -1,0 +1,69 @@
+@using System.ComponentModel
+@using AntDesign.TableModels
+
+<Table TItem="Data" DataSource="@data" OnRow="OnRow" ScrollX="1000" RowClassName="@(x => x.Data.Score < 70 ? "danger" : "" )">
+    <PropertyColumn Property="c=>c.Name" Fixed="left">
+        <a>@context.Name</a>
+    </PropertyColumn>
+    <PropertyColumn Property="c=>c.Score"></PropertyColumn>
+</Table>
+
+<style>
+    .danger, .danger > td {
+        background-color: #ffccc7 !important;
+    }
+
+        .danger:hover, .danger:hover > td {
+            background-color: #ffa39e !important;
+        }
+</style>
+
+
+@code {
+    Data[] data = new Data[]
+    {
+        new()
+        {
+            Key = "1",
+            Name = "John Brown",
+            Score = 95,
+        },
+        new()
+        {
+            Key = "2",
+            Name = "Jim Green",
+            Score = 87,
+        },
+        new()
+        {
+            Key = "3",
+            Name = "Joe Black",
+            Score = 65,
+        }
+        };
+
+    public class Data
+    {
+        [DisplayName("Key")]
+        public string Key { get; set; }
+
+        [DisplayName("Name")]
+        public string Name { get; set; }
+
+        [DisplayName("Score")]
+        public int Score { get; set; }
+    }
+
+    Dictionary<string, object> OnRow(RowData<Data> row)
+    {
+        Action<MouseEventArgs> OnClick = args =>
+        {
+            Console.WriteLine($"row {row.Data.Key} was clicked");
+        };
+
+        return new Dictionary<string, object>
+        {
+            { "onclick", OnClick },
+        };
+    }
+}

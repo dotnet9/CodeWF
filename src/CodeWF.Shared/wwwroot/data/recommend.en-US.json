@@ -1,0 +1,22 @@
+﻿[
+  {
+    "title": "Power query by Ant Design Blazor and Efcore",
+    "description": "Ant Design table can seamlessly interact with Efcore for queries of pagination, sorting and filtering.",
+    "img": "/docs/assets/news/blazoref.png",
+    "href": "https://dev.to/yongquan/ant-design-blazor-table-4963",
+    "popularize": false
+  },
+  {
+    "title": "Show case highlight - Azure Design Studio",
+    "description": "A web app which helps you create the architecture design diagram for your Azure solutions and automatically generate IaC code from it.",
+    "img": "/docs/assets/news/AzureDesignStudio.png",
+    "href": "https://github.com/chunliu/AzureDesignStudio",
+    "popularize": false
+  },
+  {
+    "title": "Ant Design Blazor Reuse Tabs",
+    "description": "The Blazor community has been clamouring for multiple tabs for over a year now, and it's been quite an achievement to finally implement a ReuseTabs component based on the Tabs component in conjunction with Blazor's built-in routing component in the last few days.",
+    "img": "/docs/assets/news/reuse-tabs-demo.png",
+    "href": "https://antblazor.com/en-US/experimental/reusetabs"
+  }
+]

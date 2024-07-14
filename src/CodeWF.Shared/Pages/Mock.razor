@@ -1,0 +1,30 @@
+﻿@layout BlankLayout;
+@page "/mock"
+@page "/zh-CN/mock"
+@page "/en-US/mock"
+
+@using System.Reflection
+@using CodeWF.Shared.Services
+
+<div id="@DemoId">
+    <DynamicComponent Type="_demoType"></DynamicComponent>
+</div>
+
+@inject DemoService demoService
+
+@code
+{
+    [SupplyParameterFromQuery]
+    public string DemoId { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string Type { get; set; }
+
+    private Type _demoType;
+
+    protected override void OnInitialized()
+    {
+        _demoType = demoService.GetShowCase(Type);
+        base.OnInitialized();
+    }
+}

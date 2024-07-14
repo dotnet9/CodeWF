@@ -1,0 +1,26 @@
+<TreeSelect TItem="string"
+            TItemValue="string"
+			Style="width:100%;"
+			@bind-Value="value"
+			Placeholder="Please select"
+			AllowClear
+			TreeDefaultExpandAll>
+	<TreeNode TItem="string" Key="parent 1" Title="parent 1">
+		<TreeNode TItem="string" Key="parent 1-0" Title="parent 1-0">
+			<TreeNode TItem="string" Key="leaf1" Title="leaf1" />
+			<TreeNode TItem="string" Key="leaf2" Title="leaf2" />
+		</TreeNode>
+		<TreeNode TItem="string" Key="parent 1-1" Title="parent 1-1">
+			<TreeNode TItem="string" Key="leaf3">
+				<TitleTemplate>
+					<b Style="color:#08c;">leaf3</b>
+				</TitleTemplate>
+			</TreeNode>
+		</TreeNode>
+	</TreeNode>
+</TreeSelect>
+
+
+@code {
+	private string value="leaf3";
+}

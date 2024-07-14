@@ -1,0 +1,123 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<Button Type="primary" OnClick="@ShowModal">
+    Open Modal with a Form
+</Button>
+
+<Button Type="primary" OnClick="@ShowModalWithService">
+    Open Modal with a Form with service
+</Button>
+
+<Modal Title="@("BasicModal")"
+       @bind-Visible="@_visible"
+       OnOk="@HandleOk"
+       OnCancel="@HandleCancel">
+         @FormTemplate()
+</Modal>
+
+@inject ModalService ModelService;
+@code {
+
+    RenderFragment FormTemplate()
+    {
+        return 
+        @<Form Model="@model"
+              LabelColSpan="8"
+              WrapperColSpan="16"
+              OnFinish="OnFinish"
+              OnFinishFailed="OnFinishFailed"
+              @ref="@_form">
+            <FormItem Label="Username">
+                <Input @bind-Value="@context.Username" />
+            </FormItem>
+            <FormItem Label="Password">
+                <InputPassword @bind-Value="@context.Password" />
+            </FormItem>
+        </Form>
+    ;
+    }
+
+    bool _visible = false;
+    bool _submitting = false;
+    private Form<Model> _form;
+
+    private Model model = new Model();
+
+    public class Model
+    {
+        [Required]
+        public string Username { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public bool RememberMe { get; set; } = true;
+    }
+
+    private void ShowModal()
+    {
+        _visible = true;
+    }
+
+    /// <summary>
+    /// on modal OK button is click, submit form manually
+    /// </summary>
+    /// <param name="e"></param>
+    private async Task HandleOk(MouseEventArgs e)
+    {
+        _submitting = true;
+        await Task.Delay(1000);
+        _form.Submit();
+    }
+
+    private void HandleCancel(MouseEventArgs e)
+    {
+        Console.WriteLine(e);
+    }
+
+    /// <summary>
+    /// when form is submited, close the modal
+    /// </summary>
+    /// <param name="args"></param>
+    private void OnFinish(EditContext editContext)
+    {
+        _submitting = false;
+        _visible = false;
+    }
+
+    private void OnFinishFailed(EditContext editContext)
+    {
+        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
+    }
+
+    private void ShowModalWithService()
+    {
+        ModalRef modalRef = default;
+        modalRef = ModelService.CreateModal(new()
+        {
+            Content = FormTemplate(),
+            OnOk = async e =>
+            {
+                modalRef?.SetConfirmLoading(true);
+                await Task.Delay(1000);
+                if (!_form.Validate())
+                {
+                    modalRef?.SetConfirmLoading(false);
+                    return;
+                }
+
+                _form.Submit();
+
+                await modalRef.CloseAsync();
+
+                 _form.Reset();
+            },
+            OnCancel = async e =>
+            {   
+                if (!_form.IsModified || await ModelService.ConfirmAsync(new() { Content = "Are you sure you want to discard the entries?" }))
+                {   
+                    await modalRef.CloseAsync();
+                     _form.Reset();
+                }
+            },
+        });
+    }
+}

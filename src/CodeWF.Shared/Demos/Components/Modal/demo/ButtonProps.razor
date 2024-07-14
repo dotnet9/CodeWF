@@ -1,0 +1,16 @@
+﻿<Button Type="primary" OnClick="()=> _visible = true">
+    Open Modal with customized button props
+</Button>
+<Modal Title="@("BasicModal")"
+       @bind-Visible="@_visible"
+       OkButtonProps="new AntDesign.ButtonProps(){ Disabled = true }"
+       CancelButtonProps="new AntDesign.ButtonProps(){ Disabled = true }">
+    <p>Some contents...</p>
+    <p>Some contents...</p>
+    <p>Some contents...</p>
+</Modal>
+
+@code{
+    bool _visible = false;
+
+}

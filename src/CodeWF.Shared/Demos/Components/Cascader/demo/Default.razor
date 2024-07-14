@@ -1,0 +1,54 @@
+﻿<div>
+  <Cascader Options="@options" @bind-Value="value"></Cascader>
+  <span>selected: @value</span>
+</div>
+
+@code {
+  string value = "xihu";
+
+  List<CascaderNode> options = new List<CascaderNode>()
+  {
+      new()
+      {
+          Value = "zhejiang",
+          Label = "Zhejiang",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "hangzhou",
+                  Label = "Hangzhou",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "xihu",
+                          Label = "West Lake",
+                      },
+                  }
+              },
+          },
+      },
+      new()
+      {
+          Value = "jiangsu",
+          Label = "Jiangsu",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "nanjing",
+                  Label = "Nanjing",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "zhonghuamen",
+                          Label = "Zhong Hua Men",
+                      },
+                  }
+              },
+          },
+      }
+  };
+}

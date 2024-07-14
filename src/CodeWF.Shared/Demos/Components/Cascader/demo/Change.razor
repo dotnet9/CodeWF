@@ -1,0 +1,58 @@
+﻿<div>
+  <Cascader Options="@options" @bind-Value="value" ChangeOnSelect="true" SelectedNodesChanged="OnChange"></Cascader>
+</div>
+
+@code {
+  string value = "112";
+  void OnChange(CascaderNode[] selectedNodes)
+  {
+    Console.WriteLine($"value: {value} selected: {string.Join(",", selectedNodes.Select(x => x.Value))}");
+  }
+
+  List<CascaderNode> options = new List<CascaderNode>()
+  {
+      new()
+      {
+          Value = "zhejiang",
+          Label = "Zhejiang",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "hangzhou",
+                  Label = "Hangzhou",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "xihu",
+                          Label = "West Lake",
+                      },
+                  }
+              },
+          },
+      },
+      new()
+      {
+          Value = "jiangsu",
+          Label = "Jiangsu",
+          Children = new CascaderNode[]
+          {
+              new()
+              {
+                  Value = "nanjing",
+                  Label = "Nanjing",
+                  Children = new CascaderNode[]
+                  {
+                      new()
+                      {
+                          Value = "zhonghuamen",
+                          Label = "Zhong Hua Men",
+                      },
+                  }
+              },
+          },
+      }
+  };
+
+}
