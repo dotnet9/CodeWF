@@ -1383,7 +1383,7 @@
         "Name": "download",
         "Title": "下载按钮",
         "Description": "<p>下载按钮提供了文件下载的<a href=\"https://learn.microsoft.com/zh-cn/aspnet/core/blazor/file-downloads#download-from-a-url\">简单实现</a>，可以满足多数情况下的需求。</p>\n<p><code>Url</code>参数为空或null时，该按钮不会触发文件下载。</p>\n<p><code>FileName</code>参数实际是<code>&lt;a/&gt;</code>标签的<code>download</code>属性。关于其描述和限制请参阅<a href=\"https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/a#attr-download\">MDN文档</a>。</p>\n",
-        "Code": "<div>\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.svg\" FileName=\"antblazor_logo\" />\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.svg\" FileName=\"antblazor_logo\" >Download</DownloadButton>\r\n</div>",
+        "Code": "<div>\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.png\" FileName=\"antblazor_logo\" />\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.png\" FileName=\"antblazor_logo\" >Download</DownloadButton>\r\n</div>",
         "Type": "Demos.Components.Button.demo.Download",
         "Style": "",
         "Debug": false

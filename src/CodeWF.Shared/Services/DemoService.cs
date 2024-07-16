@@ -153,19 +153,14 @@ namespace CodeWF.Shared.Services
             return await _httpClient.GetFromJsonAsync<Recommend[]>(new Uri(_baseUrl, $"_content/CodeWF.Shared/data/recommend.{CurrentLanguage}.json").ToString());
         }
 
-        public async Task<Product[]> GetProduct()
+        public async Task<BlogPost[]> GetPost()
         {
-            return await _httpClient.GetFromJsonAsync<Product[]>(new Uri(_baseUrl, $"_content/CodeWF.Shared/data/products.json").ToString());
+            return await _httpClient.GetFromJsonAsync<BlogPost[]>(new Uri(_baseUrl, $"_content/CodeWF.Shared/data/posts.{CurrentLanguage}.json").ToString());
         }
 
         public async Task<MoreProps[]> GetMore()
         {
             return await _httpClient.GetFromJsonAsync<MoreProps[]>(new Uri(_baseUrl, $"_content/CodeWF.Shared/data/more-list.{CurrentLanguage}.json").ToString());
-        }
-
-        public async Task<Sponsor[]> GetSponsors()
-        {
-            return await _httpClient.GetFromJsonAsync<Sponsor[]>(new Uri(_baseUrl, $"_content/CodeWF.Shared/data/sponsors.{CurrentLanguage}.json").ToString());
         }
     }
 }

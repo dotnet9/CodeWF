@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CodeWF.Shared.Services
+﻿namespace CodeWF.Shared.Services
 {
-    public class Product
+    public class BlogPost
     {
         public string Img { get; set; }
 

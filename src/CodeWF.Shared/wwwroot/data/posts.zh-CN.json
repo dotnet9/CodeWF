@@ -1,0 +1,26 @@
+[
+  {
+    "img": "https://img1.dotnet9.com/2024/03/cover_06.png",
+    "title": "NetBeauty2：让你的.NET项目输出目录更清爽",
+    "description": "在.NET项目开发中，随着项目复杂性的增加，依赖的dll文件也会逐渐增多。这往往导致输出目录混乱，不便于管理和部署。而NetBeauty2开源项目正是为了解决这一问题而生，它能够帮助开发者在独立发布.NET项目时，将.NET运行时和依赖的dll文件移动到指定的目录，从而让输出目录更加干净、清爽。",
+    "href": "https://blog.codewf.com/post/2024/3/12/netbeauty2-let-your-dotnet-project-output-directory-is-more-refreshing"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2022/11/0402.png",
+    "title": ".NET跨平台客户端框架 - Avalonia UI",
+    "description": "这是一个基于WPF XAML的跨平台UI框架，并支持多种操作系统（Windows（.NET Core），Linux（GTK），MacOS，Android和iOS），Web（WebAssembly）",
+    "href": "https://blog.codewf.com/post/2022/11/19/one-of-the-best-choices-for-dotnet-cross-platform-frameworks-avalonia-ui"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2024/01/cover_02.png",
+    "title": "各版本操作系统对.NET支持情况",
+    "description": "借助虚拟机和测试机，检测各版本操作系统对.NET的支持情况。安装操作系统后，实测安装相应运行时并能够运行星尘代理为通过。",
+    "href": "https://blog.codewf.com/post/2024/1/13/each-version-of-the-operating-system-is-correct-dotnet-support"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2023/09/cover_08.png",
+    "title": ".NET反编译、第三方库调试（拦截、篡改、伪造）、一库多版本兼容",
+    "description": "使用者本人对于传播和利用本公众号提供的信息所造成的任何直接或间接的后果和损失负全部责任。公众号及作者对于这些后果不承担任何责任。如果造成后果，请自行承担责任。谢谢！",
+    "href": "https://blog.codewf.com/post/2023/9/26/simulate-scenarios-using-third-party-dotnet-libraries-for-debugging-interception-decompilation-and-compatibility-solutions-for-multiple-versions-of-one-library"
+  }
+]

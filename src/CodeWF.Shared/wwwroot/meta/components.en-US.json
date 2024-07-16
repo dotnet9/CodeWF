@@ -1353,7 +1353,7 @@
         "Name": "download",
         "Title": "Download Buttons",
         "Description": "<p><code>DownloadButton</code> provides a <a href=\"https://learn.microsoft.com/en-us/aspnet/core/blazor/file-downloads#download-from-a-url\">simple implementation</a> of file download, which may meet the needs of most situations.</p>\n<p>When <code>Url</code> is null or empty, this button won't trigger file download.</p>\n<p><code>FileName</code> is actually the <code>download</code> attribute of <code>&lt;a/&gt;</code>. About its description and limit, please read <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download\">MDN Doc</a>.</p>\n",
-        "Code": "<div>\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.svg\" FileName=\"antblazor_logo\" />\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.svg\" FileName=\"antblazor_logo\" >Download</DownloadButton>\r\n</div>",
+        "Code": "<div>\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.png\" FileName=\"antblazor_logo\" />\r\n    <DownloadButton Type=\"@ButtonType.Primary\" Icon=\"@IconType.Outline.Download\" Url=\"docs/assets/logo.png\" FileName=\"antblazor_logo\" >Download</DownloadButton>\r\n</div>",
         "Type": "Demos.Components.Button.demo.Download",
         "Style": "",
         "Debug": false

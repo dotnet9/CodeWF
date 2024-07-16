@@ -1,22 +1,30 @@
 ﻿[
   {
-    "title": "Power query by Ant Design Blazor and Efcore",
-    "description": "Ant Design table can seamlessly interact with Efcore for queries of pagination, sorting and filtering.",
-    "img": "/docs/assets/news/blazoref.png",
-    "href": "https://dev.to/yongquan/ant-design-blazor-table-4963",
+    "title": "QR Code Generator",
+    "description": "Generate and download QR codes for URLs or text, with customizable background and foreground colors.",
+    "img": "https://img1.dotnet9.com/site/tools/qrcode-generator.jpg",
+    "href": "https://tools.codewf.com/qrcode-generator",
     "popularize": false
   },
   {
-    "title": "Show case highlight - Azure Design Studio",
-    "description": "A web app which helps you create the architecture design diagram for your Azure solutions and automatically generate IaC code from it.",
-    "img": "/docs/assets/news/AzureDesignStudio.png",
-    "href": "https://github.com/chunliu/AzureDesignStudio",
+    "title": "Date and Time Converter",
+    "description": "Convert dates and times into various formats.",
+    "img": "https://img1.dotnet9.com/site/tools/date-converter.png",
+    "href": "https://tools.codewf.com/date-converter",
     "popularize": false
   },
   {
-    "title": "Ant Design Blazor Reuse Tabs",
-    "description": "The Blazor community has been clamouring for multiple tabs for over a year now, and it's been quite an achievement to finally implement a ReuseTabs component based on the Tabs component in conjunction with Blazor's built-in routing component in the last few days.",
-    "img": "/docs/assets/news/reuse-tabs-demo.png",
-    "href": "https://antblazor.com/en-US/experimental/reusetabs"
+    "title": "Integer Base Converter",
+    "description": "Transform numbers between different bases (decimal, hexadecimal, binary, octal, base64, etc.).",
+    "img": "https://img1.dotnet9.com/site/tools/base-converter.png",
+    "href": "https://tools.codewf.com/base-converter",
+    "popularize": false
+  },
+  {
+    "title": "Randomize String",
+    "description": "Ensure string security for URLs, filenames, and identifiers.",
+    "img": "https://img1.dotnet9.com/site/tools/slugify-string.png",
+    "href": "https://tools.codewf.com/slugify-string",
+    "popularize": false
   }
 ]

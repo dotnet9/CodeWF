@@ -15,11 +15,9 @@ namespace CodeWF.Shared.Pages
 
         private Recommend[] _recommends = { };
 
-        private Product[] _products = { };
+        private BlogPost[] _posts = { };
 
         private MoreProps[] _moreArticles = { };
-
-        private Sponsor[] _sponsors = { };
         [Inject] private DemoService DemoService { get; set; }
         [Inject] private ILocalizationService Language { get; set; }
 
@@ -66,9 +64,8 @@ namespace CodeWF.Shared.Pages
         private async Task FetchData()
         {
             _recommends = await DemoService.GetRecommend();
-            _products = await DemoService.GetProduct();
+            _posts = await DemoService.GetPost();
             //_moreArticles = await DemoService.GetMore();
-            _sponsors = await DemoService.GetSponsors();
             await InvokeAsync(StateHasChanged);
         }
 

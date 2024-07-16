@@ -4,7 +4,7 @@
 @page "/zh-CN/"
 @page "/en-US/"
 
-<PageTitle>Ant Design of Blazor</PageTitle>
+<PageTitle>CodeWF</PageTitle>
 
 <div id="react-content">
     <MainHeader IsHome />
@@ -31,16 +31,19 @@
                 <div class="home-banner-content">
                     <div>
                         <div class="home-card-logo">
-                            <h1 class="home-banner-mini">Ant Design Blazor</h1>
-                            <h1 class="home-banner-normal" style="font-size: 3.7em;">Ant Design Blazor</h1>
+                            <h1 class="home-banner-mini">CodeWF</h1>
+                            <h1 class="home-banner-normal" style="font-size: 3.7em;">CodeWF</h1>
                         </div>
                     </div>
                     <p>@Localizer["app.home.introduce"]</p>
                     <div class="home-banner-content-operations">
-                        <a href="/@Language.CurrentCulture.Name/docs">
-                            <Button Type="primary" Shape="round">@Localizer["app.home.getting-started"]</Button>
+                        <a href="/@Language.CurrentCulture.Name/tool">
+                            <Button Type="primary" Shape="round">@Localizer["app.home.using-tools"]</Button>
                         </a>
-                        <a href="https://github.com/ant-design-blazor/ant-design-blazor/stargazers">
+                        <a href="/@Language.CurrentCulture.Name/post">
+                            <Button Type="primary" Shape="round">@Localizer["app.home.browse-blogs"]</Button>
+                        </a>
+                        <a href="https://github.com/dotnet9/codewf">
                             <Button Shape="round" Icon="github">@Localizer["app.home.star-on-github"]</Button>
                         </a>
                     </div>
@@ -51,32 +54,13 @@
             @if (_recommends.Any())
             {
                 <div class="home-block-content">
-                    <h2 class="ant-typography" direction="ltr" style="font-weight: lighter; color: rgb(49, 70, 89);">@Localizer["app.home.recommend"]</h2>
-                    <Row Style="margin: -12px -12px -36px;">
-                        <AntDesign.Col Xs="24" Sm="14" Style="padding: 12px;">
-                            <Recommend Data="_recommends[0]" Main />
-                        </AntDesign.Col>
-                        <AntDesign.Col Xs="24" Sm="10" Style="padding: 12px;">
-                            <Row Style="margin: -12px -12px 12px;">
-                                <AntDesign.Col Span="24" Style="padding: 12px;">
-                                    <Recommend Data="_recommends[1]" />
-                                </AntDesign.Col>
-                                <AntDesign.Col Span="24" Style="padding: 12px;">
-                                    <Recommend Data="_recommends[2]" />
-                                </AntDesign.Col>
-                            </Row>
-                        </AntDesign.Col>
-                    </Row>
-                </div>
-            }
-
-            @if (_products.Any())
-            {
-                <div class="home-block-content">
-                    <h2 class="ant-typography" direction="ltr" style="font-weight: lighter; color: rgb(49, 70, 89);">@Localizer["app.home.products"]</h2>
+                    <h2 class="ant-typography" direction="ltr" style="font-weight: lighter; color: rgb(49, 70, 89);">
+                        @Localizer["app.home.tools"]
+                        <div class="home-block-content-extra"><a href="https://tools.codewf.com/" target="_blank">@Localizer["app.header.menu.more"]</a></div>
+                    </h2>
                     <div style="margin-bottom: -28px;">
                         <Row Class="design-mini-panels" Style="margin: 40px -20px 20px;">
-                            @foreach (var item in _products)
+                            @foreach (var item in _recommends)
                             {
                                 <AntDesign.Col Xs="24" Sm="8" Style="padding: 20px;">
                                     <a href="@item.Href" target="_blank" rel="noopener noreferrer">
@@ -96,40 +80,31 @@
                 </div>
             }
 
-            @if (_sponsors.Any())
+            @if (_posts.Any())
             {
                 <div class="home-block-content">
                     <h2 class="ant-typography" direction="ltr" style="font-weight: lighter; color: rgb(49, 70, 89);">
-                        @Localizer["app.home.sponsors"]
-                        <div class="home-block-content-extra"><a href="@(Localizer["app.home.sponsor-us-href"])" target="_blank">@Localizer["app.home.sponsor-us"]</a></div>
-                    </h2>
-                    <div class="ant-row" style="margin: -16px -12px 16px;">
-                        @foreach (var item in _sponsors)
-                        {
-                            <div class="ant-col ant-col-xs-24 ant-col-sm-12" style="padding: 16px 12px;">
-                                <a href="@item.Href" target="_blank" rel="noopener noreferrer">
-                                  @*   <Card Class="more-card" Hoverable>
-                                        <Cover>
-                                            <img alt="@item.Title" src="@item.Img">
-                                        </Cover>
-                                        <Body>
-                                            <CardMeta Title="@item.Title" Description="@item.Description" />
-                                            <div>
-                                                @item.Date
-                                                <span class="more-card-source">
-                                                    <img src="https://gw.alipayobjects.com/zos/basement_prod/5f4e1fd0-d255-4309-b181-a3715a720ebe.svg" alt="zhihu">
-                                                </span>
-                                            </div>
-                                        </Body>
-                                    </Card> *@
-                                    <Card Style="margin-top: 16px">
-                                        <CardMeta Avatar="@item.Logo"
-                                                    Title="@item.Name"
-                                                    Description="@item.Comment" />
-                                    </Card>
-                                </a>
-                            </div>
-                        }
+                        @Localizer["app.home.posts"]
+                        <div class="home-block-content-extra"><a href="https://blog.codewf.com/" target="_blank">@Localizer["app.header.menu.more"]</a></div>
+                        </h2>
+                    <div style="margin-bottom: -28px;">
+                        <Row Class="design-mini-panels" Style="margin: 40px -20px 20px;">
+                            @foreach (var item in _posts)
+                            {
+                                <AntDesign.Col Xs="24" Sm="8" Style="padding: 20px;">
+                                    <a href="@item.Href" target="_blank" rel="noopener noreferrer">
+                                        <Card Class="design-mini-panel" Hoverable>
+                                            <Cover>
+                                                <img alt="@item.Title" src="@item.Img">
+                                            </Cover>
+                                            <Body>
+                                                <CardMeta Title="@item.Title" Description="@Localizer[item.Description]" />
+                                            </Body>
+                                        </Card>
+                                    </a>
+                                </AntDesign.Col>
+                            }
+                        </Row>
                     </div>
                 </div>
             }

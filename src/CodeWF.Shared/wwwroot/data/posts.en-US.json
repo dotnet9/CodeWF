@@ -1,0 +1,26 @@
+[
+  {
+    "img": "https://img1.dotnet9.com/2024/03/cover_06.png",
+    "title": "NetBeauty2: Make Your .NET Project Output Directory Neater",
+    "description": "In .NET projects, increased complexity often leads to more dll files, causing cluttered output directories. NetBeauty2, an open-source project, helps developers organize by moving .NET runtime and dependencies to a designated folder during project release, resulting in a cleaner output directory.",
+    "href": "https://blog.codewf.com/post/2024/3/12/netbeauty2-let-your-dotnet-project-output-directory-is-more-refreshing"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2022/11/0402.png",
+    "title": "Avalonia UI: A .NET Cross-Platform Client Framework",
+    "description": "A cross-platform UI framework based on WPF XAML supporting various OSes (Windows (.NET Core), Linux (GTK), MacOS, Android, iOS), and Web (WebAssembly).",
+    "href": "https://blog.codewf.com/post/2022/11/19/one-of-the-best-choices-for-dotnet-cross-platform-frameworks-avalonia-ui"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2024/01/cover_02.png",
+    "title": "Support Status of .NET across Different Operating Systems",
+    "description": "By using virtual machines and test machines, this post examines .NET support for various OS versions. After installing each OS, successful installation and execution of StarDust proxy indicates compatibility.",
+    "href": "https://blog.codewf.com/post/2024/1/13/each-version-of-the-operating-system-is-correct-dotnet-support"
+  },
+  {
+    "img": "https://img1.dotnet9.com/2023/09/cover_08.png",
+    "title": "Reverse Engineering, Debugging Third-party Libraries, and Compatibility Solutions for Multi-Version Libraries",
+    "description": "Users are solely responsible for any consequences or losses resulting from using information provided through this channel. Neither the channel nor the author shall be liable for such outcomes. Users should bear the responsibility if any issues arise. Thank you!",
+    "href": "https://blog.codewf.com/post/2023/9/26/simulate-scenarios-using-third-party-dotnet-libraries-for-debugging-interception-decompilation-and-compatibility-solutions-for-multiple-versions-of-one-library"
+  }
+]
