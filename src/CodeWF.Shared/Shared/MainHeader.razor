@@ -3,7 +3,7 @@
         <GridCol Xs="24" Sm="24" Md="6" Lg="6" Xl="5" Xxl="4">
             <h1>
                 <a id="logo" href="/">
-                    <img alt="logo" src="/docs/assets/logo.png">CodeWF
+                    <img alt="logo" src="/docs/assets/logo.png">@Localizer["app.home.title"]
                 </a>
             </h1>
         </GridCol>
@@ -33,6 +33,8 @@
     [Parameter] public bool IsHome { get; set; }
 
     [Parameter] public EventCallback<bool> OnMobileModeChanged { get; set; }
+
+    [Inject] private IStringLocalizer Localizer { get; set; }
 
     private void OnBreakpoint(BreakpointType breakpoint)
     {

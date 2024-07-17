@@ -857,5 +857,64 @@
         ]
       }
     ]
+  },
+  {
+    "Order": 4,
+    "Title": "工具",
+    "Type": "subMenu",
+    "Url": "tool",
+    "Children": [
+      {
+        "Order": -2,
+        "Title": "开发",
+        "Type": "itemGroup",
+        "Children": [
+          {
+            "Order": 0,
+            "Title": "时间戳转换",
+            "SubTitle": "Unix时间戳转换",
+            "Type": "menuItem",
+            "Url": "tool/timestamp"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Order": 5,
+    "Title": "博客",
+    "Type": "subMenu",
+    "Url": "post",
+    "Children": [
+      {
+        "Order": -2,
+        "Title": "Avalonia UI",
+        "Type": "itemGroup",
+        "Children": [
+          {
+            "Order": 0,
+            "Title": "AvaloniaUI项目离线开发全攻略：IDE安装、模板应用与NuGet私有化部署一站式解决",
+            "SubTitle": "本文将指导您如何在本地网络环境中成功安装并配置AvaloniaUI所需的工具和模板。",
+            "Type": "menuItem",
+            "Url": "post/2024/06/avalonia-ui-project-offline-development-guide-one-stop-solution-for-ide-installation-template-application-and-nu-get-private-deployment"
+          }
+        ]
+      },
+      {
+        "Order": 1,
+        "Title": ".NET",
+        "Type": "itemGroup",
+        "Children": [
+          {
+            "Order": 0,
+            "Title": ".NET 9 X86 AOT的突破 - 支持老旧Win7与XP环境",
+            "SubTitle": ".NET 9开始，X86 AOT支持Win7和XP，不仅仅只支持SP1版本",
+            "Type": "menuItem",
+            "Url": "post/2024/07/good-news-breakthrough-in-net-9-x86-aot-supports-old-win7-and-xp-environments",
+            "Cover": "https://img1.dotnet9.com/2024/07/cover_01.png"
+          }
+        ]
+      }
+    ]
   }
 ]

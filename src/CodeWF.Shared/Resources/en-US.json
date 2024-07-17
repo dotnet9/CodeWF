@@ -31,6 +31,7 @@
   "app.demo.codesandbox": "Open in CodeSandbox",
   "app.demo.stackblitz": "Open in Stackblitz",
   "app.demo.riddle": "Open in Riddle",
+  "app.home.title": "CodeWF",
   "app.home.introduce": "Unleash your .NET skills with free tools & tech blogs - the one-stop resource hub.",
   "app.home.tools": "Tools",
   "app.home.popularize": "Popular",

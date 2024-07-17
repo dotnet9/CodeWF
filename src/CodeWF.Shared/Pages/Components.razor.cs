@@ -16,6 +16,14 @@ namespace CodeWF.Shared.Pages
     {
         [Parameter]
         public string Locale { get; set; }
+
+        [Parameter]
+        public int Year { get; set; }
+        [Parameter]
+        public int Month { get; set; }
+        [Parameter]
+        public string Slug { get; set; }
+
         [Parameter]
         public string Name { get; set; }
 

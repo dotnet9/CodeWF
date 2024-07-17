@@ -31,6 +31,7 @@
   "app.demo.codesandbox": "在 CodeSandbox 中打开",
   "app.demo.stackblitz": "在 Stackblitz 中打开",
   "app.demo.riddle": "在 Riddle 中打开",
+  "app.home.title": "码界工坊",
   "app.home.introduce": "探索.NET在线工具与技术精华，一站式编程资源站。",
   "app.home.tools": "推荐工具",
   "app.home.popularize": "推广",
