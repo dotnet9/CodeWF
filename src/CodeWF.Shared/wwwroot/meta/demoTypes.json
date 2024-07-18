@@ -673,5 +673,6 @@
   "Demos.Components.Watermark.demo.Scrolling",
   "Demos.Experimental.ReuseTabs.demo.DynamicTitle",
   "Demos.Experimental.ReuseTabs.demo.Layout_",
-  "Demos.Experimental.ReuseTabs.demo.TitleAttribute"
+  "Demos.Experimental.ReuseTabs.demo.TitleAttribute",
+  "Demos.Tool.Timestamp.demo.Basic"
 ]

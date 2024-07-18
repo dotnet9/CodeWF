@@ -7762,5 +7762,29 @@
         "Debug": false
       }
     ]
+  },
+  {
+    "Category": "Tool",
+    "Title": "Timestamp",
+    "SubTitle": "",
+    "Type": "时间",
+    "Desc": "时间戳，是从1970年1月1日（UTC/GMT的午夜）开始所经过的秒数（不考虑闰秒），用于表示一个时间点。然而，这种格式对于人类阅读并不友好，因此需要转换成可读的日期和时间格式。这个工具能够将时间戳快速转换为人类可读的日期时间格式，同时也支持反向转换，即将日期时间转换为时间戳。",
+    "ApiDoc": "",
+    "Cols": 1,
+    "Cover": "https://gw.alipayobjects.com/zos/antfincdn/lkI2hNEDr2V/Tabs.svg",
+    "DemoList": [
+      {
+        "Order": 0,
+        "Name": "Basic",
+        "Title": "工具使用",
+        "Description": "输入时间或时间戳，点击转换",
+        "Code": "",
+        "Type": "Demos.Tool.Timestamp.demo.Basic",
+        "Style": "",
+        "Iframe": 360,
+        "Link": "/tool/timestamp",
+        "Debug": false
+      }
+    ]
   }
 ]

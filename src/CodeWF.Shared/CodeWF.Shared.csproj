@@ -46,4 +46,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Demos\post\2024\07\" />
+  </ItemGroup>
+
 </Project>

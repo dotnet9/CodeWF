@@ -7673,5 +7673,29 @@
         "Debug": false
       }
     ]
+  },
+  {
+    "Category": "Tool",
+    "Title": "Timestamp",
+    "SubTitle": "",
+    "Type": "Time",
+    "Desc": "Timestamp is the number of seconds (excluding leap seconds) that have passed since January 1, 1970 (midnight UTC/GMT), used to represent a point in time. However, this format is not user-friendly for human reading, so it needs to be converted into readable date and time formats. This tool can quickly convert timestamps into human readable date and time formats, and also supports reverse conversion, that is, converting date and time into timestamps.",
+    "ApiDoc": "",
+    "Cols": 1,
+    "Cover": "https://gw.alipayobjects.com/zos/antfincdn/lkI2hNEDr2V/Tabs.svg",
+    "DemoList": [
+      {
+        "Order": 0,
+        "Name": "Basic",
+        "Title": "Convert code",
+        "Description": "Convert to",
+        "Code": "",
+        "Type": "Demos.Tool.Timestamp.demo.Basic",
+        "Style": "",
+        "Iframe": 360,
+        "Link": "/tool/timestamp",
+        "Debug": false
+      }
+    ]
   }
 ]
