@@ -1,0 +1,121 @@
+﻿@rendermode InteractiveServer
+
+<div class="home-banner">
+    <MSwiper @bind-Index="_carouselValue"
+             Style="position: relative"
+             Height="@("100%")">
+        <MSwiperSlide>
+            <MRow NoGutters Style="height: 100%">
+                <MCol Cols="12" Lg="6" Class="intro-wrapper">
+                    <div class="intro">
+                        <div class="intro-title">在线工具箱</div>
+                        <div class="intro-subtitle">实用</div>
+                        <div class="intro-actions">
+                            <MButton Class="gradual-btn" Text Ripple="false" Href="/stack">了解更多</MButton>
+                        </div>
+                    </div>
+                </MCol>
+                <MCol Cols="12" Lg="6" Class="cover-wrapper">
+                    <MImage Src="https://img1.dotnet9.com/site/banners/tool.png"
+                            Contain
+                            Eager
+                            Style="margin-left: 36px"
+                            Width="@("100%")"
+                            Height="@("100%")" />
+                </MCol>
+            </MRow>
+        </MSwiperSlide>
+        <MSwiperSlide>
+            <MRow NoGutters Style="height: 100%">
+                <MCol Cols="12" Lg="6" Class="intro-wrapper">
+                    <div class="intro">
+                        <div class="intro-title">博客</div>
+                        <div class="intro-subtitle">日常技术总结</div>
+                        <div class="intro-actions">
+                            <MButton Class="gradual-btn" Text Ripple="false" Href="/post">了解更多</MButton>
+                        </div>
+                    </div>
+                </MCol>
+                <MCol Cols="12" Lg="6" Class="cover-wrapper">
+                    <MImage Src="https://img1.dotnet9.com/site/banners/blog.png"
+                            Contain
+                            Eager
+                            Width="@("100%")"
+                            Height="@("100%")" />
+                </MCol>
+            </MRow>
+        </MSwiperSlide>
+        <MSwiperSlide>
+            <MRow NoGutters Style="height: 100%">
+                <MCol Cols="12" Lg="6" Class="intro-wrapper">
+                    <div class="intro">
+                        <div class="intro-title">资源</div>
+                        <div class="intro-subtitle">开源项目</div>
+                        <div class="intro-actions">
+                            <MButton Class="gradual-btn" Text Ripple="false" Href="/resource">了解更多</MButton>
+                        </div>
+                    </div>
+                </MCol>
+                <MCol Cols="12" Lg="6" Class="cover-wrapper">
+                    <MImage Src="https://img1.dotnet9.com/site/banners/resource.png"
+                            Eager
+                            Contain
+                            Width="@("100%")"
+                            Height="@("100%")" />
+                </MCol>
+            </MRow>
+        </MSwiperSlide>
+        <MSwiperAutoplay />
+        <MSwiperPagination Clickable Class="carousel-dot hidden-md-and-up" />
+    </MSwiper>
+
+    <NextView Class="hidden-md-and-up" MoreText="更多产品" />
+
+    <div class="home-banner__slider-wrapper hidden-sm-and-down">
+        <MItemGroup Value="_carouselValue"
+                    ValueChanged="v => _carouselValue = v.ToInt32()"
+                    ActiveClass="active">
+            <MRow NoGutters Class="slider">
+                <MItem>
+                    <MCol Class="slider-item" Cols="4" @onclick="() => _carouselValue = 0">
+                        <div class="number @context.ActiveClass">01</div>
+                        <PBlockText Style="width: calc(100% - 56px)"
+                                    Primary="在线工具箱"
+                                    Secondary="实用"
+                                    PrimaryClass="@($"h6 text-truncate {(context.Active ? "emphasis--text" : "regular--text")} mb-2")"
+                                    SecondaryClass="@($"subtitle text-truncate {(context.Active ? "regular2--text" : "regular3--text")} ")">
+                        </PBlockText>
+                    </MCol>
+                </MItem>
+                <MItem>
+                    <MCol Class="slider-item" Cols="4" @onclick="() => _carouselValue = 1">
+                        <div class="number @context.ActiveClass">02</div>
+                        <PBlockText Style="width: calc(100% - 56px)"
+                                    Primary="博客"
+                                    Secondary="日常技术总结"
+                                    PrimaryClass="@($"h6 text-truncate {(context.Active ? "emphasis--text" : "regular--text")} mb-2")"
+                                    SecondaryClass="@($"subtitle text-truncate {(context.Active ? "regular2--text" : "regular3--text")} ")">
+                        </PBlockText>
+                    </MCol>
+                </MItem>
+                <MItem>
+                    <MCol Class="slider-item" Cols="4" @onclick="() => _carouselValue = 2">
+                        <div class="number @context.ActiveClass">03</div>
+                        <PBlockText Style="width: calc(100% - 56px)"
+                                    Primary="资源"
+                                    Secondary="开源项目"
+                                    PrimaryClass="@($"h6 text-truncate {(context.Active ? "emphasis--text" : "regular--text")} mb-2")"
+                                    SecondaryClass="@($"subtitle text-truncate {(context.Active ? "regular2--text" : "regular3--text")} ")">
+                        </PBlockText>
+                    </MCol>
+                </MItem>
+            </MRow>
+        </MItemGroup>
+    </div>
+</div>
+
+@code {
+
+    private int _carouselValue = 0;
+
+}

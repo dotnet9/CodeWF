@@ -1,0 +1,28 @@
+﻿<MCard Class="@($"blazor-card blazor-card__margin-bottom {(IsImageRight ? "img--right" : "")}")" Flat>
+    <div class="blazor-card__image">
+        <img src="@Image" alt="@Title" />
+    </div>
+    <div>
+        <div class="blazor-card__title">@Title</div>
+
+        <div class="blazor-card__description">
+            @Description
+        </div>
+    </div>
+</MCard>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string? Image { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public bool IsImageRight { get; set; }
+
+}

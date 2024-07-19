@@ -1,0 +1,86 @@
+﻿@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<MNavigationDrawer Value="@_drawer"
+                   ValueChanged="ValueChanged"
+                   Fixed
+                   Temporary
+                   Right
+                   Width="315"
+                   NoSsr>
+    <MList Class="mt-1" Style="height: 100%; overflow-y: auto; padding-top:24px;" Elevation="0" Subheader TwoLine Routable>
+        @foreach (var item in NavItems)
+        {
+            @if (item.IsSubheader)
+            {
+                <MSubheader Style="height: auto"
+                            Class="subtitle3 emphasis--text">
+                    @item.Subheader
+                </MSubheader>
+            }
+            else
+            {
+                <MListItem Href="@item.Href" Disabled="@item.Disabled" ActiveClass="primary--text" Class="home-menu-hover">
+                    @if (item.Image is not null)
+                    {
+                        <MListItemAvatar Tile Size="40" Class="mt-0 mb-0">
+                            <MImage Src="@item.Image"
+                                    alt="@item.Title"
+                                    Height="@item.Size"
+                                    Width="@item.Size"
+                                    Contain
+                                    Eager />
+                        </MListItemAvatar>
+                    }
+                    <MListItemContent >
+                        <MListItemTitle Class="h8 regular--text">
+                            @if (item.Disabled)
+                            {
+                                <div style="color: #A3AED0;">@item.Title</div>
+                            }
+                            else
+                            {
+                                <div style="color: #485585;">@item.Title</div>
+                            }
+                        </MListItemTitle>
+                        <MListItemSubtitle Class="body2 regular3--text">@item.Subtitle</MListItemSubtitle>
+                    </MListItemContent>
+                </MListItem>
+            }
+        }
+    </MList>
+</MNavigationDrawer>
+
+@code {
+
+    [Parameter] public List<NavItem> NavItems { get; set; } = new();
+
+    private bool? _drawer = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(100);
+            _drawer = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ValueChanged(bool? val)
+    {
+        var prevDrawer = _drawer;
+
+        _drawer = val;
+        
+        StateHasChanged();
+
+        await Task.Delay(300);
+
+        if (prevDrawer is true && _drawer is false)
+        {
+            Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("Aside", (bool?)null));
+        }
+    }
+
+}

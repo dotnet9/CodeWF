@@ -1,0 +1,20 @@
+﻿<MInteractiveTrigger InteractiveValue="true"
+                     InteractiveComponentType="typeof(ScrollToNext)"
+                     QueryName="@nameof(ScrollingToNext)"
+                     QueryValue="ScrollingToNext"
+                     Class="@($"home-banner__slider-wrapper {Class}")"
+                     Style="background-image: url('https://cdn.masastack.com/images/mUnion.png'); background-size: 100% 100%">
+    <MIcon Small Color="#E2E7F4">mdi-chevron-double-up</MIcon>
+    <div class="more">@MoreText</div>
+</MInteractiveTrigger>
+
+@code {
+
+    [Parameter] public string? MoreText { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [SupplyParameterFromQuery]
+    private bool? ScrollingToNext { get; set; }
+
+}

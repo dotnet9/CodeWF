@@ -1,0 +1,92 @@
+﻿@page "/stack"
+@inject NavigationManager NavigationManager
+
+<PageTitle>温州数闪科技有限公司</PageTitle>
+
+<SectionContent SectionName="document">
+    <MButton Text
+             Class="mr-9 h8 emphasis2--text"
+             Href="https://docs.masastack.com/stack/masa-stack-1.0/introduce"
+             Target="_blank">
+        文档
+    </MButton>
+</SectionContent>
+
+<div class="home-banner without-carousels">
+    <MRow NoGutters Style="height: 100%">
+        <MCol Cols="12" Lg="6" Class="intro-wrapper">
+            <div class="intro">
+                <div class="intro-title">开源企业级开发者门户&#10;平台工程</div>
+                <div class="intro-subtitle">让开发者聚焦业务价值的实现</div>
+                <div class="intro-actions">
+                    <MButton Class="gradual-btn" Text Ripple="false" Href="https://docs.masastack.com/stack/masa-stack-1.0/introduce">开始使用</MButton>
+                    <MButton Text Ripple="false" Class="text-capitalize"
+                             Href="https://github.com/masastack" Target="_blank">
+                        <MIcon Class="mr-2">mdi-github</MIcon>
+                        Github
+                    </MButton>
+                </div>
+            </div>
+        </MCol>
+        <MCol Cols="12" Lg="6" Class="cover-wrapper">
+            <img src="https://cdn.masastack.com/images/stack_banner.png"
+                 width="100%" />
+        </MCol>
+    </MRow>
+
+    <NextViewInteractiveTrigger Class="hidden-md-and-up" MoreText="查看更多" />
+</div>
+<div class="home-content">
+    <div class="home-content__item" id="basic-ability-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="basic-ability"
+                                         Items="sMenuableTitleItems"
+                                         Title="BASIC ABILITY" />
+            <div class="home-content__item-subtitle">现代应用治理解决方案</div>
+        </div>
+        <StackBasicAbility Items="basicAbilityFeatures" />
+    </div>
+    <div class="home-content__item" id="operator-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="operator" Items="sMenuableTitleItems" Title="OPERATOR"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">高效运维解决方案</div>
+        </div>
+        <StackBasicAbility Items="operatorFeatures" />
+    </div>
+    <div class="home-content__item" id="data-factory-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="data-factory" Items="sMenuableTitleItems" Title="DATA FACTORY"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">数据治理解决方案</div>
+        </div>
+        <StackBasicAbility Items="dataFactoryFeatures" />
+    </div>
+    <div class="home-content__item" id="why-masa-stack-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="why-masa-stack" Items="sMenuableTitleItems" Title="WHY MASA STACK"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">为什么选择MASA Stack?</div>
+        </div>
+        <MRow Class="home-content__item-cards no-gutters-on-mobile">
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon1.svg"
+                         Title=".NET优先"
+                         Icon="https://cdn.masastack.com/images/v-icon1.svg"
+                         WhyContents="sWhyContent1">
+                </WhyCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon2.svg"
+                         Title="开源"
+                         Icon="https://cdn.masastack.com/images/v-icon2.svg"
+                         WhyContents="sWhyContent2">
+                </WhyCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon3.svg"
+                         Title="社区"
+                         Icon="https://cdn.masastack.com/images/v-icon3.svg"
+                         WhyContents="sWhyContent3">
+                </WhyCard>
+            </MCol>
+        </MRow>
+    </div>
+</div>

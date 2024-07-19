@@ -1,0 +1,37 @@
+﻿<MCard Class="why-card fill-height-on-desktop" Flat>
+    <div class="d-flex flex-column" style="width: 100%">
+        <div class="d-flex align-center">
+            <img src="@Image" width="48" height="48" alt="@Title" />
+            <div class="why-card__title">@Title</div>
+        </div>
+        <hr style="border: 0.5px solid #E2E7F4; margin-top:32px;" class="hidden-md-and-up" />
+        <div>
+            @if (WhyContents is not null && WhyContents.Count > 0)
+            {
+                @foreach (var content in WhyContents)
+                {
+                    <div class="d-flex align-center why-card__ul">
+                        <img src="@Icon" width="20" height="20" />
+                        <div class="why-card__li">@content</div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</MCard>
+
+@code {
+
+    [Parameter]
+    public string? Image { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public List<string>? WhyContents { get; set; }
+
+}

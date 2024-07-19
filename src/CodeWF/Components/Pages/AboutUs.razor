@@ -1,0 +1,57 @@
+﻿@page "/aboutus"
+
+<PageTitle>温州数闪科技有限公司</PageTitle>
+
+<div class="home-banner without-carousels d-flex align-center justify-center">
+    <div class="d-flex justify-center">
+        <img src="https://cdn.masastack.com/images/logo_big.png"
+             class="aboutus__banner"
+             alt="logo" />
+    </div>
+
+    <NextViewInteractiveTrigger Class="hidden-md-and-up" MoreText="公司简介" />
+</div>
+
+<div class="home-content">
+    <div class="home-content__item">
+        <div class="home-content__item-header mb-4" id="aboutus_companyinfo">
+            <MenuTitle Title="公司简介" />
+        </div>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="12" Class="d-flex justify-center">
+                <MCard style="background-color:transparent; width:980px;" Flat>
+                    <MRow>
+                        <MCol>
+                            <p class="regular2--text about-desc">
+                                温州数闪科技有限公司，成立于2021年，是一家 开源 软件公司。致力于打造开源产品MASA Stack，提供一站式.NET现代化应用开发交付解决方案，赋能 560万.NET开发者转型为数字化人才，帮助企业降低数字化转型门槛，让变化更简单！
+                            </p>
+                        </MCol>
+                    </MRow>
+                </MCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="12" Md="4">
+                <AboutUsCard Image="https://cdn.masastack.com/images/shenzhenaddress.svg"
+                             Description="深圳市南山区深圳湾科技生态园2栋B座708" />
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <AboutUsCard Image="https://cdn.masastack.com/images/hangzhouaddress.svg"
+                             Description="浙江省杭州市钱塘区新加坡科技园9幢12层" />
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <AboutUsCard Image="https://cdn.masastack.com/images/wenzhouaddress.svg"
+                             Description="浙江省乐清市北白象镇长江路1号" />
+            </MCol>
+        </MRow>
+    </div>
+    <div class="home-content">
+        <div class="home-content__item text-center">
+            <div class="home-content__item-header mb-4" id="aboutus_contactus">
+                <MenuTitle Title="联系我们" />
+            </div>
+            <img src="https://cdn.masastack.com/images/contact.png"
+                 class="aboutus__contact-img" />
+        </div>
+    </div>
+</div>

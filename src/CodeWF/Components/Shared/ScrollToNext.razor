@@ -1,0 +1,19 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("MasaOfficialWebsite.scrollToNext");
+
+            await Task.Delay(500); // animation duration
+
+            Navigation.NavigateWithQueryParameter("ScrollingToNext", (bool?)null);
+        }
+    }
+
+}

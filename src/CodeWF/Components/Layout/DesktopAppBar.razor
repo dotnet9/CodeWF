@@ -1,0 +1,49 @@
+﻿<AppBar Class="hidden-sm-and-down" BarHeight="100" LogoHeight="42">
+    <SectionOutlet SectionName="document" />
+
+    <MInteractiveTriggers Class="nav-menus"
+                          WithPopup
+                          Left="NavMenuLeft"
+                          PopupClass="menu-list"
+                          TValue="string"
+                          QueryName="nav-menu"
+                          QueryValue="@QueryValue"
+                          InteractiveValue="navMenuInteractiveValues"
+                          InteractiveComponentType="typeof(NavMenu)"
+                          InteractiveComponentParameters="ProductNavMenuParameters">
+        <MButton Id="@($"{context}-nav-menu")" Class="mr-9 h8 emphasis2--text" Text>
+            @(context switch
+            {
+                "tool" => "工具",
+                "post" => "博客",
+                _         => context
+            })
+        </MButton>
+    </MInteractiveTriggers>
+
+    <MButton Text Class="h8 emphasis2--text" Href="/aboutus">
+        关于我们
+    </MButton>
+</AppBar>
+
+@code {
+
+    [Parameter] public List<NavItem> ToolNavItems { get; set; } = new();
+
+    [Parameter] public List<NavItem> PostNavItems { get; set; } = new();
+
+    [SupplyParameterFromQuery(Name = "nav-menu")]
+    private string? QueryValue { get; set; }
+
+    private static string[] navMenuInteractiveValues = { "tool", "post" };
+
+    private bool IsToolNavMenu => QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true;
+
+    private Dictionary<string, object> ProductNavMenuParameters => new()
+    {
+        { nameof(NavMenu.Items), IsToolNavMenu ? ToolNavItems : PostNavItems },
+    };
+
+    private int NavMenuLeft => IsToolNavMenu ? -388 : -286;
+
+}

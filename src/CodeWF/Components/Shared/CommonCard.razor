@@ -1,0 +1,32 @@
+﻿<MCard Height=@Height Class="@Class" Flat>
+    <div class="d-flex align-center">
+        <img src="@Image" width="66" height="66" alt="@Title" />
+    </div>
+    <div>
+        <div class="common-card__title">@Title</div>
+        <div class="common-card__subtitle">@SubTitle</div>
+        <div class="common-card__content">@Content</div>
+    </div>
+</MCard>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string? Content { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? SubTitle { get; set; }
+
+    [Parameter]
+    public string? Image { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public int Height { get; set; }
+
+}

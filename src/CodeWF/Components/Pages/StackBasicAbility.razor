@@ -1,0 +1,20 @@
+﻿<MRow Class="home-content__item-cards no-gutters-on-mobile">
+    @foreach (var item in Items)
+    {
+        <MCol Cols="12" Md="6">
+            <CommonCard Height="@item.Height"
+                        Class="@($"common-card {(item.RightImage ? "flex-row-reverse justify-space-between" : "")}")"
+                        Title="@item.Title"
+                        SubTitle="@item.SubTitle"
+                        Content="@item.Content"
+                        Image="@item.Image">
+            </CommonCard>
+        </MCol>
+    }
+</MRow>
+
+@code {
+
+    [Parameter] public List<Stack.StackFeature> Items { get; set; } = new();
+
+}

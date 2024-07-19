@@ -1,0 +1,35 @@
+﻿<MCard Class="@Class" Flat>
+    <div class="d-flex flex-column" style="width:100%">
+        <div class="building-block-card__title">@Title</div>
+        @if (Clickable)
+        {
+            <div class="building-block-card__actions">
+                <MButton Class="building-block-card__content building-block-card__gradual-btn" Text Ripple="false" Href="https://blazor-pro.masastack.com">
+                    <div style="margin: 16px 48px;">
+                        @Content
+                    </div>
+                </MButton>
+            </div>
+        }
+        else
+        {
+            <div class="building-block-card__content">@Content</div>
+        }
+    </div>
+</MCard>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public string? Content { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool Clickable { get; set; }
+
+}

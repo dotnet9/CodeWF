@@ -1,0 +1,88 @@
+﻿@page "/"
+
+<PageTitle>码界工坊</PageTitle>
+
+<HomeBanner />
+
+<div class="home-content">
+    <div class="home-content__item full-page" id="product-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="product" Items="menuableTitleItems" Title="产品"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">Modern App & Service Architecture</div>
+        </div>
+        <MRow Class="home-content__item-cards no-gutters-on-mobile">
+            <MCol Cols="12" Md="4">
+                <ProductCard Title="MASA Stack"
+                             Href="/stack"
+                             Image="https://cdn.masastack.com/images/home_logn.svg"
+                             Description="开源企业级开发者门户  平台工程，包含企业IT现代化应用开发交付的全部板块，如应用治理、服务编排与集成、数据治理、可观测性、DevOps研发协作、AI智能等一站式解决方案">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <ProductCard Title="MASA Framework"
+                             Href="/framework"
+                             Image="https://cdn.masastack.com/images/framework_logo.svg"
+                             Description=".NET下一代微服务开发框架，内嵌分布式运行时——Dapr云原生最佳实践，能够快速实现分布式、微服务、DDD、SaaS等现代化应用开发">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <ProductCard Title="MASA Blazor"
+                             Href="/blazor"
+                             Image="https://cdn.masastack.com/images/blazor_logo.svg"
+                             Description="基于Material设计规范的Blazor组件库，打造企业级.NET全栈解决方案，具有模块化、响应式和优秀的性能，并实现MAUI多端适配">
+                </ProductCard>
+            </MCol>
+        </MRow>
+    </div>
+
+    <div class="home-content__item full-page fire" id="activity-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="activity" Items="menuableTitleItems" Title="最新活动"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">最新社区活动预告与往期回顾</div>
+        </div>
+        <MRow Class="home-content__item-cards no-gutters-on-mobile">
+            @foreach (var item in AllActivities.OrderByDescending(a => a.StartAt).Take(3))
+            {
+                <MCol Cols="12" Md="4">
+                    <ActivityCard Data="item" />
+                </MCol>
+            }
+        </MRow>
+
+        <MoreButton Href="/activity">更多活动</MoreButton>
+    </div>
+
+    <div class="home-content__item full-page fir" id="service-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="pro" Items="menuableTitleItems" Title="企业服务"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">提供开源商业优质服务 欢迎咨询</div>
+        </div>
+        <MRow Class="home-content__item-cards no-gutters-on-mobile">
+            <MCol Cols="12" Md="4">
+                <ServiceCard Image="images/diamond.svg"
+                             Title="开源服务年包"
+                             Icon="mdi-check-circle"
+                             IconColor="#6946FF"
+                             Contents="whyContent1">
+                </ServiceCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <ServiceCard Image="images/custom-service.svg"
+                             Title="企业定制服务"
+                             Icon="mdi-check-circle"
+                             IconColor="#05CD99"
+                             Contents="whyContent2">
+                </ServiceCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <ServiceCard Image="images/training-service.svg"
+                             Title="培训服务"
+                             Icon="mdi-check-circle"
+                             IconColor="#FF7D00"
+                             Contents="whyContent3">
+                </ServiceCard>
+            </MCol>
+        </MRow>
+
+    </div>
+</div>

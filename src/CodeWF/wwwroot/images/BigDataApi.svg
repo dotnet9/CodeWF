@@ -1,0 +1,21 @@
+<svg width="66" height="66" viewBox="0 0 66 66" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="66" height="66" fill="white"/>
+<rect width="66" height="66" fill="white"/>
+<rect x="41.25" y="30.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="41.25" y="8.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="41.25" y="16.5" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="41.25" y="44" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="41.25" y="52.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="33" y="30.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="33" y="8.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="33" y="16.5" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="33" y="44" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="33" y="52.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="49.5" y="30.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="49.5" y="8.25" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="49.5" y="16.5" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="49.5" y="44" width="5.5" height="5.5" fill="#4318FF"/>
+<rect x="49.5" y="52.25" width="5.5" height="5.5" fill="#4318FF"/>
+<circle cx="13.75" cy="33" r="5.5" fill="#4318FF"/>
+<path d="M35.75 11L13.75 33M13.75 33H35.75M13.75 33L35.75 55" stroke="#4318FF" stroke-width="2.75"/>
+</svg>

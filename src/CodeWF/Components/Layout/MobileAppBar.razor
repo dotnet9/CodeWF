@@ -1,0 +1,21 @@
+﻿@inject NavigationManager Navigation
+
+<AppBar Class="hidden-md-and-up" BarHeight="48" LogoHeight="30">
+    <MButton Icon Href="@Navigation.GetRelativeUriWithQueryParameter(nameof(Aside), true)">
+        <MIcon>mdi-menu</MIcon>
+    </MButton>
+</AppBar>
+
+@if (Aside)
+{
+    <MobileNavigationDrawer NavItems="NavItems" />
+}
+
+@code {
+
+    [Parameter] public List<NavItem> NavItems { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private bool Aside { get; set; }
+
+}

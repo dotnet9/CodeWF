@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Components.Sections
+
+<MAppBar App
+         Height="@BarHeight"
+         Class="@($"appbar {Class}")"
+         Flat
+         Dense>
+    <a href="/" style="display: contents">
+        <img src="https://img1.dotnet9.com/site/logo.ico"
+             height="@LogoHeight"
+             alt="logo" />
+        <span Class="mr-9 h4 emphasis2--text">码界工坊</span>
+    </a>
+
+    <MSpacer />
+
+    @ChildContent
+</MAppBar>
+
+@code {
+
+    [Parameter] public int BarHeight { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public int LogoHeight { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+}

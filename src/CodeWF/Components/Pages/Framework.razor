@@ -1,0 +1,188 @@
+﻿@page "/framework"
+
+<PageTitle>温州数闪科技有限公司</PageTitle>
+
+<SectionContent SectionName="document">
+    <MButton Text
+             Class="mr-9 h8 emphasis2--text"
+             Href="https://docs.masastack.com/framework/concepts/overview"
+             Target="_blank">
+        文档
+    </MButton>
+</SectionContent>
+
+<div class="home-banner without-carousels">
+    <MRow NoGutters Style="height: 100%">
+        <MCol Cols="12" Lg="6" Class="intro-wrapper">
+            <div class="intro">
+                <div class="intro-title">.NET下一代微服务&#10;开发框架</div>
+                <div class="intro-subtitle">开启全新的现代化应用开发交付体验</div>
+                <div class="intro-actions">
+                    <MButton Class="gradual-btn" Text Ripple="false" Href="https://docs.masastack.com/framework/concepts/overview">开始使用</MButton>
+                    <MButton Text Ripple="false" Class="text-capitalize"
+                             Href="https://github.com/masastack/MASA.Framework" Target="_blank">
+                        <MIcon Class="mr-2">mdi-github</MIcon>
+                        Github
+                    </MButton>
+                </div>
+            </div>
+        </MCol>
+        <MCol Cols="12" Lg="6" Class="cover-wrapper">
+            <img src="https://cdn.masastack.com/images/banner4.png"
+                 width="100%" />
+        </MCol>
+    </MRow>
+
+    <NextViewInteractiveTrigger Class="hidden-md-and-up" MoreText="构建块" />
+</div>
+
+<div class="home-content">
+    <div class="home-content__item">
+        <img class="framework-diagram hidden-md-and-up"
+             src="https://cdn.masastack.com/images/masaframework2.svg"
+             width="100%" />
+        <img class="framework-diagram hidden-sm-and-down"
+             src="https://cdn.masastack.com/images/masaframework1.svg"
+             height="663px" />
+    </div>
+
+    <div class="home-content__item" id="building-blocks-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="building-blocks" Items="s_menuableTitleItems" Title="BUILDING BLOCKS" />
+            <div class="home-content__item-subtitle">构建块</div>
+        </div>
+        <MRow Class="building-block__item-cards no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="StackSdks" Content="MASA Stack SDK" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Authentication" Content="认证" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Identity" Content="身份" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Configuration" Content="配置" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Data" Content="数据" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="DDD" Content="领域驱动设计" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Dispatcher" Content="调度器" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Bindings" Content="绑定" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Isolation" Content="隔离性" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Observability" Content="可观测性" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="SearchEngine" Content="搜索引擎" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Services" Content="服务" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="R/W Splitting" Content="读写分离" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Caching" Content="缓存" Class="building-block-card building-block-card__margin-left building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Storage" Content="储存" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Testable" Content="可测试性" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Consistency" Content="一致性" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="AOP" Content="面向切面编程" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="I18N" Content="国际化" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Rule Engine" Content="规则引擎" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+    </div>
+
+    <div class="home-content__item" id="utils-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="utils" Items="s_menuableTitleItems" Title="UTILS"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">通用类库集合</div>
+        </div>
+        <MRow Class="building-block__item-cards no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Configuration" Content="配置" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Data" Content="数据" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Development" Content="开发" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Exceptions" Content="异常处理" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+        <MRow Class="no-gutters-on-mobile">
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Extensions" Content="扩展" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Model" Content="模型" Class="building-block-card building-block-card__margin-left building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+            <MCol Cols="6" Md="3">
+                <BuildingBlockCard Title="Security" Content="安全" Class="building-block-card building-block-card__margin-bottom"></BuildingBlockCard>
+            </MCol>
+        </MRow>
+    </div>
+
+    <div class="home-content__item" id="why-masa-framework-content">
+        <div class="home-content__item-header">
+            <MenuTitleInteractiveTrigger InteractiveValue="why-masafx" Items="s_menuableTitleItems" Title="WHY MASA FRAMEWORK"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">为什么选择MASA Framework?</div>
+        </div>
+        <MRow Class="home-content__item-cards no-gutters-on-mobile">
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon4.svg"
+                         Title="现代应用开发体验"
+                         Icon="https://cdn.masastack.com/images/v-icon1.svg"
+                         WhyContents="s_whyContent1">
+                </WhyCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon2.svg"
+                         Title="开源"
+                         Icon="https://cdn.masastack.com/images/v-icon2.svg"
+                         WhyContents="s_whyContent2">
+                </WhyCard>
+            </MCol>
+            <MCol Cols="12" Md="4">
+                <WhyCard Image="https://cdn.masastack.com/images/icon3.svg"
+                         Title="社区"
+                         Icon="https://cdn.masastack.com/images/v-icon3.svg"
+                         WhyContents="s_whyContent3">
+                </WhyCard>
+            </MCol>
+        </MRow>
+    </div>
+
+</div>

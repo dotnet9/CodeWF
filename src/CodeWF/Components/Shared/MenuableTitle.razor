@@ -1,0 +1,69 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject NavigationManager Navigation
+@inherits NextTickComponentBase
+
+<MMenu Value="visible"
+       ValueChanged="ValueChanged"
+       OffsetY
+       Eager
+       ContentClass="menuable-title__content"
+       ExternalActivator
+       Activator="@Activator">
+    <ChildContent>
+        <MList Dense Flat TwoLine>
+            @foreach (var item in Items)
+            {
+                <MListItem OnClick="@(() => ScrollTo(item.Selector))">
+                    <MListItemContent>
+                        <MListItemTitle Class="h8 regular--text">@item.Title</MListItemTitle>
+                        <MListItemSubtitle Class="body2 regular3--text">@item.Subtitle</MListItemSubtitle>
+                    </MListItemContent>
+                </MListItem>
+            }
+        </MList>
+    </ChildContent>
+</MMenu>
+
+@code
+{
+    [Inject]
+    private IJSRuntime Js { get; set; } = null!;
+
+    [Parameter]
+    public List<MenuableTitleItem> Items { get; set; } = new();
+
+    [Parameter]
+    public string? Activator { get; set; }
+
+    [Parameter]
+    public string? QueryName { get; set; }
+
+    private bool visible;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(100);
+            visible = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ValueChanged(bool val)
+    {
+        var prevVisible = visible;
+
+        visible = val;
+
+        if (prevVisible && !visible)
+        {
+            Navigation.NavigateTo(Navigation.GetRelativeUriWithQueryParameter(QueryName, (string?)null));
+        }
+    }
+
+    private async Task ScrollTo(string selector)
+    {
+        await Js.InvokeVoidAsync("MasaOfficialWebsite.scrollTo", selector);
+    }
+}

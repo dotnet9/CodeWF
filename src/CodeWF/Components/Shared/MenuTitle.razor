@@ -1,0 +1,18 @@
+﻿<div id="@Id" class="d-flex align-center justify-center home-content__item-title">
+    @Title
+
+    @if (Icon)
+    {
+        <MIcon Style="color:#323D6F;" Class="hidden-md-and-up">mdi-chevron-down</MIcon>
+    }
+</div>
+
+@code {
+
+    [Parameter] public string? Id { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+
+    [Parameter] public bool Icon { get; set; }
+
+}
