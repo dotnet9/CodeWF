@@ -384,9 +384,8 @@ html {
             font-weight: 700;
             font-size: 24px;
             line-height: 51px;
-            letter-spacing: 0.02em;
+            margin-left: 3px;
             color: #1B2559;
-            max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

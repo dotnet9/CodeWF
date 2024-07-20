@@ -274,12 +274,11 @@
 
     .website-shared .product-card .product-card__title {
         font-weight: 700;
-        font-size: 24px;
+        font-size: 20px;
         line-height: 36px;
+        margin-left: 3px;
         text-align: center;
-        letter-spacing: normal;
         color: #1B2559;
-        max-width: 150px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -287,7 +286,7 @@
 
     .website-shared .product-card .product-card__desc {
         font-weight: 400;
-        font-size: 16px;
+        font-size: 15px;
         line-height: 24px;
         text-align: justify;
         letter-spacing: normal;
