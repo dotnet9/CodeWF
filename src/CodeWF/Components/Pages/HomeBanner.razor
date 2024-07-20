@@ -1,7 +1,7 @@
 ﻿@rendermode InteractiveServer
 
 <div class="home-banner">
-    <MSwiper @bind-Index="_carouselValue"
+    <MSwiper @bind-Index="_carouselInt"
              Style="position: relative"
              Height="@("100%")">
         <MSwiperSlide>
@@ -72,8 +72,7 @@
     <NextView Class="hidden-md-and-up" MoreText="更多产品" />
 
     <div class="home-banner__slider-wrapper hidden-sm-and-down">
-        <MItemGroup Value="_carouselValue"
-                    ValueChanged="v => _carouselValue = v.ToInt32()"
+        <MItemGroup @bind-Value="_carouselValue"
                     ActiveClass="active">
             <MRow NoGutters Class="slider">
                 <MItem>
@@ -116,6 +115,13 @@
 
 @code {
 
-    private int _carouselValue = 0;
+    StringNumber _carouselValue = 1;
+
+    int _carouselInt
+    {
+        get => _carouselValue.ToInt32();
+
+        set => _carouselValue = value.ToString();
+    }
 
 }
