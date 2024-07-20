@@ -1,9 +1,9 @@
-﻿<MCard Class="product-card" Flat Style="height:490px;display: flex;flex-direction: column;">
+﻿<MCard Class="product-card" Flat>
     <div class="product-card__header">
         <img src="@Image" height="65" width="65" />
         <div class="product-card__title">@Title</div>
     </div>
-    <div class="product-card__desc" style="flex: 1; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;">
+    <div class="product-card__desc">
         @Description
     </div>
 
@@ -25,17 +25,3 @@
     public string? Href { get; set; }
 
 }
-
-<style>
-    .product-card__header {
-        display: flex;
-        align-items: center; /* 垂直居中对齐 */
-    }
-
-    .product-card__title {
-        max-width: 150px; /* 设置最大宽度，根据需要调整 */
-        overflow: hidden; /* 隐藏超出部分 */
-        text-overflow: ellipsis; /* 使用省略号显示超出文字 */
-        white-space: nowrap; /* 不换行 */
-    }
-</style>

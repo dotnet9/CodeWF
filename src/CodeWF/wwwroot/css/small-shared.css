@@ -264,6 +264,8 @@
         padding-top: 16px;
         padding-bottom: 8px;
         margin-bottom: 4px;
+        display: flex;
+        align-items: center;
     }
 
         .website-shared .product-card .product-card__header .m-image {
@@ -277,6 +279,10 @@
         text-align: center;
         letter-spacing: normal;
         color: #1B2559;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .website-shared .product-card .product-card__desc {
@@ -289,6 +295,11 @@
         margin-bottom: 24px;
         min-height: unset;
         height: auto;
+        flex: 1;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
     }
 
 .website-shared .activity-card {
