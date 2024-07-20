@@ -16,14 +16,12 @@
             {
                 "tool" => "工具",
                 "post" => "博客",
+                "resource" => "资源",
+                "about" => "关于",
                 _         => context
             })
         </MButton>
     </MInteractiveTriggers>
-
-    <MButton Text Class="h8 emphasis2--text" Href="/aboutus">
-        关于我们
-    </MButton>
 </AppBar>
 
 @code {
@@ -32,18 +30,63 @@
 
     [Parameter] public List<NavItem> PostNavItems { get; set; } = new();
 
+    [Parameter] public List<NavItem> ResourceNavItems { get; set; } = new();
+
+    [Parameter] public List<NavItem> AboutNavItems { get; set; } = new();
+
     [SupplyParameterFromQuery(Name = "nav-menu")]
     private string? QueryValue { get; set; }
 
-    private static string[] navMenuInteractiveValues = { "tool", "post" };
+    private static string[] navMenuInteractiveValues = { "tool", "post", "resource", "about" };
 
-    private bool IsToolNavMenu => QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true;
-
-    private Dictionary<string, object> ProductNavMenuParameters => new()
+    private Dictionary<string, object> ProductNavMenuParameters
     {
-        { nameof(NavMenu.Items), IsToolNavMenu ? ToolNavItems : PostNavItems },
-    };
+        get
+        {
+            var dict = new Dictionary<string, object>();
+            List<NavItem> items;
+            if (QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                items = ToolNavItems;
+            }
+            else if (QueryValue?.Equals("post", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                items = PostNavItems;
+            }
+            else if (QueryValue?.Equals("resource", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                items = ResourceNavItems;
+            }
+            else
+            {
+                items = AboutNavItems;
+            }
+            dict[nameof(NavMenu.Items)] = items;
+            return dict;
+        }
+    }
 
-    private int NavMenuLeft => IsToolNavMenu ? -388 : -286;
+    private int NavMenuLeft
+    {
+        get
+        {
+            if (QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                return -388;
+            }
+            else if (QueryValue?.Equals("post", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                return -286;
+            }
+            else if (QueryValue?.Equals("resource", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                return -184;
+            }
+            else
+            {
+                return -84;
+            }
+        }
+    }
 
 }

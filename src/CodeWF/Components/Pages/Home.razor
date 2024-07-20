@@ -5,84 +5,116 @@
 <HomeBanner />
 
 <div class="home-content">
-    <div class="home-content__item full-page" id="product-content">
+
+    <div class="home-content__item full-page" id="tool-content">
         <div class="home-content__item-header">
-            <MenuTitleInteractiveTrigger InteractiveValue="product" Items="menuableTitleItems" Title="产品"></MenuTitleInteractiveTrigger>
-            <div class="home-content__item-subtitle">Modern App & Service Architecture</div>
+            <MenuTitleInteractiveTrigger InteractiveValue="product" Items="menuableTitleItems" Title="在线工具箱"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">Online Toolbox</div>
         </div>
         <MRow Class="home-content__item-cards no-gutters-on-mobile">
-            <MCol Cols="12" Md="4">
-                <ProductCard Title="MASA Stack"
-                             Href="/stack"
-                             Image="https://cdn.masastack.com/images/home_logn.svg"
-                             Description="开源企业级开发者门户  平台工程，包含企业IT现代化应用开发交付的全部板块，如应用治理、服务编排与集成、数据治理、可观测性、DevOps研发协作、AI智能等一站式解决方案">
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="二维码生成器"
+                             Href="https://tools.codewf.com/qrcode-generator"
+                             Image="https://img1.dotnet9.com/site/tools/qrcode-generator.png"
+                             Description="生成并下载url或文本的QR代码，并自定义背景和前景颜色。">
                 </ProductCard>
             </MCol>
-            <MCol Cols="12" Md="4">
-                <ProductCard Title="MASA Framework"
-                             Href="/framework"
-                             Image="https://cdn.masastack.com/images/framework_logo.svg"
-                             Description=".NET下一代微服务开发框架，内嵌分布式运行时——Dapr云原生最佳实践，能够快速实现分布式、微服务、DDD、SaaS等现代化应用开发">
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="日期时间转换器"
+                             Href="https://tools.codewf.com/date-converter"
+                             Image="https://img1.dotnet9.com/site/tools/date-converter.png"
+                             Description="将日期和时间转换为各种不同的格式">
                 </ProductCard>
             </MCol>
-            <MCol Cols="12" Md="4">
-                <ProductCard Title="MASA Blazor"
-                             Href="/blazor"
-                             Image="https://cdn.masastack.com/images/blazor_logo.svg"
-                             Description="基于Material设计规范的Blazor组件库，打造企业级.NET全栈解决方案，具有模块化、响应式和优秀的性能，并实现MAUI多端适配">
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="整数基转换器"
+                             Href="https://tools.codewf.com/base-converter"
+                             Image="https://img1.dotnet9.com/site/tools/base-converter.png"
+                             Description="在不同的基数（十进制、十六进制、二进制、八进制、base64…）之间转换数字">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="打乱字符串"
+                             Href="https://tools.codewf.com/slugify-string"
+                             Image="https://img1.dotnet9.com/site/tools/slugify-string.png"
+                             Description="确保字符串 url、文件名和 id 安全。">
                 </ProductCard>
             </MCol>
         </MRow>
     </div>
 
-    <div class="home-content__item full-page fire" id="activity-content">
+    <div class="home-content__item full-page" id="blog-content">
         <div class="home-content__item-header">
-            <MenuTitleInteractiveTrigger InteractiveValue="activity" Items="menuableTitleItems" Title="最新活动"></MenuTitleInteractiveTrigger>
-            <div class="home-content__item-subtitle">最新社区活动预告与往期回顾</div>
+            <MenuTitleInteractiveTrigger InteractiveValue="product" Items="menuableTitleItems" Title="博客"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">Blog</div>
         </div>
         <MRow Class="home-content__item-cards no-gutters-on-mobile">
-            @foreach (var item in AllActivities.OrderByDescending(a => a.StartAt).Take(3))
-            {
-                <MCol Cols="12" Md="4">
-                    <ActivityCard Data="item" />
-                </MCol>
-            }
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="NetBeauty2：让你的.NET项目输出目录更清爽"
+                             Href="https://blog.codewf.com/post/2024/3/12/netbeauty2-let-your-dotnet-project-output-directory-is-more-refreshing"
+                             Image="https://img1.dotnet9.com/site/tools/clear.png"
+                             Description="生成并下载在.NET项目开发中，随着项目复杂性的增加，依赖的dll文件也会逐渐增多。这往往导致输出目录混乱，不便于管理和部署。而NetBeauty2开源项目正是为了解决这一问题而生，它能够帮助开发者在独立发布.NET项目时，将.NET运行时和依赖的dll文件移动到指定的目录，从而让输出目录更加干净、清爽。">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title=".NET跨平台客户端框架 - Avalonia UI"
+                             Href="https://blog.codewf.com/post/2022/11/19/one-of-the-best-choices-for-dotnet-cross-platform-frameworks-avalonia-ui"
+                             Image="https://img1.dotnet9.com/site/tools/avalonia-white-purple.svg"
+                             Description="这是一个基于WPF XAML的跨平台UI框架，并支持多种操作系统（Windows（.NET Core），Linux（GTK），MacOS，Android和iOS），Web（WebAssembly）">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="各版本操作系统对.NET支持情况"
+                             Href="https://blog.codewf.com/post/2024/1/13/each-version-of-the-operating-system-is-correct-dotnet-support"
+                             Image="https://img1.dotnet9.com/site/tools/dotnet.png"
+                             Description="借助虚拟机和测试机，检测各版本操作系统对.NET的支持情况。安装操作系统后，实测安装相应运行时并能够运行星尘代理为通过。">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title=".NET反编译、第三方库调试（拦截、篡改、伪造）、一库多版本兼容"
+                             Href="https://blog.codewf.com/post/2023/9/26/simulate-scenarios-using-third-party-dotnet-libraries-for-debugging-interception-decompilation-and-compatibility-solutions-for-multiple-versions-of-one-libraryhttps://blog.codewf.com/post/2023/9/26/simulate-scenarios-using-third-party-dotnet-libraries-for-debugging-interception-decompilation-and-compatibility-solutions-for-multiple-versions-of-one-library"
+                             Image="https://img1.dotnet9.com/site/tools/safe.png"
+                             Description="使用者本人对于传播和利用本公众号提供的信息所造成的任何直接或间接的后果和损失负全部责任。公众号及作者对于这些后果不承担任何责任。如果造成后果，请自行承担责任。谢谢！">
+                </ProductCard>
+            </MCol>
         </MRow>
-
-        <MoreButton Href="/activity">更多活动</MoreButton>
     </div>
 
-    <div class="home-content__item full-page fir" id="service-content">
+    <div class="home-content__item full-page" id="resource-content">
         <div class="home-content__item-header">
-            <MenuTitleInteractiveTrigger InteractiveValue="pro" Items="menuableTitleItems" Title="企业服务"></MenuTitleInteractiveTrigger>
-            <div class="home-content__item-subtitle">提供开源商业优质服务 欢迎咨询</div>
+            <MenuTitleInteractiveTrigger InteractiveValue="product" Items="menuableTitleItems" Title="资源"></MenuTitleInteractiveTrigger>
+            <div class="home-content__item-subtitle">Resource</div>
         </div>
         <MRow Class="home-content__item-cards no-gutters-on-mobile">
-            <MCol Cols="12" Md="4">
-                <ServiceCard Image="images/diamond.svg"
-                             Title="开源服务年包"
-                             Icon="mdi-check-circle"
-                             IconColor="#6946FF"
-                             Contents="whyContent1">
-                </ServiceCard>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="HandyControl"
+                             Href="https://blog.dotnet9.com/post/2019/12/9/open-source-wpf-control-library-handycontrol"
+                             Image="https://img1.dotnet9.com/2019/12/0206.png"
+                             Description="一个很多人参与贡献的WPF开源控件项目">
+                </ProductCard>
             </MCol>
-            <MCol Cols="12" Md="4">
-                <ServiceCard Image="images/custom-service.svg"
-                             Title="企业定制服务"
-                             Icon="mdi-check-circle"
-                             IconColor="#05CD99"
-                             Contents="whyContent2">
-                </ServiceCard>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="WPF牛逼的动画库：XamlFlair"
+                             Href="https://blog.dotnet9.com/post/2023/7/3/one-wpf-awesome-animation-library-xamlflair"
+                             Image="https://img1.dotnet9.com/2021/07/cover_05.jpg"
+                             Description="XamlFlair库的目标是简化常见动画的实现，并允许开发人员使用几行Xaml`轻松`地添加单个或组合的动画集。">
+                </ProductCard>
             </MCol>
-            <MCol Cols="12" Md="4">
-                <ServiceCard Image="images/training-service.svg"
-                             Title="培训服务"
-                             Icon="mdi-check-circle"
-                             IconColor="#FF7D00"
-                             Contents="whyContent3">
-                </ServiceCard>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title=".NET类库“Vanara”：简单易用的Windows API封装库"
+                             Href="https://blog.dotnet9.com/post/2021/6/28/dotnet-classlibrary-vanara-an-easy-to-use-windows-api-encapsulation-library"
+                             Image="https://img1.dotnet9.com/2021/06/cover_01.png"
+                             Description="一系列非常简单易用，对Windows API做了极好封装的.NET类库，几乎不用再写繁琐的Windows API转换函数了。">
+                </ProductCard>
+            </MCol>
+            <MCol Cols="9" Md="3">
+                <ProductCard Title="初识MASA Blazor"
+                             Href="https://blog.dotnet9.com/post/2022/1/12/first-met-masa-blazor"
+                             Image="https://img1.dotnet9.com/2022/01/0711.png"
+                             Description="一个Mateial风格的开源Blazor组件库">
+                </ProductCard>
             </MCol>
         </MRow>
-
     </div>
+
 </div>
