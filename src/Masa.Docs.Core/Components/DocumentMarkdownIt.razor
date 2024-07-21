@@ -1,0 +1,47 @@
+﻿@using System.ComponentModel
+@inject IJSRuntime JSRuntime
+
+<MMarkdownIt Source="@Source"
+             AnchorOptions="@s_anchorOptions"
+             OnTocParsed="@OnTocParsed"
+             OnFrontMatterParsed="@OnFrontMatterParsed"
+             OnAfterRendered="OnAfterRendered"
+             Html
+             Typographer
+             HeaderSections
+             Scope="document"
+             Class="doc-markdown-body">
+</MMarkdownIt>
+
+@code {
+
+    [CascadingParameter]
+    private MScrollToTarget? ScrollToTargetComp { get; set; }
+    
+    [CascadingParameter(Name = "IsDark")]
+    private bool IsDark { get; set; }
+
+    [Parameter, EditorRequired]
+    public string? Source { get; set; }
+
+    [Parameter]
+    public EventCallback<List<MarkdownItTocContent>?> OnTocParsed { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> OnFrontMatterParsed { get; set; }
+
+    private static readonly MarkdownItAnchorOptions s_anchorOptions = new()
+    {
+        Level = 1,
+        PermalinkClass = "",
+        PermalinkSymbol = ""
+    };
+
+    private async Task OnAfterRendered()
+    {
+        await JSRuntime.TryInvokeVoidAsync("updateThemeOfElementsFromMarkdown", IsDark);
+
+        ScrollToTargetComp?.RetryObserveTargets();
+    }
+
+}

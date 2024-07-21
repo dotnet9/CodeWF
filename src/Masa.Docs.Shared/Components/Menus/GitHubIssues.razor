@@ -1,0 +1,141 @@
+﻿@namespace Masa.Docs.Shared.Components
+@implements IDisposable;
+@using System.Net.Http.Json;
+@using System.Text.Json;
+@using System.Text.Json.Nodes;
+@using Microsoft.Extensions.Caching.Memory;
+@using Octokit
+@using System.Diagnostics.CodeAnalysis
+@using Masa.Blazor.Docs.Services
+@inject BlazorDocService BlazorDocService
+
+@if (_show)
+{
+    if (_searching)
+    {
+        <MSkeletonLoader Class="github-issues" Type="button,button,button"></MSkeletonLoader>
+    }
+    else
+    {
+        <div class="github-issues github-issues--loaded rounded">
+            <a class="d-flex" target=_blank href="@($"https://github.com/masastack/MASA.Blazor/issues?q=is:issue+{Labels}")">
+                <MIcon Class="emphasize1-color mr-1" Size="16">mdi-plus</MIcon>
+                <span>Issues</span>
+            </a>
+            <a class="d-flex" target=_blank href="@($"https://github.com/masastack/MASA.Blazor/issues?q=is:open+is:issue+{Labels}")">
+                <MIcon Class="mr-1" Size="16">mdi-alert-circle-outline</MIcon>
+                <span>@_openCount</span>&nbsp;
+                <span>Open</span>
+            </a>
+            <a class="d-flex" target=_blank href="@($"https://github.com/masastack/MASA.Blazor/issues?q=is:issue+is:closed+{Labels}")">
+                <MIcon Class="mr-1" Size="16">mdi-check</MIcon>
+                <span>@_closeCount</span>&nbsp;
+                <span>Closed</span>
+            </a>
+        </div>
+    }
+}
+
+@code {
+
+    [Inject]
+    private GithubService GithubService { get; set; } = null!;
+
+    [Inject]
+    public NavigationManager Navigation { get; set; } = null!;
+
+    bool _show;
+    bool _searching;
+    int _openCount;
+    int _closeCount;
+    List<string> _componentNames = new();
+
+    private string Labels => "label:" + string.Join(',', _componentNames);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await SearchIssues();
+    }
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    private async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await SearchIssues();
+    }
+
+    private async Task SearchIssues()
+    {
+        var temp = _show;
+
+        var isComponentPage = Navigation.GetAbsolutePath().StartsWith("/blazor/components/", StringComparison.OrdinalIgnoreCase);
+        if (!isComponentPage)
+        {
+            _show = false;
+
+            if (temp)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+
+            return;
+        }
+
+        var pageToApi = await BlazorDocService.ReadPageToApiAsync();
+
+        var segments = Navigation.GetSegments();
+        var lastSegment = segments.LastOrDefault()?.ToLowerInvariant();
+        if (lastSegment == "api")
+        {
+            if (_show)
+            {
+                return;
+            }
+
+            lastSegment = segments.SkipLast(1).LastOrDefault()?.ToLowerInvariant();
+        }
+
+        if (lastSegment is null or "all")
+        {
+            _show = false;
+
+            if (temp)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+
+            return;
+        }
+
+        _show = true;
+        _searching = true;
+        await InvokeAsync(StateHasChanged);
+
+        _componentNames.Clear();
+
+        if (pageToApi.TryGetValue(lastSegment, out var components))
+        {
+            _componentNames.AddRange(components.Select(c => "component/" + (c[0] == 'M' ? c.TrimStart('M') : c.TrimStart('P'))));
+        }
+        else
+        {
+            _componentNames.Add("component/" + lastSegment.ToPascal().TrimEnd('s'));
+        }
+
+        (_openCount, _closeCount) = await GithubService.SearchIssuesAsync("masastack", "MASA.Blazor", new[] { string.Join(',', _componentNames) }, lastSegment);
+
+        _searching = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= HandleLocationChanged;
+    }
+
+}

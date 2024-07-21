@@ -1,0 +1,28 @@
+﻿@namespace Masa.Blazor.Docs.Components
+@inject I18n I18n
+
+@if (Data is not null && Data.Any())
+{
+    <section id="@Name.ToLower()">
+        <AppHeading Level="3" Href="@($"#{Name.ToLower()}")" Content="@(I18n.T(Name))"></AppHeading>
+        <ApiDatatable Field="@Name" Data="Data" Filter="@Filter" GithubUri="@GithubUri" />
+    </section>
+}
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Name { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public List<ParameterInfo>? Data { get; set; }
+
+    [Parameter]
+    public string? GithubUri { get; set; }
+
+    [Parameter]
+    public string? Filter { get; set; }
+
+}

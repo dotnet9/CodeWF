@@ -1,0 +1,42 @@
+﻿<div>
+    <MResponsive MaxWidth="400" Class="mx-auto mb-4">
+        <MTextField @bind-Value="_overscanCount" Type="number" TValue="int" Label="Overscan count">
+        </MTextField>
+    </MResponsive>
+
+    <MCard Elevation="6" MaxWidth="400" Class="mx-auto">
+        <MVirtualScroll Height="300" OverscanCount="@_overscanCount" ItemSize="65" Items="_items">
+            <ItemContent>
+                <MListItem>
+                    <MListItemAction>
+                        <MButton Fab Small Depressed Color="primary">
+                            @context
+                        </MButton>
+                    </MListItemAction>
+
+                    <MListItemContent>
+                        <MListItemTitle>
+                            User Database Record <strong>ID @context</strong>
+                        </MListItemTitle>
+                    </MListItemContent>
+
+                    <MListItemAction>
+                        <MIcon Small>
+                            mdi-open-in-new
+                        </MIcon>
+                    </MListItemAction>
+
+                </MListItem>
+
+                <MDivider></MDivider>
+            </ItemContent>
+        </MVirtualScroll>
+    </MCard>
+</div>
+
+@code
+{
+    int _overscanCount = 3;
+
+    private readonly int[] _items = Enumerable.Range(1, 7000).ToArray();
+}

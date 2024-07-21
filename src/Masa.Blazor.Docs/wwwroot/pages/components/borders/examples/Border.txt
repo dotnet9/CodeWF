@@ -1,0 +1,42 @@
+﻿<MCard Outlined MaxWidth="300" Class="mx-auto" Tile>
+    <MBorder Offset Border="_border" Style="@OffsetBroderStyle">
+        <MBorder Color="#e91e63">
+            <MCardTitle>Card Title</MCardTitle>
+            <MCardSubtitle>Card Subtitle</MCardSubtitle>
+        </MBorder>
+        <MCardText>
+            <p>Greyhound divisively hello coldly wonderfully marginally far upon excluding. </p>
+        </MCardText>
+        <MCardActions>
+            <MButton Text Color="primary">
+                <MIcon Small>fa:fas fa-edit</MIcon>
+                edit
+            </MButton>
+            <MButton Text Color="primary">
+                <MIcon Small>fa:fas fa-share-square</MIcon>
+                share
+            </MButton>
+        </MCardActions>
+    </MBorder>
+</MCard>
+
+<div style="display:flex;justify-content:center;">
+    <MRadioGroup TValue="Borders" @bind-Value="_border" Row>
+        <MRadio Value="Borders.Left" Label="left"></MRadio>
+        <MRadio Value="Borders.Top" Label="top"></MRadio>
+        <MRadio Value="Borders.Right" Label="right"></MRadio>
+        <MRadio Value="Borders.Bottom" Label="bottom"></MRadio>
+    </MRadioGroup>
+</div>
+
+@code {
+    private Borders _border = Borders.Bottom;
+
+    private string? OffsetBroderStyle => _border switch
+    {
+        Borders.Left or Borders.Right => "margin: -1px 0;",
+        Borders.Top or Borders.Bottom => "margin: 0 -1px",
+        _ => null
+    };
+
+}

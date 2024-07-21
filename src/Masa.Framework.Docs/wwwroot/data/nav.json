@@ -1,0 +1,256 @@
+[
+  {
+    "title": "dotnet",
+    "items": [
+      {
+        "title": "dotnet9",
+        "items": [
+          "good-news-breakthrough-in-net-9-x86-aot-supports-old-win7-and-xp-environments"
+        ]
+      }
+    ]
+  },
+  {
+    "title": "concepts",
+    "items": [
+      "overview",
+      "observability",
+      "modern-application"
+    ]
+  },
+  {
+    "title": "getting-started",
+    "items": [
+      "overview",
+      "web-project"
+    ]
+  },
+  {
+    "title": "tutorial",
+    "items": [
+      "overview",
+      "mf-part-1",
+      "mf-part-2",
+      "mf-part-3",
+      "mf-part-4",
+      "mf-part-5",
+      "mf-part-6"
+    ]
+  },
+  {
+    "title": "building-blocks",
+    "items": [
+      {
+        "title": "auto-complete",
+        "items": [
+          "overview",
+          "elasticsearch",
+          "faq"
+        ]
+      },
+      {
+        "title": "background-jobs",
+        "items": [
+          "overview",
+          "memory",
+          "hangfire",
+          "faq"
+        ]
+      },
+      {
+        "title": "caching",
+        "items": [
+          "overview",
+          "stackexchange-redis",
+          "multilevel-cache"
+        ]
+      },
+      {
+        "title": "caller",
+        "items": [
+          "overview",
+          "httpclient",
+          "daprclient",
+          "faq"
+        ]
+      },
+      {
+        "title": "configuration",
+        "items": [
+          "overview",
+          "configuration-local",
+          "dcc"
+        ]
+      },
+      "cqrs",
+      {
+        "title": "data",
+        "items": [
+          "overview",
+          "orm-efcore",
+          "data-filter",
+          "connection-strings",
+          "faq"
+        ]
+      },
+      {
+        "title": "data-mapping",
+        "items": [
+          "overview",
+          "mapster"
+        ]
+      },
+      {
+        "title": "data-serializer",
+        "items": [
+          "overview",
+          "json",
+          "yaml"
+        ]
+      },
+      {
+        "title": "development",
+        "items": [
+          "overview",
+          "dapr-starter"
+        ]
+      },
+      {
+        "title": "ddd",
+        "items": [
+          "overview",
+          "domain-model",
+          "repository",
+          "domain-service",
+          "faq"
+        ]
+      },
+      {
+        "title": "dispatcher",
+        "items": [
+          "overview",
+          "local-event",
+          "integration-event",
+          "faq"
+        ]
+      },
+      {
+        "title": "distributed-lock",
+        "items": [
+          "overview",
+          "lock-local",
+          "medallion"
+        ]
+      },
+      "exception",
+      {
+        "title": "globalization",
+        "items": [
+          "overview",
+          "i18n",
+          "i18n-aspnetcore",
+          "i18n-dcc"
+        ]
+      },
+      {
+        "title": "identity",
+        "items": [
+          "overview",
+          "aspnetcore",
+          "blazor-server",
+          "blazor-wasm",
+          "faq"
+        ]
+      },
+      {
+        "title": "id-generator",
+        "items": [
+          "overview",
+          "normal-guid",
+          "sequential-guid",
+          "snowflake"
+        ]
+      },
+      {
+        "title": "isolation",
+        "items": [
+          "overview",
+          "multi-environment",
+          "multi-tenant",
+          "faq"
+        ]
+      },
+      "openId-connect",
+      "minimal-apis",
+      {
+        "title": "rules-engine",
+        "items": [
+          "overview",
+          "microsoft-rules-engine"
+        ]
+      },
+      "stack-sdks",
+      {
+        "title": "storage",
+        "items": [
+          "overview",
+          "aliyun-oss"
+        ]
+      }
+    ]
+  },
+  {
+    "title": "utils",
+    "items": [
+      {
+        "title": "data",
+        "items": [
+          "overview",
+          "elasticsearch",
+          "prometheus"
+        ]
+      },
+      {
+        "title": "extensions",
+        "items": [
+          "overview",
+          "fluent-validation",
+          "dependency-injection",
+          "dotnet-extensions",
+          "enums",
+          "expression"
+        ]
+      },
+      {
+        "title": "ldap",
+        "items": [
+          "overview",
+          "novell"
+        ]
+      },
+      "memory-cache",
+      {
+        "title": "security",
+        "items": [
+          "cryptography",
+          "token"
+        ]
+      }
+    ]
+  },
+  {
+    "title": "upgrade",
+    "items": [
+      "0.6.0",
+      "0.7.0",
+      "1.0.0"
+    ]
+  },
+  {
+    "title": "contribution",
+    "items": [
+      "overview",
+      "recommend"
+    ]
+  }
+]

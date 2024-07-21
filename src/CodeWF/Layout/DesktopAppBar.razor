@@ -1,5 +1,14 @@
 ﻿<AppBar Class="hidden-sm-and-down" BarHeight="100" LogoHeight="42">
     <SectionOutlet SectionName="document" />
+        
+    <MButton Text Class="h8 emphasis2--text" Href="/tool">
+        工具
+    </MButton>
+    <MButton Text Class="h8 emphasis2--text" Href="/post">
+        博客
+    </MButton><MButton Text Class="h8 emphasis2--text" Href="/res">
+        资源
+    </MButton>
 
     <MInteractiveTriggers Class="nav-menus"
                           WithPopup
@@ -8,17 +17,14 @@
                           TValue="string"
                           QueryName="nav-menu"
                           QueryValue="@QueryValue"
-                          InteractiveValue="navMenuInteractiveValues"
+                          InteractiveValue="_navMenuInteractiveValues"
                           InteractiveComponentType="typeof(NavMenu)"
                           InteractiveComponentParameters="ProductNavMenuParameters">
         <MButton Id="@($"{context}-nav-menu")" Class="mr-9 h8 emphasis2--text" Text>
             @(context switch
             {
-                "tool" => "工具",
-                "post" => "博客",
-                "resource" => "资源",
                 "about" => "关于",
-                _         => context
+                _ => context
             })
         </MButton>
     </MInteractiveTriggers>
@@ -26,67 +32,25 @@
 
 @code {
 
-    [Parameter] public List<NavItem> ToolNavItems { get; set; } = new();
-
-    [Parameter] public List<NavItem> PostNavItems { get; set; } = new();
-
-    [Parameter] public List<NavItem> ResourceNavItems { get; set; } = new();
-
     [Parameter] public List<NavItem> AboutNavItems { get; set; } = new();
 
     [SupplyParameterFromQuery(Name = "nav-menu")]
     private string? QueryValue { get; set; }
 
-    private static string[] navMenuInteractiveValues = { "tool", "post", "resource", "about" };
+    private static string[] _navMenuInteractiveValues = { "about" };
 
     private Dictionary<string, object> ProductNavMenuParameters
     {
         get
         {
-            var dict = new Dictionary<string, object>();
-            List<NavItem> items;
-            if (QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true)
+            var dict = new Dictionary<string, object>
             {
-                items = ToolNavItems;
-            }
-            else if (QueryValue?.Equals("post", StringComparison.OrdinalIgnoreCase) is true)
-            {
-                items = PostNavItems;
-            }
-            else if (QueryValue?.Equals("resource", StringComparison.OrdinalIgnoreCase) is true)
-            {
-                items = ResourceNavItems;
-            }
-            else
-            {
-                items = AboutNavItems;
-            }
-            dict[nameof(NavMenu.Items)] = items;
+                [nameof(NavMenu.Items)] = AboutNavItems
+            };
             return dict;
         }
     }
 
-    private int NavMenuLeft
-    {
-        get
-        {
-            if (QueryValue?.Equals("tool", StringComparison.OrdinalIgnoreCase) is true)
-            {
-                return -388;
-            }
-            else if (QueryValue?.Equals("post", StringComparison.OrdinalIgnoreCase) is true)
-            {
-                return -286;
-            }
-            else if (QueryValue?.Equals("resource", StringComparison.OrdinalIgnoreCase) is true)
-            {
-                return -184;
-            }
-            else
-            {
-                return -84;
-            }
-        }
-    }
+    private int NavMenuLeft => -84;
 
 }

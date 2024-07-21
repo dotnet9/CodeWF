@@ -1,0 +1,21 @@
+﻿<MRow Justify="@JustifyTypes.Center">
+    <MImage MaxHeight="@MaxHeight"
+            MaxWidth="@MaxWidth"
+            Contain="@Contain"
+            Src="https://picsum.photos/id/11/500/300"
+            LazySrc="https://picsum.photos/id/11/10/6">
+    </MImage>
+</MRow>
+
+@code {
+
+    [Parameter]
+    public bool Contain { get; set; }
+
+    [Parameter]
+    public StringNumber MaxWidth { get; set; }
+
+    [Parameter]
+    public StringNumber MaxHeight { get; set; }
+
+}

@@ -1,0 +1,138 @@
+﻿@inject I18n I18n
+
+@namespace Masa.Blazor.Docs.Components
+
+<AppSheet Class="mb-9 m-sheet--no-bg">
+    <MSimpleTable Class="api-table">
+        <thead>
+        <tr>
+            @foreach (var header in Headers)
+            {
+                <th style="@GetHeaderStyle(header)">
+                    <div class="subtitle">@I18n.T(header)</div>
+                </th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                @foreach (var header in Headers)
+                {
+                    <td>
+                        @if (header == "name")
+                        {
+                            <span class="subtitle">
+                                <MBadge Value="@(item.Required)" Color="transparent"
+                                        Class="@(item.IsObsolete ? "text-mono text-no-wrap text-decoration-line-through" : "text-mono text-no-wrap")"
+                                        OffsetY="10">
+                                    <BadgeContent>
+                                        <MIcon Size="9" Color="red lighten-2">mdi-asterisk</MIcon>
+                                    </BadgeContent>
+                                    <ChildContent>
+                                        @item.Name
+
+                                        @if (!string.IsNullOrEmpty(item.ReleasedOn))
+                                        {
+                                            <MChip Class="ml-2 px-2" Outlined XSmall Color="@AppService.ColorForUpdateState">@item.ReleasedOn</MChip>
+                                        }
+                                    </ChildContent>
+                                </MBadge>
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="body">
+                                @if (header == "type")
+                                {
+                                    var noTypeDesc = string.IsNullOrWhiteSpace(item.TypeDesc);
+
+                                    <MTooltip Disabled="@noTypeDesc" ContentClass="text-mono" ContentStyle="white-space: pre" Top>
+                                        <ActivatorContent>
+                                            <code @attributes="@context.Attrs"
+                                                  class="@(noTypeDesc ? "" : "tooltip-code")">
+                                                @item.Type
+                                            </code>
+                                        </ActivatorContent>
+                                        <ChildContent>
+                                            @item.TypeDesc
+                                        </ChildContent>
+                                    </MTooltip>
+                                }
+                                else if (header == "default")
+                                {
+                                    <span class="text-mono">
+                                        @(string.IsNullOrWhiteSpace(item.DefaultValue) ? "-" : item.DefaultValue)
+                                    </span>
+                                }
+                                else if (header == "description")
+                                {
+                                    @if (string.IsNullOrWhiteSpace(item.Description))
+                                    {
+                                        <span>
+                                            MISSING DESCRIPTION
+                                            @if (GithubUri is not null)
+                                            {
+                                                @("(")
+                                                <AppLink Href="@GithubUri" Content="@I18n.T("contribute.edit", args: "Github")"></AppLink>
+                                                @(")")
+                                            }
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <MMarkdownIt Class="doc-markdown-body" Source="@item.Description" Scope="desc"></MMarkdownIt>
+                                    }
+                                }
+                            </span>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+        </tbody>
+    </MSimpleTable>
+</AppSheet>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Field { get; set; } = null!;
+
+    [Parameter]
+    public List<ParameterInfo> Data { get; set; }
+
+    [Parameter]
+    public string? Filter { get; set; }
+
+    [Parameter]
+    public string? GithubUri { get; set; }
+
+    static readonly Dictionary<string, string[]> s_headerMaps = new()
+    {
+        { "props", new[] { "name", "type", "default", "description" } },
+        { "methods", new[] { "name", "type", "description" } },
+        { "events", new[] { "name", "type", "description" } },
+        { "contents", new[] { "name", "type", "description" } }
+    };
+
+    private string[] Headers => s_headerMaps[Field];
+
+    private IEnumerable<ParameterInfo> Items => string.IsNullOrWhiteSpace(Filter)
+        ? Data.OrderBy(item => item.Name)
+        : Data.Where(item => item.Name.Contains(Filter, StringComparison.OrdinalIgnoreCase) || item.Type.Contains(Filter, StringComparison.OrdinalIgnoreCase) || (item.DefaultValue != null && item.DefaultValue.Contains(Filter, StringComparison.OrdinalIgnoreCase))).OrderBy(item => item.Name);
+
+    string GetHeaderStyle(string header)
+    {
+        return header switch
+        {
+            "default" => "width:144px;",
+            "name" => "width:144px",
+            "type" => "width:264px;",
+            _ => ""
+            };
+    }
+
+}

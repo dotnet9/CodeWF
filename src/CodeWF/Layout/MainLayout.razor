@@ -14,10 +14,7 @@
 
     <MobileAppBar NavItems="AllNavItems" />
 
-    <DesktopAppBar ToolNavItems="toolNavItems"
-                   PostNavItems="postNavItems"
-                   ResourceNavItems="resourceNavItems"
-                   AboutNavItems="aboutItems" />
+    <DesktopAppBar AboutNavItems="AllNavItems" />
 
     <MMain>
         @Body
@@ -205,35 +202,9 @@
         { nameof(FollowUsBtn.Class), FollowUs }
     };
 
-    private static readonly List<NavItem> toolNavItems =
+    private static List<NavItem> AllNavItems { get; } =
     [
-        new NavItem("Token 生成器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/token-generator", 12),
-    new NavItem("日期时间转换器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/date-converter", 12),
-    new NavItem("Url分析器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/url-parser", 12),
-    new NavItem("MAC地址查找", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/mac-address-lookup", 12),
-    new NavItem("计时器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/chronometer", 12),
-    new NavItem("字符串混淆器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/string-obfuscator", 12),
-    new NavItem("IBAN验证器和解析器", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://tools.dotnet9.com/iban-validator-and-parser", 12),
+        new NavItem("关于", "", "", "/about", 12)
     ];
-
-    private static readonly List<NavItem> postNavItems =
-    [
-        new NavItem(".NET", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://blog.dotnet9.com/category/dotnet", 12),
-    new NavItem("前端", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://blog.dotnet9.com/category/frontend", 12),
-    ];
-
-    private static readonly List<NavItem> resourceNavItems =
-    [
-        new NavItem("HandyControl", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://blog.dotnet9.com/post/2019/12/9/open-source-wpf-control-library-handycontrol", 12),
-    new NavItem("WPF牛逼的动画库：XamlFlair", "", "https://cdn.masastack.com/images/bule-dot.svg", "https://blog.dotnet9.com/post/2023/7/3/one-wpf-awesome-animation-library-xamlflair", 12),
-    ];
-
-    private static readonly List<NavItem> aboutItems =
-    [
-        new NavItem("关于"),
-    new NavItem("关于", "", "https://cdn.masastack.com/images/bule-dot.svg", "/about", 12)
-    ];
-
-    private static List<NavItem> AllNavItems => toolNavItems.Concat(postNavItems).Concat(resourceNavItems).Concat(aboutItems).ToList();
 
 }

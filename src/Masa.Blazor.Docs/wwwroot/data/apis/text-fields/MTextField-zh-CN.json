@@ -1,0 +1,10 @@
+{
+  "props": {
+    "numberProps": "",
+    "updateOnBlur": "在失去焦点时更新绑定值而不是输入时。"
+  },
+  "events": {
+  },
+  "contents": {
+  }
+}

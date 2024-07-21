@@ -1,0 +1,68 @@
+﻿@page "/blazor/examples/page-stack/page2/{id}"
+@layout PageStackLayout
+@inject PageStackNavController NavController
+
+<PStackPageBarInit Title="Page 2">
+</PStackPageBarInit>
+
+<p class="caption">url: /blazor/examples/page-stack/page2/{id}</p>
+
+<div>
+    <h1>
+        @if (_loading)
+        {
+            <MProgressCircular Indeterminate/>
+        }
+        else
+        {
+            <span>Id: @Id</span>
+        }
+    </h1>
+    <h3>Page 2 created at @(_createdAt.ToString("HH:mm:ss zz"))</h3>
+    <a class="text-decoration-underline" @onclick="UpdateId">Update Id</a>
+    <br/>
+    <a class="text-decoration-underline"
+       @onclick="@(() => NavController.Push("/blazor/examples/page-stack/page3"))">
+        Navigate to Page 3
+    </a>
+    
+    <MSyntaxHighlight Code="@sourceCode"
+                      Language="razor"
+                      Style="font-size: 10px">
+    </MSyntaxHighlight>
+</div>
+
+@code {
+
+    [Parameter] public string Id { get; set; } = default!;
+
+    private DateTimeOffset _createdAt;
+
+    private string? _prevId;
+    private bool _loading;
+
+    protected override void OnInitialized()
+    {
+        _createdAt = DateTimeOffset.UtcNow;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_prevId != Id)
+        {
+            _loading = true;
+            StateHasChanged();
+
+            await Task.Delay(1000);
+            _loading = false;
+            _prevId = Id;
+        }
+    }
+
+    private void UpdateId()
+    {
+        var newId = Random.Shared.Next(100, 999);
+        NavController.Replace($"/blazor/examples/page-stack/page2/{newId}");
+    }
+
+}

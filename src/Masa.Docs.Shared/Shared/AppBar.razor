@@ -1,0 +1,76 @@
+﻿@using System.Globalization
+@inject MasaBlazor MasaBlazor
+@implements IDisposable
+
+<MAppBar Id="app-bar"
+         App
+         Class="default-app-bar m-bar--underline"
+         Flat
+         ClippedRight
+         ClippedLeft
+         Height="@(MasaBlazor.Breakpoint.Mobile ? AppService.MobileAppBarHeight : AppService.AppBarHeight)"
+         Style="left: 0">
+    <div Class="hidden-sm-and-down mr-4" style="min-width:264px;">
+        <Logo />
+    </div>
+
+    @if (HideAppBarNavIcon is false && Project is not null)
+    {
+        <MAppBarNavIcon Class="hidden-lg-and-up"
+                        @onclick="OnAppBarNavIconClick" />
+    }
+
+    <AppBarItems RepoUrl="@RepoUrl"
+                 OnCultureChanged="OnCultureChanged"
+                 OnDotClick="OnDotClick" 
+                 OnSettingsClick="OnSettingsClick">
+    </AppBarItems>
+</MAppBar>
+
+@code {
+
+    [CascadingParameter(Name = "Culture")]
+    public string? Culture { get; set; }
+
+    [CascadingParameter(Name = "project")]
+    public string? Project { get; set; }
+
+    [CascadingParameter(Name = "Env")]
+    public string? Env { get; set; }
+
+    [Parameter]
+    public string? RepoUrl { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCultureChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnAppBarNavIconClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnDotClick { get; set; }
+
+    [Parameter]
+    public bool HideAppBarNavIcon { get; set; }
+
+    [Parameter]
+    public EventCallback OnSettingsClick { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        MasaBlazor.MobileChanged += MasaBlazorOnMobileChanged;
+    }
+
+    private void MasaBlazorOnMobileChanged(object? sender, MobileChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MasaBlazor.MobileChanged -= MasaBlazorOnMobileChanged;
+    }
+
+}

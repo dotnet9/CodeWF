@@ -1,0 +1,111 @@
+﻿@using System.Net.Http.Json;
+@using YamlDotNet.Core.Tokens
+<MToolbar Color="orange accent-1" Light>
+    <ChildContent>
+        <MAppBarNavIcon Class="hidden-sm-and-down"></MAppBarNavIcon>
+        <MToolbarTitle Class="text-h6 mr-6 hidden-sm-and-down">
+            Cryptocurrency
+        </MToolbarTitle>
+        <MAutocomplete @bind-Value="_model"
+                       Items="_items"
+                       Loading="_isLoading"
+                       OnSearchInputUpdate="Search"
+                       Chips
+                       Clearable
+                       HideDetails="true"
+                       HideSelected
+                       ItemText="r => r.Name"
+                       ItemValue="r => r.Symbol"
+                       CacheItems
+                       DebounceInterval="300"
+                       Label="Search for a coin..."
+                       Solo>
+            <NoDataContent>
+                <MListItem>
+                    <MListItemTitle>
+                        Search for your favorite
+                        <strong>Cryptocurrency</strong>
+                    </MListItemTitle>
+                </MListItem>
+            </NoDataContent>
+            <SelectionContent Context="data">
+                <MChip Color="blue-grey"
+                       Class="white--text">
+                    <MIcon Left>
+                        mdi-bitcoin
+                    </MIcon>
+                    <span>
+                        @data.Item.Name
+                    </span>
+                </MChip>
+            </SelectionContent>
+            <ItemContent Context="data">
+                <MListItemAvatar Color="indigo"
+                                 Class="text-h5 font-weight-light white--text">
+                    @data.Item.Name[0]
+                </MListItemAvatar>
+                <MListItemContent>
+                    <MListItemTitle>
+                        @data.Item.Name
+                    </MListItemTitle>
+                    <MListItemSubtitle>
+                        @data.Item.Symbol
+                    </MListItemSubtitle>
+                </MListItemContent>
+                <MListItemAction>
+                    <MIcon>mdi-bitcoin</MIcon>
+                </MListItemAction>
+            </ItemContent>
+        </MAutocomplete>
+    </ChildContent>
+    <ExtensionContent>
+        <MTabs @bind-Value="_tab"
+               HideSlider="@Disabled"
+               Color="blue-grey"
+               SliderColor="blue-grey">
+            <MTab Disabled="@Disabled">
+                News
+            </MTab>
+            <MTab Disabled="@Disabled">
+                Trading
+            </MTab>
+            <MTab Disabled="@Disabled">
+                Blog
+            </MTab>
+        </MTabs>
+    </ExtensionContent>
+</MToolbar>
+
+@code {
+
+    record Currency(string Id, string Symbol, string Name);
+
+    [Inject] public IHttpClientFactory HttpClientFactory { get; set; } = null!;
+    private HttpClient? _httpClient;
+
+    private bool _isLoading;
+    private List<Currency> _items = new List<Currency>();
+    private string? _model;
+    private StringNumber? _tab;
+
+    private bool Disabled => _model == null;
+
+    public async Task Search(string val)
+    {
+        if (_items.Count > 0)
+        {
+            return;
+        }
+
+        _httpClient ??= HttpClientFactory.CreateClient("masa-docs");
+
+        _isLoading = true;
+
+        await Task.Delay(500); // Simulate network latency
+        var items = await _httpClient.GetFromJsonAsync<List<Currency>>("_content/Masa.Blazor.Docs/data/demo/coins-list.json");
+        _items = items?.Take(100).ToList() ?? new(); // TODO: for now Autocomplete cannot handle many items
+
+        _isLoading = false;
+    }
+
+}

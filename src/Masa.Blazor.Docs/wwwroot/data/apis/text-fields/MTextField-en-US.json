@@ -1,0 +1,10 @@
+{
+  "props": {
+    "numberProps": "",
+    "updateOnBlur": "Update the bound value on blur instead of on input."
+  },
+  "events": {
+  },
+  "contents": {
+  }
+}

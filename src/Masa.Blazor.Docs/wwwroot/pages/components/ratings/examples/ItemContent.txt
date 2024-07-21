@@ -1,0 +1,25 @@
+﻿<div class="text-center">
+    <MRating @bind-Value="_rating">
+        <ItemContent Context="props">
+            <MButton Icon
+                     Color="@(props.IsFilled ? GenColor(props.Index) : "grey lighten-1")"
+                     Large
+                     @onexclick="props.Click">
+                <MIcon>
+                    @(props.IsFilled ? "mdi-star-circle" : "mdi-star-circle-outline")
+                </MIcon>
+            </MButton>
+        </ItemContent>
+    </MRating>
+</div>
+
+@code
+{
+    private double _rating = 4.5;
+    private static string[] _colors = ["green", "purple", "orange", "indigo", "red"];
+
+    private string GenColor(int index)
+    {
+        return _colors[index];
+    }
+}

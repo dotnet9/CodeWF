@@ -1,0 +1,58 @@
+@inherits LayoutComponentBase
+
+<MApp>
+    <PPageTabsProvider>
+        <MAppBar App Color="white">
+            <PPageTabs @ref="_pageTabs"
+                       NoDataPath="@s_noDataPath"
+                       TabOptions="@TabOptions"
+                       SelfPatterns="@s_selfPatterns">
+            </PPageTabs>
+        </MAppBar>
+
+        <MMain>
+            <PPageContainer PageTabs="_pageTabs"
+                            SelfPatterns="@s_selfPatterns"
+                            ExcludePatterns="@s_excludedPatterns">
+                <MContainer>
+                    @Body
+                </MContainer>
+            </PPageContainer>
+        </MMain>
+    </PPageTabsProvider>
+
+    <MBottomNavigation App Routable Color="primary">
+        <MButton Href="/blazor/examples/page-tabs/page1">Page 1</MButton>
+        <MButton Href="/blazor/examples/page-tabs/page2">Page 2</MButton>
+        <MButton Href="/blazor/examples/page-tabs/page3">Page 3</MButton>
+        <MButton Href="/blazor/examples/page-tabs/page4">Page 4</MButton>
+    </MBottomNavigation>
+</MApp>
+
+@code {
+
+    private PPageTabs? _pageTabs;
+
+    private static readonly string s_noDataPath = "/blazor/examples/page-tabs/page1";
+
+    private static readonly string[] s_selfPatterns =
+    {
+        "/blazor/examples/page-tabs/page4",
+    };
+
+    private static readonly string[] s_excludedPatterns =
+    {
+        "/blazor/examples/page-tabs/page2"
+    };
+
+    private TabOptions? TabOptions(PageTabPathValue pathValue)
+    {
+        if (pathValue.AbsolutePath == "/blazor/examples/page-tabs/page2")
+        {
+            return new TabOptions("Custom tab title", "mdi-tab", "font-weight-bold", false);
+        }
+
+        return null;
+    }
+
+}

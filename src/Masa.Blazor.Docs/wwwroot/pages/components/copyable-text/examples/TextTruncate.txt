@@ -1,0 +1,6 @@
+﻿@using Masa.Blazor.Presets
+
+<PCopyableText ContentClass="text-truncate"
+               ContentStyle="display:inline-block;vertical-align:top;width:150px;">
+    There is a text that can be copied.
+</PCopyableText>

@@ -1,0 +1,162 @@
+[
+  {
+    "title": "masa-stack-1.0",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      "access-guide",
+      {
+        "title": "installation",
+        "items": [
+          "docker-compose",
+          "helm"
+        ]
+      },
+      {
+        "title": "tls",
+        "items": [
+          "temporary"
+        ]
+      }
+    ]
+  },
+  {
+    "title": "auth",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      {
+        "title": "use-guide",
+        "items": [
+          "user", 
+          "rolepermision", 
+          "team", 
+          "sso", 
+          "configureoauth", 
+          "org"
+        ]
+      },
+      {
+        "title": "develop-guide",
+        "items": [
+          "permission",
+          "identity-provider",
+          "sso",
+          "authentication-authorization",
+          "api",
+          "sdk-instance",
+          "swagger"
+        ]
+      },
+      "best-practices",
+      "faq",
+      "related-agreements"
+    ]
+  },
+  {
+    "title": "dcc",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      "use-guide",
+      "basic-concepts",
+      "best-practices",
+      "related-agreements",
+      "faq"
+    ]
+  },
+  {
+    "title": "pm",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      "use-guide",
+      "basic-concepts",
+      "best-practices",
+      "sdk-instance",
+      "related-agreements",
+      "faq"
+    ]
+  },
+  {
+    "title": "mc",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      {
+        "title": "use-guide",
+        "items": [
+          "channel", 
+          "message-template", 
+          "receiver-group", 
+          "send-message", 
+          "message-record"
+        ]
+      },
+      "sdk-instance",
+      "best-practices",
+      "faq",
+      "related-agreements"
+    ]
+  },
+  {
+    "title": "alert",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      {
+        "title": "use-guide",
+        "items": [
+          "alarm-rule", 
+          "alarm-history", 
+          "web-hook"
+        ]
+      },
+      "develop-guide",
+      "sdk-instance",
+      "best-practices",
+      "faq",
+      "related-agreements"
+    ]
+  },
+  {
+    "title": "scheduler",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      {
+        "title": "use-guide",
+        "items": [
+          "get-started", 
+          "scheduler-job-app", 
+          "scheduler-http", 
+          "scheduler-dapr"
+        ]
+      },
+      "sdk-instance",
+      "best-practices",
+      "faq",
+      "related-agreements"
+    ]
+  },
+  {
+    "title": "tsc",
+    "icon": "mdi-bookmark",
+    "items": [
+      "introduce",
+      {
+        "title": "use-guide",
+        "items": [
+          "basic-concepts", 
+          "monitoring", 
+          "error-query", 
+          "trouble-shooting"
+        ]
+      },
+      "api",
+      "sdk-instance",
+      "best-practices",
+      "faq"
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "extends": {
+    "path": "text-fields/MTextField"
+  },
+  "props": {
+    "debounceInterval": ""
+  },
+  "events": {
+  },
+  "contents": {
+  }
+}

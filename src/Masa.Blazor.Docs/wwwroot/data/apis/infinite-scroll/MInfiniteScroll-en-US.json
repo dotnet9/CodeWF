@@ -1,0 +1,20 @@
+{
+  "props": {
+    "emptyText": "Text to display when there is no content",
+    "errorText": "Text to display when loading fails",
+    "loadingText": "Text to display when loading",
+    "loadMoreText": "Text to display after loading successfully",
+    "parent": "The parent element to listen for scroll events",
+    "threshold": "The distance in pixels from the bottom of the content to trigger a load",
+    "manual": "Disable automatic loading"
+  },
+  "events": {
+    "onLoad": "Load event, triggered when the component rendered at the first time or the content was scrolled to the bottom"
+  },
+  "contents": {
+    "emptyContent": "Content to display when there is no content",
+    "errorContent": "Content to display when loading fails",
+    "loadingContent": "Content to display when loading",
+    "loadMoreContent": "Content to display when loading more"
+  }
+}

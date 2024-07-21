@@ -1,0 +1,92 @@
+﻿@inject I18n I18n
+@inject MasaBlazor MasaBlazor
+@implements IDisposable
+
+<div class="flex-1-1-auto d-flex align-center justify-end ml-4">
+    @if (MasaBlazor.Breakpoint.LgAndUp)
+    {
+        <Tabs />
+    }
+
+    @if (MasaBlazor.Breakpoint.XsOnly)
+    {
+        <MSpacer />
+    }
+
+    @if (MasaBlazor.Breakpoint.SmAndUp)
+    {
+        @if (!string.IsNullOrEmpty(Project))
+        {
+            <Search @ref="_algoliaSearch" Class="mr-6" Style="max-width: 340px;" />
+        }
+    }
+    else
+    {
+        @if (!string.IsNullOrEmpty(Project))
+        {
+            <Search @ref="_algoliaSearch" />
+        }
+    }
+
+    <LanguageMenu OnCultureChanged="OnCultureChangedLocal" />
+
+    <NotificationsMenu />
+
+    <ThemeToggle />
+
+    @if (MasaBlazor.Breakpoint.LgAndUp)
+    {
+        <ToolIcons RepoUrl="@RepoUrl" OnSettingsClick="OnSettingsClick" />
+    }
+    else
+    {
+        <MobileToolIcons OnDotClick="OnDotClick" />
+    }
+</div>
+
+@code {
+
+    [CascadingParameter(Name = "project")]
+    public string? Project { get; set; }
+
+    [CascadingParameter(Name = "Env")]
+    public string? Env { get; set; }
+    
+    [Parameter]
+    public string? RepoUrl { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCultureChanged { get; set; }
+
+    private Search? _algoliaSearch;
+
+    public async Task OnCultureChangedLocal(string value)
+    {
+        await OnCultureChanged.InvokeAsync(value);
+        await _algoliaSearch!.InitDocSearchAsync();
+    }
+
+    [Parameter]
+    public EventCallback OnDotClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnSettingsClick { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        MasaBlazor.MobileChanged += MasaBlazorOnMobileChanged;
+    }
+
+    private void MasaBlazorOnMobileChanged(object? sender, MobileChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MasaBlazor.MobileChanged -= MasaBlazorOnMobileChanged;
+    }
+
+}

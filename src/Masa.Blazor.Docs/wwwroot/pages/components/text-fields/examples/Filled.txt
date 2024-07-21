@@ -1,0 +1,24 @@
+﻿<MContainer>
+    <MRow>
+        <MCol Cols="12"
+              Sm="6">
+            <MTextField @bind-Value="first"
+                        Label="First Name"
+                        Filled>
+            </MTextField>
+        </MCol>
+
+        <MCol Cols="12"
+              Sm="6">
+            <MTextField @bind-Value="last"
+                        Label="Last Name"
+                        Filled>
+            </MTextField>
+        </MCol>
+    </MRow>
+</MContainer>
+
+@code{
+    string first = "John";
+    string last = "Doe";
+}

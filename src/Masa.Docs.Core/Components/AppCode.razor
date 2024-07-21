@@ -1,0 +1,77 @@
+﻿@inherits NextTickComponentBase
+@inject IJSRuntime JSRuntime
+@inject I18n I18n
+
+<MHover>
+    <div Class="app-code @Class" @attributes="@context.Attrs">
+        @if (FileNameExists)
+        {
+            <MLazy MinHeight="48">
+                <MToolbar Dense Class="px-1 elevation-0 text-body-2 rounded-t" Dark Color="#47464E">
+                    <MIcon Dense Class="mr-1">mdi-file-tree</MIcon>
+                    @FileName
+                </MToolbar>
+            </MLazy>
+        }
+
+        <MSyntaxHighlight Class="@($"white--text overflow-x-auto overflow-y-hidden pa-4 ma-0 {ComputedClass}")"
+                          Code="@Code"
+                          Language="@Language"
+                          OnHighlighted="OnHighlighted"
+                          data-line="@LineHighlights">
+        </MSyntaxHighlight>
+        @if (IsUsage)
+        {
+            <div class="text-caption white--text"
+                 style="position: absolute; bottom: 2px; right: 4px;">
+                @I18n.T("usage-note")
+            </div>
+        }
+        else
+        {
+            <FadeTransition>
+                <AppCopyButton Show="@context.Hover" Content="@Code" Class="mr-n2 mt-n2"></AppCopyButton>
+            </FadeTransition>
+        }
+    </div>
+</MHover>
+
+@code {
+
+    [CascadingParameter(Name = "IsDark")] public bool IsDark { get; set; }
+
+    [Parameter] [EditorRequired] public string? Code { get; set; }
+
+    [Parameter] [EditorRequired] public string? Language { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public string? FileName { get; set; }
+
+    [Parameter] public string? LineHighlights { get; set; }
+
+    [Parameter] public bool RoundedTop0 { get; set; }
+
+    [Parameter] public bool IsUsage { get; set; }
+
+    private bool FileNameExists => !string.IsNullOrWhiteSpace(FileName);
+
+    private string ComputedClass
+    {
+        get
+        {
+            if (RoundedTop0 || FileNameExists)
+            {
+                return "rounded-b";
+            }
+
+            return "rounded";
+        }
+    }
+
+    private async Task OnHighlighted(ElementReference elementReference)
+    {
+        await JSRuntime.InvokeVoidAsync("prismHighlightLines", elementReference);
+    }
+
+}
