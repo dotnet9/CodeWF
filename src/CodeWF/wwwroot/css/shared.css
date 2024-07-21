@@ -727,7 +727,7 @@ html {
 
     .website-shared .aboutus-card {
         display: flex;
-        height: 334px;
+        height: 380px;
         flex-direction: column;
         align-items: center;
         border-radius: 24px;

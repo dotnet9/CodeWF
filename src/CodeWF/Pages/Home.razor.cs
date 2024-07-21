@@ -1,6 +1,6 @@
 ﻿using CodeWF.Models;
 
-namespace CodeWF.Components.Pages;
+namespace CodeWF.Pages;
 
 public partial class Home
 {
