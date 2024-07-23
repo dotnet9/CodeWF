@@ -3,9 +3,17 @@
   "date-converter": "日期时间转换器",
   "input-date-string-label": "把你的日期字符串放在这里",
   "input-date-string-type-label": "日期字符串类型",
+
+
   "dotnet": ".NET",
   "dotnet9": ".NET 9",
   "good-news-breakthrough-in-net-9-x86-aot-supports-old-win7-and-xp-environments": ".NET 9 X86 AOT的突破 - 支持老旧Win7与XP环境",
+
+
+  "wpf-controls": "WPF控件库",
+  "open-source-wpf-control-library-handycontrol": "HandyControl",
+
+
   "introduction": "介绍",
   "browser-support": "浏览器支持",
   "frequently-asked-questions": "常见问题",
