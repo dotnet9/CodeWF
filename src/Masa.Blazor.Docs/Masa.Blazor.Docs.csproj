@@ -27,10 +27,6 @@
     <ExamplesSourceFile Include="Examples\**\*.razor" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ExamplesSourceFile Remove="Examples\converter\date-converter\DateConverterTool.razor" />
-  </ItemGroup>
-
   <Target Name="CopyExmaplesToTxt" AfterTargets="Build">
     <Copy SourceFiles="@(ExamplesSourceFile)" DestinationFiles="wwwroot\pages\%(RecursiveDir)\examples\%(Filename).txt" />
   </Target>

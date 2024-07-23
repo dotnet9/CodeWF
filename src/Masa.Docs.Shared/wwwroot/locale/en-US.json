@@ -1,6 +1,8 @@
 {
   "converter": "Converter",
   "date-converter": "Date-time converter",
+  "input-date-string-label": "Put your date string here",
+  "input-date-string-type-label": "Date string type",
   "dotnet": ".NET",
   "dotnet9": ".NET 9",
   "good-news-breakthrough-in-net-9-x86-aot-supports-old-win7-and-xp-environments": "Breakthrough in. NET 9 X86 AOT - Supports Old Win7 and XP Environments",

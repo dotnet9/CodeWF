@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masa.Docs.Core;
+﻿namespace Masa.Docs.Core;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class JSCustomElementAttribute : Attribute

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Masa.Docs.Core;
+﻿namespace Masa.Docs.Core;
 
 public static partial class GeneratedRegexes
 {

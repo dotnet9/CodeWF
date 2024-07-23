@@ -1,1 +1,75 @@
-﻿<MButton>Converter</MButton>
+﻿@inject I18n I18N
+@attribute [JSCustomElement]
+
+<MRow>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField @bind-Value="_inputDateStr"
+                    Solo
+                    Label="@I18N.T("input-date-string-label")"
+                    Clearable />
+    </MCol>
+    
+    <MCol Cols="8"
+          Sm="6">
+        <MSelect Items="_items"
+                 @bind-Value="@_inputDateType"
+                 ItemText="u => u.Label"
+                 ItemValue="u => u.Value"
+                 Filled
+                 Label="@I18N.T("input-date-string-type-label")"
+                 Dense></MSelect>
+    </MCol>
+</MRow>
+<MRow>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="JS locale date string"
+                    Value="@_jsLocaleDateString" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="ISO 8601"
+                    Value="@_iso8601" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="ISO 9075"
+                    Value="@_iso9075" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="RFC 3339"
+                    Value="@_rfc3339" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="RFC 7231"
+                    Value="@_rfc7231" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="Unix timestamp"
+                    Value="@_unixTimestamp" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="Timestamp"
+                    Value="@_timestamp" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="UTC format"
+                    Value="@_utcFormat" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="Mongo ObjectID"
+                    Value="@_jsLocaleDateString" />
+    </MCol>
+    <MCol Cols="12"
+          Sm="6">
+        <MTextField Label="Excel date/time"
+                    Value="@_excelDateAndTime" />
+    </MCol>
+</MRow>
