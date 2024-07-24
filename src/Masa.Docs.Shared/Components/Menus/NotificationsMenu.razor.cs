@@ -14,7 +14,7 @@ public partial class NotificationsMenu
         public NotificationItem()
         {
         }
-        
+
         public NotificationItem(string title,
             string content,
             NotificationType type,
