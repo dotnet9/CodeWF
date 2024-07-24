@@ -34,11 +34,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF", "CodeWF\CodeWF.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Docs.Core", "Masa.Docs.Core\Masa.Docs.Core.csproj", "{7A49AC4A-5C2F-431A-AE1D-E31921C85B98}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Blazor.Docs", "Masa.Blazor.Docs\Masa.Blazor.Docs.csproj", "{51485378-1EC6-477B-840C-BE231F977DD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tool.Docs", "CodeWF.Tool.Docs\CodeWF.Tool.Docs.csproj", "{51485378-1EC6-477B-840C-BE231F977DD3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Framework.Docs", "Masa.Framework.Docs\Masa.Framework.Docs.csproj", "{30D61FF1-1534-4C22-A045-4F28AFB4E220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Post.Docs", "CodeWF.Post.Docs\CodeWF.Post.Docs.csproj", "{30D61FF1-1534-4C22-A045-4F28AFB4E220}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Stack.Docs", "Masa.Stack.Docs\Masa.Stack.Docs.csproj", "{704EAD99-910C-4C68-9786-561E0B3A8D70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Resource.Docs", "CodeWF.Resource.Docs\CodeWF.Resource.Docs.csproj", "{704EAD99-910C-4C68-9786-561E0B3A8D70}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Docs.Shared", "Masa.Docs.Shared\Masa.Docs.Shared.csproj", "{137DB15C-8F31-40F6-9DF3-1F05BD36A126}"
 EndProject

@@ -1,4 +1,4 @@
-﻿using Masa.Blazor.Docs;
+﻿using CodeWF.Tool.Docs;
 
 namespace Masa.Docs.Shared;
 

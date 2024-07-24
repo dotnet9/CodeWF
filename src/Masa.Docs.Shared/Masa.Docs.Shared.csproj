@@ -27,9 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Masa.Blazor.Docs\Masa.Blazor.Docs.csproj" />
-    <ProjectReference Include="..\Masa.Framework.Docs\Masa.Framework.Docs.csproj" />
-    <ProjectReference Include="..\Masa.Stack.Docs\Masa.Stack.Docs.csproj" />
+    <ProjectReference Include="..\CodeWF.Tool.Docs\CodeWF.Tool.Docs.csproj" />
+    <ProjectReference Include="..\CodeWF.Post.Docs\CodeWF.Post.Docs.csproj" />
+    <ProjectReference Include="..\CodeWF.Resource.Docs\CodeWF.Resource.Docs.csproj" />
   </ItemGroup>
 
 </Project>

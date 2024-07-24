@@ -120,7 +120,7 @@ public partial class NotificationsMenu
         _httpClient ??= HttpClientFactory.CreateClient("masa-docs");
 
         var list = await _httpClient.GetFromJsonAsync<List<NotificationItem>>(
-            "_content/Masa.Blazor.Docs/data/notifications.json");
+            "_content/CodeWF.Tool.Docs/data/notifications.json");
         _allNotifications = (list ?? []).OrderByDescending(u => u.CreatedAt).ToList();
     }
 }

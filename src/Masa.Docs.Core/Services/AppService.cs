@@ -25,16 +25,7 @@ public class AppService
 
     public static List<DefaultItem> GetNavMenus(string? project)
     {
-        var list = new List<DefaultItem>()
-        {
-            new("docs", "/", "^/$|^/((?!(blazor/components|blazor/getting-started)).)*/[^/]*"),
-        };
-
-        if (project == "blazor")
-        {
-            list.Add(new("getting-started", "/blazor/getting-started/installation", "/blazor/getting-started"));
-            list.Add(new("ui-components", "/blazor/components/all", "/blazor/components"));
-        }
+        var list = new List<DefaultItem>();
 
         list.Add(new("annual-service", "/annual-service", "pricing", "red"));
         
@@ -45,14 +36,8 @@ public class AppService
     {
         var list = new List<DefaultItem>();
 
-        if (project == "blazor")
-        {
-            list.Add(new("made-with-masa-blazor", "/blazor/resources/made-with-masa-blazor"));
-            list.Add(new("pro", "https://blazor-pro.masastack.com", "free-pro", "green"));
-        }
-
-        list.Add(new("blog", "https://blogs.masastack.com/tags/MASA-Stack/"));
-        list.Add(new("official-website", "https://www.masastack.com/stack"));
+        list.Add(new("blog", "https://codewf.com/post/"));
+        list.Add(new("official-website", "https://codewf.com"));
 
         return list;
     }
