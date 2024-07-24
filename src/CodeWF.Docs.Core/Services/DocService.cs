@@ -20,7 +20,7 @@ public class DocService
     {
         _i18n = i18n;
 
-        _httpClient = factory.CreateClient("masa-docs");
+        _httpClient = factory.CreateClient("codewf-docs");
 
         _projectMap = new Lazy<Task<Dictionary<string, Project>?>>(async () =>
         {

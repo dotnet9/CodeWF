@@ -16,7 +16,7 @@ public class BlazorDocService
     public BlazorDocService(IHttpClientFactory factory, I18n i18n)
     {
         _i18n = i18n;
-        _httpClient = factory.CreateClient("masa-docs");
+        _httpClient = factory.CreateClient("codewf-docs");
 
         _commonApis = new Lazy<Task<Dictionary<string, Dictionary<string, Dictionary<string, string>>>?>>(async () =>
             await _httpClient.GetFromJsonAsync<Dictionary<string, Dictionary<string, Dictionary<string, string>>>>(

@@ -4,13 +4,13 @@ namespace CodeWF.Docs.Shared;
 
 public static class ServiceCollectionExtensions
 {
-    public static IMasaBlazorBuilder AddMasaDocs(this IServiceCollection services, string baseUri, string mode = BlazorMode.Server)
+    public static IMasaBlazorBuilder AddCodeWFDocs(this IServiceCollection services, string baseUri, string mode = BlazorMode.Server)
     {
         BlazorMode.Current = mode;
 
         var userAgent =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36 Edg/81.0.416.68";
-        services.AddHttpClient("masa-docs", httpClient =>
+        services.AddHttpClient("codewf-docs", httpClient =>
         {
             httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
             httpClient.BaseAddress = new Uri(baseUri);
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
             });
         });
 
-        services.AddMasaBlazorDocs();
+        services.AddCodeWFToolDocs();
 
         return masaBlazorBuilder;
     }

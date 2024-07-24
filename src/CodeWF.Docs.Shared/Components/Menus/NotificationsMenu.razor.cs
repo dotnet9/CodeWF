@@ -117,7 +117,7 @@ public partial class NotificationsMenu
 
     private async Task GetNotifications()
     {
-        _httpClient ??= HttpClientFactory.CreateClient("masa-docs");
+        _httpClient ??= HttpClientFactory.CreateClient("codewf-docs");
 
         var list = await _httpClient.GetFromJsonAsync<List<NotificationItem>>(
             "_content/CodeWF.Tool.Docs/data/notifications.json");

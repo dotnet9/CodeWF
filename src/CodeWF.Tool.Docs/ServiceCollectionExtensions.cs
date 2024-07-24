@@ -6,7 +6,7 @@ namespace CodeWF.Tool.Docs;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddMasaBlazorDocs(this IServiceCollection services)
+    public static IServiceCollection AddCodeWFToolDocs(this IServiceCollection services)
     {
         services.AddScoped<BlazorDocService>();
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), includeInternalTypes: true);

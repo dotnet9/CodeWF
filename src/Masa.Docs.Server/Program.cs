@@ -23,7 +23,7 @@ docSeverUrls = docSeverUrls?.Select(x => x.Replace("0.0.0.0", "127.0.0.1")).ToAr
 var docSeverUrl = docSeverUrls?.FirstOrDefault(x => x.StartsWith("https://")) ??
                   docSeverUrls?.FirstOrDefault(x => x.StartsWith("http://"));
 
-builder.Services.AddMasaDocs(docSeverUrl ?? "http://localhost:5000").AddI18nForServer("wwwroot/locale");
+builder.Services.AddCodeWFDocs(docSeverUrl ?? "http://localhost:5000").AddI18nForServer("wwwroot/locale");
 
 var app = builder.Build();
 

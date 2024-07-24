@@ -247,7 +247,7 @@ public partial class Example : NextTickComponentBase
         var portableExecutableReferences = new List<PortableExecutableReference>();
         if (Js is IJSInProcessRuntime)
         {
-            using var http = HttpClientFactory.CreateClient("masa-docs");
+            using var http = HttpClientFactory.CreateClient("codewf-docs");
             foreach (var asm in s_assemblies)
             {
                 try

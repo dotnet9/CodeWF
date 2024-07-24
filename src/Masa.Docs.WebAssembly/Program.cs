@@ -9,7 +9,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddScoped<LazyAssemblyLoader>();
 
-await builder.Services.AddMasaDocs(builder.HostEnvironment.BaseAddress, BlazorMode.Wasm)
+await builder.Services.AddCodeWFDocs(builder.HostEnvironment.BaseAddress, BlazorMode.Wasm)
              .AddI18nForWasmAsync($"{builder.HostEnvironment.BaseAddress}/_content/CodeWF.Docs.Shared/locale");
 
 builder.RootComponents.Add<App>("#app");
