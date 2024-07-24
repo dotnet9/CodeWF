@@ -1,4 +1,4 @@
-using Masa.Docs.Core;
+using CodeWF.Docs.Core;
 using Masa.Docs.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 

@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core", "CodeWF.Core\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF", "CodeWF\CodeWF.csproj", "{CE8B8C0F-BADC-4E84-BE8D-7ECFFDC3D864}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masa.Docs.Core", "Masa.Docs.Core\Masa.Docs.Core.csproj", "{7A49AC4A-5C2F-431A-AE1D-E31921C85B98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.Core", "CodeWF.Docs.Core\CodeWF.Docs.Core.csproj", "{7A49AC4A-5C2F-431A-AE1D-E31921C85B98}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tool.Docs", "CodeWF.Tool.Docs\CodeWF.Tool.Docs.csproj", "{51485378-1EC6-477B-840C-BE231F977DD3}"
 EndProject

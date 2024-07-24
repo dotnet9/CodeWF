@@ -92,7 +92,7 @@ public partial class Example : NextTickComponentBase
         CompileRazorProjectFileSystem.AddGlobalUsing("@using Masa.Blazor.Presets");
 
         var githubUri =
-            $"https://github.com/masastack/MASA.Blazor/blob/main/docs/CodeWF.Tool.Docs/{File.Replace(".", "/").Replace("_", "-")}.razor";
+            $"https://github.com/dotnet/CodeWF/blob/main/docs/CodeWF.Tool.Docs/{File.Replace(".", "/").Replace("_", "-")}.razor";
 
         // From File: Examples.components.alerts.Border
         // To Path: pages/Examples/components/alerts/examples/Border.txt
