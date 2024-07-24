@@ -1,0 +1,50 @@
+﻿@inject I18n I18n
+@inject DocService DocService
+
+<MRow>
+    <MCol Cols="12" Md="6" Lg="6" Xl="3">
+        <MRow>
+            <MCol Cols="12">
+                <IntroCard Title="@I18n.T("building-blocks")"
+                           OpenInNewUrl="/post/building-blocks/auto-complete/overview">
+                    @GenIntroCardContent(_buildingBlocks)
+                </IntroCard>
+            </MCol>
+            <MCol Cols="12">
+                <IntroCard Title="@I18n.T("utils")"
+                           OpenInNewUrl="/post/utils/auto-complete/overview">
+                    @GenIntroCardContent(_utils)
+                </IntroCard>
+            </MCol>
+        </MRow>
+
+    </MCol>
+</MRow>
+
+@code {
+
+    private RenderFragment GenIntroCardContent(IEnumerable<(string? Title, string? Href)>? items) => __builder =>
+    {
+        @if (items is null)
+        {
+            <MSkeletonLoader Type="paragraph" />
+        }
+        else
+        {
+            <div class="d-flex flex-wrap">
+                @foreach (var (title, href) in items)
+                {
+                    <MButton Small
+                             Color="secondary"
+                             Outlined
+                             Href="@href"
+                             Class="mr-2 mb-2">
+                        @I18n.T(title)
+                        <MIcon Small Right>mdi-open-in-new</MIcon>
+                    </MButton>
+                }
+            </div>
+        }
+    };
+
+}

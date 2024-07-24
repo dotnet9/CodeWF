@@ -1,0 +1,16 @@
+﻿@inject MasaBlazor MasaBlazor                    
+@inject IPopupService PopupService
+@inject I18n I18n
+
+<MRow>
+    <MCol Cols="12" Md="6">
+        <MRow>
+            <MCol Cols="12">
+                <IntroCard Title="@I18n.T("getting-started")"
+                           OpenInNewUrl="/tool/getting-started/installation"
+                           MarkdownSource="@I18n.T("intro.blazor.getting-started")">
+                </IntroCard>
+            </MCol>
+        </MRow>
+    </MCol>
+</MRow>

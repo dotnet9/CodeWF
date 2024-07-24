@@ -26,7 +26,7 @@ public class DocService
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<Dictionary<string, Project>>("_content/Masa.Docs.Shared/data/project.json");
+                return await _httpClient.GetFromJsonAsync<Dictionary<string, Project>>("_content/CodeWF.Docs.Shared/data/project.json");
             }
             catch (Exception e)
             {
@@ -49,7 +49,7 @@ public class DocService
 
         var cultureName = _i18n.Culture.Name;
 
-        if (project != "blazor")
+        if (project != "tool")
         {
             cultureName = "zh-CN";
         }
@@ -106,7 +106,7 @@ public class DocService
     public static async Task<List<NavItem>> GetAllComponentsAsync()
     {
         var valueTaskResult = new ValueTask<List<NavItem>>();
-        bool success = s_projectNavsCache.TryGetValue("blazor", out valueTaskResult);
+        bool success = s_projectNavsCache.TryGetValue("tool", out valueTaskResult);
 
         var result = new List<NavItem>();
         if (success)

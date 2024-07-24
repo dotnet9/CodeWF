@@ -181,7 +181,7 @@ public partial class Components
     {
         try
         {
-            _md = await DocService.ReadDocumentAsync("blazor", _group, Page);
+            _md = await DocService.ReadDocumentAsync("tool", _group, Page);
         }
         catch (HttpRequestException e)
         {

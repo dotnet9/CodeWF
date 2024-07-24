@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Masa.Docs.WebAssembly": {
+    "CodeWF.Docs.WebAssembly": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

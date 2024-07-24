@@ -1,9 +1,9 @@
 ﻿@page "/"
 @using Masa.Blazor
-@using Masa.Docs.Shared
+@using CodeWF.Docs.Shared
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@namespace Masa.Docs.Server.Pages
+@namespace CodeWF.Docs.Server.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -15,7 +15,7 @@
     <meta name="description" content="码界工坊是一个热衷于互联网分享精神的网站，这里有工具，也有文章，助力开发人员和IT工作者。" />
     <base href="~/" />
     <link href="_content/Masa.Blazor/css/masa-blazor.min.css" rel="stylesheet">
-    <link href="Masa.Docs.Server.styles.css" rel="stylesheet">
+    <link href="CodeWF.Docs.Server.styles.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/stack/css/standard.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/@("@mdi")/font@7.1.96/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/materialicons/materialicons.css" rel="stylesheet">
@@ -31,10 +31,10 @@
     <link href="https://cdn.masastack.com/npm/drawflow/0.0.59/drawflow.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/10.2.0/swiper-bundle.min.css" rel="stylesheet">
     <link href="https://cdn.masastack.com/npm/xgplayer/3.0.11/xgplayer.min.css" rel="stylesheet">
-    <link href="_content/Masa.Docs.Shared/prism/prism-material-dark-for-masa.css" rel="stylesheet">
-    <link href="_content/Masa.Docs.Shared/prism/prism-line-highlight.min.css" rel="stylesheet">
-    <link href="_content/Masa.Docs.Shared/css/docs.css" rel="stylesheet">
-    <link href="_content/Masa.Docs.Shared/css/docs--sm-and-down.css" rel="stylesheet" media="(max-width: 960px)">
+    <link href="_content/CodeWF.Docs.Shared/prism/prism-material-dark-for-masa.css" rel="stylesheet">
+    <link href="_content/CodeWF.Docs.Shared/prism/prism-line-highlight.min.css" rel="stylesheet">
+    <link href="_content/CodeWF.Docs.Shared/css/docs.css" rel="stylesheet">
+    <link href="_content/CodeWF.Docs.Shared/css/docs--sm-and-down.css" rel="stylesheet" media="(max-width: 960px)">
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
     <component type="typeof(MAppThemeStylesheet)" render-mode="ServerPrerendered"/>
 </head>
@@ -54,19 +54,19 @@
 
     <script src="_framework/blazor.server.js" autostart="false"></script>
     <script src="_content/Masa.Blazor/js/masa-blazor.js"></script>
-    <script src="_content/Masa.Docs.Shared/js/docs.js"></script>
-    <script src="_content/Masa.Docs.Shared/js/markdown-it-emoji.min.js"></script>
-    <script src="_content/Masa.Docs.Shared/js/markdown-parser.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/js/docs.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/js/markdown-it-emoji.min.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/js/markdown-parser.js"></script>
     <script src="https://cdn.masastack.com/npm/echarts/5.4.2/echarts.min.js"></script>
-    <script src="_content/Masa.Docs.Shared/echarts/theme/vintage.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/echarts/theme/vintage.js"></script>
     <script src="https://cdn.masastack.com/npm/quill/1.3.6/quill.js"></script>
     <script src="https://cdn.masastack.com/npm/quill/1.3.6/quilljs-markdown.js"></script>
     <script src="https://cdn.masastack.com/npm/quill/1.3.6/quill-emoji.js"></script>
     <script src="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.min.js"></script>
-    <script src="_content/Masa.Docs.Shared/quill/quill-blot-formatter.min.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/quill/quill-blot-formatter.min.js"></script>
     <script src="https://cdn.masastack.com/npm/docsearch/v3/docsearch.js"></script>
     <script src="https://cdn.masastack.com/npm/sortable/Sortable.min.js"></script>
-    <script src="_content/Masa.Docs.Shared/prism/prism.min.js"></script>
+    <script src="_content/CodeWF.Docs.Shared/prism/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/10.2.0/swiper-bundle.min.js"></script>
     <script src="https://cdn.masastack.com/npm/drawflow/0.0.59/drawflow.min.js"></script>
     <script src="https://api.map.baidu.com/getscript?v=1.0&&type=webgl&ak=QahcSGCkRzIVXBkKhWHt3vGhNyYGdk3t"></script>

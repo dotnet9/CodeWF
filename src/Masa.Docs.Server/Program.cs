@@ -1,5 +1,5 @@
 using CodeWF.Docs.Core;
-using Masa.Docs.Shared;
+using CodeWF.Docs.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Services;
 
 var builder = WebApplication.CreateBuilder(args);
