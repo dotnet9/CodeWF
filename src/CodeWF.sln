@@ -42,9 +42,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Resource.Docs", "Cod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.Shared", "CodeWF.Docs.Shared\CodeWF.Docs.Shared.csproj", "{137DB15C-8F31-40F6-9DF3-1F05BD36A126}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.Server", "Masa.Docs.Server\CodeWF.Docs.Server.csproj", "{A74A13CA-07A1-4A57-BC88-7198D5E37BB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.Server", "CodeWF.Docs.Server\CodeWF.Docs.Server.csproj", "{A74A13CA-07A1-4A57-BC88-7198D5E37BB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.WebAssembly", "Masa.Docs.WebAssembly\CodeWF.Docs.WebAssembly.csproj", "{AE2465FC-4EA8-4636-B301-501BCDF0DB51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Docs.WebAssembly", "CodeWF.Docs.WebAssembly\CodeWF.Docs.WebAssembly.csproj", "{AE2465FC-4EA8-4636-B301-501BCDF0DB51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
