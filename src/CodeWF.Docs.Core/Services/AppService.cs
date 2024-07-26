@@ -22,23 +22,4 @@ public class AppService
             TocChanged?.Invoke(this, value);
         }
     }
-
-    public static List<DefaultItem> GetNavMenus(string? project)
-    {
-        var list = new List<DefaultItem>();
-
-        list.Add(new("annual-service", "/annual-service", "pricing", "red"));
-        
-        return list;
-    }
-
-    public static List<DefaultItem> GetResources(string? project)
-    {
-        var list = new List<DefaultItem>();
-
-        list.Add(new("blog", "https://codewf.com/post/"));
-        list.Add(new("official-website", "https://codewf.com"));
-
-        return list;
-    }
 }

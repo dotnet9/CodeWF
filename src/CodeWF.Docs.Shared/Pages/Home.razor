@@ -6,46 +6,6 @@
 
 <MMain Class="portal-main">
     <MContainer Style="padding-top: 64px;">
-        <MTabs Value="@Product"
-               Color="primary"
-               Centered="@(!MasaBlazor.Breakpoint.Xs)"
-               FixedTabs="MasaBlazor.Breakpoint.Xs"
-               IconsAndText="@(!MasaBlazor.Breakpoint.Xs)">
-            <MTab Value="@("resource")"
-                  OnClick="@(() => NavigationManager.NavigateTo(NavigationManager.GetRelativeUriWithQueryParameter("product", "resource")))">
-                @if (!MasaBlazor.Breakpoint.Xs)
-                {
-                    @("resource")
-                }
-            </MTab>
-            <MTab Value="@("post")"
-                  OnClick="@(() => NavigationManager.NavigateTo(NavigationManager.GetRelativeUriWithQueryParameter("product", "post")))">
-                @if (!MasaBlazor.Breakpoint.Xs)
-                {
-                    @("post")
-                }
-            </MTab>
-            <MTab Value="@("tool")"
-                  OnClick="@(() => NavigationManager.NavigateTo(NavigationManager.GetRelativeUriWithQueryParameter("product", "tool")))">
-                @if (!MasaBlazor.Breakpoint.Xs)
-                {
-                    @("tool")
-                }
-            </MTab>
-        </MTabs>
-
-        <MDivider Style="position: relative; margin-top: -1px;" />
-
-        <MTabsItems Value="@Product" Class="mt-8">
-            <MTabItem Value="@("resource")" Transition="">
-                <ResourceIntro />
-            </MTabItem>
-            <MTabItem Value="@("post")" Transition="">
-                <PostIntro />
-            </MTabItem>
-            <MTabItem Value="@("tool")" Transition="">
-                <ToolIntro Version="@Version" />
-            </MTabItem>
-        </MTabsItems>
+        <ToolIntro Version="@Version" />
     </MContainer>
 </MMain>

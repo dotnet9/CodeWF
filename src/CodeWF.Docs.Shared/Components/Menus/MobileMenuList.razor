@@ -11,20 +11,21 @@
                    Temporary>
     <MList Nav>
         <MListItemGroup>
-            @foreach (var item in _items)
-            {
-                <MListItem Href="@item.Href" Target="@item.Target">
-                    <MListItemContent>
-                        <MListItemTitle Class="d-flex align-center justify-space-between">
-                            @I18n.T(item.Title)
-                            @if (!string.IsNullOrWhiteSpace(item.State))
-                            {
-                                <MChip Color="@item.StateBackgroundColor" Small>@I18n.T(item.State)</MChip>
-                            }
-                        </MListItemTitle>
-                    </MListItemContent>
-                </MListItem>
-            }
+            <MListItem Href="https://codewf.com">
+                <MListItemContent>
+                    <MListItemTitle Class="d-flex align-center justify-space-between">@I18n.T("home")</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+            <MListItem Href="https://codewf.com/tool">
+                <MListItemContent>
+                    <MListItemTitle Class="d-flex align-center justify-space-between">@I18n.T("tool")</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
+            <MListItem Href="https://codewf.com/post">
+                <MListItemContent>
+                    <MListItemTitle Class="d-flex align-center justify-space-between">@I18n.T("post")</MListItemTitle>
+                </MListItemContent>
+            </MListItem>
             <MDivider/>
             <MListItem Href="https://github.com/masastack/MASA.Blazor" Target="_blank">
                 <MListItemContent>
@@ -73,8 +74,6 @@
     private void RefreshItems()
     {
         _items.Clear();
-        _items.AddRange(AppService.GetNavMenus(Project));
-        _items.AddRange(AppService.GetResources(Project));
     }
 
 }

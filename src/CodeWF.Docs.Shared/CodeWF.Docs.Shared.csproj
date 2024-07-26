@@ -28,8 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeWF.Tool.Docs\CodeWF.Tool.Docs.csproj" />
-    <ProjectReference Include="..\CodeWF.Post.Docs\CodeWF.Post.Docs.csproj" />
-    <ProjectReference Include="..\CodeWF.Resource.Docs\CodeWF.Resource.Docs.csproj" />
   </ItemGroup>
 
 </Project>
