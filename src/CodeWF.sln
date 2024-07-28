@@ -30,9 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{16EDF2E0-B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Core", "CodeWF.Core\CodeWF.Core.csproj", "{931DF9F5-CE07-483C-8C6B-1BCFAE0B8E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF", "CodeWF\CodeWF.csproj", "{77053803-8224-45E1-B104-412972A1E766}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF", "CodeWF\CodeWF.csproj", "{77053803-8224-45E1-B104-412972A1E766}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Client", "CodeWF.Client\CodeWF.Client.csproj", "{551ACF0E-24E7-4100-828E-3A1114DDFD2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Client", "CodeWF.Client\CodeWF.Client.csproj", "{551ACF0E-24E7-4100-828E-3A1114DDFD2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
