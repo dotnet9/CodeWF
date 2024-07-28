@@ -1,0 +1,32 @@
+﻿<MInteractiveTrigger Class="pointer-events-md-none"
+                     DisableLinkOnInteractive
+                     QueryName="@nameof(MenuTitle)"
+                     QueryValue="@MenuTitle"
+                     InteractiveValue="@InteractiveValue"
+                     InteractiveComponentType="typeof(MenuableTitle)"
+                     InteractiveComponentParameters="@Parameters">
+    <MenuTitle Id="@Id" Title="@Title" Icon/>
+</MInteractiveTrigger>
+
+@code {
+
+    [SupplyParameterFromQuery] private string? MenuTitle { get; set; }
+
+    [Parameter] public string InteractiveValue { get; set; } = null!;
+
+    [Parameter] public List<MenuableTitleItem> Items { get; set; } = new();
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+
+    private string Id => $"menu-title__{InteractiveValue}";
+
+    private Dictionary<string, object?> Parameters => new()
+    {
+        { nameof(MenuableTitle.Items), Items },
+        { nameof(MenuableTitle.Activator), $"#{Id}" },
+        { nameof(MenuableTitle.QueryName), nameof(MenuTitle) }
+    };
+
+}

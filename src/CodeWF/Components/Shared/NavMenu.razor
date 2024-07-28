@@ -1,0 +1,50 @@
+﻿@rendermode InteractiveServer
+@inherits MInteractivePopup
+
+<MList Subheader
+       TwoLine
+       Routable>
+    @foreach (var item in Items)
+    {
+        @if (item.IsSubheader)
+        {
+            <MSubheader Style="height: auto"
+                        Class="subtitle3 emphasis--text">
+                @item.Subheader
+            </MSubheader>
+        }
+        else
+        {
+            <MListItem Href="@item.Href" ActiveClass="primary--text" Disabled="@item.Disabled" Class="home-menu-hover">
+                @if (item.Image is not null)
+                {
+                    <MListItemAvatar Tile Size="40" Class="mt-0 mb-0">
+                        <MImage Src="@item.Image" alt="@item.Title"
+                                Height="@item.Size" Width="@item.Size"
+                                Contain Eager />
+                    </MListItemAvatar>
+                }
+                <MListItemContent>
+                    <MListItemTitle Class="h8 regular--text">
+                        <div style="@item.Style"> @item.Title</div>
+                    </MListItemTitle>
+                    <MListItemSubtitle Class="body2 regular3--text">@item.Subtitle</MListItemSubtitle>
+                </MListItemContent>
+            </MListItem>
+        }
+    }
+</MList>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IList<NavItem> Items { get; set; } = new List<NavItem>();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        Items ??= new List<NavItem>();
+    }
+
+}

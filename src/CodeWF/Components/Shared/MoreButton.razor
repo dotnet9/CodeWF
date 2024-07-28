@@ -1,0 +1,19 @@
+﻿@if (!string.IsNullOrWhiteSpace(Href))
+{
+    <div style="text-align: right">
+        <MButton Right Text Href="@Href" Class="more-button">
+            @ChildContent
+            <MIcon>mdi-menu-right</MIcon>
+        </MButton>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Href { get; set; }
+
+}

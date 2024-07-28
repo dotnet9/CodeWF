@@ -1,0 +1,60 @@
+﻿<AppBar Class="hidden-sm-and-down" BarHeight="100" LogoHeight="42">
+    <SectionOutlet SectionName="document"/>
+
+    <MButton Text Class="h8 emphasis2--text" Href="/">
+        首页
+    </MButton>
+    <MButton Text Class="h8 emphasis2--text" Href="https://tools.codewf.com">
+        IT工具箱
+    </MButton>
+    <MButton Text Class="h8 emphasis2--text" Href="/tool">
+        Blazor工具箱
+    </MButton>
+    <MButton Text Class="h8 emphasis2--text" Href="/post">
+        博客
+    </MButton>
+
+    <MInteractiveTriggers Class="nav-menus"
+                          WithPopup
+                          Left="NavMenuLeft"
+                          PopupClass="menu-list"
+                          TValue="string"
+                          QueryName="nav-menu"
+                          QueryValue="@QueryValue"
+                          InteractiveValue="_navMenuInteractiveValues"
+                          InteractiveComponentType="typeof(NavMenu)"
+                          InteractiveComponentParameters="ProductNavMenuParameters">
+        <MButton Id="@($"{context}-nav-menu")" Class="mr-9 h8 emphasis2--text" Text>
+            @(context switch
+            {
+                "about" => "关于",
+                _ => context
+            })
+        </MButton>
+    </MInteractiveTriggers>
+</AppBar>
+
+@code {
+
+    [Parameter] public List<NavItem> AboutNavItems { get; set; } = new();
+
+    [SupplyParameterFromQuery(Name = "nav-menu")]
+    private string? QueryValue { get; set; }
+
+    private static string[] _navMenuInteractiveValues = { "about" };
+
+    private Dictionary<string, object> ProductNavMenuParameters
+    {
+        get
+        {
+            var dict = new Dictionary<string, object>
+            {
+                [nameof(NavMenu.Items)] = AboutNavItems
+            };
+            return dict;
+        }
+    }
+
+    private int NavMenuLeft => -84;
+
+}

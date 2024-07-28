@@ -1,0 +1,16 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inherits MInteractivePopup
+
+<div class="mt-2 @Class" style="@Style" id="follow-us-image">
+    <img src="@Image" />
+</div>
+
+@code {
+
+    [Parameter] [EditorRequired] public string Image { get; set; } = null!;
+
+    [Parameter] public string? Style { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+}
