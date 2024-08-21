@@ -4,17 +4,17 @@
 
     <div class="hidden-sm-and-down" style="position: absolute;width: 100vw;height: 100vh;">
         <svg class="vector-197" width="811" height="489" viewBox="0 0 811 489" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path opacity="0.17" d="M169.501 19.2565C-212.467 219.758 154.518 435.832 286 477.257C439.359 525.574 674.775 413.608 776.57 298.243C878.365 182.878 733 139.256 609 139.256C305 139.256 320.001 -59.7435 169.501 19.2565Z" fill="#4318FF" />
+            <path opacity="0.17" d="M169.501 19.2565C-212.467 219.758 154.518 435.832 286 477.257C439.359 525.574 674.775 413.608 776.57 298.243C878.365 182.878 733 139.256 609 139.256C305 139.256 320.001 -59.7435 169.501 19.2565Z" fill="#4318FF"/>
         </svg>
         <svg class="vector-198" xmlns="http://www.w3.org/2000/svg" width="311" height="305" viewBox="0 0 311 305" fill="none">
-            <path opacity="0.46" d="M86.9623 8.73412C-90.9182 57.6102 53.7769 97.8286 86.9623 172.986C125.669 260.648 161.598 328.962 219.778 296.992C315.867 244.191 314.765 136.66 308.678 118.692C302.591 100.724 247.311 -35.3247 86.9623 8.73412Z" fill="#05CD99" />
+            <path opacity="0.46" d="M86.9623 8.73412C-90.9182 57.6102 53.7769 97.8286 86.9623 172.986C125.669 260.648 161.598 328.962 219.778 296.992C315.867 244.191 314.765 136.66 308.678 118.692C302.591 100.724 247.311 -35.3247 86.9623 8.73412Z" fill="#05CD99"/>
         </svg>
         <div class="rectangle-723"></div>
     </div>
 
-    <MobileAppBar NavItems="AllNavItems" />
+    <MobileAppBar NavItems="AllNavItems"/>
 
-    <DesktopAppBar AboutNavItems="AllNavItems" />
+    <DesktopAppBar AboutNavItems="AllNavItems"/>
 
     <MMain>
         @Body
@@ -24,7 +24,7 @@
         <img src="https://cdn.masastack.com/images/footer.png"
              class="mb-n2"
              style="width: 100vw"
-             alt="footer" />
+             alt="footer"/>
         <MFooter Color="#4318ff" Dark Padless>
             <MRow NoGutters Class="footer-content">
                 <MCol Class="map" Cols="12" Md="7">
@@ -169,7 +169,7 @@
                                              Target="_blank">
                                         <img class="cover"
                                              src="https://cdn.masastack.com/images/bilibili.png"
-                                             alt="bilibili" />
+                                             alt="bilibili"/>
                                     </MButton>
                                 </MCardText>
                             </MCard>
@@ -180,7 +180,7 @@
                     <img src="https://img1.dotnet9.com/site/logo.png"
                          width="60"
                          alt="logo"
-                         class="hidden-sm-and-down" />
+                         class="hidden-sm-and-down"/>
                     <div>码界工坊 - <a class="text-decoration-none white--text" href="https://beian.miit.gov.cn" target="_blank">蜀ICP备19038256号-1</a></div>
                 </MCol>
             </MRow>
@@ -196,10 +196,7 @@
 
 @code {
 
-    [SupplyParameterFromQuery]
-
-    private string? FollowUs { get; set; }
-
+    [SupplyParameterFromQuery] private string? FollowUs { get; set; }
 
 
     private Dictionary<string, object> FollowUsParameters => new()
@@ -209,13 +206,10 @@
     };
 
 
-
     private static List<NavItem> AllNavItems { get; } =
 
     [
-
         new NavItem("关于", "", "", "/about", 12)
-
     ];
 
 }

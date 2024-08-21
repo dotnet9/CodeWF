@@ -26,7 +26,13 @@
                 }
                 <MListItemContent>
                     <MListItemTitle Class="h8 regular--text">
-                        <div style="@item.Style"> @item.Title</div>
+                        <div style="@item.Style">
+                            @item.Title
+                            @if(item.IsExternal)
+                            {
+                                <MIcon XSmall Color="regular" Class="ml-1 mt-n2">mdi-open-in-new</MIcon>
+                            }
+                        </div>
                     </MListItemTitle>
                     <MListItemSubtitle Class="body2 regular3--text">@item.Subtitle</MListItemSubtitle>
                 </MListItemContent>

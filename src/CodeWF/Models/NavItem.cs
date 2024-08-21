@@ -16,6 +16,8 @@ public class NavItem
 
     public bool IsSubheader => Subheader is not null;
 
+    public bool IsExternal => Href is not null && Href.StartsWith("http");
+
     public bool Disabled { get; set; }
 
     public string Style
