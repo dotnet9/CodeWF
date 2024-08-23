@@ -147,30 +147,18 @@
                             <MCard Color="transparent" Flat Dark Class="footer-content__item footer-content__focus">
                                 <MCardTitle>关注我们</MCardTitle>
                                 <MCardText>
-                                    <MInteractiveTriggers Class="d-inline"
-                                                          QueryName="@nameof(FollowUs)"
-                                                          QueryValue="@FollowUs"
-                                                          InteractiveValue="@(new[] { "wechat", "qq" })"
-                                                          InteractiveComponentType="typeof(FollowUsBtn)"
-                                                          InteractiveComponentParameters="@FollowUsParameters">
-                                        <MButton Outlined
-                                                 Icon
-                                                 Color="white"
-                                                 Class="follow-us-icon mr-9">
-                                            <MIcon>@(context == "wechat" ? "mdi-wechat" : "mdi-qqchat")</MIcon>
-                                        </MButton>
-                                    </MInteractiveTriggers>
+                                    <CodeWF.Components.Shared.ContactMeBtn @rendermode=RenderMode.InteractiveAuto IconName="mdi-wechat" ImgSrc="https://img1.dotnet9.com/site/wechatpublic.jpg" />
 
-                                    <MButton Class="follow-us-icon"
-                                             Outlined
-                                             Icon
-                                             Color="white"
-                                             Href="https://space.bilibili.com/470546606"
-                                             Target="_blank">
-                                        <img class="cover"
-                                             src="https://cdn.masastack.com/images/bilibili.png"
-                                             alt="bilibili"/>
+                                    <CodeWF.Components.Shared.ContactMeBtn @rendermode=RenderMode.InteractiveAuto IconName="mdi-qqchat" ImgSrc="https://img1.dotnet9.com/site/qqgoup1.png" />
+
+                                    <MButton Href="https://space.bilibili.com/470546606"
+                                             Large="true" Icon="true" Outlined="true" Color="white"
+                                             Class="mx-2 pa-8" Target="_blank">
+                                             <img class="cover"
+                                                  src="https://cdn.masastack.com/images/bilibili.png"
+                                                  alt="bilibili" />
                                     </MButton>
+                                    
                                 </MCardText>
                             </MCard>
                         </MCol>
