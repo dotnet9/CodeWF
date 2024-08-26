@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CodeWF.EventBus" Version="3.4.4" />
+    <PackageReference Include="CodeWF.EventBus" Version="3.4.4.2" />
   </ItemGroup>
 
   <ItemGroup>

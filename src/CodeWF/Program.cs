@@ -34,8 +34,6 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(CodeWF.Client._Imports).Assembly);
+    .AddInteractiveServerRenderMode();
 
 app.Run();
