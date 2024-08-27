@@ -125,22 +125,30 @@
                         <MCard Color="transparent" Flat Dark Class="footer-content__item footer-content__focus">
                             <MCardTitle>关注我们</MCardTitle>
                             <MCardText>
-                                <MButton Href="https://img1.dotnet9.com/site/wechatpublic.jpg" IconName="mdi-wechat"
-                                         Large="true" Icon="true" Outlined="true" Color="white"
-                                         Class="mx-2 pa-8" Target="_blank" />
+                                <MInteractiveTriggers Class="d-inline"
+                                                      QueryName="@nameof(FollowUs)"
+                                                      QueryValue="@FollowUs"
+                                                      InteractiveValue="@(new[] { "wechat", "qq" })"
+                                                      InteractiveComponentType="typeof(FollowUsBtn)"
+                                                      InteractiveComponentParameters="@FollowUsParameters">
+                                    <MButton Outlined
+                                             Icon
+                                             Color="white"
+                                             Class="follow-us-icon mr-9">
+                                        <MIcon>@(context == "wechat" ? "mdi-wechat" : "mdi-qqchat")</MIcon>
+                                    </MButton>
+                                </MInteractiveTriggers>
 
-                                <MButton Href="https://img1.dotnet9.com/site/qqgoup1.png" IconName="mdi-qqchat"
-                                         Large="true" Icon="true" Outlined="true" Color="white"
-                                         Class="mx-2 pa-8" Target="_blank" />
-
-                                <MButton Href="https://space.bilibili.com/470546606"
-                                         Large="true" Icon="true" Outlined="true" Color="white"
-                                         Class="mx-2 pa-8" Target="_blank">
+                                <MButton Class="follow-us-icon"
+                                         Outlined
+                                         Icon
+                                         Color="white"
+                                         Href="https://space.bilibili.com/470546606"
+                                         Target="_blank">
                                     <img class="cover"
                                          src="https://cdn.masastack.com/images/bilibili.png"
                                          alt="bilibili"/>
                                 </MButton>
-
                             </MCardText>
                         </MCard>
                     </MCol>
@@ -156,3 +164,16 @@
         </MRow>
     </MFooter>
 </div>
+
+@code {
+
+    [SupplyParameterFromQuery] private string? FollowUs { get; set; }
+
+
+    private Dictionary<string, object> FollowUsParameters => new()
+    {
+        { nameof(FollowUsBtn.Image), FollowUs == "wechat" ? "https://img1.dotnet9.com/site/wechatpublic.jpg" : "https://img1.dotnet9.com/site/qqgoup1.png" },
+        { nameof(FollowUsBtn.Class), FollowUs }
+    };
+
+}

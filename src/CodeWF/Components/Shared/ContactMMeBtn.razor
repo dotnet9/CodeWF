@@ -1,0 +1,20 @@
+﻿﻿<MMenu NudgeTop="100" OffsetX="true" Left="true" OffsetOverflow="true" Transition="scroll-y-transition">
+    <ActivatorContent>
+        <MButton @attributes=context.Attrs
+                 Outlined="true" Color="white" Large="true" Class="mx-2 pa-8"
+                 IconName="@IconName" />
+    </ActivatorContent>
+    <ChildContent>
+        <MImage Src="@ImgSrc" MinWidth="200" MaxWidth="300" LazySrc="@ImgSrc" />
+    </ChildContent>
+</MMenu>
+
+@code {
+    [Parameter]
+    public int Col { get; set; } = 4;
+
+    [Parameter, EditorRequired]
+    public string IconName { get; set; }
+    [Parameter, EditorRequired]
+    public string ImgSrc { get; set; }
+}
