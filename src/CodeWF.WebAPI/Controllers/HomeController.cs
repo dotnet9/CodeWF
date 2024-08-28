@@ -18,7 +18,7 @@ public class HomeController(
     ///     获取所有友情链接
     /// </summary>
     /// <returns></returns>
-    [HttpGet(Name = "GetBase")]
+    [HttpGet]
     public async Task<SiteBase?> GetAsync()
     {
         const string cacheKey = $"{nameof(HomeController)}_{nameof(GetAsync)}";

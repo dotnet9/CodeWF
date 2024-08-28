@@ -42,7 +42,6 @@ void ConfigureServices(IServiceCollection services)
         case "postgresql":
             services.AddPostgreSQLStorage(connectionString!);
             break;
-        case "sqlite":
         default:
             services.AddSQLiteStorage(connectionString!);
             break;

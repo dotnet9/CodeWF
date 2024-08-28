@@ -19,7 +19,7 @@ public class LinkController(
     ///     获取所有友情链接
     /// </summary>
     /// <returns></returns>
-    [HttpGet(Name = "GetLinks")]
+    [HttpGet]
     public async Task<List<Link>?> GetAsync()
     {
         const string cacheKey = $"{nameof(LinkController)}_{nameof(GetAsync)}";
