@@ -5,7 +5,4 @@ namespace CodeWF.Data.Specifications;
 
 public sealed class AboutSpec : Specification<About>
 {
-    public AboutSpec()
-    {
-    }
 }

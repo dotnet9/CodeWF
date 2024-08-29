@@ -31,13 +31,14 @@ public static class WebApplicationExtensions
             app.Logger.LogCritical(e, e.Message);
 
             app.MapGet("/", () => Results.Problem(
-                detail: "Database connection test failed, please check your connection string and firewall settings, then RESTART CodeWF manually.",
+                detail:
+                "Database connection test failed, please check your connection string and firewall settings, then RESTART CodeWF manually.",
                 statusCode: 500
             ));
             await app.RunAsync();
         }
 
-        bool isNew = !await context.About.AnyAsync();
+        var isNew = !await context.About.AnyAsync();
         if (isNew)
         {
             try
@@ -56,12 +57,23 @@ public static class WebApplicationExtensions
             }
         }
     }
+
     private static async Task SeedDatabase(WebApplication app, BlogDbContext context)
     {
         app.Logger.LogInformation("Seeding database...");
 
         await context.ClearAllData();
-        await Seed.SeedAsync(context, app.Logger);
+
+        var assetsDir = app.Configuration.GetValue<string>("Site:Assets");
+
+        if (string.IsNullOrWhiteSpace(assetsDir) || !Directory.Exists(assetsDir))
+        {
+            app.Logger.LogError("Please config Site:Assets for seed data");
+        }
+        else
+        {
+            await Seed.SeedAsync(context, assetsDir, app.Logger);
+        }
 
         app.Logger.LogInformation("Database seeding successfully.");
     }

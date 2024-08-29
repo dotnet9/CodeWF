@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CodeWF.Core.Abouts;
 
-public class GetAboutResponse
+public record GetAboutResponse
 {
     public string? Title { get; set; }
     public string? Content { get; set; }
