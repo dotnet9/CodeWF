@@ -22,14 +22,11 @@ void ConfigureServices(IServiceCollection services)
 {
     services.AddControllers();
 
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
-    // 绑定网站配置
     services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 
-    // 添加MemoryCache支持
     services.AddMemoryCache();
 
     var databaseType = builder.Configuration.GetConnectionString("DatabaseType");
