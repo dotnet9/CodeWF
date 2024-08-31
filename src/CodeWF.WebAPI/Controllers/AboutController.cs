@@ -1,18 +1,19 @@
 ﻿using CodeWF.Core.Abouts;
-using CodeWF.EventBus;
+using CodeWF.Data.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeWF.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AboutController(IEventBus eventBus) : ControllerBase
+    public class AboutController(IMediator mediator) : ControllerBase
     {
         [HttpGet]
-        [ProducesResponseType<GetAboutResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType<About>(StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
-            var about = await eventBus.QueryAsync(new GetAboutQuery());
+            var about = await mediator.Send(new GetAboutQuery());
             return Ok(about);
         }
     }

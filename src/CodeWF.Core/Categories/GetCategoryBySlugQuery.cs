@@ -1,15 +1,15 @@
-﻿using CodeWF.EventBus;
+﻿using CodeWF.Data;
+using CodeWF.Data.Entities;
+using CodeWF.Data.Specifications;
+using MediatR;
 
 namespace CodeWF.Core.Categories;
 
-public record GetCategoryBySlugResponse
-{
-    public string? Name { get; set; }
-    public string? Slug { get; set; }
-}
+public record GetCategoryBySlugQuery(string Slug) : IRequest<Category?>;
 
-public class GetCategoryBySlugQuery(string slug) : Query<GetCategoryBySlugResponse>
+public class GetCategoryByRouteQueryHandler(CodeWFRepository<Category> repository)
+    : IRequestHandler<GetCategoryBySlugQuery, Category?>
 {
-    public string Slug { get; set; } = slug;
-    public override GetCategoryBySlugResponse Result { get; set; }
+    public Task<Category?> Handle(GetCategoryBySlugQuery request, CancellationToken ct) =>
+        repository.FirstOrDefaultAsync(new CategoryBySlugSpec(request.Slug), ct);
 }

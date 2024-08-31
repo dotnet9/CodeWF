@@ -1,36 +1,17 @@
 ﻿using CodeWF.Data;
 using CodeWF.Data.Entities;
 using CodeWF.Data.Specifications;
-using CodeWF.EventBus;
-using Microsoft.Extensions.Logging;
+using MediatR;
 
 namespace CodeWF.Core.Abouts;
 
-public record GetAboutResponse
-{
-    public string? Title { get; set; }
-    public string? Content { get; set; }
+public record GetAboutQuery : IRequest<About?>;
 
-    public DateTime? UpdateTime { get; set; }
-}
-
-public class GetAboutQuery : Query<GetAboutResponse>
+public class GetAboutQueryHandler(CodeWFRepository<About> repository)
+    : IRequestHandler<GetAboutQuery, About?>
 {
-    public override GetAboutResponse Result { get; set; }
-}
-
-[Event]
-public class GetAboutQueryHandler(CodeWFRepository<About> repository, ILogger<GetAboutQueryHandler> logger)
-{
-    [EventHandler]
-    public async Task Handle(GetAboutQuery request)
+    public Task<About?> Handle(GetAboutQuery request, CancellationToken ct)
     {
-        var result = await repository.FirstOrDefaultAsync(new AboutSpec());
-        request.Result = new GetAboutResponse()
-        {
-            Title = result?.Title,
-            Content = result?.Content,
-            UpdateTime = result?.UpdateTime
-        };
+        return repository.FirstOrDefaultAsync(new AboutSpec(), ct);
     }
 }
