@@ -1,20 +1,20 @@
-﻿using CodeWF.Data.Entities;
+﻿using CodeWF.Core.Abouts;
+using CodeWF.Data;
+using CodeWF.Data.Entities;
 using CodeWF.Data.Specifications;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
-using CodeWF.Core.Abouts;
-using CodeWF.Data;
-using Microsoft.Extensions.Caching.Memory;
 
-namespace CodeWF.Core.Categories;
+namespace CodeWF.Core.CategoryFeature;
 
 public class CreateCategoryCommand : IRequest
 {
     [Required]
     [Display(Name = "Name")]
     [MaxLength(64)]
-    public string Name { get; set; }
+    public string DisplayName { get; set; }
 
     [Required]
     [Display(Name = "Slug")]
@@ -22,11 +22,16 @@ public class CreateCategoryCommand : IRequest
     [MaxLength(64)]
     public string Slug { get; set; }
 
+    [Required]
+    [Display(Name = "Description")]
+    [MaxLength(128)]
+    public string Note { get; set; }
+
     public int Sort { get; set; }
 }
 
 public class CreateCategoryCommandHandler(
-    CodeWFRepository<Category> repository,
+    CodeWFRepository<CategoryEntity> repository,
     IMemoryCache cache,
     ILogger<GetAboutQueryHandler> logger) : IRequestHandler<CreateCategoryCommand>
 {
@@ -35,12 +40,13 @@ public class CreateCategoryCommandHandler(
         var exists = await repository.AnyAsync(new CategoryBySlugSpec(request.Slug), ct);
         if (exists) return;
 
-        var category = new Category
+        var category = new CategoryEntity
         {
             Id = Guid.NewGuid(),
-            Slug = request.Slug.Trim(),
-            Name = request.Name.Trim(),
             Sort = request.Sort,
+            Slug = request.Slug.Trim(),
+            Note = request.Note.Trim(),
+            DisplayName = request.DisplayName.Trim()
         };
 
         await repository.AddAsync(category, ct);

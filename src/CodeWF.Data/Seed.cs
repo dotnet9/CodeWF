@@ -38,10 +38,10 @@ public class Seed
         }
     }
 
-    private static async Task<About> GetAboutAsync()
+    private static async Task<AboutEntity> GetAboutAsync()
     {
         var file = Path.Combine(_assetsDir, SiteDir, AboutFileName);
-        About about = new()
+        AboutEntity about = new()
         {
             Id = Guid.NewGuid(),
             Title = "About"
@@ -58,16 +58,16 @@ public class Seed
         return about;
     }
 
-    private static async Task<List<Category>?> GetCategoriesAsync()
+    private static async Task<List<CategoryEntity>?> GetCategoriesAsync()
     {
         var file = Path.Combine(_assetsDir, SiteDir, CategoryFileName);
         if (!File.Exists(file))
         {
-            return [new Category { Id = Guid.NewGuid(), Name = ".NET", Slug = "dotnet" }];
+            return [new CategoryEntity { Id = Guid.NewGuid(), DisplayName = ".NET", Slug = "dotnet" }];
         }
 
         var jsonStr = await File.ReadAllTextAsync(file);
-        var categories = System.Text.Json.JsonSerializer.Deserialize<List<Category>>(jsonStr);
+        var categories = System.Text.Json.JsonSerializer.Deserialize<List<CategoryEntity>>(jsonStr);
         if (categories?.Any() == true)
         {
             categories.ForEach(category => category.Id = Guid.NewGuid());

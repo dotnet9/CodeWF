@@ -10,7 +10,7 @@ namespace CodeWF.WebAPI.Controllers
     public class AboutController(IMediator mediator) : ControllerBase
     {
         [HttpGet]
-        [ProducesResponseType<About>(StatusCodes.Status200OK)]
+        [ProducesResponseType<AboutEntity>(StatusCodes.Status200OK)]
         public async Task<IActionResult> Get()
         {
             var about = await mediator.Send(new GetAboutQuery());

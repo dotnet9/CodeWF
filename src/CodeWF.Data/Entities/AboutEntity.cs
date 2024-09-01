@@ -1,6 +1,6 @@
 ﻿namespace CodeWF.Data.Entities;
 
-public class About
+public class AboutEntity
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = null!;

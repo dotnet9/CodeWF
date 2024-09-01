@@ -13,29 +13,14 @@ public class BlogDbContext : DbContext
     {
     }
 
-    public virtual DbSet<About> About { get; set; }
-    public virtual DbSet<Category> Category { get; set; }
-    public virtual DbSet<ChatGroup> ChatGroup { get; set; }
-    public virtual DbSet<ChatGroupMessage> ChatGroupMessage { get; set; }
-    public virtual DbSet<ChatGroupUser> ChatGroupUser { get; set; }
-    public virtual DbSet<ChatUserFriend> ChatUserFriend { get; set; }
-    public virtual DbSet<ChatUserMessage> ChatUserMessage { get; set; }
-    public virtual DbSet<Comment> Comment { get; set; }
-    public virtual DbSet<Family> Family { get; set; }
-    public virtual DbSet<HistoryInfo> HistoryInfo { get; set; }
-    public virtual DbSet<Post> Post { get; set; }
-    public virtual DbSet<Resource> Resource { get; set; }
-    public virtual DbSet<ResourcePath> ResourcePath { get; set; }
-    public virtual DbSet<SystemConfig> SystemConfig { get; set; }
-    public virtual DbSet<Tag> Tag { get; set; }
-    public virtual DbSet<TreeHole> TreeHole { get; set; }
-    public virtual DbSet<User> User { get; set; }
-    public virtual DbSet<WebInfo> WebInfo { get; set; }
-    public virtual DbSet<WeiYan> WeiYan { get; set; }
+    public virtual DbSet<AboutEntity> About { get; set; }
+    public virtual DbSet<CategoryEntity> Category { get; set; }
+    public virtual DbSet<CommentEntity> Comment { get; set; }
+    public virtual DbSet<PostEntity> Post { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //modelBuilder.ApplyConfiguration(new AboutConfiguration());
+        modelBuilder.ApplyConfiguration(new CategoryConfiguration());
     }
 }
 
@@ -44,6 +29,7 @@ public static class BlogDbContextExtension
     public static async Task ClearAllData(this BlogDbContext context)
     {
         context.About.RemoveRange();
+        context.Category.RemoveRange();
 
         await context.SaveChangesAsync();
     }

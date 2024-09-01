@@ -16,6 +16,7 @@ public class MySqlBlogDbContext : BlogDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new AboutConfiguration());
+        modelBuilder.ApplyConfiguration(new PostCategoryConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

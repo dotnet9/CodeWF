@@ -5,12 +5,12 @@ using MediatR;
 
 namespace CodeWF.Core.Abouts;
 
-public record GetAboutQuery : IRequest<About?>;
+public record GetAboutQuery : IRequest<AboutEntity?>;
 
-public class GetAboutQueryHandler(CodeWFRepository<About> repository)
-    : IRequestHandler<GetAboutQuery, About?>
+public class GetAboutQueryHandler(CodeWFRepository<AboutEntity> repository)
+    : IRequestHandler<GetAboutQuery, AboutEntity?>
 {
-    public Task<About?> Handle(GetAboutQuery request, CancellationToken ct)
+    public Task<AboutEntity?> Handle(GetAboutQuery request, CancellationToken ct)
     {
         return repository.FirstOrDefaultAsync(new AboutSpec(), ct);
     }

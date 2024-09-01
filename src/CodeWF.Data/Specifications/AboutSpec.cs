@@ -3,6 +3,6 @@ using CodeWF.Data.Entities;
 
 namespace CodeWF.Data.Specifications;
 
-public sealed class AboutSpec : Specification<About>
+public sealed class AboutSpec : Specification<AboutEntity>
 {
 }

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CodeWF.Data.SQLite.Configurations;
 
-internal class AboutConfiguration : IEntityTypeConfiguration<About>
+internal class AboutConfiguration : IEntityTypeConfiguration<AboutEntity>
 {
-    public void Configure(EntityTypeBuilder<About> builder)
+    public void Configure(EntityTypeBuilder<AboutEntity> builder)
     {
         builder.Property(e => e.Id).ValueGeneratedNever();
         builder.Property(e => e.Title).HasMaxLength(128);
