@@ -1,4 +1,5 @@
 using CodeWF.AspNetCore.EventBus;
+using CodeWF.Auth.Options;
 using CodeWF.Core.Abouts;
 using CodeWF.Data.MySql;
 using CodeWF.Data.PostgreSQL;
@@ -15,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
+builder.Services.Configure<EncryptionOption>(builder.Configuration.GetSection("Encryption"));
 
 builder.Services.AddMemoryCache();
 

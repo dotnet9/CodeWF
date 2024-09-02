@@ -13,6 +13,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CodeWF.Auth\CodeWF.Auth.csproj" />
 		<ProjectReference Include="..\CodeWF.Core\CodeWF.Core.csproj" />
 		<ProjectReference Include="..\CodeWF.Data.MySql\CodeWF.Data.MySql.csproj" />
 		<ProjectReference Include="..\CodeWF.Data.PostgreSQL\CodeWF.Data.PostgreSQL.csproj" />

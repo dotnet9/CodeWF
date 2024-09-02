@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace CodeWF.Utils;
 
@@ -58,5 +59,22 @@ public static class Helper
         }
 
         return osVer.VersionString;
+    }
+
+    // https://docs.microsoft.com/en-us/aspnet/core/security/data-protection/consumer-apis/password-hashing?view=aspnetcore-6.0
+    // This is not secure, but better than nothing.
+    public static string HashPassword(string clearPassword, string saltBase64)
+    {
+        var salt = Convert.FromBase64String(saltBase64);
+
+        // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+        var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            password: clearPassword!,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100000,
+            numBytesRequested: 256 / 8));
+
+        return hashed;
     }
 }
