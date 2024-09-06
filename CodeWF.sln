@@ -12,9 +12,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.zh-CN.md = README.zh-CN.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Blog.Web", "src\CodeWF.Blog.Web\CodeWF.Blog.Web.csproj", "{96E2EB41-ED90-4539-A0EE-FF584713020A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeWF.Blog.Web.Client", "src\CodeWF.Blog.Web.Client\CodeWF.Blog.Web.Client.csproj", "{9E90407E-F233-4398-8ACA-2F7CF3856C9E}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96E2EB41-ED90-4539-A0EE-FF584713020A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E2EB41-ED90-4539-A0EE-FF584713020A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E2EB41-ED90-4539-A0EE-FF584713020A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E2EB41-ED90-4539-A0EE-FF584713020A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E90407E-F233-4398-8ACA-2F7CF3856C9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E90407E-F233-4398-8ACA-2F7CF3856C9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E90407E-F233-4398-8ACA-2F7CF3856C9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E90407E-F233-4398-8ACA-2F7CF3856C9E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{96E2EB41-ED90-4539-A0EE-FF584713020A} = {6D5D67FD-2EA6-4EEA-BFC8-B6A548254448}
+		{9E90407E-F233-4398-8ACA-2F7CF3856C9E} = {6D5D67FD-2EA6-4EEA-BFC8-B6A548254448}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0F801025-09A0-4A6E-BBFD-BAF96CDB633D}
