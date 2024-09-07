@@ -4,15 +4,25 @@
     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
     <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label>
     <nav class="sitenav" aria-labelledby="main-menu">
-        <FluentNavMenu Id="main-menu" Width="250" Collapsible="true" Title="Navigation menu" @bind-Expanded="expanded" CustomToggle="true">
-            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
-            <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size20.NumberSymbolSquare())" IconColor="Color.Accent">Counter</FluentNavLink>
+        <FluentNavMenu Id="main-menu" Width="250" Collapsible="true" Title="Navigation menu" @bind-Expanded="_expanded" CustomToggle="true">
+            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">首页</FluentNavLink>
+            <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size20.NumberSymbolSquare())" IconColor="Color.Accent">
+                Counter
+            </FluentNavLink>
+            <FluentNavGroup Icon="@(new Icons.Regular.Size24.CalendarNote())" Title="博客">
+                <FluentNavLink Icon="@(new Icons.Regular.Size24.LeafOne())">.NET</FluentNavLink>
+                <FluentNavLink Icon="@(new Icons.Regular.Size24.Database())">数据库</FluentNavLink>
+            </FluentNavGroup>
+            <FluentNavGroup Icon="@(new Icons.Regular.Size24.Toolbox())" Title="工具">
+                <FluentNavLink Icon="@(new Icons.Regular.Size24.CircleImage())">图片</FluentNavLink>
+                <FluentNavLink Icon="@(new Icons.Regular.Size24.TextProofingTools())">数字</FluentNavLink>
+            </FluentNavGroup>
             <FluentNavLink Href="weather" Icon="@(new Icons.Regular.Size20.WeatherPartlyCloudyDay())" IconColor="Color.Accent">Weather</FluentNavLink>
         </FluentNavMenu>
     </nav>
 </div>
 
 @code {
-    private bool expanded = true;
+    private bool _expanded = true;
 
 }
