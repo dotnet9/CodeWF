@@ -1,0 +1,33 @@
+﻿@rendermode InteractiveAuto
+@inject IOptions<SiteOption> Site
+@using CodeWF.Blog.Web.Client.Extensions
+@using CodeWF.Blog.Web.Client.Helpers
+@using CodeWF.Blog.Web.Client.Models
+@using CodeWF.Blog.Web.Client.Options
+@using Microsoft.Extensions.Options
+@using YamlDotNet.Serialization
+<FluentAutocomplete TOption="BlogPost"
+                    AutoComplete="off"
+                    Autofocus="true"
+                    Label="搜索文章或工具"
+                    Width="250"
+                    MaxAutoHeight="@(_autoHeight ? "200px" : null)"
+                    Placeholder="输入部分文章或工具关键字"
+                    OnOptionsSearch="@OnSearchAsync"
+                    MaximumSelectedOptions="1"
+                    OptionText="@(item => item.Title)"/>
+
+@code {
+    bool _autoHeight = false;
+
+    private List<BlogPost>? _posts;
+
+    private async Task OnSearchAsync(OptionsSearchEventArgs<BlogPost> e)
+    {
+        _posts ??= await AssetsHelper.ReadBlogPostsAsync(Site.Value.LocalAssetsDir);
+
+        e.Items = _posts.Where(item => item.Title.Contains(e.Text, StringComparison.OrdinalIgnoreCase)).OrderBy(item => item.Title);
+    }
+
+    
+}
