@@ -8,7 +8,7 @@ public class AssetsHelperTest
     [TestMethod]
     public async Task Read_Markdown_File_Success()
     {
-        var markdownFile = "D:\\github\\owner\\Assets.Dotnet9\\2019\\11\\Uses-fluent-validation-in-WPF.md";
+        var markdownFile = "D:\\github\\owner\\Assets.Dotnet9\\2021\\06\\dotnet-classlibrary-vanara-an-easy-to-use-windows-api-encapsulation-library.md";
 
         var blogPost = await AssetsHelper.ReadBlogPostAsync(markdownFile);
 

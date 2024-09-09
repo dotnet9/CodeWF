@@ -1,5 +1,4 @@
-﻿using CodeWF.Blog.Web.Client.Extensions;
-using CodeWF.Blog.Web.Client.Models;
+﻿using CodeWF.Blog.Web.Client.Models;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -50,7 +49,6 @@ public static class AssetsHelper
 
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeConverter(new CommaSeparatedListConverter())
             .Build();
 
         BlogPost blogPost;

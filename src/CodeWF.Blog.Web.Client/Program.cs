@@ -1,4 +1,3 @@
-using CodeWF.Blog.Web.Client.Options;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
