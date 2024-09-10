@@ -1,32 +1,81 @@
 ﻿@rendermode InteractiveAuto
-@inject IOptions<SiteOption> Site
-@using CodeWF.Blog.Web.Client.Helpers
+
+@inject IBlogPostService BlogPostService;
+@inject NavigationManager NavigationManager
+@inject IKeyCodeService KeyCodeService
+
 @using CodeWF.Blog.Web.Client.Models
-@using CodeWF.Blog.Web.Client.Options
-@using Microsoft.Extensions.Options
-@using YamlDotNet.Serialization
-<FluentAutocomplete TOption="BlogPost"
+@using CodeWF.Blog.Web.Client.Services
+
+<FluentAutocomplete @ref="_searchAutocomplete"
+                    TOption="BlogPost"
                     AutoComplete="off"
                     Autofocus="true"
                     Label="搜索文章或工具"
-                    Width="250"
-                    MaxAutoHeight="@(_autoHeight ? "200px" : null)"
+                    Width="250px"
+                    MaxAutoHeight="@(AutoHeight ? "200px" : null)"
                     Placeholder="输入部分文章或工具关键字"
                     OnOptionsSearch="@OnSearchAsync"
+                    @bind-ValueText="@_searchBlogPost"
+                    @bind-SelectedOptions="_selectedBlogPosts"
+                    @bind-SelectedOptions:after="HandleSearchClicked"
                     MaximumSelectedOptions="1"
                     OptionText="@(item => item.Title)"/>
 
 @code {
-    bool _autoHeight = false;
+    private const bool AutoHeight = false;
+    private FluentAutocomplete<BlogPost>? _searchAutocomplete = default!;
+    private string? _searchBlogPost = string.Empty;
+    private IEnumerable<BlogPost>? _selectedBlogPosts = [];
 
-    private List<BlogPost>? _posts;
+    protected override void OnInitialized()
+    {
+        KeyCodeService.RegisterListener(OnKeyDownAsync);
+    }
+
+    public Task OnKeyDownAsync(FluentKeyCodeEventArgs? args)
+    {
+        if (args is not null && args.Key == KeyCode.Slash)
+        {
+            _searchAutocomplete?.Element?.FocusAsync();
+        }
+
+        return Task.CompletedTask;
+    }
 
     private async Task OnSearchAsync(OptionsSearchEventArgs<BlogPost> e)
     {
-        _posts ??= await AssetsHelper.ReadBlogPostsAsync(Site.Value.LocalAssetsDir);
+        var searchBlogPost = e.Text;
 
-        e.Items = _posts.Where(item => item.Title.Contains(e.Text, StringComparison.OrdinalIgnoreCase)).OrderBy(item => item.Title);
+        if (string.IsNullOrWhiteSpace(searchBlogPost))
+        {
+            e.Items = null;
+        }
+        else
+        {
+            e.Items = await BlogPostService.SearchAsync(searchBlogPost);
+        }
     }
 
-    
+    private void HandleSearchClicked()
+    {
+        _searchBlogPost = null;
+        var blogPost = _selectedBlogPosts?.SingleOrDefault();
+        _selectedBlogPosts = [];
+        InvokeAsync(StateHasChanged);
+
+        if (blogPost is null)
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo($"/post/{blogPost.Date?.Year:D4}/{blogPost.Date?.Month:D2}/{blogPost.Slug}");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        KeyCodeService.UnregisterListener(OnKeyDownAsync, OnKeyDownAsync);
+        return ValueTask.CompletedTask;
+    }
+
 }

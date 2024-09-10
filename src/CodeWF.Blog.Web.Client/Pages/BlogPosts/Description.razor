@@ -1,0 +1,55 @@
+﻿@page "/post/{year}/{month}/{slug}"
+@using CodeWF.Blog.Web.Client.Models
+@using CodeWF.Blog.Web.Client.Services
+@using CodeWF.Blog.Web.Client.Shared.Components
+@using Markdig
+
+@rendermode InteractiveAuto
+
+@inject IBlogPostService BlogPostService;
+
+<PageTitle>@_currentBlogPost?.Title</PageTitle>
+
+<h1>@_currentBlogPost?.Title</h1>
+
+<div>
+    @HtmlContent
+</div>
+
+@code {
+
+    [Parameter] public string? Year { get; set; }
+
+    [Parameter] public string? Month { get; set; }
+
+    [Parameter] public string? Slug { get; set; }
+
+    public MarkupString HtmlContent { get; private set; }
+
+    private BlogPost? _currentBlogPost;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentBlogPost = await BlogPostService.GetBySlug(Slug);
+        if (!string.IsNullOrWhiteSpace(_currentBlogPost?.Content))
+        {
+            HtmlContent = ConvertToMarkupString(_currentBlogPost.Content);
+        }
+    }
+
+    private static MarkupString ConvertToMarkupString(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return new MarkupString("Empty");
+
+        var builder = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Use<MarkdownSectionPreCodeExtension>();
+
+        var pipeline = builder.Build();
+
+        var html = Markdown.ToHtml(value, pipeline);
+
+        return new MarkupString(html);
+    }
+
+}
