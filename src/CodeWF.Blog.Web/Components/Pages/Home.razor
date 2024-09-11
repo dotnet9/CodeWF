@@ -8,14 +8,15 @@
 
 @if (_banners?.Count > 0)
 {
-    <ul>
+    <h3>推荐文章</h3>
+    <ol>
         @foreach (var blogPost in _banners)
         {
             <li>
                 <a href="/post/@blogPost.Date?.Year/@blogPost.Date?.Month/@blogPost.Slug" title="@blogPost.Description">@blogPost.Title</a>
             </li>
         }
-    </ul>
+    </ol>
 }
 
 <_FriendLink/>
