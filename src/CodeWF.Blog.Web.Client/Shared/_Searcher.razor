@@ -1,11 +1,10 @@
-﻿@rendermode InteractiveAuto
+﻿@using CodeWF.Blog.Web.Client.IServices
+@using CodeWF.Blog.Web.Client.Models.BlogPosts
+@rendermode InteractiveAuto
 
 @inject IBlogPostService BlogPostService;
 @inject NavigationManager NavigationManager
 @inject IKeyCodeService KeyCodeService
-
-@using CodeWF.Blog.Web.Client.Models
-@using CodeWF.Blog.Web.Client.Services
 
 <FluentAutocomplete @ref="_searchAutocomplete"
                     TOption="BlogPost"

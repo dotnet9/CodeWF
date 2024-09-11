@@ -1,3 +1,4 @@
+using CodeWF.Blog.Web.Client.IServices;
 using CodeWF.Blog.Web.Client.Options;
 using CodeWF.Blog.Web.Client.Services;
 using CodeWF.Blog.Web.Components;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 builder.Services.AddSingleton<IBlogPostService, BlogPostService>();
+builder.Services.AddSingleton<IFriendLinkService, FriendLinkService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

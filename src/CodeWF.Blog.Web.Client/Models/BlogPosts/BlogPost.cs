@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Blog.Web.Client.Models;
+﻿namespace CodeWF.Blog.Web.Client.Models.BlogPosts;
 
 public class BlogPost
 {

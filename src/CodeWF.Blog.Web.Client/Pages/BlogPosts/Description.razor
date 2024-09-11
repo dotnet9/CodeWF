@@ -1,17 +1,49 @@
 ﻿@page "/post/{year}/{month}/{slug}"
-@using CodeWF.Blog.Web.Client.Models
-@using CodeWF.Blog.Web.Client.Services
+@using System.Dynamic
+@using CodeWF.Blog.Web.Client.IServices
+@using CodeWF.Blog.Web.Client.Models.BlogPosts
+@using CodeWF.Blog.Web.Client.Options
 @using CodeWF.Blog.Web.Client.Shared.Components
 @using Markdig
+@using Microsoft.Extensions.Options
 
 @rendermode InteractiveAuto
 
 @inject IBlogPostService BlogPostService;
 @inject IJSRuntime JsRuntime
+@inject IOptions<SiteOption> Site
 
 <PageTitle>@_currentBlogPost?.Title</PageTitle>
 
 <h1>@_currentBlogPost?.Title</h1>
+
+<p>
+    <span>作者：@(!string.IsNullOrWhiteSpace(_currentBlogPost?.Author) ? _currentBlogPost.Author : Site.Value.Owner)</span>
+    @if (_currentBlogPost?.Categories?.Count > 0)
+    {
+        <span>分类：</span>
+        foreach (var category in _currentBlogPost.Categories)
+        {
+            <span>@category</span>
+        }
+    }
+    @if (_currentBlogPost?.Tags?.Count > 0)
+    {
+        <span>标签：</span>
+        foreach (var category in _currentBlogPost.Tags)
+        {
+            <span>@category</span>
+        }
+    }
+    @if (_currentBlogPost?.Lastmod != null)
+    {
+        <span>最近更新：@_currentBlogPost.Lastmod?.ToString("yyyy-MM-dd HH:mm")</span>
+    }
+    else
+    {
+        <span>发布于：@_currentBlogPost?.Date?.ToString("yyyy-MM-dd HH:mm")</span>
+    }
+</p>
 
 <div>
     @HtmlContent
@@ -37,6 +69,7 @@
             HtmlContent = ConvertToMarkupString(_currentBlogPost.Content);
         }
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await JsRuntime.InvokeVoidAsync("Prism.highlightAll");

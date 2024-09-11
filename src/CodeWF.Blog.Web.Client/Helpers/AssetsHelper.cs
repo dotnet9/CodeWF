@@ -1,4 +1,6 @@
-﻿using CodeWF.Blog.Web.Client.Models;
+﻿using System.Text.Json;
+using CodeWF.Blog.Web.Client.Models.BlogPosts;
+using CodeWF.Blog.Web.Client.Models.FriendLinks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -15,15 +17,27 @@ public static class AssetsHelper
         for (var start = startYear; start <= endYear; start++)
         {
             var postDir = Path.Combine(assetsDir, start.ToString());
-            var postFiles = System.IO.Directory.GetFiles(postDir, "*.md", SearchOption.AllDirectories);
+            var postFiles = Directory.GetFiles(postDir, "*.md", SearchOption.AllDirectories);
             foreach (var postFile in postFiles)
             {
-                var blogPost = await AssetsHelper.ReadBlogPostAsync(postFile);
+                var blogPost = await ReadBlogPostAsync(postFile);
                 posts.Add(blogPost);
             }
         }
 
         return posts;
+    }
+
+    public static async Task<List<FriendLink>?> ReadFriendLinks(string assetsDir)
+    {
+        var dataFile = Path.Combine(assetsDir, "site", "FriendLink.json");
+        if (!File.Exists(dataFile))
+        {
+            return default;
+        }
+
+        var data = await File.ReadAllTextAsync(dataFile);
+        return !string.IsNullOrWhiteSpace(data) ? JsonSerializer.Deserialize<List<FriendLink>>(data) : default;
     }
 
     public static async Task<BlogPost> ReadBlogPostAsync(string markdownFilePath)

@@ -1,5 +1,31 @@
 ﻿@page "/"
+@using CodeWF.Blog.Web.Client.IServices
+@using CodeWF.Blog.Web.Client.Models.BlogPosts
+
+@inject IBlogPostService Service
 
 <PageTitle>首页</PageTitle>
 
-<Searcher />
+@if (_banners?.Count > 0)
+{
+    <ul>
+        @foreach (var blogPost in _banners)
+        {
+            <li>
+                <a href="/post/@blogPost.Date?.Year/@blogPost.Date?.Month/@blogPost.Slug" title="@blogPost.Description">@blogPost.Title</a>
+            </li>
+        }
+    </ul>
+}
+
+<_FriendLink/>
+
+@code
+{
+    private List<BlogPost>? _banners;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _banners = await Service.GetBannersAsync();
+    }
+}

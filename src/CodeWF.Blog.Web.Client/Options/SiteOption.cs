@@ -2,5 +2,6 @@
 
 public class SiteOption
 {
+    public string? Owner { get; set; }
     public string? LocalAssetsDir { get; set; }
 }
