@@ -72,7 +72,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JsRuntime.InvokeVoidAsync("Prism.highlightAll");
+        await JsRuntime.InvokeVoidAsync("highlightAll");
     }
 
     private static MarkupString ConvertToMarkupString(string? value)
