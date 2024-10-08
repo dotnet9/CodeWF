@@ -1,0 +1,30 @@
+﻿@inherits BaseComponent
+
+<CmsCard Class="cl-creator-user">
+    <AntAvatar Src="@CurrentUser?.AvatarUrl" />
+    <div style="margin-left:20px;">
+        <div class="name">@CurrentUser?.Name</div>
+        <div class="bottom">
+            <span><span class="count">@User?.ContentQty</span> 问题</span>
+            <span class="divider">|</span>
+            <span><span class="count">@User?.ReplyQty</span> 回复</span>
+            <span class="divider">|</span>
+            <span>注册时间：@User?.CreateTime.ToString("yyyy-MM-dd HH:mm:ss")</span>
+        </div>
+    </div>
+    <div style="position:absolute;top:20px;right:20px;">
+        <AntButton Name="安全退出" Danger OnClick="cl_logout()" />
+    </div>
+</CmsCard>
+
+<script>
+    function cl_logout() {
+        AntBlazor.showConfirm('确定要退出？', function() {
+            AntBlazor.post('/signout').then(res => location='./bbs');
+        });
+    }
+</script>
+
+@code {
+    [Parameter] public CmUser User { get; set; }
+}

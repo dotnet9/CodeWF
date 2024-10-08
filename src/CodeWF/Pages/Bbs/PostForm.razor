@@ -1,0 +1,28 @@
+﻿@page "/bbs/postform"
+@inherits BaseComponent
+
+<PageTitle>新问题 - @AppConfig.AppTitle</PageTitle>
+
+<div class="container cl-container cl-creator">
+    <UCategory Service="Service" />
+    <CmsCard Class="cl-bbs-form" Icon="far fa-question-circle" Title="提问题">
+        <UPostForm Service="Service" BackUrl="@Url.BbsUrl" />
+    </CmsCard>
+    @* <div>
+        <SigninBox />
+        <div style="height:20px;"></div>
+        <CmsCard Title="如何排版">
+
+        </CmsCard>
+    </div> *@
+</div>
+
+@code {
+    private ISiteService Service;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+    }
+}

@@ -1,0 +1,65 @@
+﻿@inject NavigationManager Navigation
+
+<nav class="topnav navbar navbar-expand-lg navbar-dark bg-primary fixed-top @NavClass">
+    <div class="container">
+        <a class="navbar-brand" href="/"></a>
+        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarColor02" style="">
+            <ul class="navbar-nav mr-auto d-flex align-items-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">开源</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="@Config.GiteeUrl">
+                            Gitee  <img width="70" src="@Config.GiteeUrl/badge/star.svg?theme=dark" alt="star" style="margin-left:14px;">
+                        </a>
+                        <a class="dropdown-item" href="@Config.GithubUrl">
+                            GitHub <img width="70" src="https://img.shields.io/github/stars/known/known?color=%231890FF" alt="stars">
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://demo.known.org.cn">演示</a>
+                </li>
+                <li class="nav-item@(IsActive("/doc")?" active":"")">
+                    <a class="nav-link" href="./doc">文档</a>
+                </li>
+                <li class="nav-item@(IsActive("/bbs")?" active":"")">
+                    <a class="nav-link" href="./bbs">交流</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">资源</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="https://www.cnblogs.com/known">博客</a>
+                        <a class="dropdown-item" href="https://space.bilibili.com/3546586514721249">视频</a>
+                        <a class="dropdown-item" href="./api">类库API</a>
+                        <a class="dropdown-item" href="./log">更新日志</a>
+                        <a class="dropdown-item" href="http://v1x.known.org.cn">V1.2.x</a>
+                    </div>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto d-flex align-items-center">
+                <li class="nav-item">
+                    <span class="nav-link" href="#">
+                        <a class="btn btn-success btn-round shadow-sm" href="#" data-toggle="modal" data-target="#modal_newsletter">
+                            最新版本：V@(Config.Version.FrameVersion.Replace("Known V", ""))
+                        </a>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@code {
+    private string NavClass => IsIndex ? "index-nav" : "bg-white navbar-light shadow-sm scrollednav py-0";
+
+    [Parameter] public bool IsIndex { get; set; }
+
+    private bool IsActive(string code)
+    {
+        var uri = Navigation.Uri.Replace(Navigation.BaseUri, "/");
+        return uri.StartsWith(code);
+    }
+}

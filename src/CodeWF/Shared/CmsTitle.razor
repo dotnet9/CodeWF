@@ -1,0 +1,16 @@
+﻿@if (!string.IsNullOrWhiteSpace(Icon))
+{
+    <div class="title">
+        <i class="@Icon" />
+        <span style="margin-left:10px;">@Title</span>
+    </div>
+}
+else
+{
+    <div class="title">@Title</div>
+}
+
+@code {
+    [Parameter] public string Icon { get; set; }
+    [Parameter] public string Title { get; set; }
+}

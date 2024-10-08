@@ -1,0 +1,29 @@
+﻿<KContext Value="context">
+    <Router AppAssembly="typeof(AppWeb).Assembly" AdditionalAssemblies="Config.Assemblies">
+        <Found Context="routeData">
+            <KRouteData Value="routeData">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(AntLayout)" />
+            </KRouteData>
+        </Found>
+        <NotFound>
+            <Result Status="404" />
+        </NotFound>
+    </Router>
+    <AntContainer />
+    <KBlazorUI />
+</KContext>
+
+@code {
+    private UIContext context;
+
+    [Parameter] public string IPAddress { get; set; }
+    [Parameter] public bool IsMobile { get; set; }
+
+    protected override void OnInitialized()
+    {
+        context = new UIContext();
+        context.IPAddress = IPAddress;
+        context.IsMobile = IsMobile;
+        base.OnInitialized();
+    }
+}

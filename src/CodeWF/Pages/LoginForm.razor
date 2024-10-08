@@ -1,0 +1,82 @@
+﻿@inherits Known.Pages.LoginPage
+
+<AntModal Id="@Id" Name="登录 / 注册" Width="450">
+    <div class="cl-login">
+        <div class="cl-login-head">用 户 登 录</div>
+        <form id="login-form">
+            <AntFormItem>
+                <AntInput Id="@nameof(LoginInfo.UserName)" Required Icon="far fa-user" Placeholder="用户名" />
+            </AntFormItem>
+            <AntFormItem>
+                <AntPassword Id="@nameof(LoginInfo.Password)" Required Icon="far fa-lock" Placeholder="密码" />
+            </AntFormItem>
+            <AntFormItem>
+                <AntButton Name="登 录" Block OnClick="return cl_login()" />
+            </AntFormItem>
+        </form>
+        <div id="login-weixin" style="text-align:center;margin-bottom:20px;display:none;">
+            <div style="margin-bottom:10px;">请使用微信扫码登录</div>
+            <div id="login-qrcode"></div>
+        </div>
+        <div class="cl-login-foot">
+            <div onclick="cl_login_type(this,0)">扫码登录</div>
+            <div style="color:#d9d9d9;">|</div>
+            <div class="active" onclick="cl_login_type(this,1)">密码登录</div>
+        </div>
+    </div>
+</AntModal>
+
+<script>
+    var checkQRCode;
+    function cl_login_type(obj, type) {
+        $('.cl-login-head').html(type === 1 ? '用 户 登 录' : '扫 码 登 录');
+        if (type === 1) {
+            $('#login-form').show();
+            $('#login-weixin').hide();
+            clearInterval(checkQRCode);
+        } else {
+            $('#login-form').hide();
+            $('#login-weixin').show();
+            checkQRCode = setInterval(function(){
+                AntBlazor.get('/weixin/check?token=@qrToken').then(res => res.json()).then(data => {
+                    if (data.isValid) location = location;
+                });
+            }, 1000);
+        }
+        $('.cl-login-foot div').removeClass('active');
+        $(obj).addClass('active');
+    }
+
+    function cl_login() {
+        var form = AntBlazor.getForm('login-form');
+        if (!form.IsValid)
+            return false;
+        form.Data.IsPassword = true;
+        AntBlazor.post('/signin', form.Data).then(res => res.json()).then(data => {
+            if (!data.isValid)
+                AntBlazor.showMessage('error', data.message);
+            else
+                location = location;
+        });
+        return false;
+    }
+    
+    $(function() {
+        $('#login-qrcode').qrcode({ text: '@qrCodeUrl', width: 200, height: 200 });
+    });
+</script>
+
+@code {
+    private string qrToken;
+    private string qrCodeUrl;
+
+    [Parameter] public Func<Task> OnLoginOK { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        //state名称固定为known_xxx，不能修改
+        qrToken = AuthService.GetWeixinQRCodeToken();
+        qrCodeUrl = WeixinApi.GetAuthorizeUrl($"known_{qrToken}");
+    }
+}

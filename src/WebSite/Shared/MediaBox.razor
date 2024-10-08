@@ -1,0 +1,16 @@
+﻿<div class="media">
+	<div class="iconbox iconmedium rounded-circle @Style mr-4">
+		<i class="@Icon" />
+	</div>
+	<div class="media-body">
+		<h5>@Title</h5>
+		<p class="text-muted">@ChildContent</p>
+	</div>
+</div>
+
+@code {
+	[Parameter] public string Style { get; set; }
+	[Parameter] public string Icon { get; set; }
+	[Parameter] public string Title { get; set; }
+	[Parameter] public RenderFragment ChildContent { get; set; }
+}

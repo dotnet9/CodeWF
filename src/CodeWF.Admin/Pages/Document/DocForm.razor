@@ -1,0 +1,80 @@
+﻿@inherits BaseComponent
+
+<div class="kui-card right-card" style="grid-template-columns:@(isPreview?"auto 50%":"100%");">
+    <div class="doc-form">
+        <div class="doc-form-top">
+            <div style="display:flex;align-items:center;">
+                <div>
+                    <label style="margin-right:10px;">代码</label>
+                    <AntInput @bind-Value="model.Code" Disabled Style="width:150px;" />
+                </div>
+                <div style="margin-left:10px;">
+                    <label style="margin-right:10px;">标题</label>
+                    <AntInput @bind-Value="model.Title" Disabled Style="width:200px;" />
+                </div>
+            </div>
+            @if (isPreview)
+            {
+                <Tooltip Title="关闭预览">
+                    <Icon Type="double-right" Theme="outline" OnClick="e=>isPreview=false" />
+                </Tooltip>
+            }
+            else
+            {
+                <Tooltip Title="显示预览">
+                    <Icon Type="double-left" Theme="outline" OnClick="e=>isPreview=true" />
+                </Tooltip>
+            }
+        </div>
+        <div class="absolute" style="top:40px;bottom:40px;">
+            <AntTextArea @bind-Value="model.Content" Style="height:100%;" />
+        </div>
+        <div class="absolute" style="bottom:0;">
+            <AntButton Type="@ButtonType.Primary" Name="保存" OnClick="OnSave" />
+        </div>
+    </div>
+    <div style="position:relative;display:@(isPreview?"block":"none");">
+        <div class="cl-doc absolute" style="top:0;bottom:0;">
+            @CmsUtils.GetMarkdownHtml(model.Content)
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isPreview = false;
+    private CmPost model = new();
+    private IPostService Service;
+    private string ContentType => Type.ToString();
+
+    [Parameter] public ContentType Type { get; set; }
+
+    public async Task LoadDataAsync(CmCategory item)
+    {
+        model = await Service.GetPostAsync(item.Id);
+        if (model == null)
+        {
+            model = new CmPost
+            {
+                Id = item.Id,
+                CategoryId = item.Id,
+                Type = ContentType,
+                Title = item.Name,
+                Status = PostStatus.Published
+            };
+        }
+        model.Code = item.Code;
+        await StateChangedAsync();
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<IPostService>();
+    }
+
+    private async void OnSave()
+    {
+        var result = await Service.SavePostAsync(model);
+        UI.Result(result);
+    }
+}

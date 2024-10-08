@@ -1,0 +1,56 @@
+﻿@page "/bbs"
+@page "/bbs/{category}"
+@inherits ListComponent<PostListInfo>
+
+<PageTitle>问题交流 - @AppConfig.AppTitle</PageTitle>
+
+<UMenuBar Target="cl-bbs-menu" />
+<div class="container cl-container cl-bbs">
+    <UCategory Service="Service" />
+    <CmsCard Class="cl-posts">
+        <HeadTemplate>
+            <CmsTitle Icon="far fa-server" Title="内容列表" />
+            <AntForm Id="query">
+                <AntSearch Id="Key" Placeholder="请输入关键字搜索" Value="@key" />
+            </AntForm>
+        </HeadTemplate>
+        <ChildContent>
+            @if (Result.TotalCount == 0)
+            {
+                <AntEmpty />
+            }
+            else
+            {
+                foreach (var post in Result.PageData)
+                {
+                    <UPostItem Post="post" />
+                }
+                <div style="padding:15px 0;text-align:center;">
+                    <AntPagination TotalCount="Result.TotalCount" PageSize="Criteria.PageSize" PageIndex="Criteria.PageIndex" />
+                </div>
+            }
+        </ChildContent>
+    </CmsCard>
+    <div>
+        <SigninBox Service="Service" />
+        <div style="height:20px;"></div>
+        <UPostRank Service="Service" />
+    </div>
+</div>
+
+@code {
+    private ISiteService Service;
+    private string key;
+
+    [Parameter] public string Category { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+        key = Context.Request.Get<string>("Key");
+        Criteria.Parameters["Key"] = key;
+        Criteria.SetQuery(nameof(CmPost.Type), QueryType.Equal, ContentType.Interact.ToString());
+        Result = await Service.QueryPostsAsync(Criteria);
+    }
+}

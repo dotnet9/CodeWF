@@ -1,0 +1,28 @@
+﻿<KContext Value="context">
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <KRouteData Value="routeData">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(SiteLayout)" />
+            </KRouteData>
+        </Found>
+        <NotFound>
+            <p>页面不存在！</p>
+        </NotFound>
+    </Router>
+</KContext>
+
+@code {
+    private UIContext context;
+    [CascadingParameter] private HttpContext Context { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        context = new UIContext();
+        Context.SetContext(context);
+        if (Context.User.Identity.IsAuthenticated)
+            context.CurrentUser = await AuthService.GetUserAsync(Context.User.Identity.Name);
+        else
+            context.CurrentUser = null;
+    }
+}

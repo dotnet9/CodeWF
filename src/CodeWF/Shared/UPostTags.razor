@@ -1,0 +1,16 @@
+﻿@inherits BaseComponent
+
+<div class="tags">
+    @if (!string.IsNullOrWhiteSpace(Tags))
+    {
+        foreach (var tag in Tags.Split(','))
+        {
+            @* <a class="ant-tag ant-tag-blue" href="@Url.GetBbsTagUrl(tag)">@tag</a> *@
+            <AntTag Color="blue">@tag</AntTag>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public string Tags { get; set; }
+}

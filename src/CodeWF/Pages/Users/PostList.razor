@@ -1,0 +1,61 @@
+﻿@page "/creator/posts"
+@inherits ListComponent<PostListInfo>
+
+<PageTitle>问题列表 - @AppConfig.AppTitle</PageTitle>
+
+<div class="container cl-container cl-creator">
+    <UCMenu />
+    <CmsCard Class="cl-posts">
+        <HeadTemplate>
+            <CmsTitle Icon="far fa-list-alt" Title="问题列表" />
+            <AntForm Id="query">
+                <AntSearch Id="Key" Placeholder="请输入关键字搜索" Value="@key" />
+            </AntForm>
+        </HeadTemplate>
+        <ChildContent>
+            <div class="cl-user-post-item">
+                <div class="item">
+                    <div style="font-weight:bold;">问题标题</div>
+                    <div style="font-weight:bold;">提问时间</div>
+                    <div style="font-weight:bold;">操作</div>
+                </div>
+            </div>
+            @if (Result.TotalCount == 0)
+            {
+                <AntEmpty />
+            }
+            else
+            {
+                foreach (var item in Result.PageData)
+                {
+                    <div class="cl-user-post-item">
+                        <div class="item">
+                            <div><a class="ask-title" href="@Url.GetBbsPostUrl(item.Id)">@item.Title</a></div>
+                            <div>@item.PublishTime?.ToString("yyyy-MM-dd HH:mm")</div>
+                            <div><a href="@Url.GetPostForm(item.Id)" class="ant-tag ant-tag-blue">编辑</a></div>
+                        </div>
+                    </div>
+                }
+                <div style="padding:15px 0;text-align:center;">
+                    <AntPagination TotalCount="Result.TotalCount" PageSize="Criteria.PageSize" PageIndex="Criteria.PageIndex" />
+                </div>
+            }
+        </ChildContent>
+    </CmsCard>
+</div>
+
+@code {
+    private ISiteService Service;
+    private string key;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+        key = Context.Request.Get<string>("Key");
+        Criteria.Parameters["Key"] = key;
+        Criteria.SetQuery(nameof(CmPost.Type), QueryType.Equal, ContentType.Interact.ToString());
+        Criteria.SetQuery(nameof(CmPost.UserId), QueryType.Equal, CurrentUser.Id);
+        Result = await Service.QueryPostsAsync(Criteria);
+    }
+}

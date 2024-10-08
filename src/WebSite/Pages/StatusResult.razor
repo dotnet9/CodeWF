@@ -1,0 +1,21 @@
+﻿@page "/result"
+@using AntBlazor
+@layout EmptyLayout
+
+<PageTitle>登录成功 - @AppConfig.AppTitle</PageTitle>
+
+@if (Code == "login")
+{
+    <div style="margin:50px;text-align:center;">
+        <h1 style="font-size:1rem;">微信扫码登录</h1>
+        <AntResult Type="success" Title="登录成功！">
+            <ExtraContent>
+                <AntButton Name="进入Known官网" OnClick="location='./'" />
+            </ExtraContent>
+        </AntResult>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery] public string Code { get; set; }
+}

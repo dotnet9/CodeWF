@@ -1,0 +1,74 @@
+﻿@page "/api"
+@inherits BaseComponent
+
+<PageTitle>类库API文档 - @AppConfig.AppTitle</PageTitle>
+
+<UMenuBar Target="cl-api-menu" />
+<div class="container cl-container cl-doc">
+    <UApiMenu />
+    <CmsCard>
+        <div class="cl-doc-body">
+            @foreach (var assembly in DocHelper.Assemblies)
+            {
+                @* <h1>@assembly.Name</h1> *@
+                @foreach (var name in assembly.Namespaces)
+                {
+                    @* <h2>@name.Name</h2> *@
+                    @foreach (var type in name.Types)
+                    {
+                        <div id="doc_@type.Id" class="api-doc cl-hide">
+                            <h3>@type.FullName - @type.Description</h3>
+                            @if (type.Fields.Count > 0)
+                            {
+                                <h4>字段</h4>
+                                <UApiField Items="type.Fields" />
+                            }
+                            @if (type.Constructors.Count > 0)
+                            {
+                                <h4>构造函数</h4>
+                                <UApiMethod Items="type.Constructors" />
+                            }
+                            @if (type.Properties.Count > 0)
+                            {
+                                <h4>属性</h4>
+                                <UApiProperty Items="type.Properties" />
+                            }
+                            @if (type.PublicMethods.Count > 0)
+                            {
+                                <h4>Public方法</h4>
+                                <UApiMethod Items="type.PublicMethods" />
+                            }
+                            @if (type.ProtectedMethods.Count > 0)
+                            {
+                                <h4>Protected方法</h4>
+                                <UApiMethod Items="type.ProtectedMethods" />
+                            }
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </CmsCard>
+</div>
+
+<script>
+    var ApiDoc = {
+        showMenu: function(id) {
+            var menu = $('#menu_' + id);
+            if (menu.hasClass('cl-hide'))
+                menu.removeClass('cl-hide').addClass('cl-show');
+            else
+                menu.removeClass('cl-show').addClass('cl-hide');
+        },
+        showDoc: function(obj, id) {
+            $('.api-type').removeClass('active');
+            $('.api-doc').removeClass('cl-show').addClass('cl-hide');
+            $('#doc_' + id).removeClass('cl-hide').addClass('cl-show');
+            $(obj).addClass('active');
+        }
+    };
+    $(function() {
+        $('.api-namespace').first().click();
+        $('.api-type').first().click();
+    });
+</script>

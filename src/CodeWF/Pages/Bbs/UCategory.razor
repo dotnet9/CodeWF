@@ -1,0 +1,41 @@
+﻿@inherits BaseComponent
+
+<CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="交流分类">
+    <a href="@Url.BbsUrl" class="@(IsActive("")?"active":"")">
+        <i class="far fa-database" />
+        <span style="margin-left:10px;">综合</span>
+    </a>
+    @if (categories != null && categories.Count > 0)
+    {
+        foreach (var item in categories)
+        {
+            <a href="@item.BbsUrl" class="@(IsActive(item.Code)?"active":"")">
+                <i class="@item.Icon" />
+                <span style="margin-left:10px;">@item.Name</span>
+            </a>
+        }
+    }
+</CmsCard>
+
+@code {
+    private List<CmCategory> categories = [];
+
+    [Parameter] public ISiteService Service { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        var lists = await Service.GetCategoriesAsync(ContentType.Interact);
+        categories = lists?.OrderBy(l => l.Sort).ToList();
+    }
+
+    private bool IsActive(string code)
+    {
+        var uri = Navigation.Uri.Split('?')[0];
+        code = code.ToLower();
+        if (code == "" && uri.EndsWith("/bbs"))
+            return true;
+
+        return uri.EndsWith($"/{code}");
+    }
+}

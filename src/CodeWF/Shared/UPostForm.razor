@@ -1,0 +1,42 @@
+﻿@inherits BaseComponent
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <AntAlert Type="error">@errorMessage</AntAlert>
+}
+<AntForm Id="@formId">
+    <div class="label"><span style="color:#f00;">*</span>标题</div>
+    <AntInput Id="@nameof(PostFormInfo.Title)" Value="@model?.Title" Placeholder="请输入标题" Required />
+    <div class="label"><span style="color:#f00;">*</span>请详细描述你的问题</div>
+    <CmsMarkdown Id="@nameof(PostFormInfo.Content)" Value="@model?.Content" Placeholder="在这里输入问题内容" />
+    <div class="button">
+        <AntButton Name="发布" OnClick="@($"return AntBlazor.validate('{formId}');")" />
+        <AntButton Name="取消" Type="default" OnClick="@($"location='{BackUrl}';return false;")" />
+    </div>
+</AntForm>
+
+@code {
+    private PostFormInfo model = new();
+    private string formId = "post-form";
+    private string errorMessage = "";
+
+    [Parameter] public ISiteService Service { get; set; }
+    [Parameter] public string BackUrl { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        if (!string.IsNullOrWhiteSpace(Id))
+            model = await Service.GetPostAsync(Id);
+        if (Context.Request.IsHandler(formId))
+        {
+            model = Context.Request.GetModel<PostFormInfo>();
+            model.Id = Id;
+            var result = await Service.SavePostAsync(model);
+            if (!result.IsValid)
+                errorMessage = result.Message;
+            else
+                Context.Response.Redirect(Url.UserPostsUrl.Trim('.'));
+        }
+    }
+}

@@ -1,0 +1,21 @@
+﻿@page "/creator/post/{id}"
+@inherits BaseComponent
+
+<PageTitle>编辑问题 - @AppConfig.AppTitle</PageTitle>
+
+<div class="container cl-container cl-creator">
+    <UCMenu />
+    <CmsCard Class="cl-creator-form" Title="编辑问题">
+        <UPostForm Id="@Id" Service="Service" BackUrl="@Url.UserPostsUrl" />
+    </CmsCard>
+</div>
+
+@code {
+    private ISiteService Service;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+    }
+}

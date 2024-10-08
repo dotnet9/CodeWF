@@ -1,0 +1,32 @@
+﻿<div class="cl-bbs-post-item">
+    <a class="ask-title" href="@Url.GetBbsPostUrl(Post.Id)">@Post.Title</a>
+    <div class="ask-bottom">
+        <UPostTags Tags="@Post?.Tags" />
+        <UPostCount Post="Post" />
+    </div>
+    @* <div class="item">
+        <div>
+            <a href="@Url.GetBbsPostUrl(Post.Id)">
+                <div class="title">@Post.Title</div>
+                <div class="summary">@Post.Summary</div>
+            </a>
+            <div class="bottom">
+                <div>
+                    <span>@Post.Author</span>
+                    <span style="margin:0 5px;">|</span>
+                    <span><i class="far fa-eye" /> @Post.ViewQty</span>
+                    <span class="like"><i class="far fa-thumbs-up" /> @Post.LikeQty</span>
+                </div>
+                <UPostTags Tags="@Post.Tags" />
+            </div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Post.Image))
+        {
+            <div><img src="@Post.Image" /></div>
+        }
+    </div> *@
+</div>
+
+@code {
+    [Parameter] public PostListInfo Post { get; set; }
+}

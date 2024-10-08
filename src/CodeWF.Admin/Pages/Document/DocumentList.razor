@@ -1,0 +1,29 @@
+﻿@inherits BasePage
+
+<style>
+    .left-card {display:grid;grid-template-rows:30px 30px auto;padding:10px;gap:10px;position:relative;}
+    .right-card {display:grid;padding:10px;gap:10px;position:relative;}
+    .doc-menu {position:absolute;top:90px;bottom:0;left:0;right:0;overflow:auto;padding:10px;}
+    .doc-form {display:grid;grid-template-rows:30px auto 30px;gap:10px;position:relative;}
+    .doc-form-top {display:flex;justify-content:space-between;align-items:center;}
+    .doc-form-top .anticon {font-size:1rem;cursor:pointer;}
+    .absolute {position:absolute;left:0;right:0;overflow:auto;display:block;padding-top:0;margin-bottom:0;}
+</style>
+
+<div class="kui-row-28" style="height:100%;max-height:100%;">
+    <div class="kui-card left-card">
+        <DocMenu Type="Type" OnMenuClick="OnMenuClick" />
+    </div>
+    <DocForm Type="Type" @ref="form" />
+</div>
+
+@code {
+    private DocForm form;
+
+    protected virtual ContentType Type { get; }
+
+    private async void OnMenuClick(CmCategory item)
+    {
+        await form?.LoadDataAsync(item);
+    }
+}

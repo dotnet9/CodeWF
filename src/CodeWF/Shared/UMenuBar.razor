@@ -1,0 +1,20 @@
+﻿<div class="cl-menu-bar" onclick="cl_click_bar(this)"><i class="far fa-bars" /></div>
+<script>
+    var isMenuShow = false;
+    function cl_click_bar(obj) {
+        var target = '@Target';
+        var menu = $('.' + target);
+        if (isMenuShow) {
+            menu.hide();
+            $(obj).css('left', 0);
+        } else {
+            menu.show();
+            $(obj).css('left', '199px');
+        }
+        isMenuShow = !isMenuShow;
+    }
+</script>
+
+@code {
+    [Parameter] public string Target { get; set; }
+}

@@ -1,0 +1,29 @@
+﻿<CmsCard Class="cl-api-menu">
+    <HeadTemplate>
+        <AntSearch Placeholder="请输入关键字搜索" />
+    </HeadTemplate>
+    <ChildContent>
+        <ul>
+            @foreach (var assembly in DocHelper.Assemblies)
+            {
+                <li>
+                    <div>@assembly.Name</div>
+                    <ul>
+                        @foreach (var item in assembly.Namespaces)
+                        {
+                            <li>
+                                <div class="api-namespace" onclick="ApiDoc.showMenu('@item.Id')">@item.Name</div>
+                                <ul id="menu_@item.Id" class="cl-hide">
+                                    @foreach (var type in item.Types)
+                                    {
+                                        <li class="api-type" onclick="ApiDoc.showDoc(this,'@type.Id')" title="@type.Description">@type.Name</li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </ChildContent>
+</CmsCard>

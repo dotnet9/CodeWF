@@ -1,0 +1,60 @@
+﻿@inherits BaseComponent
+
+<CmsCard Class="cl-doc-menu">
+    @if (categories != null && categories.Count > 0)
+    {
+        <ul>
+            @foreach (var item in categories)
+            {
+                <li>
+                    @if (item.Children.Count > 0)
+                    {
+                        <div>@item.Name</div>
+                        <ul>
+                            @foreach (var sub in item.Children)
+                            {
+                                <li><a href="@GetUrl(sub)" class="@(IsActive(sub.Code)?"active":"")">@sub.Name</a></li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <a href="@GetUrl(item)" class="@(IsActive(item.Code)?"active":"")">@item.Name</a>
+                    }
+                </li>
+            }
+        </ul>
+    }
+</CmsCard>
+
+@code {
+    private ISiteService Service;
+    private List<CmCategory> categories = [];
+
+    [Parameter] public ContentType Type { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+        var lists = await Service.GetCategoriesAsync(Type);
+        if (Type == ContentType.UpdateLog)
+            categories = lists?.OrderByDescending(l => l.Sort).ToList().ToTreeData();
+        else
+            categories = lists?.OrderBy(l => l.Sort).ToList().ToTreeData();
+    }
+
+    private string GetUrl(CmCategory item) => Type == ContentType.UpdateLog ? item.LogUrl : item.DocUrl;
+
+    private bool IsActive(string code)
+    {
+        var uri = Navigation.Uri;
+        code = code.ToLower();
+        var first = Type == ContentType.Document ? "introduce" : "";
+        var url = Type == ContentType.Document ? "/doc" : "/log";
+        if (code == first && uri.EndsWith(url))
+            return true;
+
+        return uri.EndsWith($"/{code}");
+    }
+}

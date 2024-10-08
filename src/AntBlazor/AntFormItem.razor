@@ -1,0 +1,22 @@
+﻿@inherits BaseComponent
+
+<div class="ant-form-item">
+    <div class="ant-form-item-row ant-row">
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <div class="ant-form-item-label ant-col">@Label</div>
+        }
+        <div class="ant-form-item-control ant-col">
+            <div class="ant-form-item-control-input">
+                <div class="ant-form-item-control-input-content">
+                    @ChildContent
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

@@ -1,0 +1,133 @@
+﻿@inherits BaseComponent
+
+<div>
+    <AntButton Type="@ButtonType.Primary" Name="新增文件夹" OnClick="OnAddFolder" />
+    <AntButton Type="@ButtonType.Primary" Name="新增页面" OnClick="OnAddPage" />
+</div>
+<div>
+    <Search Placeholder="搜索关键字" ClassicSearchIcon />
+</div>
+<div class="doc-menu">
+    <CategoryTypeTree DataSource="categories" ShowIcon BlockNode DefaultExpandAll
+          TitleExpression="x => x.DataItem.Name"
+          IconExpression="@(x=>x.DataItem.Children.Count>0?"folder":"file")"
+          ChildrenExpression="x => x.DataItem.Children"
+          OnClick="this.Callback<TreeEventArgs<CmCategory>>(OnTreeClick)">
+        <TitleTemplate>
+            <Dropdown Trigger="new Trigger[] { Trigger.ContextMenu }">
+                <Overlay>
+                    <Menu OnMenuItemClicked="e=>OnTreeContextClick(e,context.DataItem)">
+                        <MenuItem Key="Folder">添加文件夹</MenuItem>
+                        <MenuItem Key="Page">添加页面</MenuItem>
+                        <MenuItem Key="Edit">编辑</MenuItem>
+                        <MenuItem Key="Delete">删除</MenuItem>
+                    </Menu>
+                </Overlay>
+                <ChildContent>
+                    <span>@context.DataItem.Name</span>
+                </ChildContent>
+            </Dropdown>
+        </TitleTemplate>
+    </CategoryTypeTree>
+</div>
+
+@code {
+    private List<CmCategory> categories = [];
+    private ICommonService Service;
+    private string ContentType => Type.ToString();
+
+    [Parameter] public ContentType Type { get; set; }
+    [Parameter] public Action<CmCategory> OnMenuClick { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ICommonService>();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+            await RefreshTreeAsync();
+    }
+
+    private void OnAddFolder() => NewForm("添加文件夹");
+    private void OnAddPage() => NewForm("添加页面");
+
+    private void OnTreeClick(TreeEventArgs<CmCategory> e)
+    {
+        var item = e.Node.DataItem;
+        if (item.Children.Count > 0)
+        {
+            UI.Error("请点击页面节点进行编辑。");
+            return;
+        }
+
+        OnMenuClick?.Invoke(item);
+    }
+
+    private void OnTreeContextClick(MenuItem item, CmCategory info)
+    {
+        if (item.Key == "Folder")
+            NewForm("添加文件夹", info);
+        else if (item.Key == "Page")
+            NewForm("添加页面", info);
+        else if (item.Key == "Edit")
+            EditForm(info);
+        else if (item.Key == "Delete")
+            OnDelete(info);
+    }
+
+    private void OnDelete(CmCategory info)
+    {
+        UI.Confirm($"确定要删除{info.Name}？", async () =>
+        {
+            var result = await Service.DeleteCategoriesAsync([info]);
+            UI.Result(result, RefreshTreeAsync);
+        });
+    }
+
+    private async Task RefreshTreeAsync()
+    {
+        var lists = await Service.GetCategoriesAsync(ContentType);
+        if (lists == null || lists.Count == 0)
+            return;
+
+        categories = lists.OrderBy(l => l.Sort).ToList().ToTreeData();
+        await StateChangedAsync();
+    }
+
+    private void NewForm(string title, CmCategory parent = null)
+    {
+        var parentId = "0";
+        var sort = categories.Count + 1;
+        if (parent != null)
+        {
+            parentId = parent.Id;
+            title = $"{title} - {parent.Name}";
+            sort = parent.Children.Count + 1;
+        }
+        var data = new CmCategory { Type = ContentType, ParentId = parentId, Sort = sort };
+        ShowForm(data, title);
+    }
+
+    private void EditForm(CmCategory data)
+    {
+        var name = data.Children.Count == 0 ? "页面" : "文件夹";
+        ShowForm(data, $"编辑{name}");
+    }
+
+    private void ShowForm(CmCategory data, string title)
+    {
+        var model = new FormModel<CmCategory>(this);
+        model.Title = title;
+        model.Data = data;
+        model.OnSave = Service.SaveCategoryAsync;
+        model.OnSaved = async d => await RefreshTreeAsync();
+        model.AddRow().AddColumn(c => c.Code);
+        model.AddRow().AddColumn(c => c.Name);
+        model.AddRow().AddColumn(c => c.Sort);
+        UI.ShowForm(model);
+    }
+}

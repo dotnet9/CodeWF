@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="blazor,ant-design,known,razor,react,vue,组件,dotnet">
+    <meta name="description" content="CodeWF是基于Blazor开发的一个论坛网站，网站前台使用Blazor静态组件，后台使用Known框架。" />
+    <base href="/" />
+    <HeadOutlet />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/fa.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/AntBlazor/css/web.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/Known/css/web.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/CodeWF/css/editormd.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/CodeWF/css/web.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/main.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/aos.css")" />
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/app.css")" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <script src="@Config.GetStaticFileUrl("js/jquery.min.js")"></script>
+</head>
+
+<body>
+    <Routes />
+    <script src="@Config.GetStaticFileUrl("_content/AntBlazor/js/AntBlazor.js")"></script>
+    <script src="@Config.GetStaticFileUrl("_content/Known/libs/prism.js")"></script>
+    <script src="@Config.GetStaticFileUrl("_content/Known/libs/qrcode.js")"></script>
+    <script src="@Config.GetStaticFileUrl("_content/CodeWF/js/editormd.js")"></script>
+    <script src="@Config.GetStaticFileUrl("js/bootstrap.min.js")"></script>
+    <script src="@Config.GetStaticFileUrl("js/popper.min.js")"></script>
+    <script src="@Config.GetStaticFileUrl("js/aos.js")"></script>
+    <noscript>
+        <style>
+            *[data-aos] {
+                display: block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+        </style>
+    </noscript>
+    <script>
+        AOS.init({
+            duration: 700,
+            disable: function () {
+                var maxWidth = 1200;
+                return window.innerWidth < maxWidth;
+            }
+        });
+    </script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+
+</html>

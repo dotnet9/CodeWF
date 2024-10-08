@@ -1,0 +1,37 @@
+﻿@inherits BaseComponent
+
+<div class="ant-radio-group">
+    @if (Items != null && Items.Count > 0)
+    {
+        var index = 0;
+        foreach (var item in Items)
+        {
+            var classWrapper = "ant-radio-wrapper";
+            var className = "ant-radio";
+            if (item.Key == Value)
+            {
+                classWrapper += " ant-radio-wrapper-checked";
+                className += " ant-radio-checked";
+            }
+            <label class="@classWrapper">
+                <span class="@className">
+                    @if (item.Key == Value)
+                    {
+                        <input type="radio" class="ant-radio-input" id="@($"{Id}_{index++}")" name="@Id" value="@item.Key" checked>
+                    }
+                    else
+                    {
+                        <input type="radio" class="ant-radio-input" id="@($"{Id}_{index++}")" name="@Id" value="@item.Key">
+                    }
+                    <span class="ant-radio-inner"></span>
+                </span>
+                <span>@item.Value</span>
+            </label>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public string Value { get; set; }
+    [Parameter] public Dictionary<string, string> Items { get; set; }
+}

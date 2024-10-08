@@ -1,0 +1,20 @@
+/*site*/
+body {background-color:#f2f3f5;font-family:Lato,PingFang SC,Microsoft YaHei,sans-serif;}
+.fixed-top {z-index:1000;}
+.navbar-brand {background:url(../img/logo.png);display:block;width:180px;height:50px;}
+.bg-white .navbar-brand {background:url(../img/logo1.png)}
+.navbar-nav .nav-link {font-weight:500;font-size:1.1rem;}
+.navbar-light .navbar-nav .nav-link {color:#201f21;}
+.navbar-light .navbar-nav .active > .nav-link {color:#7832e2;}
+.navbar-nav .dropdown-item {font-weight:500;}
+.bg-primary {background-color:#1c66b9 !important;fill:#1c66b9 !important;}
+.bg-white {background-color:#fff !important;fill:#fff !important;}
+.text-muted{margin-left:6px;}
+
+.footer {background-color:#202942;color:#adb5bd;padding:3rem 0 2rem 0;}
+.copyright {text-align:center;margin-top:1rem;display:flex;justify-content:space-between;}
+
+@media screen and (max-width:768px) {
+    .qrcode {text-align:center;}
+    .copyright {flex-direction:column;}
+}

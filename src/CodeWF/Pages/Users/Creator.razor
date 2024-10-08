@@ -1,0 +1,96 @@
+﻿@page "/creator"
+@inherits BaseComponent
+
+<PageTitle>创作中心 - @AppConfig.AppTitle</PageTitle>
+
+<div class="container cl-container cl-creator">
+    <UCMenu />
+    <div>
+        <UCUser User="user" />
+        <div style="height:20px;"></div>
+        <CmsCard Class="cl-user" Icon="far fa-border-all" Title="个人信息">
+            <KGroupBox Title="个人资料">
+                @if (!string.IsNullOrWhiteSpace(msgUser))
+                {
+                    <AntAlert Type="@typeUser">@msgUser</AntAlert>
+                }
+                <AntForm Id="@formUser">
+                    <AntFormItem Label="用户名">
+                        <AntInput Id="@nameof(UserFormInfo.UserName)" Value="@model?.UserName" Required />
+                    </AntFormItem>
+                    <AntFormItem Label="昵称">
+                        <AntInput Id="@nameof(UserFormInfo.NickName)" Value="@model?.NickName" Required />
+                    </AntFormItem>
+                    <AntFormItem Label="性别">
+                        <AntRadio Id="@nameof(UserFormInfo.Sex)" Value="@model?.Sex" Items="Sexes" />
+                    </AntFormItem>
+                    <AntFormItem Label="职业">
+                        <AntInput Id="@nameof(UserFormInfo.Metier)" Value="@model?.Metier" />
+                    </AntFormItem>
+                    <div class="button">
+                        <AntButton Name="确定修改" OnClick="@($"return AntBlazor.validate('{formUser}');")" />
+                    </div>
+                </AntForm>
+            </KGroupBox>
+            <KGroupBox Title="修改密码">
+                @if (!string.IsNullOrWhiteSpace(msgPwd))
+                {
+                    <AntAlert Type="@typePwd">@msgPwd</AntAlert>
+                }
+                <AntForm Id="@formPwd">
+                    <AntFormItem Label="新密码">
+                        <AntPassword Id="@nameof(PwdFormInfo.NewPwd)" Required />
+                    </AntFormItem>
+                    <AntFormItem Label="确认密码">
+                        <AntPassword Id="@nameof(PwdFormInfo.NewPwd1)" Required />
+                    </AntFormItem>
+                    <div class="button">
+                        <AntButton Name="确定修改" OnClick="@($"return AntBlazor.validate('{formPwd}');")" />
+                    </div>
+                </AntForm>
+            </KGroupBox>
+        </CmsCard>
+    </div>
+</div>
+
+@code {
+    private Dictionary<string, string> Sexes = new Dictionary<string, string>
+    {
+        ["0"] = "男", ["1"] = "女"
+    };
+    private ISiteService Service;
+    private CmUser user = new();
+    private UserFormInfo model = new();
+    private string formUser = "user-form";
+    private string formPwd = "pwd-form";
+    private string typeUser = "";
+    private string msgUser = "";
+    private string typePwd = "";
+    private string msgPwd = "";
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+        user = await Service.GetUserAsync(CurrentUser?.Id);
+        model.UserName = user?.UserName;
+        model.NickName = user?.NickName;
+        model.Sex = user?.Sex;
+        model.Metier = user?.Metier;
+
+        if (Context.Request.IsHandler(formUser))
+        {
+            model = Context.Request.GetModel<UserFormInfo>();
+            var result = await Service.SaveUserAsync(model);
+            typeUser = result.IsValid ? "success" : "error";
+            msgUser = result.Message;
+        }
+        else if (Context.Request.IsHandler(formPwd))
+        {
+            var info = Context.Request.GetModel<PwdFormInfo>();
+            var result = await Service.SaveUserPwdAsync(info);
+            typePwd = result.IsValid ? "success" : "error";
+            msgPwd = result.Message;
+        }
+    }
+}
