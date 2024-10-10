@@ -2,7 +2,7 @@
 
 <nav class="topnav navbar navbar-expand-lg navbar-dark bg-primary fixed-top @NavClass">
     <div class="container">
-        <a class="navbar-brand" href="/"></a>
+        <Logo />
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -12,7 +12,7 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">开源</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="@Config.GiteeUrl">
-                            Gitee  <img width="70" src="@Config.GiteeUrl/badge/star.svg?theme=dark" alt="star" style="margin-left:14px;">
+                            Gitee <img width="70" src="@Config.GiteeUrl/badge/star.svg?theme=dark" alt="star" style="margin-left:14px;">
                         </a>
                         <a class="dropdown-item" href="@Config.GithubUrl">
                             GitHub <img width="70" src="https://img.shields.io/github/stars/known/known?color=%231890FF" alt="stars">
@@ -22,10 +22,10 @@
                 <li class="nav-item">
                     <a class="nav-link" href="http://demo.known.org.cn">演示</a>
                 </li>
-                <li class="nav-item@(IsActive("/doc")?" active":"")">
+                <li class="nav-item@(IsActive("/doc") ? " active" : "")">
                     <a class="nav-link" href="./doc">文档</a>
                 </li>
-                <li class="nav-item@(IsActive("/bbs")?" active":"")">
+                <li class="nav-item@(IsActive("/bbs") ? " active" : "")">
                     <a class="nav-link" href="./bbs">交流</a>
                 </li>
                 <li class="nav-item dropdown">

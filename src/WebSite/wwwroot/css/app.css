@@ -2,7 +2,21 @@
 body {background-color:#f2f3f5;font-family:Lato,PingFang SC,Microsoft YaHei,sans-serif;}
 .fixed-top {z-index:1000;}
 .navbar-brand {background:url(../img/logo.png);display:block;width:180px;height:50px;}
-.bg-white .navbar-brand {background:url(../img/logo1.png)}
+.logo-link {
+    text-decoration: none;
+    color: #dddddd;
+    display: flex;
+    align-items: center;
+}
+    .logo-link:hover {
+        color: #ffffff;
+    }  
+.logo-container {gap: 10px;}
+.logo-image {height: 28px; width: auto}
+.logo-text {font-size: 1.2rem;font-weight: bold;}
+.bg-white .navbar-brand {
+    background: url(../img/logo1.png)
+}
 .navbar-nav .nav-link {font-weight:500;font-size:1.1rem;}
 .navbar-light .navbar-nav .nav-link {color:#201f21;}
 .navbar-light .navbar-nav .active > .nav-link {color:#7832e2;}
