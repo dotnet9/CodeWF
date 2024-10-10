@@ -12,5 +12,5 @@ public class BdUserList : BaseTablePage<CmUser>
         Table.OnQuery = Service.QueryUsersAsync;
     }
 
-    public async void Export() => await ExportDataAsync();
+    public async void Export() => await Table.ExportDataAsync();
 }

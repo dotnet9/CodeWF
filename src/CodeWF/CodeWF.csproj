@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Markdig" Version="0.37.0" />
-        <PackageReference Include="Known" Version="2.0.13" />
+        <PackageReference Include="Known" Version="2.0.14" />
         <ProjectReference Include="..\AntBlazor\AntBlazor.csproj" />
     </ItemGroup>
 

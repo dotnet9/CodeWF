@@ -15,6 +15,7 @@
 .counts .like {cursor:pointer;margin-left:10px;}
 .counts .like:hover {color:#1890ff;}
 
+code {padding: 0 2.5px;}
 blockquote {border-left:5px solid #ffe58f;padding:10px;background-color:#fffbe6;border-radius:3px;overflow:auto;}
 blockquote p {margin-bottom:0;}
 

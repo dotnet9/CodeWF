@@ -7,16 +7,16 @@
 
     <ItemGroup>
         <PackageReference Include="Coravel" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0-rc.1.24451.1" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0-rc.2.24474.1" />
         <!--
-        <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+        <PackageReference Include="System.Data.OleDb" Version="8.0.1" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
         <PackageReference Include="MySqlConnector" Version="2.3.7" />
-        <PackageReference Include="Npgsql" Version="8.0.3" />
-        <PackageReference Include="DM.DmProvider" Version="8.3.1.25526" />
+        <PackageReference Include="Npgsql" Version="8.0.4" />
+        <PackageReference Include="DM.DmProvider" Version="8.3.1.28188" />
         -->
         <PackageReference Include="Known.Cells" Version="1.0.2" />
-        <PackageReference Include="Known.Core" Version="2.0.13" />
+        <PackageReference Include="Known.Core" Version="2.0.14" />
         <ProjectReference Include="..\CodeWF.Admin\CodeWF.Admin.csproj" />
         <ProjectReference Include="..\CodeWF.EntityFramework\CodeWF.EntityFramework.csproj" />
     </ItemGroup>

@@ -12,5 +12,5 @@ public class ImLogList : BaseTablePage<CmLog>
         Table.OnQuery = Service.QueryLogsAsync;
     }
 
-    public async void Export() => await ExportDataAsync();
+    public async void Export() => await Table.ExportDataAsync();
 }

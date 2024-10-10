@@ -15,7 +15,7 @@ public class ImPostList : BaseTablePage<CmPost>
     public void DeleteM() => Table.DeleteM(Service.DeletePostsAsync);
     public void Edit(CmPost row) => Table.EditForm(Service.SavePostAsync, row);
     public void Delete(CmPost row) => Table.Delete(Service.DeletePostsAsync, row);
-    public async void Export() => await ExportDataAsync();
+    public async void Export() => await Table.ExportDataAsync();
 
     private Task<PagingResult<CmPost>> QueryPostsAsync(PagingCriteria criteria)
     {

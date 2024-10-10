@@ -8,7 +8,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CodeWF\CodeWF.csproj" />
         <PackageReference Include="Known.EntityFramework" Version="1.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-rc.1.24451.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-rc.2.24474.1" />
     </ItemGroup>
 
 </Project>

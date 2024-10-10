@@ -49,6 +49,10 @@ class UIService : IUIService
     {
         throw new NotImplementedException();
     }
+    public void BuildSpin(RenderTreeBuilder builder, SpinModel model)
+    {
+        throw new NotImplementedException();
+    }
 
     public void BuildToolbar(RenderTreeBuilder builder, ToolbarModel model)
     {
