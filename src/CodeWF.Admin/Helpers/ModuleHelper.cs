@@ -9,10 +9,11 @@ class ModuleHelper
             var baseData = modules.FirstOrDefault(m => m.Name == "基础数据");
             modules.Add(GetBdUserList(baseData.Id));
 
-            var document = GetModule("Documents", "文档管理", "file-search", ModuleType.Menu.ToString(), 2);
+            var document = GetModule("Contents", "内容管理", "file-search", ModuleType.Menu.ToString(), 2);
             modules.Add(document);
             modules.Add(GetDmUpdateLogList(document.Id));
             modules.Add(GetDmDocumentList(document.Id));
+            modules.Add(GetDmArticleList(document.Id));
 
             var interact = GetModule("Interacts", "交流管理", "read", ModuleType.Menu.ToString(), 3);
             modules.Add(interact);
@@ -100,6 +101,25 @@ class ModuleHelper
             EntityData = "",
             PageData = "",
             FormData = ""
+        };
+    }
+
+    private static SysModule GetDmArticleList(string parentId)
+    {
+        return new SysModule
+        {
+            ParentId = parentId,
+            Code = "DmArticleList",
+            Name = "文章管理",
+            Icon = "file-word",
+            Description = "查询和维护文章信息。",
+            Target = ModuleType.Custom.ToString(),
+            Url = "/dms/articles",
+            Sort = 3,
+            Enabled = true,
+            EntityData = "CmPost",
+            PageData = "{\"Type\":null,\"ShowPager\":true,\"PageSize\":null,\"ToolSize\":null,\"ActionSize\":null,\"Tools\":[\"New\",\"DeleteM\"],\"Actions\":[\"Edit\",\"Delete\"],\"Columns\":[{\"Id\":\"CategoryId\",\"Name\":\"分类ID\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"Title\",\"Name\":\"标题\",\"IsViewLink\":true,\"IsQuery\":true,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"Content\",\"Name\":\"内容\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"Status\",\"Name\":\"状态\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"PublishTime\",\"Name\":\"发布时间\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"ViewQty\",\"Name\":\"浏览数\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null},{\"Id\":\"LikeQty\",\"Name\":\"喜欢数\",\"IsViewLink\":false,\"IsQuery\":false,\"IsQueryAll\":false,\"IsSum\":false,\"IsSort\":false,\"DefaultSort\":null,\"Fixed\":null,\"Width\":null,\"Align\":null}]}",
+            FormData = "{\"Width\":1000,\"Maximizable\":false,\"DefaultMaximized\":false,\"IsContinue\":false,\"NoFooter\":false,\"Fields\":[{\"Row\":1,\"Column\":1,\"Span\":null,\"CustomField\":null,\"CategoryType\":null,\"Category\":null,\"Placeholder\":null,\"ReadOnly\":false,\"MultiFile\":false,\"Id\":\"CategoryId\",\"Name\":\"分类ID\",\"Type\":0,\"Length\":null,\"Required\":false},{\"Row\":1,\"Column\":1,\"Span\":null,\"CustomField\":null,\"CategoryType\":null,\"Category\":null,\"Placeholder\":null,\"ReadOnly\":false,\"MultiFile\":false,\"Id\":\"Title\",\"Name\":\"标题\",\"Type\":0,\"Length\":null,\"Required\":true},{\"Row\":1,\"Column\":1,\"Span\":null,\"CustomField\":null,\"CategoryType\":null,\"Category\":null,\"Placeholder\":null,\"ReadOnly\":false,\"MultiFile\":false,\"Id\":\"Content\",\"Name\":\"内容\",\"Type\":1,\"Length\":null,\"Required\":true}]}"
         };
     }
     #endregion

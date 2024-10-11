@@ -4,6 +4,7 @@ html, body {font-family:'Microsoft YaHei', Arial, sans-serif;width:100%;height:1
 .known, .ws-space, .ws-chart .ant-card, .ws-func .ant-card {border-radius:5px;}
 .kui-logo {background:url(../img/logo1.png) no-repeat left var(--kui-bgcolor);margin-left:6px;}
 :root[theme=dark] .kui-logo {background:url(../img/logo.png) no-repeat left var(--kui-bgcolor);}
+.kui-page-body {height:100%;}
 
 /*Login*/
 .login {position:absolute;left:0;right:0;top:0;bottom:0;overflow:auto;}

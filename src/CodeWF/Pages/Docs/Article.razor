@@ -1,0 +1,24 @@
+﻿@page "/article/{code}"
+@inherits BaseComponent
+
+<PageTitle>@model?.Title - @AppConfig.AppTitle</PageTitle>
+
+<div class="container cl-container cl-article">
+    <CmsCard>
+        @CmsUtils.GetMarkdownHtml(model?.Content)
+    </CmsCard>
+</div>
+
+@code {
+    private ISiteService Service;
+    private PostDetailInfo model;
+
+    [Parameter] public string Code { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        Service = await CreateServiceAsync<ISiteService>();
+        model = await Service.GetPostAsync(ContentType.Article, Code);
+    }
+}

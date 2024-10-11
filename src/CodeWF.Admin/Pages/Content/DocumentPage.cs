@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Admin.Pages.Document;
+﻿namespace CodeWF.Admin.Pages.Content;
 
 [Route("/dms/updatelogs")]
 public class DmUpdateLogList : DocumentList

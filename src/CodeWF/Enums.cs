@@ -6,6 +6,10 @@
 public enum ContentType
 {
     /// <summary>
+    /// 文章。
+    /// </summary>
+    Article,
+    /// <summary>
     /// 更新日志。
     /// </summary>
     UpdateLog,

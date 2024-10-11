@@ -6,15 +6,18 @@
 public interface ISiteService : IService
 {
     #region Category
+
     /// <summary>
     /// 异步获取内容类别列表。
     /// </summary>
     /// <param name="type">内容类型。</param>
     /// <returns>内容类别列表。</returns>
     Task<List<CmCategory>> GetCategoriesAsync(ContentType type);
+
     #endregion
 
     #region Post
+
     /// <summary>
     /// 异步分页查询内容列表。
     /// </summary>
@@ -50,9 +53,11 @@ public interface ISiteService : IService
     /// <param name="info">内容表单信息。</param>
     /// <returns>保存结果。</returns>
     Task<Result> SavePostAsync(PostFormInfo info);
+
     #endregion
 
     #region Reply
+
     /// <summary>
     /// 异步分页查询回复列表。
     /// </summary>
@@ -73,9 +78,11 @@ public interface ISiteService : IService
     /// <param name="info">回复表单信息。</param>
     /// <returns>保存结果。</returns>
     Task<Result> SaveReplyAsync(ReplyFormInfo info);
+
     #endregion
 
     #region User
+
     /// <summary>
     /// 异步获取系统用户信息。
     /// </summary>
@@ -96,6 +103,7 @@ public interface ISiteService : IService
     /// <param name="info">用户密码信息。</param>
     /// <returns>保存结果。</returns>
     Task<Result> SaveUserPwdAsync(PwdFormInfo info);
+
     #endregion
 }
 
@@ -104,13 +112,16 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
     private readonly ISiteRepository Repository = Config.GetScopeService<ISiteRepository>();
 
     #region Category
+
     public Task<List<CmCategory>> GetCategoriesAsync(ContentType type)
     {
         return Database.QueryListAsync<CmCategory>(d => d.Type == type.ToString());
     }
+
     #endregion
 
     #region Post
+
     public Task<PagingResult<PostListInfo>> QueryPostsAsync(PagingCriteria criteria)
     {
         return Repository.QueryPostsAsync(criteria);
@@ -126,8 +137,8 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
         var database = Database;
         await database.OpenAsync();
         var post = type == ContentType.Interact
-                 ? await database.QueryByIdAsync<CmPost>(code)
-                 : await GetPostByDocumentAsync(database, type, code);
+            ? await database.QueryByIdAsync<CmPost>(code)
+            : await GetPostByCodeAsync(database, type, code);
         if (post != null)
         {
             //添加查看记录，同IP记录一次
@@ -154,9 +165,11 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
                 var user = await database.QueryByIdAsync<CmUser>(post.UserId);
                 info.Author = user?.NickName;
             }
+
             if (type == ContentType.Interact)
                 info.Replies = await GetReplyListsAsync(database, post.Id);
         }
+
         await database.CloseAsync();
         return info;
     }
@@ -183,6 +196,7 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
                 PublishTime = DateTime.Now
             };
         }
+
         model.Title = info.Title;
         model.Content = info.Content;
         var vr = model.Validate(Context);
@@ -196,8 +210,13 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
         }, model);
     }
 
-    private static async Task<CmPost> GetPostByDocumentAsync(Database db, ContentType type, string code)
+    private static async Task<CmPost> GetPostByCodeAsync(Database db, ContentType type, string code)
     {
+        // 查询文章
+        if (type == ContentType.Article)
+            return await db.QueryAsync<CmPost>(d => d.Type == type.ToString() && d.CategoryId == code);
+
+        // 查询文档
         var categories = await db.QueryListAsync<CmCategory>(d => d.Type == type.ToString());
         if (string.IsNullOrWhiteSpace(code))
         {
@@ -213,15 +232,18 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
                 code = firstPage?.Code;
             }
         }
+
         var category = categories.FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
         if (category == null)
             return null;
 
         return await db.QueryByIdAsync<CmPost>(category.Id);
     }
+
     #endregion
 
     #region Reply
+
     public Task<PagingResult<ReplyListInfo>> QueryRepliesAsync(PagingCriteria criteria)
     {
         return Repository.QueryRepliesAsync(criteria);
@@ -252,6 +274,7 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
                 ReplyTime = DateTime.Now
             };
         }
+
         model.Content = info.Content;
         var vr = model.Validate(Context);
         if (!vr.IsValid)
@@ -292,11 +315,14 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
             };
             infos.Add(info);
         }
+
         return infos;
     }
+
     #endregion
 
     #region User
+
     public Task<CmUser> GetUserAsync(string id)
     {
         return Database.QueryByIdAsync<CmUser>(id);
@@ -317,10 +343,7 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
         if (count > 0)
             return Result.Error("用户名已存在！");
 
-        return await database.TransactionAsync(Language.Save, async db =>
-        {
-            await db.SaveAsync(model);
-        }, model);
+        return await database.TransactionAsync(Language.Save, async db => { await db.SaveAsync(model); }, model);
     }
 
     public async Task<Result> SaveUserPwdAsync(PwdFormInfo info)
@@ -339,5 +362,6 @@ class SiteService(Context context) : ServiceBase(context), ISiteService
             await db.SaveAsync(model);
         }, model);
     }
+
     #endregion
 }
