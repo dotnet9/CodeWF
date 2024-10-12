@@ -5,7 +5,10 @@
 
 <div class="container cl-container cl-article">
     <CmsCard>
-        @CmsUtils.GetMarkdownHtml(model?.Content)
+        <div class="count"><i class="far fa-eye" /> @model?.ViewQty</div>
+        <div class="cl-article-body @Code">
+            @CmsUtils.GetMarkdownHtml(model?.Content)
+        </div>
     </CmsCard>
 </div>
 

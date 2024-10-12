@@ -40,6 +40,22 @@ blockquote p {margin-bottom:0;}
     display:none;background-color:#fff;color:rgba(0,0,0,0.5);border:1px solid #ccc;border-radius:0 5px 5px 0;cursor:pointer;
 }
 
+/*article*/
+.cl-article .cl-card-body {position:relative;}
+.cl-article .cl-card-body .count {position:absolute;top:10px;right:10px;color:#8a919f;}
+.cl-article-body {padding:20px;}
+.cl-article-body a.active {font-weight:bold;}
+.cl-article h1 {font-weight:bold;font-size:1.5rem;margin-bottom:10px;}
+.cl-article h2 {font-weight:bold;font-size:1.2rem;margin-bottom:10px;}
+.cl-article h3 {font-weight:bold;font-size:1.1rem;margin-bottom:10px;}
+.cl-article h4 {font-weight:bold;font-size:1rem;margin-bottom:10px;}
+.cl-article pre {border-left:5px solid #1890ff;padding:10px;background-color:#f1f1f1;border-radius:3px;}
+.cl-article code {font-size:1rem;margin:0 2px;}
+.cl-article pre code {font-size:14px;margin:0;}
+.cl-article table {width:100%;border-collapse:collapse;margin-bottom:20px;}
+.cl-article table th {border:1px solid #ccc;padding:5px;font-weight:bold;}
+.cl-article table td {border:1px solid #ccc;padding:5px;}
+
 /*doc*/
 .cl-doc {display:grid;grid-template-columns:250px calc(100% - 270px);gap:20px;}
 .cl-doc .cl-card-body {position:relative;}
@@ -158,4 +174,5 @@ blockquote p {margin-bottom:0;}
         display:none;position:fixed;left:0;top:49.8px;bottom:0;overflow:auto;z-index:900;
         background-color:#fff;width:200px;height:auto;border-right:1px solid #ccc;border-radius:0;
     }
+    .cl-article-body {padding:0;}
 }
