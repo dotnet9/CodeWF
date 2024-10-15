@@ -2,7 +2,7 @@
 
 <nav class="topnav navbar navbar-expand-lg navbar-dark bg-primary fixed-top @NavClass">
     <div class="container">
-        <Logo />
+        <Logo/>
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,39 +11,35 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">开源</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="@Config.GiteeUrl">
-                            Gitee <img width="70" src="@Config.GiteeUrl/badge/star.svg?theme=dark" alt="star" style="margin-left:14px;">
-                        </a>
-                        <a class="dropdown-item" href="@Config.GithubUrl">
-                            GitHub <img width="70" src="https://img.shields.io/github/stars/known/known?color=%231890FF" alt="stars">
-                        </a>
+                        @foreach (var project in _projects)
+                        {
+                            <a class="dropdown-item" href="@project.Value" target="_blank">
+                                @project.Key <img width="70" src="https://img.shields.io/github/stars/dotnet9/@project.Key?color=%231890FF" alt="stars">
+                            </a>
+                        }
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="http://demo.known.org.cn">演示</a>
-                </li>
                 <li class="nav-item@(IsActive("/doc") ? " active" : "")">
-                    <a class="nav-link" href="./doc">文档</a>
+                    <a class="nav-link" href="/doc">文档</a>
                 </li>
                 <li class="nav-item@(IsActive("/bbs") ? " active" : "")">
-                    <a class="nav-link" href="./bbs">交流</a>
+                    <a class="nav-link" href="/post">博文</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">资源</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="https://www.cnblogs.com/known">博客</a>
-                        <a class="dropdown-item" href="https://space.bilibili.com/3546586514721249">视频</a>
-                        <a class="dropdown-item" href="./api">类库API</a>
-                        <a class="dropdown-item" href="./log">更新日志</a>
-                        <a class="dropdown-item" href="http://v1x.known.org.cn">V1.2.x</a>
+                        @foreach (var resource in _resources)
+                        {
+                            <a class="dropdown-item" href="@resource.Value" target="_blank">@resource.Key</a>
+                        }
                     </div>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto d-flex align-items-center">
                 <li class="nav-item">
-                    <span class="nav-link" href="#">
-                        <a class="btn btn-success btn-round shadow-sm" href="#" data-toggle="modal" data-target="#modal_newsletter">
-                            最新版本：V@(Config.Version.FrameVersion.Replace("Known V", ""))
+                    <span class="nav-link">
+                        <a class="btn btn-success btn-round shadow-sm" href="https://github.com/dotnet9/CodeWF" target="_blank">
+                            本站代码
                         </a>
                     </span>
                 </li>
@@ -55,6 +51,23 @@
 @code {
     private string NavClass => IsIndex ? "index-nav" : "bg-white navbar-light shadow-sm scrollednav py-0";
 
+    private Dictionary<string, string> _projects = new()
+    {
+        { "CodeWF", "https://github.com/dotnet9/CodeWF" },
+        { "CodeWF.EventBus", "https://github.com/dotnet9/CodeWF.EventBus" },
+        { "CodeWF.EventBus.Socket", "https://github.com/dotnet9/CodeWF.EventBus.Socket" },
+        { "CodeWF.NetWeaver", "https://github.com/dotnet9/CodeWF.NetWeaver" },
+        { "CodeWF.Toolbox", "https://github.com/dotnet9/CodeWF.Toolbox" },
+        { "CodeWF.Tools", "https://github.com/dotnet9/CodeWF.Tools" },
+        { "Assets.Dotnet9", "https://github.com/dotnet9/Assets.Dotnet9" }
+    };
+
+    private Dictionary<string, string> _resources = new()
+    {
+        { "博客园", "https://www.cnblogs.com/Dotnet9-com" },
+        { "B站", "https://space.bilibili.com/470546606" }
+    };
+
     [Parameter] public bool IsIndex { get; set; }
 
     private bool IsActive(string code)
@@ -62,4 +75,5 @@
         var uri = Navigation.Uri.Replace(Navigation.BaseUri, "/");
         return uri.StartsWith(code);
     }
+
 }
