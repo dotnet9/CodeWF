@@ -1,8 +1,13 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using CodeWF.Options;
+
+var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
+builder.Services.AddSingleton<AppService>();
 builder.AddApp();
 
 var app = builder.Build();

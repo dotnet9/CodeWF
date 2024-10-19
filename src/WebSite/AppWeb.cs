@@ -1,4 +1,5 @@
 ﻿using CodeWF.EntityFramework;
+using CodeWF.Options;
 
 namespace WebSite;
 
@@ -23,7 +24,7 @@ static class AppWeb
             ["设计"] = ["设计"],
             ["建议"] = ["建议"],
             ["BUG"] = ["BUG", "Exception", "异常"]
-        };
+        }; 
 
         //ModuleHelper.InitAppModules();
         //Stopwatcher.Enabled = true;

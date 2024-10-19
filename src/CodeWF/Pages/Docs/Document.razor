@@ -1,14 +1,21 @@
 ﻿@page "/doc"
-@page "/doc/{page}"
+@page "/doc/{slug}"
+
+@using CodeWF.Options
+@using Microsoft.Extensions.Options
 @inherits BaseComponent
+@inject IOptions<SiteOption> SiteOptions
+@inject AppService AppService
 
-<PageTitle>@model?.Title - @AppConfig.AppTitle</PageTitle>
+<PageTitle>@model?.Name - @SiteOptions.Value.AppTitle</PageTitle>
 
-<UMenuBar Target="cl-doc-menu" />
+<UMenuBar Target="cl-doc-menu"/>
 <div class="container cl-container cl-doc">
-    <UDocMenu Type="ContentType.Document" />
+    <UDocMenu />
     <CmsCard>
-        <div class="count"><i class="far fa-eye" /> @model?.ViewQty</div>
+        <div class="count">
+            <i class="far fa-eye"/> @Random.Shared.Next(5, 1000)
+        </div>
         <div class="cl-doc-body">
             @CmsUtils.GetMarkdownHtml(model?.Content)
         </div>
@@ -16,15 +23,15 @@
 </div>
 
 @code {
-    private ISiteService Service;
-    private PostDetailInfo model;
+    private DocItem? model;
 
-    [Parameter] public string Page { get; set; }
+    [Parameter] public string? Slug { get; set; }
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        Service = await CreateServiceAsync<ISiteService>();
-        model = await Service.GetPostAsync(ContentType.Document, Page);
+
+        model = await AppService.GetDocItemAsync(Slug);
     }
+
 }
