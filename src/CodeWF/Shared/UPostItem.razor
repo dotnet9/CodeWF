@@ -1,8 +1,8 @@
 ﻿<div class="cl-bbs-post-item">
-    <a class="ask-title" href="@Url.GetBbsPostUrl(Post.Id)">@Post.Title</a>
+    <a class="ask-title" href="@Url.GetBbsPostUrl(Post.Slug)">@Post.Title</a>
     <div class="ask-bottom">
         <UPostTags Tags="@Post?.Tags" />
-        <UPostCount Post="Post" />
+        @* <UPostCount Post="Post" /> *@
     </div>
     @* <div class="item">
         <div>
@@ -28,5 +28,5 @@
 </div>
 
 @code {
-    [Parameter] public PostListInfo Post { get; set; }
+    [Parameter] public BlogPost Post { get; set; }
 }
