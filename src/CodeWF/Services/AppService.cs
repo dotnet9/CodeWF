@@ -13,6 +13,7 @@ public class AppService
     private List<DocItem>? _docItems;
     private List<CategotyItem>? _categotyItems;
     private List<BlogPost>? _blogPosts;
+    private List<FriendLinkItem>? _friendLinkItems;
 
     public AppService(IOptions<SiteOption> siteOption)
     {
@@ -200,5 +201,22 @@ public class AppService
         blogPost.Content = markdownContent;
 
         return blogPost;
+    }
+    public async Task<List<FriendLinkItem>?> GetAllFriendLinkItemsAsync()
+    {
+        if (_friendLinkItems?.Any() == true)
+        {
+            return _friendLinkItems;
+        }
+
+        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "FriendLink.json");
+        if (!File.Exists(filePath))
+        {
+            return _friendLinkItems;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        fileContent.FromJson(out _friendLinkItems, out var msg);
+        return _friendLinkItems;
     }
 }

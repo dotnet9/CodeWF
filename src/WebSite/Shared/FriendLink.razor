@@ -1,0 +1,30 @@
+﻿@using AntBlazor
+@inherits BaseComponent
+@inject AppService AppService
+
+<div class="container pt-5 pb-5 links" data-aos="fade-up">
+    <span>友情链接: </span>
+        @if (_links?.Any() != true)
+        {
+            <AntEmpty/>
+        }
+        else
+        {
+            @foreach (var link in _links)
+            {
+                <span><a href="@link.Link" target="_blank" title="@link.Description">@link.Title</a>&nbsp;&nbsp;|</span>
+            }
+        }
+</div>
+
+@code {
+    private List<FriendLinkItem>? _links;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+
+        _links = await AppService.GetAllFriendLinkItemsAsync();
+    }
+
+}

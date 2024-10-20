@@ -58,10 +58,6 @@
     </div>
 </div>
 
-<div class="container pt-5 pb-5" data-aos="fade-up">
-    @CmsUtils.GetMarkdownHtml(model?.Content)
-</div>
-
 <script>
 	jQuery(document).ready(function() {
 		$(window).scroll(function() {
@@ -69,16 +65,3 @@
 		});
 	});
 </script>
-
-@code {
-    private ISiteService Service;
-    private PostDetailInfo model;
-
-    protected override async Task OnInitAsync()
-    {
-        await base.OnInitAsync();
-        Service = await CreateServiceAsync<ISiteService>();
-        model = await Service.GetPostAsync(ContentType.Article, "test");
-    }
-
-}

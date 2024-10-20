@@ -24,6 +24,20 @@ body {background-color:#f2f3f5;font-family:Lato,PingFang SC,Microsoft YaHei,sans
 .bg-primary {background-color:#1c66b9 !important;fill:#1c66b9 !important;}
 .bg-white {background-color:#fff !important;fill:#fff !important;}
 .text-muted{margin-left:6px;}
+.links{
+        background: #fdfdfd;
+    border-bottom: 1px solid #e3e3e3;
+    line-height: 1;
+    margin-bottom: 15px;
+    margin-top: -15px;
+    padding: 10px;
+}
+    .links a {
+        border-right: 1px solid #e3e3e3;
+        padding: 0 8px;    color: #999;
+    display: inline-block;
+    margin: 5px 0;
+    }
 
 .footer {background-color:#202942;color:#adb5bd;padding:3rem 0 2rem 0;}
 .copyright {text-align:center;margin-top:1rem;display:flex;justify-content:space-between;}
