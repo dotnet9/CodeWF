@@ -2,10 +2,6 @@
 @inject AppService AppService
 
 <CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="交流分类">
-    <a href="@Url.BbsUrl" class="@(IsActive("")?"active":"")">
-        <i class="far fa-database" />
-        <span style="margin-left:10px;">综合</span>
-    </a>
     @if (categories != null && categories.Count > 0)
     {
         foreach (var item in categories)

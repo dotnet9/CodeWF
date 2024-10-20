@@ -1,20 +1,21 @@
 ﻿@inherits BaseComponent
+@inject AppService AppService
 
 <CmsCard Class="cl-rank" Icon="far fa-fire" Title="交流榜">
-    @if (posts == null || posts.Count == 0)
+    @if (_posts is not { Count: > 0 })
     {
         <AntEmpty />
     }
     else
     {
         var index = 0;
-        foreach (var item in posts)
+        foreach (var item in _posts)
         {
             index++;
             <div class="cl-rank-item">
                 <div class="@($"index index{index}")">@index</div>
                 <div class="title">
-                    <a class="ask-title" href="@Url.GetBbsPostUrl(item.Id)">@item.Title</a>
+                    <a class="ask-title" href="@Url.GetBbsPostUrl(item)">@item.Title</a>
                 </div>
             </div>
         }
@@ -22,13 +23,11 @@
 </CmsCard>
 
 @code {
-    private List<PostListInfo> posts = [];
-
-    [Parameter] public ISiteService Service { get; set; }
+    private List<BlogPost>? _posts;
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        posts = await Service.GetRankPostsAsync(ContentType.Interact);
+        _posts = await AppService.GetBannerPostAsync();
     }
 }

@@ -145,6 +145,15 @@ public class AppService
         return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
     }
 
+    public async Task<List<BlogPost>?> GetBannerPostAsync()
+    {
+        var posts = (await GetAllBlogPostsAsync())
+                                                    ?.Where(post => post.Banner)
+                                                    .OrderByDescending(post=>post.Date)
+                                                    .ToList();
+        return posts;
+    }
+
     public async Task<BlogPost?> GetPostBySlug(string slug)
     {
         var post = (await GetAllBlogPostsAsync())?.FirstOrDefault(cat => cat.Slug == slug);

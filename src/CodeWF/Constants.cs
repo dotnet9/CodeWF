@@ -38,6 +38,6 @@ class Url
     public static string GetDocUrl(string code) => $"./doc/{code.ToLower()}";
     public static string GetApiUrl(string code) => $"./api/{code.ToLower()}";
     public static string GetBbsUrl(string code) => $"./bbs/{code.ToLower()}";
-    public static string GetBbsPostUrl(string id) => $"./bbs/post/{id}";
+    public static string GetBbsPostUrl(BlogPost post) => $"./bbs/post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
     public static string GetBbsTagUrl(string tag) => $"./bbs/tag/{tag}";
 }
