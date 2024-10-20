@@ -1,12 +1,16 @@
 ﻿@page "/bbs"
-@page "/bbs/{category}"
+@page "/bbs/cat/{category}"
+@using CodeWF.Options
+@using Microsoft.Extensions.Options
 @inherits ListComponent<PostListInfo>
+@inject IOptions<SiteOption> SiteOptions
+@inject AppService AppService 
 
-<PageTitle>问题交流 - @AppConfig.AppTitle</PageTitle>
+<PageTitle>问题交流 - @SiteOptions.Value.AppTitle</PageTitle>
 
 <UMenuBar Target="cl-bbs-menu" />
 <div class="container cl-container cl-bbs">
-    <UCategory Service="Service" />
+    <UCategory />
     <CmsCard Class="cl-posts">
         <HeadTemplate>
             <CmsTitle Icon="far fa-server" Title="内容列表" />

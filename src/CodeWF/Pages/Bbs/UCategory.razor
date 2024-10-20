@@ -1,4 +1,5 @@
 ﻿@inherits BaseComponent
+@inject AppService AppService
 
 <CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="交流分类">
     <a href="@Url.BbsUrl" class="@(IsActive("")?"active":"")">
@@ -9,8 +10,8 @@
     {
         foreach (var item in categories)
         {
-            <a href="@item.BbsUrl" class="@(IsActive(item.Code)?"active":"")">
-                <i class="@item.Icon" />
+            <a href="@GetUrl(item)" class="@(IsActive(item.Slug)?"active":"")">
+                @* <i class="@item.Icon" /> *@
                 <span style="margin-left:10px;">@item.Name</span>
             </a>
         }
@@ -18,16 +19,16 @@
 </CmsCard>
 
 @code {
-    private List<CmCategory> categories = [];
-
-    [Parameter] public ISiteService Service { get; set; }
+    private List<CategotyItem> categories = [];
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        var lists = await Service.GetCategoriesAsync(ContentType.Interact);
-        categories = lists?.OrderBy(l => l.Sort).ToList();
+        var lists = await AppService.GetAllCategoryItemsAsync();
+        categories = lists?.OrderBy(c => c.Sort).ToList();
     }
+
+    private string GetUrl(CategotyItem item) => $"/bbs/cat/{item.Slug}";
 
     private bool IsActive(string code)
     {

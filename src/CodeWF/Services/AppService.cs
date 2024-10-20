@@ -8,6 +8,7 @@ public class AppService
 {
     private readonly SiteOption _siteInfo;
     private List<DocItem>? _docItems;
+    private List<CategotyItem>? _categotyItems;
 
     public AppService(IOptions<SiteOption> siteOption)
     {
@@ -74,5 +75,23 @@ public class AppService
         await ReadContentAsync(first);
 
         return first;
+    }
+
+    public async Task<List<CategotyItem>?> GetAllCategoryItemsAsync()
+    {
+        if (_categotyItems?.Any() == true)
+        {
+            return _categotyItems;
+        }
+
+        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "category.json");
+        if (!File.Exists(filePath))
+        {
+            return _categotyItems;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        fileContent.FromJson(out _categotyItems, out var msg);
+        return _categotyItems;
     }
 }

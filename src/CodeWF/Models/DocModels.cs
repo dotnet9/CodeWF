@@ -407,3 +407,12 @@ public class DocItem
     public string? Content { get; set; }
     public List<DocItem>? Children { get; set; }
 }
+
+public class CategotyItem
+{
+    public int Sort { get; set; }
+
+    public string? Name { get; set; }
+    public string? Memo { get; set; }
+    public string? Slug { get; set; }
+}
