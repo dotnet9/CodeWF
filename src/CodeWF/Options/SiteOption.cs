@@ -7,4 +7,5 @@ public class SiteOption
     public string? Memo { get; set; }
     public string? LocalAssetsDir { get; set; }
     public int StartYear { get; set; }
+    public string? BaiAn { get; set; }
 }

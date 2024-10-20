@@ -1,9 +1,13 @@
-﻿<footer class="footer">
+﻿@using CodeWF.Options
+@using Microsoft.Extensions.Options
+@inject IOptions<SiteOption> SiteOption
+
+<footer class="footer">
     <div class="container">
         <div class="row">
             <div class="col-12 col-md">
-                <Logo />
-                <div class="desc">专注C#和Blazor技术，为开发者提供优秀开发框架！</div>
+                <Logo/>
+                <div class="desc">@SiteOption.Value.Memo</div>
             </div>
             <div class="col-12 col-md">
                 <div class="row">
@@ -11,20 +15,20 @@
                         <h5 class="mb-4 text-white">相关链接</h5>
                         <ul class="list-unstyled text-small">
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="https://www.cnblogs.com/known">博客</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://www.cnblogs.com/Dotnet9-com/">博客</a>
                             </li>
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="https://space.bilibili.com/3546586514721249">视频</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://space.bilibili.com/470546606">视频</a>
                             </li>
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="./api">类库API</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://github.com/dotnet9/">Github</a>
                             </li>
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="./log">更新日志</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://gitee.com/dotnet9">Gitee</a>
                             </li>
                         </ul>
                     </div>
@@ -32,28 +36,34 @@
                         <h5 class="mb-4 text-white">相关资源</h5>
                         <ul class="list-unstyled text-small">
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="https://blazor.net/docs/components/index.html">Blazor文档</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://irihi.tech/">铱泓科技</a>
                             </li>
                             <li>
-                                <i class="fas fa-angle-right" />
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="http://known.org.cn/">Known</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
                                 <a class="text-muted" href="https://antblazor.com">Ant Design Blazor</a>
                             </li>
                             <li>
-                                <i class="fas fa-angle-right" />
-                                <a class="text-muted" href="https://fontawesome.com.cn">Fontawesome中文网</a>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://www.youtube.com/channel/UCbkbOlw8snP93RJ2BhH44Qw">Murat Yücedağ</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-12 col-md" style="margin-top:1rem;">
-                        <div class="qrcode"><img src="./img/qrcode.jpg" width="180" /></div>
+                        <div class="qrcode">
+                            <img src="https://img1.dotnet9.com/site/favicon/wechatpublic.jpg" width="180" alt="Dotnet9微信公众号"/>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="copyright">
-            <span>©2020-@DateTime.Now.Year CodeWF</span>
-            <a class="text-muted" target="_blank" href="https://beian.miit.gov.cn">备案号</a>
+            <span>©@SiteOption.Value.StartYear-@DateTime.Now.Year @SiteOption.Value.Owner</span>
+            <a class="text-muted" target="_blank" href="https://beian.miit.gov.cn">@SiteOption.Value.BaiAn</a>
         </div>
     </div>
 </footer>

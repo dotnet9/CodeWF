@@ -1,6 +1,10 @@
-﻿<a href="/" class="logo-link">
+﻿@using CodeWF.Options
+@using Microsoft.Extensions.Options
+@inject IOptions<SiteOption> SiteOption
+
+<a href="/" class="logo-link">
     <div class="logo-container">
         <img src="favicon.png" alt="Logo" title="CodeWF Logo" class="logo-image"/>
-        <span class="logo-text">码界工坊</span>
+        <span class="logo-text">@SiteOption.Value.AppTitle</span>
     </div>
 </a>
