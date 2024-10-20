@@ -126,7 +126,7 @@ public class AppService
 
     public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string slug)
     {
-        var cat = (await GetAllCategoryItemsAsync()).FirstOrDefault(cat => cat.Slug == slug);
+        var cat = (await GetAllCategoryItemsAsync())?.FirstOrDefault(cat => cat.Slug == slug);
         if (cat == null)
         {
             return default;
@@ -143,6 +143,12 @@ public class AppService
             .Take(pageSize)
             .ToList();
         return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
+    }
+
+    public async Task<BlogPost?> GetPostBySlug(string slug)
+    {
+        var post = (await GetAllBlogPostsAsync())?.FirstOrDefault(cat => cat.Slug == slug);
+        return post;
     }
 
     public static async Task<BlogPost> ReadBlogPostAsync(string markdownFilePath)

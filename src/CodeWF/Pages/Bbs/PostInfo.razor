@@ -1,5 +1,9 @@
-﻿@page "/bbs/post/{id}"
+﻿@page "/{slug}"
+@page "/{year}/{month}/{slug}"
+@page "/post/{year}/{month}/{slug}"
+@page "/bbs/post/{year}/{month}/{slug}"
 @inherits BaseComponent
+@inject AppService AppService
 
 <PageTitle>@model?.Title - @AppConfig.AppTitle</PageTitle>
 
@@ -19,67 +23,25 @@
             </ChildContent>
         </CmsCard>
         <div style="height:20px;"></div>
-        <CmsCard Title="回复列表">
-            @if (CurrentUser != null)
-            {
-                <div style="display:grid;grid-template-columns:40px auto;">
-                    <div>
-                        <AntAvatar Src="@CurrentUser?.AvatarUrl" />
-                    </div>
-                    <div>
-                        @if (!string.IsNullOrWhiteSpace(errorMessage))
-                        {
-                            <AntAlert Type="error">@errorMessage</AntAlert>
-                        }
-                        <AntForm Id="@formId">
-                            <CmsMarkdown Id="@nameof(ReplyFormInfo.Content)" AutoFocus="autoFocus" Height="200" Placeholder="在这里输入回答内容" />
-                            <div class="button">
-                                <AntButton Name="回复" OnClick="@($"return AntBlazor.validate('{formId}');")" />
-                            </div>
-                        </AntForm>
-                    </div>
-                </div>
-            }
-            @if (model?.Replies == null || model?.Replies.Count == 0)
-            {
-                <AntEmpty />
-            }
-            else
-            {
-                foreach (var item in model?.Replies)
-                {
-                    <UReplyItem Item="item" />
-                }
-            }
-        </CmsCard>
     </div>
     <div>
-        <SigninBox Service="Service" />
+        @* <SigninBox Service="Service" />
         <div style="height:20px;"></div>
-        <UPostRank Service="Service" />
+        <UPostRank Service="Service" /> *@
     </div>
 </div>
 
 @code {
-    private ISiteService Service;
-    private PostDetailInfo model;
-    private bool autoFocus = false;
-    private string formId = "reply-form";
-    private string errorMessage = "";
+    private BlogPost? model;
+
+    [Parameter] public string? Year { get; set; }
+    [Parameter] public string? Month { get; set; }
+    [Parameter] public string Slug { get; set; }
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        Service = await CreateServiceAsync<ISiteService>();
-        if (Context.Request.IsHandler(formId))
-        {
-            autoFocus = true;
-            var model = Context.Request.GetModel<ReplyFormInfo>();
-            model.BizId = Id;
-            var result = await Service.SaveReplyAsync(model);
-            if (!result.IsValid)
-                errorMessage = result.Message;
-        }
-        model = await Service.GetPostAsync(ContentType.Interact, Id);
+
+        model = await AppService.GetPostBySlug(Slug);
     }
 }

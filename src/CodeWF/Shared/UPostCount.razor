@@ -1,11 +1,11 @@
 ﻿<div class="counts">
-    <span class="like"><i class="far fa-thumbs-up" /> @Post?.LikeQty</span>
-    <span style="margin-left:10px;"><i class="fal fa-comment-dots" /> @Post?.ReplyQty</span>
-    <span style="margin-left:10px;"><i class="far fa-eye" /> @Post?.ViewQty</span>
+    <span class="like"><i class="far fa-thumbs-up" /> 2</span>
+    <span style="margin-left:10px;"><i class="fal fa-comment-dots" /> ReplyQty</span>
+    <span style="margin-left:10px;"><i class="far fa-eye" /> ViewQty</span>
     <span style="margin:0 5px;">|</span>
     <span class="author">@Post?.Author</span>
 </div>
 
 @code {
-    [Parameter] public PostListInfo Post { get; set; }
+    [Parameter] public BlogPost Post { get; set; }
 }
