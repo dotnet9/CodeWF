@@ -1,9 +1,0 @@
-﻿global using Known;
-global using Known.Data;
-global using Known.EntityFramework;
-global using Known.Extensions;
-global using CodeWF.Entities;
-global using CodeWF.Models;
-global using CodeWF.Repositories;
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.Extensions.DependencyInjection;

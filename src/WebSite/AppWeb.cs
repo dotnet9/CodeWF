@@ -1,7 +1,4 @@
-﻿using CodeWF.EntityFramework;
-using CodeWF.Options;
-
-namespace WebSite;
+﻿namespace WebSite;
 
 static class AppWeb
 {
@@ -34,21 +31,9 @@ static class AppWeb
         {
             info.WebRoot = builder.Environment.WebRootPath;
             info.ContentRoot = builder.Environment.ContentRootPath;
-            info.Connections = [new Known.ConnectionInfo
-            {
-                Name = "Default",
-                DatabaseType = DatabaseType.SQLite,
-                ProviderType = typeof(Microsoft.Data.Sqlite.SqliteFactory),
-                ConnectionString = builder.Configuration.GetSection("ConnString").Get<string>()
-            }];
         });
         builder.Services.AddKnownWeb();
         builder.Services.AddKnownWeixin(builder.Configuration);
-        // 如下为EFCore配置，若开启，请注释上面框架自带的连接配置
-        //builder.Services.AddCodeWFEntityFramework(config =>
-        //{
-        //    config.ConnString = builder.Configuration.GetSection("ConnString").Get<string>();
-        //});
     }
 
     public static void UseApp(this WebApplication app)

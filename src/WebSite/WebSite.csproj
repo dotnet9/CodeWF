@@ -6,10 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0-rc.2.24474.1" />
-        <PackageReference Include="Known.Core" Version="2.0.14" />
+        <PackageReference Include="Known.Core" Version="2.0.15" />
         <ProjectReference Include="..\CodeWF\CodeWF.csproj" />
-        <ProjectReference Include="..\CodeWF.EntityFramework\CodeWF.EntityFramework.csproj" />
     </ItemGroup>
 
 </Project>
