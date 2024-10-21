@@ -1,6 +1,10 @@
 ﻿using CodeWF.Options;
+using Microsoft.Extensions.WebEncoders;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddRazorComponents()
