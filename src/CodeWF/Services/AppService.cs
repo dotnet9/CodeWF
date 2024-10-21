@@ -125,9 +125,10 @@ public class AppService
         return _blogPosts;
     }
 
-    public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string slug)
+    public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
+        string? key)
     {
-        var cat = (await GetAllCategoryItemsAsync())?.FirstOrDefault(cat => cat.Slug == slug);
+        var cat = (await GetAllCategoryItemsAsync())?.FirstOrDefault(cat => cat.Slug == categorySlug);
         if (cat == null)
         {
             return default;
@@ -135,12 +136,21 @@ public class AppService
 
         var posts = (await GetAllBlogPostsAsync())
             ?.Where(post => post.Categories?.Contains(cat.Name) == true);
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            posts = posts.Where(p => p.Title?.Contains(key) == true
+                                     || p.Description?.Contains(key) == true
+                                     || p.Slug?.Contains(key) == true
+                                     || p.Author?.Contains(key) == true
+                                     || p.LastModifyUser?.Contains(key) == true);
+        }
+
         var total = posts.Count();
 
         var postDatas = posts
             .OrderByDescending(post => post.Lastmod)
             .ThenByDescending(post => post.Date)
-            .Skip(pageIndex * pageSize)
+            .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();
         return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
@@ -149,9 +159,9 @@ public class AppService
     public async Task<List<BlogPost>?> GetBannerPostAsync()
     {
         var posts = (await GetAllBlogPostsAsync())
-                                                    ?.Where(post => post.Banner)
-                                                    .OrderByDescending(post=>post.Date)
-                                                    .ToList();
+            ?.Where(post => post.Banner)
+            .OrderByDescending(post => post.Date)
+            .ToList();
         return posts;
     }
 
@@ -202,6 +212,7 @@ public class AppService
 
         return blogPost;
     }
+
     public async Task<List<FriendLinkItem>?> GetAllFriendLinkItemsAsync()
     {
         if (_friendLinkItems?.Any() == true)

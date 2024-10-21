@@ -2,7 +2,7 @@
 @page "/bbs/cat/{category}"
 @using CodeWF.Options
 @using Microsoft.Extensions.Options
-@inherits BaseComponent
+@inherits ListComponent<BlogPost>
 @inject IOptions<SiteOption> SiteOptions
 @inject AppService AppService 
 
@@ -31,7 +31,7 @@
                 }
 
                 <div style="padding:15px 0;text-align:center;">
-                    <AntPagination TotalCount="@_blogPosts.Total" PageSize="ConstData.PageSize" PageIndex="@_pageIndex"/>
+                    <AntPagination TotalCount="@_blogPosts.Total" PageSize="ConstData.PageSize" PageIndex="@Page" Key="@Key"/>
                 </div>
             }
         </ChildContent>
@@ -39,18 +39,15 @@
     <div>
         @* <SigninBox Service="Service"/>
         <div style="height:20px;"></div>*@
-        <UPostRank /> 
+        <UPostRank/>
     </div>
 </div>
 
 @code {
     private PageData<BlogPost>? _blogPosts;
-    private int _pageIndex;
 
     [Parameter] public string Category { get; set; }
-
     [SupplyParameterFromQuery] public string? Key { get; set; }
-    [SupplyParameterFromQuery] public int Page { get; set; }
 
     protected override async Task OnInitAsync()
     {
@@ -59,8 +56,13 @@
         {
             Category = "dotnet";
         }
-        
-        _blogPosts = await AppService.GetPostByCategory(Page, ConstData.PageSize, Category);
+
+        if (string.IsNullOrWhiteSpace(Key))
+        {
+            Key = Context.Request.Get<string>("Key");
+        }
+
+        _blogPosts = await AppService.GetPostByCategory(Page, ConstData.PageSize, Category, Key);
     }
 
 }

@@ -75,6 +75,7 @@
     [Parameter] public int TotalCount { get; set; }
     [Parameter] public int PageSize { get; set; }
     [Parameter] public int PageIndex { get; set; }
+    [Parameter] public string? Key { get; set; }
 
     private string GetUrl(int page)
     {
@@ -84,6 +85,6 @@
             page = PageCount;
 
         var url = Navigation.Uri.Split('?')[0];
-        return $"{url}?page={page}";
+        return string.IsNullOrWhiteSpace(Key) ? $"{url}?page={page}" : $"{url}?page={page}&key={Key}";
     }
 }
