@@ -13,6 +13,7 @@ public class AppService
     private List<CategotyItem>? _categotyItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
+    private Dictionary<string, string>? _webSiteCountInfos;
 
     public AppService(IOptions<SiteOption> siteOption)
     {
@@ -138,15 +139,21 @@ public class AppService
             return default;
         }
 
-        var posts = (await GetAllBlogPostsAsync())
-            ?.Where(post => post.Categories?.Contains(cat.Name) == true);
+        IEnumerable<BlogPost> posts;
         if (!string.IsNullOrWhiteSpace(key))
         {
-            posts = posts.Where(p => p.Title?.Contains(key) == true
-                                     || p.Description?.Contains(key) == true
-                                     || p.Slug?.Contains(key) == true
-                                     || p.Author?.Contains(key) == true
-                                     || p.LastModifyUser?.Contains(key) == true);
+            posts = (await GetAllBlogPostsAsync())
+                ?.Where(p => p.Title?.Contains(key) == true
+                             || p.Description?.Contains(key) == true
+                             || p.Slug?.Contains(key) == true
+                             || p.Author?.Contains(key) == true
+                             || p.LastModifyUser?.Contains(key) == true
+                             || p.Content?.Contains(key) == true);
+        }
+        else
+        {
+            posts = (await GetAllBlogPostsAsync())
+                ?.Where(post => post.Categories?.Contains(cat.Name) == true);
         }
 
         var total = posts.Count();
@@ -167,6 +174,26 @@ public class AppService
             .OrderByDescending(post => post.Date)
             .ToList();
         return posts;
+    }
+
+    public async Task<Dictionary<string, string>> GetWebSiteCountAsync()
+    {
+        if (_webSiteCountInfos != null)
+        {
+            return _webSiteCountInfos;
+        }
+
+        _webSiteCountInfos = new();
+        await GetAllBlogPostsAsync();
+        await GetAllCategoryItemsAsync();
+        var total = _blogPosts?.Count;
+        var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author));
+        var originalPercentage = (double)original / total * 100;
+        _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - _siteInfo.StartYear}年";
+        _webSiteCountInfos["文章分类"] = $"{_categotyItems.Count}个";
+        _webSiteCountInfos["文章总计"] = $"{total}篇";
+        _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
+        return _webSiteCountInfos;
     }
 
     public async Task<BlogPost?> GetPostBySlug(string slug)
