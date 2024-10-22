@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using CodeWF
 @inherits BaseComponent
 @layout HomeLayout
 @inject AppService AppService
@@ -35,7 +36,7 @@
             foreach (var blogPost in _posts)
             {
                 <div class="col-md-6 col-xl-4">
-                    <MediaBox Style="text-salmon" Icon="fab fa-slack-hash" Title="@blogPost.Title">
+                    <MediaBox Style="text-salmon" Icon="fab fa-slack-hash" Title="@blogPost.Title" Link="@Url.GetBbsPostUrl(blogPost)">
                         @blogPost.Description
                     </MediaBox>
                 </div>

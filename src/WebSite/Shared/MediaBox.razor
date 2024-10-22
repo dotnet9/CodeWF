@@ -3,7 +3,7 @@
 		<i class="@Icon" />
 	</div>
 	<div class="media-body">
-		<h5>@Title</h5>
+		<h5><a href="@Link" target="_blank">@Title</a></h5>
 		<p class="text-muted">@ChildContent</p>
 	</div>
 </div>
@@ -12,5 +12,6 @@
 	[Parameter] public string Style { get; set; }
 	[Parameter] public string Icon { get; set; }
 	[Parameter] public string Title { get; set; }
+    [Parameter] public string Link { get; set; }
 	[Parameter] public RenderFragment ChildContent { get; set; }
 }

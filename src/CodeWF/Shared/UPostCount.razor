@@ -2,9 +2,7 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<SiteOption> SiteOption
 <div class="counts">
-    <span class="like"><i class="far fa-thumbs-up" /> @Random.Shared.Next(5, 100)</span>
-    <span style="margin-left:10px;"><i class="fal fa-comment-dots" /> @Random.Shared.Next(1, 10)</span>
-    <span style="margin-left:10px;"><i class="far fa-eye" /> @Random.Shared.Next(150, 1000)</span>
+    <span class="like">@(Post?.Lastmod?.ToString("yyyy-MM-dd HH:mm:ss") ?? Post?.Date?.ToString("yyyy-MM-dd HH:mm:ss")) </span>
     <span style="margin:0 5px;">|</span>
     <span class="author">@(string.IsNullOrWhiteSpace(Post?.Author) ? SiteOption.Value.Owner: Post!.Author)</span>
 </div>

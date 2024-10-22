@@ -15,6 +15,13 @@ builder.Services.AddSingleton<AppService>();
 builder.AddApp();
 
 var app = builder.Build();
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var service = serviceScope.ServiceProvider.GetRequiredService<AppService>();
+    await service.SeedAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

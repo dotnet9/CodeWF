@@ -6,7 +6,7 @@
     border-bottom:1px solid #e4e6eb;padding:10px 20px;
     display:flex;justify-content:space-between;align-items:center;
 }
-.cl-card-head .title {font-weight:bold;}
+.cl-card-head .title {font-size:16px;font-weight:bold;}
 .cl-card-head .counts {font-size:14px;color:#8a919f;}
 .cl-card-body {padding:15px;}
 .cl-hide {display:none;}

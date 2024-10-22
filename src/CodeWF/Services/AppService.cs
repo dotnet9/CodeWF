@@ -10,7 +10,7 @@ public class AppService
 {
     private readonly SiteOption _siteInfo;
     private List<DocItem>? _docItems;
-    private List<CategotyItem>? _categotyItems;
+    private List<CategotyItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
     private Dictionary<string, string>? _webSiteCountInfos;
@@ -18,6 +18,15 @@ public class AppService
     public AppService(IOptions<SiteOption> siteOption)
     {
         _siteInfo = siteOption.Value;
+    }
+
+    public async Task SeedAsync()
+    {
+        await GetAllCategoryItemsAsync();
+        await GetAllBlogPostsAsync();
+        await GetAllFriendLinkItemsAsync();
+        await GetAllDocItemsAsync();
+        await GetWebSiteCountAsync();
     }
 
     public async Task<List<DocItem>?> GetAllDocItemsAsync()
@@ -59,13 +68,12 @@ public class AppService
             }
         }
 
-        var items = await GetAllDocItemsAsync();
-        if (items?.Any() != true)
+        if (_docItems?.Any() != true)
         {
             return default;
         }
 
-        foreach (var item in items)
+        foreach (var item in _docItems)
         {
             if (item.Slug == slug)
             {
@@ -82,7 +90,7 @@ public class AppService
             }
         }
 
-        var first = items.FirstOrDefault();
+        var first = _docItems.FirstOrDefault();
         await ReadContentAsync(first);
 
         return first;
@@ -90,20 +98,20 @@ public class AppService
 
     public async Task<List<CategotyItem>?> GetAllCategoryItemsAsync()
     {
-        if (_categotyItems?.Any() == true)
+        if (_categoryItems?.Any() == true)
         {
-            return _categotyItems;
+            return _categoryItems;
         }
 
         var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "category.json");
         if (!File.Exists(filePath))
         {
-            return _categotyItems;
+            return _categoryItems;
         }
 
         var fileContent = await File.ReadAllTextAsync(filePath);
-        fileContent.FromJson(out _categotyItems, out var msg);
-        return _categotyItems;
+        fileContent.FromJson(out _categoryItems, out var msg);
+        return _categoryItems;
     }
 
 
@@ -134,7 +142,7 @@ public class AppService
     public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
         string? key)
     {
-        var cat = (await GetAllCategoryItemsAsync())?.FirstOrDefault(cat => cat.Slug == categorySlug);
+        var cat = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
         if (cat == null)
         {
             return default;
@@ -143,7 +151,7 @@ public class AppService
         IEnumerable<BlogPost> posts;
         if (!string.IsNullOrWhiteSpace(key))
         {
-            posts = (await GetAllBlogPostsAsync())
+            posts = _blogPosts
                 ?.Where(p => p.Title?.Contains(key) == true
                              || p.Description?.Contains(key) == true
                              || p.Slug?.Contains(key) == true
@@ -153,7 +161,7 @@ public class AppService
         }
         else
         {
-            posts = (await GetAllBlogPostsAsync())
+            posts = _blogPosts
                 ?.Where(post => post.Categories?.Contains(cat.Name) == true);
         }
 
@@ -170,7 +178,7 @@ public class AppService
 
     public async Task<List<BlogPost>?> GetBannerPostAsync()
     {
-        var posts = (await GetAllBlogPostsAsync())
+        var posts = _blogPosts
             ?.Where(post => post.Banner)
             .OrderByDescending(post => post.Date)
             .ToList();
@@ -185,13 +193,11 @@ public class AppService
         }
 
         _webSiteCountInfos = new();
-        await GetAllBlogPostsAsync();
-        await GetAllCategoryItemsAsync();
         var total = _blogPosts?.Count;
         var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author));
         var originalPercentage = (double)original / total * 100;
         _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - _siteInfo.StartYear}年";
-        _webSiteCountInfos["文章分类"] = $"{_categotyItems.Count}个";
+        _webSiteCountInfos["文章分类"] = $"{_categoryItems.Count}个";
         _webSiteCountInfos["文章总计"] = $"{total}篇";
         _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
         return _webSiteCountInfos;
@@ -199,7 +205,7 @@ public class AppService
 
     public async Task<BlogPost?> GetPostBySlug(string slug)
     {
-        var post = (await GetAllBlogPostsAsync())?.FirstOrDefault(cat => cat.Slug == slug);
+        var post = _blogPosts?.FirstOrDefault(cat => cat.Slug == slug);
         return post;
     }
 
