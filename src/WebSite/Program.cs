@@ -2,7 +2,6 @@
 using Microsoft.Extensions.WebEncoders;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using WebSite.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
@@ -22,7 +21,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", true);
     app.UseHsts();
 }
-app.UseMiddleware<CustomRoutingMiddleware>(); app.UseMiddleware<CustomRoutingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAntiforgery();
 app.UseApp();

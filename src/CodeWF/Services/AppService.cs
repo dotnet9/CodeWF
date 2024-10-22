@@ -1,9 +1,8 @@
 ﻿using CodeWF.Options;
 using CodeWF.Tools.Extensions;
 using Microsoft.Extensions.Options;
-using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
-using CodeWF.Models;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace CodeWF.Services;
 
@@ -59,6 +58,11 @@ public class AppService
         }
 
         var items = await GetAllDocItemsAsync();
+        if (items?.Any() != true)
+        {
+            return default;
+        }
+
         foreach (var item in items)
         {
             if (item.Slug == slug)
