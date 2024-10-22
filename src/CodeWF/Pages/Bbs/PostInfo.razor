@@ -2,30 +2,34 @@
 @page "/{year}/{month}/{slug}"
 @page "/post/{year}/{month}/{slug}"
 @page "/bbs/post/{year}/{month}/{slug}"
+@using CodeWF.Options
+@using Microsoft.Extensions.Options
 @inherits BaseComponent
 @inject AppService AppService
+@inject IOptions<SiteOption> SiteOption
 
-<PageTitle>@model?.Title - @AppConfig.AppTitle</PageTitle>
+<PageTitle>@model?.Title - @SiteOption.Value.AppTitle</PageTitle>
 
-<UMenuBar Target="cl-bbs-menu" />
-<div class="container cl-container cl-bbs">
-    <UCategory/>
-    <CmsCard>
-        <HeadTemplate>
-            <CmsTitle Icon="far fa-file" Title="@model?.Title" />
-            <UPostCount Post="model"/>
-        </HeadTemplate>
-        <ChildContent>
-            @CmsUtils.GetMarkdownHtml(model?.Content)
-            <div class="button">
-                <AntButton Name="返回" Type="default" OnClick="location = './bbs';"/>
-            </div>
-        </ChildContent>
-    </CmsCard>
+<div class="container cl-container cl-post">
     <div>
-        <UWebSiteCount />
+        <CmsCard>
+            <HeadTemplate>
+                <CmsTitle Icon="far fa-file" Title="@model?.Title"/>
+                <UPostCount Post="model"/>
+            </HeadTemplate>
+            <ChildContent>
+                @CmsUtils.GetMarkdownHtml(model?.Content)
+                <div class="button">
+                    <AntButton Name="返回" Type="default" OnClick="location = './bbs';"/>
+                </div>
+            </ChildContent>
+        </CmsCard>
         <div style="height:20px;"></div>
-        <UPostRank />
+    </div>
+    <div>
+        <UWebSiteCount/>
+        <div style="height: 20px;"></div>
+        <UPostRank/>
     </div>
 </div>
 
@@ -42,4 +46,5 @@
 
         model = await AppService.GetPostBySlug(Slug);
     }
+
 }
