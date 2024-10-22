@@ -1,21 +1,21 @@
-﻿namespace CodeWF;
+﻿using Markdig;
 
-/// <summary>
-/// 内容系统效用类。
-/// </summary>
+namespace CodeWF;
+
 public class CmsUtils
 {
-    /// <summary>
-    /// 将Markdown文本转换成HTML文本。
-    /// </summary>
-    /// <param name="markdown">Markdown文本。</param>
-    /// <returns>HTML文本。</returns>
     public static MarkupString GetMarkdownHtml(string markdown)
     {
         if (string.IsNullOrWhiteSpace(markdown))
             return new MarkupString("");
 
-        var html = Markdig.Markdown.ToHtml(markdown);
+        var pipelineBuilder = new MarkdownPipelineBuilder()
+            .UsePipeTables()
+            .UseBootstrap();
+        pipelineBuilder.UseAdvancedExtensions();
+        var pipeline = pipelineBuilder.Build();
+
+        var html = Markdig.Markdown.ToHtml(markdown, pipeline);
         return new MarkupString(html);
     }
 }
