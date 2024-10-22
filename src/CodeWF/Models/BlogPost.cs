@@ -23,4 +23,5 @@ public class BlogPostBrief
 public class BlogPost : BlogPostBrief
 {
     public string? Content { get; set; }
+    public string? HtmlContent { get; set; }
 }

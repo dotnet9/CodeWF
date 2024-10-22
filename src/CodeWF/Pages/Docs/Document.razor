@@ -17,7 +17,7 @@
             <i class="far fa-eye"/> @Random.Shared.Next(5, 1000)
         </div>
         <div class="cl-doc-body">
-            @CmsUtils.GetMarkdownHtml(model?.Content)
+            @((MarkupString)model?.HtmlContent)
         </div>
     </CmsCard>
 </div>

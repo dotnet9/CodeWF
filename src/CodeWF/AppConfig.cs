@@ -16,11 +16,6 @@ public static class AppConfig
     public static string AppName => "内容管理系统";
 
     /// <summary>
-    /// 取得或设置页面通用标题。
-    /// </summary>
-    public static string AppTitle { get; set; }
-
-    /// <summary>
     /// 添加CodeWF前台应用。
     /// </summary>
     /// <param name="services">依赖注入服务。</param>
@@ -41,16 +36,11 @@ public static class AppConfig
             info.IsLanguage = true;
             info.IsTheme = true;
             info.Assembly = typeof(AppConfig).Assembly;
-            //JS路径，通过JS.InvokeAppVoidAsync调用JS方法
-            //info.JsPath = "./script.js";
         });
 
-        services.AddScoped<ISiteRepository, SiteRepository>();
-        services.AddScoped<ISiteService, SiteService>();
 
         if (option.IsSite)
         {
-            DocHelper.Initialize();
             services.AddScoped<IUIService, UIService>();
         }
 

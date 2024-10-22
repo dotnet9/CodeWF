@@ -18,7 +18,7 @@
                 <UPostCount Post="model"/>
             </HeadTemplate>
             <ChildContent>
-                @CmsUtils.GetMarkdownHtml(model?.Content)
+                @((MarkupString)model?.HtmlContent)
                 <div class="button">
                     <AntButton Name="返回" Type="default" OnClick="location = './bbs';"/>
                 </div>

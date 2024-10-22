@@ -1,13 +1,13 @@
 ﻿using Markdig;
 
-namespace CodeWF;
+namespace CodeWF.Extensions;
 
-public class CmsUtils
+public static class MarkdownExtension
 {
-    public static MarkupString GetMarkdownHtml(string markdown)
+    public static string? ToHtml(this string markdown)
     {
         if (string.IsNullOrWhiteSpace(markdown))
-            return new MarkupString("");
+            return default;
 
         var pipelineBuilder = new MarkdownPipelineBuilder()
             .UsePipeTables()
@@ -15,7 +15,7 @@ public class CmsUtils
         pipelineBuilder.UseAdvancedExtensions();
         var pipeline = pipelineBuilder.Build();
 
-        var html = Markdig.Markdown.ToHtml(markdown, pipeline);
-        return new MarkupString(html);
+        var html = Markdown.ToHtml(markdown, pipeline);
+        return html;
     }
 }

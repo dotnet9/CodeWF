@@ -1,4 +1,5 @@
-﻿<KContext Value="context">
+﻿@using Known.Core.Extensions
+<KContext Value="context">
     <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">
             <KRouteData Value="routeData">
@@ -20,9 +21,5 @@
         await base.OnInitializedAsync();
         context = new UIContext();
         Context.SetContext(context);
-        if (Context.User.Identity.IsAuthenticated)
-            context.CurrentUser = await AuthService.GetUserAsync(Context.User.Identity.Name);
-        else
-            context.CurrentUser = null;
     }
 }

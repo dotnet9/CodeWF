@@ -55,6 +55,7 @@ public class AppService
             if (File.Exists(contentPath))
             {
                 item.Content = await File.ReadAllTextAsync(contentPath);
+                item.HtmlContent = item.Content.ToHtml();
             }
         }
 
@@ -240,6 +241,7 @@ public class AppService
         }
 
         blogPost.Content = markdownContent;
+        blogPost.HtmlContent = markdownContent.ToHtml();
 
         return blogPost;
     }

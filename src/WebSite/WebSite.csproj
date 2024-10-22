@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Known.Core" Version="2.0.15" />
+	    <PackageReference Include="Known.Core" Version="2.0.15" />
         <ProjectReference Include="..\CodeWF\CodeWF.csproj" />
     </ItemGroup>
 

@@ -1,4 +1,7 @@
-﻿namespace WebSite;
+﻿using CodeWF;
+using Known.Core;
+
+namespace WebSite;
 
 static class AppWeb
 {
@@ -10,18 +13,6 @@ static class AppWeb
         {
             item.Visible = item.Id != "en-US" && item.Id != "vi-VN";
         }
-
-        AppConfig.AppTitle = "Known开源企业级开发框架";
-        AIHelper.Tags = new()
-        {
-            ["前端"] = ["前端", "界面", "Blazor", "UI"],
-            ["后端"] = ["后端", "服务", "数据依赖", "Service", "Repository"],
-            ["数据库"] = ["数据库", "Database"],
-            ["需求"] = ["需求"],
-            ["设计"] = ["设计"],
-            ["建议"] = ["建议"],
-            ["BUG"] = ["BUG", "Exception", "异常"]
-        }; 
 
         //ModuleHelper.InitAppModules();
         //Stopwatcher.Enabled = true;
