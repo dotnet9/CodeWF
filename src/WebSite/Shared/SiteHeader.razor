@@ -49,8 +49,8 @@
 </nav>
 
 @code {
-    private string NavClass => IsIndex ? "index-nav" : DarkNavClasss;
-    public const string DarkNavClasss ="bg-white navbar-light shadow-sm scrollednav";
+    private string NavClass => IsIndex ? "index-nav" : DarkNavClass;
+    public const string DarkNavClass ="bg-white navbar-light shadow-sm scrollednav";
 
     private Dictionary<string, string> _projects = new()
     {
