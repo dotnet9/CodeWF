@@ -49,7 +49,8 @@
 </nav>
 
 @code {
-    private string NavClass => IsIndex ? "index-nav" : "bg-white navbar-light shadow-sm scrollednav py-0";
+    private string NavClass => IsIndex ? "index-nav" : DarkNavClasss;
+    public const string DarkNavClasss ="bg-white navbar-light shadow-sm scrollednav";
 
     private Dictionary<string, string> _projects = new()
     {
