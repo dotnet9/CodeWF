@@ -18,9 +18,12 @@
                 <UPostCount Post="model"/>
             </HeadTemplate>
             <ChildContent>
-                @((MarkupString)model?.HtmlContent)
+                @if (!string.IsNullOrWhiteSpace(model?.HtmlContent))
+                {
+                    @((MarkupString)model.HtmlContent)
+                }
                 <div class="button">
-                    <AntButton Name="返回" Type="default" OnClick="location = './bbs';"/>
+                    <a href="@ConstantUtil.GetPostGithubPath(SiteOption.Value.RemoteAssetsRepository, model)" target="_blank">在Github上编辑此文或留言</a>
                 </div>
             </ChildContent>
         </CmsCard>

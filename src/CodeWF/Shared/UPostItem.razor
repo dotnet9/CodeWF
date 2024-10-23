@@ -1,12 +1,12 @@
 ﻿<div class="cl-bbs-post-item">
-    <a class="ask-title" href="@Url.GetBbsPostUrl(Post)">@Post.Title</a>
+    <a class="ask-title" href="@ConstantUtil.GetBbsPostUrl(Post)">@Post.Title</a>
     <div class="ask-bottom">
         <UPostTags Tags="@Post?.Tags" />
         @* <UPostCount Post="Post" /> *@
     </div>
     @* <div class="item">
         <div>
-            <a href="@Url.GetBbsPostUrl(Post.Id)">
+            <a href="@ConstantUtil.GetBbsPostUrl(Post.Id)">
                 <div class="title">@Post.Title</div>
                 <div class="summary">@Post.Summary</div>
             </a>

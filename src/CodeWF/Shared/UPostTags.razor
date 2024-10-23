@@ -5,7 +5,7 @@
     {
         foreach (var tag in Tags)
         {
-            @* <a class="ant-tag ant-tag-blue" href="@Url.GetBbsTagUrl(tag)">@tag</a> *@
+            @* <a class="ant-tag ant-tag-blue" href="@ConstantUtil.GetBbsTagUrl(tag)">@tag</a> *@
             <AntTag Color="blue">@tag</AntTag>
         }
     }
