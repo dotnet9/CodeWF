@@ -10,7 +10,7 @@ public class AppService
 {
     private readonly SiteOption _siteInfo;
     private List<DocItem>? _docItems;
-    private List<CategotyItem>? _categoryItems;
+    private List<CategoryItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
     private Dictionary<string, string>? _webSiteCountInfos;
@@ -96,7 +96,7 @@ public class AppService
         return first;
     }
 
-    public async Task<List<CategotyItem>?> GetAllCategoryItemsAsync()
+    public async Task<List<CategoryItem>?> GetAllCategoryItemsAsync()
     {
         if (_categoryItems?.Any() == true)
         {

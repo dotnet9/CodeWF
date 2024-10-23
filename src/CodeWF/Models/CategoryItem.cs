@@ -1,6 +1,6 @@
 ﻿namespace CodeWF.Models;
 
-public class CategotyItem
+public class CategoryItem
 {
     public int Sort { get; set; }
 

@@ -1,10 +1,13 @@
 ﻿@page "/"
 @using CodeWF
+@using CodeWF.Options
+@using Microsoft.Extensions.Options
 @inherits BaseComponent
 @layout HomeLayout
 @inject AppService AppService
+@inject IOptions<SiteOption> SiteOption
 
-<PageTitle>码界工坊 —— 文章启智，工具助力的码农家园</PageTitle>
+<PageTitle>@SiteOption.Value.AppTitle</PageTitle>
 
 <div class="jumbotron jumbotron-lg jumbotron-fluid mb-0 pb-3 bg-primary position-relative">
     <div class="container text-white h-100">

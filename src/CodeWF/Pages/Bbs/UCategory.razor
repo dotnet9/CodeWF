@@ -15,7 +15,7 @@
 </CmsCard>
 
 @code {
-    private List<CategotyItem> categories = [];
+    private List<CategoryItem> categories = [];
 
     protected override async Task OnInitAsync()
     {
@@ -24,7 +24,7 @@
         categories = lists?.OrderBy(c => c.Sort).ToList();
     }
 
-    private string GetUrl(CategotyItem item) => $"/bbs/cat/{item.Slug}";
+    private string GetUrl(CategoryItem item) => $"/bbs/cat/{item.Slug}";
 
     private bool IsActive(string code)
     {
