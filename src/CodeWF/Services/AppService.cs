@@ -128,6 +128,11 @@ public class AppService
         for (var start = _siteInfo.StartYear; start <= endYear; start++)
         {
             var postDir = Path.Combine(_siteInfo.LocalAssetsDir, start.ToString());
+            if (!Directory.Exists(postDir))
+            {
+                continue;
+            }
+
             var postFiles = Directory.GetFiles(postDir, "*.md", SearchOption.AllDirectories);
             foreach (var postFile in postFiles)
             {
@@ -197,7 +202,7 @@ public class AppService
         var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author));
         var originalPercentage = (double)original / total * 100;
         _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - _siteInfo.StartYear}年";
-        _webSiteCountInfos["文章分类"] = $"{_categoryItems.Count}个";
+        _webSiteCountInfos["文章分类"] = $"{_categoryItems?.Count}个";
         _webSiteCountInfos["文章总计"] = $"{total}篇";
         _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
         return _webSiteCountInfos;
