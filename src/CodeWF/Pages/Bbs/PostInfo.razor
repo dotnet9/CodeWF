@@ -9,7 +9,12 @@
 <PageTitle>@model?.Title - @SiteOption.Value.AppTitle</PageTitle>
 
 <div class="container cl-container cl-post">
-    <div>
+    <div id="@mdId">
+        <div id="toc">
+            <div >
+                <a class="item-title" href="@GetTopLink()" title="@model?.Title">@model?.Title</a>
+            </div>
+        </div>
         <CmsCard>
             <HeadTemplate>
                 <CmsTitle Icon="far fa-file" Title="@model?.Title"/>
@@ -34,7 +39,13 @@
     </div>
 </div>
 
+<script>
+    $(getTOC('@mdId'));
+</script>
+
 @code {
+    Guid mdId = Guid.NewGuid();
+    string GetTopLink() => Navigation.GetPageUrl().Split('#')[0] + '#' + mdId;
     private BlogPost? model;
 
     [Parameter] public string? Year { get; set; }
