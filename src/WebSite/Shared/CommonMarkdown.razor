@@ -1,0 +1,42 @@
+﻿@using CodeWF.Pages.bbs
+@inject IOptions<SiteOption> SiteOption
+@inject NavigationManager Navigation
+
+<PageTitle>@Title - @SiteOption.Value.AppTitle</PageTitle>
+
+<div class="container cl-container cl-post">
+    <div id="@mdId">
+        <div id="toc">
+            <div>
+                <a class="item-title" href="@GetTopLink()" title="@Title">@Title</a>
+            </div>
+        </div>
+        <CmsCard>
+            <HeadTemplate>
+                <CmsTitle Icon="far fa-file" Title="@Title"/>
+            </HeadTemplate>
+            <ChildContent>
+                @if (!string.IsNullOrWhiteSpace(Content))
+                {
+                    @((MarkupString)Content)
+                }
+            </ChildContent>
+        </CmsCard>
+        <div style="height: 20px;"></div>
+    </div>
+    <div>
+        <UWebSiteCount/>
+        <div style="height: 20px;"></div>
+        <UPostRank/>
+    </div>
+</div>
+<script>
+    $(getTOC('@mdId'));
+</script>
+@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Content { get; set; }
+    Guid mdId = Guid.NewGuid();
+    string GetTopLink() => Navigation.GetPageUrl().Split('#')[0] + '#' + mdId;
+}

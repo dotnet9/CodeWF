@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager Navigation
+@inject AppService AppService
 
 <nav class="topnav navbar navbar-expand-lg navbar-dark bg-primary fixed-top @NavClass">
     <div class="container">
@@ -22,16 +23,27 @@
                 <li class="nav-item@(IsActive("/doc") ? " active" : "")">
                     <a class="nav-link" href="/doc">文档</a>
                 </li>
-                <li class="nav-item@(IsActive("/bbs") ? " active" : "")">
-                    <a class="nav-link" href="/bbs">博文</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">博客</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        @if (_categoryItems?.Any() == true)
+                        {
+                            @foreach (var cat in _categoryItems)
+                            {
+                                <a class="dropdown-item" href="@ConstantUtil.GetBbsCategoryUrl(cat.Slug)">
+                                    @cat.Name
+                                </a>
+                            }
+                        }
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">关于</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        @foreach (var resource in _resources)
-                        {
-                            <a class="dropdown-item" href="@resource.Value" target="_blank">@resource.Key</a>
-                        }
+                        <a class="dropdown-item" href="/donation">赞助</a>
+                        <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank">博客园</a>
+                        <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank">B站</a>
+                        <a class="dropdown-item" href="/about">关于</a>
                     </div>
                 </li>
             </ul>
@@ -50,7 +62,7 @@
 
 @code {
     private string NavClass => IsIndex ? "index-nav" : DarkNavClass;
-    public const string DarkNavClass ="bg-white navbar-light shadow-sm scrollednav";
+    public const string DarkNavClass = "bg-white navbar-light shadow-sm scrollednav";
 
     private Dictionary<string, string> _projects = new()
     {
@@ -63,15 +75,15 @@
         { "Assets.Dotnet9", "https://github.com/dotnet9/Assets.Dotnet9" }
     };
 
-    private Dictionary<string, string> _resources = new()
-    {
-        { "赞助", "/donation" },
-        { "博客园", "https://www.cnblogs.com/Dotnet9-com" },
-        { "B站", "https://space.bilibili.com/470546606" },
-        { "关于", "/about" }
-    };
+    private List<CategoryItem>? _categoryItems;
 
     [Parameter] public bool IsIndex { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categoryItems = await AppService.GetAllCategoryItemsAsync();
+    }
 
     private bool IsActive(string code)
     {

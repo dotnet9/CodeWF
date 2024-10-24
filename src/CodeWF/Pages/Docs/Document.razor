@@ -9,11 +9,15 @@
 
 <UMenuBar Target="cl-doc-menu"/>
 <div class="container cl-container cl-doc">
-    <UDocMenu />
+    <UDocMenu/>
     <CmsCard>
-        <div class="count">
-            <i class="far fa-eye"/> @Random.Shared.Next(5, 1000)
-        </div>
+        @if (!string.IsNullOrWhiteSpace(model?.Repository))
+        {
+            <div class="count">
+                <i class="far fa-eye"/>
+                <a href="@model?.Repository" target="_blank">看看Github上的源码</a>
+            </div>
+        }
         <div class="cl-doc-body">
             @((MarkupString)model?.HtmlContent)
         </div>
