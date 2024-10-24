@@ -1,9 +1,7 @@
-﻿@page "/{slug}"
-@page "/{year}/{month}/{slug}"
+﻿@page "/{year}/{month}/{slug}"
 @page "/post/{year}/{month}/{slug}"
 @page "/bbs/post/{year}/{month}/{slug}"
-@using CodeWF.Options
-@using Microsoft.Extensions.Options
+
 @inherits BaseComponent
 @inject AppService AppService
 @inject IOptions<SiteOption> SiteOption

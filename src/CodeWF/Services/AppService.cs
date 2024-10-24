@@ -1,8 +1,4 @@
-﻿using CodeWF.Options;
-using CodeWF.Tools.Extensions;
-using Microsoft.Extensions.Options;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+﻿
 
 namespace CodeWF.Services;
 
@@ -14,6 +10,8 @@ public class AppService
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
     private Dictionary<string, string>? _webSiteCountInfos;
+    private string? _donationContent;
+    private string? _aboutContent;
 
     public AppService(IOptions<SiteOption> siteOption)
     {
@@ -27,6 +25,8 @@ public class AppService
         await GetAllFriendLinkItemsAsync();
         await GetAllDocItemsAsync();
         await GetWebSiteCountAsync();
+        await ReadAboutAsync();
+        await ReadDonationAsync();
     }
 
     public async Task<List<DocItem>?> GetAllDocItemsAsync()
@@ -206,6 +206,42 @@ public class AppService
         _webSiteCountInfos["文章总计"] = $"{total}篇";
         _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
         return _webSiteCountInfos;
+    }
+
+    public async Task<string?> ReadAboutAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_aboutContent))
+        {
+            return _aboutContent;
+        }
+
+        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "about.md");
+        if (!File.Exists(filePath))
+        {
+            return "## 关于";
+        }
+
+        var content = await File.ReadAllTextAsync(filePath);
+        _aboutContent = content.ToHtml();
+        return _aboutContent;
+    }
+
+    public async Task<string?> ReadDonationAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_donationContent))
+        {
+            return _donationContent;
+        }
+
+        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site","pays", "Donation.md");
+        if (!File.Exists(filePath))
+        {
+            return "## 赞助";
+        }
+
+        var content = await File.ReadAllTextAsync(filePath);
+        _donationContent = content.ToHtml();
+        return _donationContent;
     }
 
     public async Task<BlogPost?> GetPostBySlug(string slug)

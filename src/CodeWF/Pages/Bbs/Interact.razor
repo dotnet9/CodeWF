@@ -1,7 +1,6 @@
 ﻿@page "/bbs"
 @page "/bbs/cat/{category}"
-@using CodeWF.Options
-@using Microsoft.Extensions.Options
+
 @inherits ListComponent<BlogPost>
 @inject IOptions<SiteOption> SiteOptions
 @inject AppService AppService 

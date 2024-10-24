@@ -9,7 +9,7 @@
         <div class="navbar-collapse collapse" id="navbarColor02" style="">
             <ul class="navbar-nav mr-auto d-flex align-items-center">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">开源</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">项目</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         @foreach (var project in _projects)
                         {
@@ -26,7 +26,7 @@
                     <a class="nav-link" href="/bbs">博文</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">资源</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">关于</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         @foreach (var resource in _resources)
                         {
@@ -65,8 +65,10 @@
 
     private Dictionary<string, string> _resources = new()
     {
+        { "赞助", "/donation" },
         { "博客园", "https://www.cnblogs.com/Dotnet9-com" },
-        { "B站", "https://space.bilibili.com/470546606" }
+        { "B站", "https://space.bilibili.com/470546606" },
+        { "关于", "/about" }
     };
 
     [Parameter] public bool IsIndex { get; set; }

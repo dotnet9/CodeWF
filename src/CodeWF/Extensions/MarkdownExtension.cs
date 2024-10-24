@@ -1,6 +1,4 @@
-﻿using Markdig;
-
-namespace CodeWF.Extensions;
+﻿namespace CodeWF.Extensions;
 
 public static class MarkdownExtension
 {
