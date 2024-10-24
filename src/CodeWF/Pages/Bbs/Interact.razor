@@ -12,10 +12,7 @@
     <UCategory/>
     <CmsCard Class="cl-posts">
         <HeadTemplate>
-            <CmsTitle Icon="far fa-server" Title="内容列表"/>
-            <AntForm Id="query">
-                <AntSearch Id="Key" Placeholder="请输入关键字搜索" Value="@Key"/>
-            </AntForm>
+            <CmsTitle Icon="far fa-server" Title="博文列表"/>
         </HeadTemplate>
         <ChildContent>
             @if (!(_blogPosts?.Total > 0))

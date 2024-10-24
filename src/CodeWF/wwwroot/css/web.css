@@ -84,6 +84,7 @@ blockquote p {margin-bottom:0;}
 
 /*post*/
 .cl-posts {min-height:500px;}
+.cl-posts .cl-card-head {padding:6.2px 20px;}
 .cl-posts .cl-card-body {padding:0;}
 .cl-posts .ant-input-search {width:200px;}
 

@@ -2,7 +2,14 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<SiteOption> SiteOption
 <div class="counts">
-    <span class="like">@(Post?.Lastmod?.ToString("yyyy-MM-dd HH:mm:ss") ?? Post?.Date?.ToString("yyyy-MM-dd HH:mm:ss")) </span>
+    @if (Post?.Lastmod != null)
+    {
+        <span class="like">最近更新于@(Post?.Lastmod?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
+    }
+    else
+    {
+        <span class="like">创建于@(Post?.Date?.ToString("yyyy-MM-dd HH:mm:ss"))</span>
+    }
     <span style="margin:0 5px;">|</span>
     <span class="author">@(string.IsNullOrWhiteSpace(Post?.Author) ? SiteOption.Value.Owner : Post!.Author)</span>
     <span style="margin:0 5px;">|</span>
