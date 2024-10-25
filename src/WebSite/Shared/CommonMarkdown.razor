@@ -1,5 +1,4 @@
-﻿@using CodeWF.Pages.bbs
-@inject IOptions<SiteOption> SiteOption
+﻿@inject IOptions<SiteOption> SiteOption
 @inject NavigationManager Navigation
 
 <PageTitle>@Title - @SiteOption.Value.AppTitle</PageTitle>
@@ -33,6 +32,7 @@
 <script>
     $(getTOC('@mdId'));
 </script>
+
 @code
 {
     [Parameter] public string Title { get; set; }

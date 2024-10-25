@@ -9,19 +9,11 @@
         </button>
         <div class="navbar-collapse collapse" id="navbarColor02" style="">
             <ul class="navbar-nav mr-auto d-flex align-items-center">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">项目</a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        @foreach (var project in _projects)
-                        {
-                            <a class="dropdown-item" href="@project.Value" target="_blank">
-                                @project.Key
-                            </a>
-                        }
-                    </div>
+                <li>
+                    <a class="nav-link" href="/">首页</a>
                 </li>
                 <li class="nav-item@(IsActive("/doc") ? " active" : "")">
-                    <a class="nav-link" href="/doc">文档</a>
+                    <a class="nav-link" href="/doc">项目</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">博客</a>
@@ -59,17 +51,6 @@
 @code {
     private string NavClass => IsIndex ? "index-nav" : DarkNavClass;
     public const string DarkNavClass = "bg-white navbar-light shadow-sm scrollednav";
-
-    private Dictionary<string, string> _projects = new()
-    {
-        { "CodeWF", "https://github.com/dotnet9/CodeWF" },
-        { "CodeWF.EventBus", "https://github.com/dotnet9/CodeWF.EventBus" },
-        { "CodeWF.EventBus.Socket", "https://github.com/dotnet9/CodeWF.EventBus.Socket" },
-        { "CodeWF.NetWeaver", "https://github.com/dotnet9/CodeWF.NetWeaver" },
-        { "CodeWF.Toolbox", "https://github.com/dotnet9/CodeWF.Toolbox" },
-        { "CodeWF.Tools", "https://github.com/dotnet9/CodeWF.Tools" },
-        { "Assets.Dotnet9", "https://github.com/dotnet9/Assets.Dotnet9" }
-    };
 
     private List<CategoryItem>? _categoryItems;
 
