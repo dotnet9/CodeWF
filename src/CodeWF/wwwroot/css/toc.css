@@ -35,9 +35,11 @@
   padding: 1em;
   position: fixed;
   top: 100vh;
-  /*right: 2%;*/
+  left: auto;
+  right: 2%;
   width: auto;
   height: auto;
+  min-width: 150px;
   max-height: 70vh;
   overflow-y: auto;
   background-color: #fff; /* 可以设置背景颜色 */

@@ -1,10 +1,7 @@
-﻿
+﻿namespace CodeWF.Services;
 
-namespace CodeWF.Services;
-
-public class AppService
+public class AppService(IOptions<SiteOption> siteOption)
 {
-    private readonly SiteOption _siteInfo;
     private List<DocItem>? _docItems;
     private List<CategoryItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
@@ -12,11 +9,6 @@ public class AppService
     private Dictionary<string, string>? _webSiteCountInfos;
     private string? _donationContent;
     private string? _aboutContent;
-
-    public AppService(IOptions<SiteOption> siteOption)
-    {
-        _siteInfo = siteOption.Value;
-    }
 
     public async Task SeedAsync()
     {
@@ -36,7 +28,7 @@ public class AppService
             return _docItems;
         }
 
-        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "doc", "doc.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", "doc.json");
         if (!File.Exists(filePath))
         {
             return _docItems;
@@ -58,8 +50,8 @@ public class AppService
 
             var contentPath = string.Empty;
             contentPath = string.IsNullOrWhiteSpace(parentDir)
-                ? Path.Combine(_siteInfo.LocalAssetsDir, "site", "doc", $"{item.Slug}.md")
-                : Path.Combine(_siteInfo.LocalAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
+                ? Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", $"{item.Slug}.md")
+                : Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
 
             if (File.Exists(contentPath))
             {
@@ -103,7 +95,7 @@ public class AppService
             return _categoryItems;
         }
 
-        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "category.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "category.json");
         if (!File.Exists(filePath))
         {
             return _categoryItems;
@@ -125,9 +117,9 @@ public class AppService
         _blogPosts = new();
         var endYear = DateTime.Now.Year;
 
-        for (var start = _siteInfo.StartYear; start <= endYear; start++)
+        for (var start = siteOption.Value.StartYear; start <= endYear; start++)
         {
-            var postDir = Path.Combine(_siteInfo.LocalAssetsDir, start.ToString());
+            var postDir = Path.Combine(siteOption.Value.LocalAssetsDir, start.ToString());
             if (!Directory.Exists(postDir))
             {
                 continue;
@@ -201,7 +193,7 @@ public class AppService
         var total = _blogPosts?.Count;
         var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author));
         var originalPercentage = (double)original / total * 100;
-        _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - _siteInfo.StartYear}年";
+        _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - siteOption.Value.StartYear}年";
         _webSiteCountInfos["文章分类"] = $"{_categoryItems?.Count}个";
         _webSiteCountInfos["文章总计"] = $"{total}篇";
         _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
@@ -215,7 +207,7 @@ public class AppService
             return _aboutContent;
         }
 
-        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "about.md");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "about.md");
         if (!File.Exists(filePath))
         {
             return "## 关于";
@@ -233,7 +225,7 @@ public class AppService
             return _donationContent;
         }
 
-        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site","pays", "Donation.md");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "pays", "Donation.md");
         if (!File.Exists(filePath))
         {
             return "## 赞助";
@@ -300,7 +292,7 @@ public class AppService
             return _friendLinkItems;
         }
 
-        var filePath = Path.Combine(_siteInfo.LocalAssetsDir, "site", "FriendLink.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "FriendLink.json");
         if (!File.Exists(filePath))
         {
             return _friendLinkItems;
