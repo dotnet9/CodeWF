@@ -5,6 +5,7 @@ using System.Text.Unicode;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
+builder.Services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddRazorComponents()
