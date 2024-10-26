@@ -6,7 +6,7 @@
             <a class="item-title" href="@GetTopLink()" title="@Title">@Title</a>
         </div>
     </div>
-    <div>
+    <div class="post">
         @if (!string.IsNullOrWhiteSpace(Content))
         {
             @((MarkupString)Content)
