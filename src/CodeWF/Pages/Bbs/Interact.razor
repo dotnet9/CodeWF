@@ -1,4 +1,5 @@
 ﻿@page "/bbs"
+@page "/bbs/cat"
 @page "/bbs/cat/{category}"
 
 @inherits ListComponent<BlogPost>
@@ -42,7 +43,7 @@
 @code {
     private PageData<BlogPost>? _blogPosts;
 
-    [Parameter] public string Category { get; set; }
+    [Parameter] public string? Category { get; set; }
     [SupplyParameterFromQuery] public string? Key { get; set; }
 
     protected override async Task OnInitAsync()
