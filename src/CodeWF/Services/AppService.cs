@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CodeWF.Options;
+using System.Text;
 
 namespace CodeWF.Services;
 
@@ -13,6 +14,7 @@ public class AppService(IOptions<SiteOption> siteOption)
     private string? _donationContent;
     private string? _aboutContent;
     private string? _rss;
+    private string? _siteMap;
 
     public async Task SeedAsync()
     {
@@ -25,6 +27,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         await ReadAboutAsync();
         await ReadDonationAsync();
         await GetRssAsync();
+        await GetSiteMapAsync();
     }
 
     public async Task<List<DocItem>?> GetAllDocItemsAsync()
@@ -109,11 +112,12 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         var fileContent = await File.ReadAllTextAsync(filePath);
         fileContent.FromJson(out _categoryItems, out var msg);
-        if (_categoryItems == null) 
+        if (_categoryItems == null)
         {
             _categoryItems = new List<CategoryItem>();
         }
-        _categoryItems.Insert(0, new CategoryItem() { Slug = ConstantUtil.DefaultCategory, Name= "所有"});
+
+        _categoryItems.Insert(0, new CategoryItem() { Slug = ConstantUtil.DefaultCategory, Name = "所有" });
         return _categoryItems;
     }
 
@@ -153,8 +157,8 @@ public class AppService(IOptions<SiteOption> siteOption)
         CategoryItem? cat = null;
         if (!string.Equals(ConstantUtil.DefaultCategory, categorySlug))
         {
-            cat  = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
-        } 
+            cat = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
+        }
 
         IEnumerable<BlogPost>? posts;
         if (!string.IsNullOrWhiteSpace(key))
@@ -339,7 +343,11 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _rss;
         }
 
-        var data = _blogPosts?.Take(10).ToList();
+        var data = _blogPosts?
+            .OrderByDescending(p => p.Lastmod)
+            .ThenByDescending(p => p.Date)
+            .Take(10)
+            .ToList();
 
         var sb = new StringBuilder();
         sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
@@ -360,7 +368,7 @@ public class AppService(IOptions<SiteOption> siteOption)
                 sb.Append("<item>");
                 sb.Append($"<title>{item.Title}</title>");
                 sb.Append(
-                    $"<link>{siteOption.Value.Domain}/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</link>");
+                    $"<link>{siteOption.Value.Domain}/bbs/post/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</link>");
                 sb.Append($"<description>{item.Description}</description>");
                 sb.Append($"<author>({item.Author ?? siteOption.Value.Owner})</author>");
                 sb.Append($"<category>{string.Join(",", item.Categories)}</category>");
@@ -378,5 +386,67 @@ public class AppService(IOptions<SiteOption> siteOption)
         _rss = sb.ToString();
 
         return _rss;
+    }
+
+    public async Task<string> GetSiteMapAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_siteMap))
+        {
+            return _siteMap;
+        }
+
+        List<SitemapNode> siteMapNodes = new();
+
+        if (_categoryItems?.Any() == true)
+        {
+            siteMapNodes.AddRange(_categoryItems.Select(x => new SitemapNode
+            {
+                LastModified = DateTimeOffset.UtcNow,
+                Priority = 0.8,
+                Url = $"{siteOption.Value.Domain}/bbs/cat/{x.Slug}",
+                Frequency = SitemapFrequency.Monthly
+            }));
+        }
+
+        if (_blogPosts?.Any() == true)
+        {
+            siteMapNodes.AddRange(_blogPosts
+                .OrderByDescending(p => p.Lastmod)
+                .ThenByDescending(p => p.Date)
+                .Select(x =>
+                    new SitemapNode
+                    {
+                        LastModified = x.Lastmod ?? x.Date ?? DateTimeOffset.Now,
+                        Priority = 0.9,
+                        Url =
+                            $"{siteOption.Value.Domain}/bbs/post/{x.Date:yyyy/MM}/{x.Slug}",
+                        Frequency = SitemapFrequency.Daily
+                    }));
+        }
+
+        StringBuilder sb = new();
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        sb.AppendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"");
+        sb.AppendLine("   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        sb.AppendLine(
+            "   xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\">");
+
+        foreach (SitemapNode m in siteMapNodes)
+        {
+            sb.AppendLine("    <url>");
+
+            sb.AppendLine($"        <loc>{m.Url}</loc>");
+            sb.AppendLine($"        <lastmod>{m.LastModified.ToString("yyyy-MM-dd")}</lastmod>");
+            sb.AppendLine($"        <changefreq>{m.Frequency}</changefreq>");
+            sb.AppendLine($"        <priority>{m.Priority}</priority>");
+
+            sb.AppendLine("    </url>");
+        }
+
+        sb.AppendLine("</urlset>");
+
+        _siteMap = sb.ToString();
+
+        return _siteMap;
     }
 }
