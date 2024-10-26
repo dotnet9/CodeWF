@@ -1,4 +1,6 @@
-﻿namespace CodeWF.Services;
+﻿using System.Text;
+
+namespace CodeWF.Services;
 
 public class AppService(IOptions<SiteOption> siteOption)
 {
@@ -10,6 +12,7 @@ public class AppService(IOptions<SiteOption> siteOption)
     private Dictionary<string, string>? _webSiteCountInfos;
     private string? _donationContent;
     private string? _aboutContent;
+    private string? _rss;
 
     public async Task SeedAsync()
     {
@@ -21,6 +24,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         await GetWebSiteCountAsync();
         await ReadAboutAsync();
         await ReadDonationAsync();
+        await GetRssAsync();
     }
 
     public async Task<List<DocItem>?> GetAllDocItemsAsync()
@@ -326,5 +330,53 @@ public class AppService(IOptions<SiteOption> siteOption)
         var fileContent = await File.ReadAllTextAsync(filePath);
         fileContent.FromJson(out _TimeLineItems, out var msg);
         return _TimeLineItems;
+    }
+
+    public async Task<string> GetRssAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_rss))
+        {
+            return _rss;
+        }
+
+        var data = _blogPosts?.Take(10).ToList();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        sb.AppendLine(
+            "<rss xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" version=\"2.0\">");
+        sb.Append("<channel>");
+        sb.Append(
+            $"<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"{siteOption.Value.Domain}/rss\"/>");
+        sb.Append($"<title>{siteOption.Value.AppTitle}_{siteOption.Value.Memo}</title>");
+        sb.Append($"<link>{siteOption.Value.Domain}/rss</link>");
+        sb.Append($"<description>{siteOption.Value.Memo}</description>");
+        sb.Append($"<copyright>{siteOption.Value.AppTitle}_{siteOption.Value.Memo}</copyright>");
+        sb.Append("<language>zh-cn</language>");
+        if (data is { Count: > 0 })
+        {
+            foreach (var item in data)
+            {
+                sb.Append("<item>");
+                sb.Append($"<title>{item.Title}</title>");
+                sb.Append(
+                    $"<link>{siteOption.Value.Domain}/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</link>");
+                sb.Append($"<description>{item.Description}</description>");
+                sb.Append($"<author>({item.Author ?? siteOption.Value.Owner})</author>");
+                sb.Append($"<category>{string.Join(",", item.Categories)}</category>");
+                sb.Append(
+                    $"<guid>{siteOption.Value.Domain}/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</guid>");
+                sb.Append($"<pubDate>{item.Date:R}</pubDate>");
+                sb.Append($"<content:encoded><![CDATA[{item.Description}]]></content:encoded>");
+                sb.Append("</item>");
+            }
+        }
+
+        sb.Append("</channel>");
+        sb.AppendLine("</rss>");
+
+        _rss = sb.ToString();
+
+        return _rss;
     }
 }

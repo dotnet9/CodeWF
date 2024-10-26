@@ -3,7 +3,9 @@
 public class SiteOption
 {
     public string? AppTitle { get; set; }
+    public string? Domain { get; set; }
     public string? Owner { get; set; }
+    public string? OwnerDesc { get; set; }
     public string? Memo { get; set; }
     public string? Favicon { get; set; }
     public string? LocalAssetsDir { get; set; }
