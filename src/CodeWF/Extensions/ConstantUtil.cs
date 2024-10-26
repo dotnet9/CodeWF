@@ -2,6 +2,7 @@
 
 public static class ConstantUtil
 {
+    public const string DefaultCategory = "default";
     public static string GetBbsCategoryUrl(string slug) => $"/bbs/cat/{slug}";
     public static string GetBbsPostUrl(BlogPost post) => $"./bbs/post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
 

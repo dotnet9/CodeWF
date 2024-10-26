@@ -5,7 +5,7 @@
 @inject IOptions<SiteOption> SiteOptions
 @inject AppService AppService 
 
-<PageTitle>问题交流 - @SiteOptions.Value.AppTitle</PageTitle>
+<PageTitle>博文 - @SiteOptions.Value.AppTitle</PageTitle>
 
 <UMenuBar Target="cl-bbs-menu"/>
 <div class="container cl-container cl-bbs">
@@ -50,7 +50,7 @@
         await base.OnInitAsync();
         if (string.IsNullOrWhiteSpace(Category))
         {
-            Category = "dotnet";
+            Category = ConstantUtil.DefaultCategory;
         }
 
         if (string.IsNullOrWhiteSpace(Key))

@@ -103,6 +103,11 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         var fileContent = await File.ReadAllTextAsync(filePath);
         fileContent.FromJson(out _categoryItems, out var msg);
+        if (_categoryItems == null) 
+        {
+            _categoryItems = new List<CategoryItem>();
+        }
+        _categoryItems.Insert(0, new CategoryItem() { Slug = ConstantUtil.DefaultCategory, Name= "所有"});
         return _categoryItems;
     }
 
@@ -139,13 +144,13 @@ public class AppService(IOptions<SiteOption> siteOption)
     public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
         string? key)
     {
-        var cat = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
-        if (cat == null)
+        CategoryItem? cat = null;
+        if (!string.Equals(ConstantUtil.DefaultCategory, categorySlug))
         {
-            return default;
-        }
+            cat  = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
+        } 
 
-        IEnumerable<BlogPost> posts;
+        IEnumerable<BlogPost>? posts;
         if (!string.IsNullOrWhiteSpace(key))
         {
             posts = _blogPosts
@@ -159,7 +164,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         else
         {
             posts = _blogPosts
-                ?.Where(post => post.Categories?.Contains(cat.Name) == true);
+                ?.Where(post => cat == null || (post.Categories != null && post.Categories.Contains(cat.Name) == true));
         }
 
         var total = posts.Count();
