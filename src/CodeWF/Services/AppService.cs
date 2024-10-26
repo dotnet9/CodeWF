@@ -6,6 +6,7 @@ public class AppService(IOptions<SiteOption> siteOption)
     private List<CategoryItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
+    private List<TimeLineItem>? _TimeLineItems;
     private Dictionary<string, string>? _webSiteCountInfos;
     private string? _donationContent;
     private string? _aboutContent;
@@ -15,6 +16,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         await GetAllCategoryItemsAsync();
         await GetAllBlogPostsAsync();
         await GetAllFriendLinkItemsAsync();
+        await GetTimeLineItemsAsync();
         await GetAllDocItemsAsync();
         await GetWebSiteCountAsync();
         await ReadAboutAsync();
@@ -306,5 +308,23 @@ public class AppService(IOptions<SiteOption> siteOption)
         var fileContent = await File.ReadAllTextAsync(filePath);
         fileContent.FromJson(out _friendLinkItems, out var msg);
         return _friendLinkItems;
+    }
+
+    public async Task<List<TimeLineItem>?> GetTimeLineItemsAsync()
+    {
+        if (_TimeLineItems?.Any() == true)
+        {
+            return _TimeLineItems;
+        }
+
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "timelines.json");
+        if (!File.Exists(filePath))
+        {
+            return _TimeLineItems;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        fileContent.FromJson(out _TimeLineItems, out var msg);
+        return _TimeLineItems;
     }
 }
