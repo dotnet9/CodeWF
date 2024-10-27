@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="CodeWF.Tools" Version="1.2.5.4" />
-        <PackageReference Include="Markdig" Version="0.37.0" />
+        <PackageReference Include="Markdig" Version="0.38.0" />
         <PackageReference Include="Known" Version="2.0.16" />
         <ProjectReference Include="..\AntBlazor\AntBlazor.csproj" />
     </ItemGroup>

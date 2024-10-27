@@ -35,10 +35,11 @@
         }
         else
         {
+            var index = 0;
             foreach (var blogPost in _posts)
             {
                 <div class="col-md-6 col-xl-4">
-                    <MediaBox Style="text-salmon" Icon="fab fa-slack-hash" Title="@blogPost.Title" Link="@ConstantUtil.GetBbsPostUrl(blogPost)">
+                    <MediaBox Style="text-salmon" Icon="@_icons[index++]" Title="@blogPost.Title" Link="@ConstantUtil.GetBbsPostUrl(blogPost)">
                         @blogPost.Description
                     </MediaBox>
                 </div>
@@ -57,7 +58,7 @@
 
 @code
 {
-
+    private string[] _icons = { "fas fa-paper-plane", "fas fa-shield-alt", "fas fa-layer-group", "fas fa-vector-square", "fab fa-amazon", "fab fa-slack-hash" };
     private List<BlogPost>? _posts;
 
     protected override async Task OnInitAsync()
