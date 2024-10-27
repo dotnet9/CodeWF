@@ -11,16 +11,20 @@
 <div class="container cl-container cl-doc">
     <UDocMenu/>
     <CmsCard>
-        @if (!string.IsNullOrWhiteSpace(model?.Repository))
-        {
-            <div class="count">
-                <i class="far fa-eye"/>
-                <a href="@model?.Repository" target="_blank">看看Github上的源码</a>
-            </div>
-        }
-        <div class="cl-doc-body">
+        <HeadTemplate>
+            <WechatPublicLink />
+            @if (!string.IsNullOrWhiteSpace(model?.Repository))
+            {
+                <div class="count">
+                    <i class="far fa-eye"/>
+                    <a href="@model?.Repository" target="_blank">看看Github上的源码</a>
+                </div>
+            }
+        </HeadTemplate>
+        <ChildContent>
+            <div class="title">@model?.Name</div>
             <UPostInfo Title="@model?.Name" Content="@model?.HtmlContent" />
-        </div>
+        </ChildContent>
     </CmsCard>
 </div>
 
