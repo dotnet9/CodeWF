@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+
+<style>
+    .default-tabs .m-tab--active:focus::before {
+        opacity: 0 !important;
+    }
+</style>
+<MApp>
+    <MMain>
+        <MAppBar   App="true" Flat="true">
+            <MContainer>
+                <MTabs Class="default-tabs" Routable="true" BackgroundColor="transparent">
+                    <MTab Href="/" Class="pr-4 black--text" MatchPattern="^/$">
+                        <MIcon Left="true" XLarge="true">@iconSvgPath</MIcon>
+                        码界工坊
+                    </MTab>
+                    @for (int i = 0; i < tabs.Length; i++)
+                    {
+                        var tab = tabs[i];
+                        <MTab Ripple="false"
+                              Href="@tab.Href"
+                              MatchPattern="@tab.Href">
+                            @tab.Name
+                        </MTab>
+                    }
+                </MTabs>
+            </MContainer>
+        </MAppBar>
+
+        <MContainer Fluid="true">
+            <MErrorHandler>
+                @Body
+            </MErrorHandler>
+        </MContainer>
+    </MMain>
+</MApp>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
