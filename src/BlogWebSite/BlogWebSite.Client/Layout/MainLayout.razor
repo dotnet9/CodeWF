@@ -1,34 +1,15 @@
 ﻿@inherits LayoutComponentBase
+@using BlogWebSite.Client.Componets
+@using BlogWebSite.Client.Layout.Componets;
 
-<style>
-    .default-tabs .m-tab--active:focus::before {
-        opacity: 0 !important;
-    }
-</style>
 <MApp>
     <MMain>
-        <MAppBar   App="true" Flat="true">
-            <MContainer>
-                <MTabs Class="default-tabs" Routable="true" BackgroundColor="transparent">
-                    <MTab Href="/" Class="pr-4 black--text" MatchPattern="^/$">
-                        <MIcon Left="true" XLarge="true">@iconSvgPath</MIcon>
-                        码界工坊
-                    </MTab>
-                    @for (int i = 0; i < tabs.Length; i++)
-                    {
-                        var tab = tabs[i];
-                        <MTab Ripple="false"
-                              Href="@tab.Href"
-                              MatchPattern="@tab.Href">
-                            @tab.Name
-                        </MTab>
-                    }
-                </MTabs>
-            </MContainer>
-        </MAppBar>
+        <AppNav />
 
         <MContainer Fluid="true">
             <MErrorHandler>
+                <MCard Title="@server" Subtitle="server" />
+                <MCard Title="@wasm" Subtitle="wasm" />
                 @Body
             </MErrorHandler>
         </MContainer>
@@ -41,3 +22,43 @@
     <span class="dismiss">🗙</span>
 </div>
 
+
+@code {
+    string wasm = "not";
+    string server = "not";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (IRenderMode.IsWasm())
+        {
+            wasm = "Is";
+            await CheckTheme();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender) // 只在第一次渲染后调用
+        {
+            if (IRenderMode.IsWasm() is false)
+            {
+                server = "Is";
+                await CheckTheme();
+            }
+        }
+         
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    async Task CheckTheme()
+    {
+        var themeName = (await MasaLS.GetItemAsync("masablazor@theme"));
+
+        MasaBlazor.SetTheme(themeName is "dark");
+
+        // MasaBlazor.OnThemeChange += theme => InvokeAsync(StateHasChanged);
+    }
+}

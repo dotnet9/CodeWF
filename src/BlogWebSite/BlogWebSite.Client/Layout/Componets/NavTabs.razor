@@ -1,0 +1,16 @@
+﻿<MTabs Class="@Class" Routable="true" Vertical="@Vertical" BackgroundColor="transparent">
+    @foreach (var tab in tabs)
+    {
+        <MTab Ripple="false" Href="@tab.Href">
+            @tab.Name
+        </MTab>
+    }
+</MTabs>
+
+@code {
+    [Parameter]
+    public bool Vertical { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}

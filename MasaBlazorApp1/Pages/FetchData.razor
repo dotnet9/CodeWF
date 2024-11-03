@@ -1,0 +1,56 @@
+﻿@page "/fetchdata"
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (_forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MDataTable Headers="_headers" Items="_forecasts" ItemsPerPage="5">
+        <ItemColContent>
+            @if (context.Header.Value == nameof(WeatherForecast.Date))
+            {
+                @context.Item.Date.ToShortDateString()
+            }
+            else
+            {
+                @context.Value
+            }
+        </ItemColContent>
+    </MDataTable>
+}
+
+@code {
+    private WeatherForecast[]? _forecasts;
+
+    private List<DataTableHeader<WeatherForecast>> _headers = new()
+    {
+        new() { Text = "Date", Value = nameof(WeatherForecast.Date) },
+        new() { Text = "Temp. (C)", Value = nameof(WeatherForecast.TemperatureC) },
+        new() { Text = "Temp. (F)", Value = nameof(WeatherForecast.TemperatureF) },
+        new() { Text = "Summary", Value = nameof(WeatherForecast.Summary), Sortable = false }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+    }
+
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
+
+        public int TemperatureC { get; set; }
+
+        public string? Summary { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

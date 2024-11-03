@@ -9,3 +9,18 @@
 @using BlogWebSite.Client
 @using Masa.Blazor
 @using Masa.Blazor.Presets
+
+@using VleaStwo.MasaBlazorHelpers.ConstantMDI;
+@using VleaStwo.MasaBlazorHelpers.CssHelpers.Colors;
+@using VleaStwo.MasaBlazorHelpers.CssHelpers.Styles;
+
+@using MDC = VleaStwo.MasaBlazorHelpers.CssHelpers.Colors.MaterialDesignColors
+@using MDI = VleaStwo.MasaBlazorHelpers.ConstantMDI.MaterialDesignIcons
+@using MDS = VleaStwo.MasaBlazorHelpers.CssHelpers.Styles.MaterialDesignStyles
+
+@inject MasaBlazor MasaBlazor
+@inject NavigationManager NavigationManager
+@inject LocalStorage MasaLS
+
+@inject IPopupService Popup
+@inject RenderModes.IRenderMode IRenderMode

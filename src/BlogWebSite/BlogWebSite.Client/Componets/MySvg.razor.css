@@ -1,0 +1,9 @@
+﻿div {
+/*    --svg-sizebase: calc(var(--svg-zoom) * 1px);
+    width: calc(var(--svg-w) * var(--svg-sizebase));
+    height: calc(var(--svg-h) * var(--svg-sizebase));*/
+    background-color: currentColor;
+    -webkit-mask: var(--svg-url) no-repeat center / contain;
+    mask: var(--svg-url) no-repeat center / contain;
+    display: inline-block; /* 确保它是一个块元素 */
+}

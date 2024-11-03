@@ -1,5 +1,8 @@
 using BlogWebSite.Components;
 
+using BlogWebSite.Client;
+using BlogWebSite.Client.RenderModes;
+
 namespace BlogWebSite
 {
     public class Program
@@ -13,7 +16,8 @@ namespace BlogWebSite
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
-            builder.Services.AddMasaBlazor();
+            builder.Services.AddMasaBlazorLocal();
+            builder.Services.AddScoped<IRenderMode, ServerRenderMode>();
 
             var app = builder.Build();
 
@@ -23,7 +27,7 @@ namespace BlogWebSite
                 app.UseWebAssemblyDebugging();
             }
             else
-            {
+            { 
                 app.UseExceptionHandler("/Error");
             }
 

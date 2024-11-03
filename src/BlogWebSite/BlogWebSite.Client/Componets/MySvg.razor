@@ -1,0 +1,25 @@
+﻿@using Masa.Blazor.Extensions;
+
+<div style="--svg-url:url('@SvgUrl');width:@Width.ToUnit();height:@Height.ToUnit()"></div>
+
+@* style="--svg-url:url('@SvgUrl');--svg-w:@SvgWidth;--svg-h:@SvgHeight;--svg-zoom:@Zoom" *@
+
+@code {
+    [Parameter]
+    public string SvgUrl { get; set; }
+
+    [Parameter]
+    public StringNumber Width { get; set; }
+
+    [Parameter]
+    public StringNumber Height { get; set; }
+
+    [Parameter, Obsolete]
+    public double SvgWidth { get; set; }
+
+    [Parameter, Obsolete]
+    public double SvgHeight { get; set; }
+
+    [Parameter, Obsolete]
+    public double Zoom { get; set; }
+}

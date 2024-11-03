@@ -1,0 +1,10 @@
+﻿@inherits Masa.Blazor.Core.MasaComponentBase
+
+<CascadingValue Value="CascadingIsDark" Name="IsDark">
+    <div class="toggle checkbox-wrapper @Class" style="@Style @GetZoom()">
+        <label class="switch mx-auto">
+            <input @bind="@Dark" @bind:after=ThemeChanged type="checkbox" />
+            <span class="slider"></span>
+        </label>
+    </div>
+</CascadingValue>

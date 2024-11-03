@@ -6,6 +6,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Include="..\BlogWebSite.Client\Layout\Componets\SettingBtns.razor" Link="SettingBtns.razor" />
+	</ItemGroup>
+
 
 	<ItemGroup>
 		<ProjectReference Include="..\BlogWebSite.Client\BlogWebSite.Client.csproj" />
