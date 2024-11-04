@@ -1,4 +1,4 @@
-﻿namespace BlogWebSite.Client.RenderModes
+﻿namespace BlogWebSite.Shared.RenderModes
 {
     public class WasmRenderMode : IRenderMode
     {

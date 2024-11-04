@@ -1,7 +1,12 @@
-﻿namespace BlogWebSite.Client.Layout.Componets
+﻿using Microsoft.AspNetCore.Components;
+
+namespace BlogWebSite.Client.Layout.Componets
 {
     public partial class AppNav
     {
+        [Parameter]
+        public bool App { get; set; }
+
         bool? open = false;
 
         protected override void OnInitialized()
