@@ -290,6 +290,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         catch (Exception ex)
         {
             string a = ex.Message;
+            Console.WriteLine($"Blog post deserialize exception, file path is 【{markdownFilePath}】, exception information: {ex}");
 
             blogPost = new BlogPost();
         }
