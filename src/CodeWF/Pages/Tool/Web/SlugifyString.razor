@@ -1,0 +1,11 @@
+﻿@inject IOptions<SiteOption> SiteOptions
+
+<PageTitle>标题转URL别名 - @SiteOptions.Value.AppTitle</PageTitle>
+
+<h1>标题转URL别名</h1>
+<p>将标题转换为URL友好的格式</p>
+
+@code
+{
+    public const string Slug = "slugify-string";
+}

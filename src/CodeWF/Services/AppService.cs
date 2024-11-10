@@ -1,11 +1,11 @@
-﻿using CodeWF.Options;
-using System.Text;
+﻿using System.Text;
 
 namespace CodeWF.Services;
 
 public class AppService(IOptions<SiteOption> siteOption)
 {
     private List<DocItem>? _docItems;
+    private List<ToolItem>? _toolItems;
     private List<CategoryItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
@@ -23,6 +23,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         await GetAllFriendLinkItemsAsync();
         await GetTimeLineItemsAsync();
         await GetAllDocItemsAsync();
+        await GetAllToolItemsAsync();
         await GetWebSiteCountAsync();
         await ReadAboutAsync();
         await ReadDonationAsync();
@@ -46,6 +47,24 @@ public class AppService(IOptions<SiteOption> siteOption)
         var fileContent = await File.ReadAllTextAsync(filePath);
         fileContent.FromJson(out _docItems, out var msg);
         return _docItems;
+    }
+
+    public async Task<List<ToolItem>?> GetAllToolItemsAsync()
+    {
+        if (_toolItems?.Any() == true)
+        {
+            return _toolItems;
+        }
+
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "tools", "tools.json");
+        if (!File.Exists(filePath))
+        {
+            return _toolItems;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        fileContent.FromJson(out _toolItems, out var msg);
+        return _toolItems;
     }
 
     public async Task<DocItem?> GetDocItemAsync(string slug)
@@ -95,6 +114,27 @@ public class AppService(IOptions<SiteOption> siteOption)
         await ReadContentAsync(first);
 
         return first;
+    }
+
+    public ToolItem? GetToolItem(string slug)
+    {
+        if (_toolItems?.Any() != true)
+        {
+            return default;
+        }
+
+        foreach (var item in _toolItems)
+        {
+            if (item.Children?.Any() != true) continue;
+
+            foreach (var child in item.Children.Where(child =>
+                         string.Equals(child.Slug, slug, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return child;
+            }
+        }
+
+        return default;
     }
 
     public async Task<List<CategoryItem>?> GetAllCategoryItemsAsync()
@@ -290,7 +330,8 @@ public class AppService(IOptions<SiteOption> siteOption)
         catch (Exception ex)
         {
             string a = ex.Message;
-            Console.WriteLine($"Blog post deserialize exception, file path is 【{markdownFilePath}】, exception information: {ex}");
+            Console.WriteLine(
+                $"Blog post deserialize exception, file path is 【{markdownFilePath}】, exception information: {ex}");
 
             blogPost = new BlogPost();
         }
