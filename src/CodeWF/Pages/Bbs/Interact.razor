@@ -1,21 +1,19 @@
 ﻿@page "/bbs"
+@page "/bbs/cat"
 @page "/bbs/cat/{category}"
 
 @inherits ListComponent<BlogPost>
 @inject IOptions<SiteOption> SiteOptions
 @inject AppService AppService 
 
-<PageTitle>问题交流 - @SiteOptions.Value.AppTitle</PageTitle>
+<PageTitle>博文 - @SiteOptions.Value.AppTitle</PageTitle>
 
 <UMenuBar Target="cl-bbs-menu"/>
 <div class="container cl-container cl-bbs">
     <UCategory/>
     <CmsCard Class="cl-posts">
         <HeadTemplate>
-            <CmsTitle Icon="far fa-server" Title="内容列表"/>
-            <AntForm Id="query">
-                <AntSearch Id="Key" Placeholder="请输入关键字搜索" Value="@Key"/>
-            </AntForm>
+            <CmsTitle Icon="far fa-server" Title="博客列表"/>
         </HeadTemplate>
         <ChildContent>
             @if (!(_blogPosts?.Total > 0))
@@ -45,7 +43,7 @@
 @code {
     private PageData<BlogPost>? _blogPosts;
 
-    [Parameter] public string Category { get; set; }
+    [Parameter] public string? Category { get; set; }
     [SupplyParameterFromQuery] public string? Key { get; set; }
 
     protected override async Task OnInitAsync()
@@ -53,7 +51,7 @@
         await base.OnInitAsync();
         if (string.IsNullOrWhiteSpace(Category))
         {
-            Category = "dotnet";
+            Category = ConstantUtil.DefaultCategory;
         }
 
         if (string.IsNullOrWhiteSpace(Key))

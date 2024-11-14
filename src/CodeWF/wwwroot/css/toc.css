@@ -8,25 +8,26 @@
 @media (min-width: 768px) {
   #toc {
     display: unset;
-    max-width: calc((100vw - 0720px) / 2 + 210px);
+    left: calc((100vw + 0720px) / 2 - 280px);
+    max-width: calc((100vw - 0720px) / 2 + 220px);
   }
 }
 @media (min-width: 992px) {
   #toc {
-    /* display:unset; */
-    max-width: calc((100vw - 0960px) / 2 + 210px);
+    left: calc((100vw + 0960px) / 2 - 280px);
+    max-width: calc((100vw - 0960px) / 2 + 220px);
   }
 }
 @media (min-width: 1200px) {
   #toc {
-    /* display:unset; */
-    max-width: calc((100vw - 1140px) / 2 + 210px);
+    left: calc((100vw + 1140px) / 2 - 280px);
+    max-width: calc((100vw - 1140px) / 2 + 220px);
   }
 }
 @media (min-width: 1920px) {
   #toc {
-    /* display:unset; */
-    max-width: calc((100vw - 1360px) / 2 + 210px);
+    left: calc((100vw + 1360px) / 2 - 280px);
+    max-width: calc((100vw - 1360px) / 2 + 220px);
   }
 }
 
@@ -34,9 +35,11 @@
   padding: 1em;
   position: fixed;
   top: 100vh;
+  left: auto;
   right: 2%;
   width: auto;
   height: auto;
+  min-width: 150px;
   max-height: 70vh;
   overflow-y: auto;
   background-color: #fff; /* 可以设置背景颜色 */

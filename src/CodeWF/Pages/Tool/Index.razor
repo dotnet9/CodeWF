@@ -1,6 +1,8 @@
-﻿@page "/doc"
-@page "/doc/{slug}"
+﻿@page "/tool"
+@page "/tool/{slug}"
 
+@using System.Diagnostics.Eventing.Reader
+@using CodeWF.Pages.Tool.Web
 @inherits BaseComponent
 @inject IOptions<SiteOption> SiteOptions
 @inject AppService AppService
@@ -9,10 +11,10 @@
 
 <UMenuBar Target="cl-doc-menu"/>
 <div class="container cl-container cl-doc">
-    <UDocMenu/>
+    <UToolMenu/>
     <CmsCard>
         <HeadTemplate>
-            <WechatPublicLink />
+            <WechatPublicLink/>
             @if (!string.IsNullOrWhiteSpace(model?.Repository))
             {
                 <div class="count">
@@ -22,13 +24,23 @@
             }
         </HeadTemplate>
         <ChildContent>
-            <UPostInfo Title="@model?.Name" Content="@model?.HtmlContent" />
+            @if (model == null)
+            {
+                <a href="/tool/@SlugifyString.Slug">@AppService.GetToolItem(SlugifyString.Slug)?.Name</a>
+            }
+            else
+            {
+                @if (string.Equals(Slug, SlugifyString.Slug))
+                {
+                    <SlugifyString/>
+                }
+            }
         </ChildContent>
     </CmsCard>
 </div>
 
 @code {
-    private DocItem? model;
+    private ToolItem? model;
 
     [Parameter] public string? Slug { get; set; }
 
@@ -36,7 +48,7 @@
     {
         await base.OnInitAsync();
 
-        model = await AppService.GetDocItemAsync(Slug);
+        model = AppService.GetToolItem(Slug);
     }
 
 }

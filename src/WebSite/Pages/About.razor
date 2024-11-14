@@ -2,35 +2,11 @@
 
 @inherits BaseComponent
 @inject AppService AppService
-@inject IOptions<SiteOption> SiteOption
 
-<PageTitle>关于 - @SiteOption.Value.AppTitle</PageTitle>
-
-<div class="container cl-container cl-post">
-    <div>
-        <CmsCard>
-            <HeadTemplate>
-                <CmsTitle Icon="far fa-file" Title="关于"/>
-            </HeadTemplate>
-            <ChildContent>
-                @if (!string.IsNullOrWhiteSpace(_html))
-                {
-                    @((MarkupString)_html)
-                }
-            </ChildContent>
-        </CmsCard>
-        <div style="height: 20px;"></div>
-    </div>
-    <div>
-        <UWebSiteCount/>
-        <div style="height: 20px;"></div>
-        <UPostRank/>
-    </div>
-</div>
+<CommonMarkdown Title="关于" Content="@_html"/>
 
 @code
 {
-
     private string? _html;
 
     protected override async Task OnInitAsync()

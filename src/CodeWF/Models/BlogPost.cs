@@ -25,3 +25,10 @@ public class BlogPost : BlogPostBrief
     public string? Content { get; set; }
     public string? HtmlContent { get; set; }
 }
+
+public class CopyRights
+{
+    public const string Reprinted = nameof(Reprinted);
+    public const string Contributes = nameof(Contributes);
+    public const string Original = nameof(Original);
+}
