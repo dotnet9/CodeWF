@@ -1,6 +1,7 @@
 ﻿@using Known.Core.Extensions
+@inject UIContext Context
 
-<KContext Value="context">
+<KContext Value="Context">
     <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">
             <KRouteData Value="routeData">
@@ -14,13 +15,11 @@
 </KContext>
 
 @code {
-    private UIContext context;
-    [CascadingParameter] private HttpContext Context { get; set; }
+    [CascadingParameter] private HttpContext HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        context = new UIContext();
-        Context.SetContext(context);
+        HttpContext.SetContext(Context);
     }
 }

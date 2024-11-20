@@ -1,4 +1,5 @@
 .editormd {margin:0;}
+.editormd-fullscreen {z-index:1000;}
 
 /*CmsLite*/
 .cl-card {background-color:#fff;border-radius:5px;}

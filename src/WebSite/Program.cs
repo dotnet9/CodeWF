@@ -19,7 +19,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 builder.Services.AddSingleton<AppService>();
-builder.AddApp();
+builder.AddApplication();
 
 
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
@@ -49,7 +49,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseAntiforgery();
-app.UseApp();
+app.UseApplication();
 app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

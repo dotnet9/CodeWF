@@ -2,7 +2,7 @@
 
 static class AppWeb
 {
-    public static void AddApp(this WebApplicationBuilder builder)
+    public static void AddApplication(this WebApplicationBuilder builder)
     {
         builder.Services.AddCodeWF();
         builder.Services.AddKnownCore(info =>
@@ -13,7 +13,7 @@ static class AppWeb
         builder.Services.AddKnownWeb();
     }
 
-    public static void UseApp(this WebApplication app)
+    public static void UseApplication(this WebApplication app)
     {
         app.UseKnown();
     }
