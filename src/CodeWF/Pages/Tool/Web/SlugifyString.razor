@@ -14,12 +14,15 @@
 <button onclick="convert()">转换</button>
 <button onclick="copy()">复制</button>
 
-<script>
+<script type="text/javascript">
     async function convert(){
         var title = $("#title").val();
         const eventSource = new EventSource('/ai/Title2Slug');
+        eventSource.onerror = function(event) {
+            $("#slug").val(event);
+        }
         eventSource.onmessage = (event) => {
-            $("#slug").val(event.data.replace(/(\r\n|\n|\r)/gm, ""));
+            $("#slug").val(event.data);
         }
     }
     function copy(){
