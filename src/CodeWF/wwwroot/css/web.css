@@ -1,4 +1,5 @@
 .editormd {margin:0;}
+.editormd-fullscreen {z-index:1000;}
 
 /*CmsLite*/
 .cl-card {background-color:#fff;border-radius:5px;}
@@ -39,6 +40,16 @@ blockquote p {margin-bottom:0;}
     position:fixed;top:50px;left:0;z-index:900;width:40px;height:40px;line-height:40px;text-align:center;font-size:25px;
     display:none;background-color:#fff;color:rgba(0,0,0,0.5);border:1px solid #ccc;border-radius:0 5px 5px 0;cursor:pointer;
 }
+.cl-doc h1, .cl-post h1 {font-weight:bold;font-size:1.5rem;margin-bottom:10px;}
+.cl-doc h2, .cl-post h2 {font-weight:bold;font-size:1.2rem;margin-bottom:10px;}
+.cl-doc h3, .cl-post h3  {font-weight:bold;font-size:1.1rem;margin-bottom:10px;}
+.cl-doc h4, .cl-post h4  {font-weight:bold;font-size:1rem;margin-bottom:10px;}
+.cl-doc pre, .cl-post pre {border-left:5px solid #1890ff;padding:10px;background-color:#f1f1f1;border-radius:3px;}
+.cl-doc code, .cl-post code {font-size:1rem;margin:0 2px;}
+.cl-doc pre code, .cl-post pre code {font-size:14px;margin:0;}
+.cl-doc table, .cl-post table {width:100%;border-collapse:collapse;margin-bottom:20px;}
+.cl-doc table th, .cl-post table th {border:1px solid #ccc;padding:0 5px;font-weight:normal;}
+.cl-doc table td, .cl-post table td {border:1px solid #ccc;padding:0 5px;}
 
 /*article*/
 .cl-article .cl-card-body {position:relative;}
@@ -64,16 +75,6 @@ blockquote p {margin-bottom:0;}
 .cl-doc-menu div {cursor:pointer;}
 .cl-doc-menu a.active {font-weight:bold;}
 .cl-doc-body {padding:15px 20px;}
-.cl-doc h1 {font-weight:bold;font-size:1.5rem;margin-bottom:10px;}
-.cl-doc h2 {font-weight:bold;font-size:1.2rem;margin-bottom:10px;}
-.cl-doc h3 {font-weight:bold;font-size:1.1rem;margin-bottom:10px;}
-.cl-doc h4 {font-weight:bold;font-size:1rem;margin-bottom:10px;}
-.cl-doc pre {border-left:5px solid #1890ff;padding:10px;background-color:#f1f1f1;border-radius:3px;}
-.cl-doc code {font-size:1rem;margin:0 2px;}
-.cl-doc pre code {font-size:14px;margin:0;}
-.cl-doc table {width:100%;border-collapse:collapse;margin-bottom:20px;}
-.cl-doc table th {border:1px solid #ccc;padding:0 5px;font-weight:normal;}
-.cl-doc table td {border:1px solid #ccc;padding:0 5px;}
 
 /*api*/
 .cl-api-menu {position:sticky;top:85px;width:250px;height:80vh;overflow:hidden;}
@@ -84,6 +85,7 @@ blockquote p {margin-bottom:0;}
 
 /*post*/
 .cl-posts {min-height:500px;}
+.cl-posts .cl-card-head {padding:6.2px 20px;}
 .cl-posts .cl-card-body {padding:0;}
 .cl-posts .ant-input-search {width:200px;}
 
@@ -166,6 +168,7 @@ blockquote p {margin-bottom:0;}
 .cl-user-post-item .ant-tag {cursor:pointer;}
 
 @media screen and (max-width:768px) {
+    .topnav form {margin-bottom:16px !important;}
     .cl-container {padding-top:65px;}
     ul {padding-left:20px;}
     .cl-menu-bar {display:block;}

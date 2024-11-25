@@ -1,0 +1,26 @@
+﻿@inherits BaseComponent
+
+<div id="@_mdId">
+    <div id="toc">
+        <div>
+            <a class="item-title" href="@GetTopLink()" title="@Title">@Title</a>
+        </div>
+    </div>
+    <div class="post">
+        @if (!string.IsNullOrWhiteSpace(Content))
+        {
+            @((MarkupString)Content)
+        }
+    </div>
+</div>
+<script>
+    $(getTOC('@_mdId'));
+</script>
+
+@code {
+    Guid _mdId = Guid.NewGuid();
+    string GetTopLink() => Navigation.GetPageUrl().Split('#')[0] + '#' + _mdId;
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Content { get; set; }
+}

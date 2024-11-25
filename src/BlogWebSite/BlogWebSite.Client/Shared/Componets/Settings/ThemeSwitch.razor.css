@@ -1,0 +1,67 @@
+﻿.checkbox-wrapper input[type=checkbox] {
+    visibility: hidden;
+    display: none;
+}
+
+.checkbox-wrapper *,
+.checkbox-wrapper ::after,
+.checkbox-wrapper ::before {
+    box-sizing: border-box;
+}
+
+/* The switch - the box around the slider */
+.checkbox-wrapper .switch {
+    --color-dark: #30313699;
+    --color-light: #f4f4f599;
+    --width-of-switch: 111px;
+    --height-of-switch: 48px;
+    /* size of sliding icon -- sun and moon */
+    --size-of-icon: 38px;
+    /* it is like a inline-padding of switch */
+    --slider-offset: 8px;
+    position: relative;
+    width: var(--width-of-switch);
+    height: var(--height-of-switch);
+    display: block;
+}
+
+/* The slider */
+.checkbox-wrapper .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-light);
+    transition: 0.4s;
+    border-radius: 30px;
+    border-color: var(--color-dark);
+    border-width: 2px;
+    border-style: dashed;
+}
+
+    .checkbox-wrapper .slider:before {
+        position: absolute;
+        content: '';
+        height: var(--size-of-icon, 1.4em);
+        width: var(--size-of-icon, 1.4em);
+        border-radius: 20px;
+        left: var(--slider-offset, 0.3em);
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(40deg, #ff0080, #ff8c00 70%);
+        transition: 0.4s;
+    }
+
+.checkbox-wrapper input:checked + .slider {
+    background-color: var(--color-dark);
+    border-color: var(--color-light);
+}
+
+    .checkbox-wrapper input:checked + .slider:before {
+        left: calc(100% - (var(--size-of-icon, 1.4em) + var(--slider-offset, 0.3em)));
+        background: var(--color-dark);
+        /* change the value of second inset in box-shadow to change the angle and direction of the moon  */
+        box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb;
+    }

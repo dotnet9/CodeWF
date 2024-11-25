@@ -1,0 +1,30 @@
+﻿@inject IOptions<SiteOption> SiteOption
+@inject NavigationManager Navigation
+
+<PageTitle>@Title - @SiteOption.Value.AppTitle</PageTitle>
+
+<div class="container cl-container cl-post">
+    <div>
+        <CmsCard>
+            <HeadTemplate>
+                <WechatPublicLink />
+            </HeadTemplate>
+            <ChildContent>
+                <div class="title">@Title</div>
+                <UPostInfo Title="@Title" Content="@Content" />
+            </ChildContent>
+        </CmsCard>
+        <div style="height:20px;"></div>
+    </div>
+    <div>
+        <UWebSiteCount />
+        <div style="height: 20px;"></div>
+        <UPostRank />
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Content { get; set; }
+}

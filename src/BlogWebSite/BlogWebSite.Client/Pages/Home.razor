@@ -1,0 +1,82 @@
+﻿@page "/"
+@using BlogWebSite.Client.Layout.Componets
+@layout Layout.HomeLayout
+
+<PageTitle>Home</PageTitle>
+
+
+<MDivider Center="true">TODO: 仅复制了HTML</MDivider>
+
+<div class="jumbotron jumbotron-lg jumbotron-fluid mb-0 pb-3 bg-primary position-relative">
+    <div class="container text-white h-100">
+        <div class="d-lg-flex align-items-center justify-content-between text-center pl-lg-5">
+            <div class="col pt-4 pb-4">
+                <h2 class="display-4" style="font-weight:500;margin-bottom:2rem;">文章启智，工具助力</h2>
+                <h5 class="font-weight-light" style="margin-bottom:10px;"><strong>码界工坊</strong>：使用<strong>.NET 9 Web API</strong> + <strong>Blazor</strong>开发。</h5>
+                <h5 class="font-weight-light" style="margin-bottom:1.5rem;">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
+                <a href="/bbs" class="btn btn-lg btn-outline-white btn-round">博客</a>
+                <a href="https://github.com/dotnet9/codewf" class="btn btn-success btn-round shadow-sm" target="_blank">Github</a>
+            </div>
+            @* <div class="col align-self-bottom align-items-right text-right h-max-380 position-relative z-index-1"><img src="https://img1.dotnet9.com/site/banners/resource.png" class="rounded img-fluid"></div> *@
+        </div>
+    </div>
+</div>
+
+<svg style="-webkit-transform:rotate(-180deg);-moz-transform:rotate(-180deg);-o-transform:rotate(-180deg);transform:rotate(-180deg);margin-top:-1px;enable-background:new 0 0 1440 126;" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1440 126" xml:space="preserve"><path class="bg-primary" d="M685.6,38.8C418.7-11.1,170.2,9.9,0,30v96h1440V30C1252.7,52.2,1010,99.4,685.6,38.8z"></path></svg>
+
+
+<div class="container pt-5 pb-5 aos-init aos-animate" data-aos="fade-up">
+    <div class="row gap-y">
+        <div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fas fa-paper-plane"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2024/9/avalonia-open-source-control-library-highly-recommended-semi-avalonia" target="_blank">Avalonia开源控件库强力推荐-Semi.Avalonia</a></h5>
+                    <p class="text-muted">Semi.Avalonia是以MIT协议开源的Avalonia UI框架下的Semi Design主题风格实现，搭配Ursa.Avalonia自定义控件库，为开发者带来全新视觉与功能体验。</p>
+                </div>
+            </div>
+        </div><div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fas fa-shield-alt"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2024/7/good-news-breakthrough-in-net-9-aot-supports-old-win7-and-xp-environments" target="_blank">.NET 9 AOT的突破 - 支持老旧Win7与XP环境</a></h5>
+                    <p class="text-muted">.NET 9开始，AOT支持Win7和XP，不仅仅只支持SP1版本</p>
+                </div>
+            </div>
+        </div><div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fas fa-layer-group"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2024/1/each-version-of-the-operating-system-is-correct-dotnet-support" target="_blank">各版本操作系统对.NET支持情况</a></h5>
+                    <p class="text-muted">借助虚拟机和测试机，检测各版本操作系统对.NET的支持情况。安装操作系统后，实测安装相应运行时并能够运行星尘代理为通过。</p>
+                </div>
+            </div>
+        </div><div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fas fa-vector-square"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2024/1/its-confirmed-that-csharp-is-the-programming-language-for-2023" target="_blank">C#创历史成为2023年度编程语言</a></h5>
+                    <p class="text-muted">朋友圈看到桂素伟大佬发的消息截图，站长赶紧翻译向大家报喜，确定了-C#是2023年度的编程语言！</p>
+                </div>
+            </div>
+        </div><div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fab fa-amazon"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2023/9/Simulate-scenarios-using-third-party-dotNET-libraries-for-debugging-interception-decompilation-and-compatibility-solutions-for-multiple-versions-of-one-library" target="_blank">.NET反编译、第三方库调试（拦截、篡改、伪造）、一库多版本兼容</a></h5>
+                    <p class="text-muted">模拟.NET实际应用场景，综合应用三个主要知识点：一是使用dnSpy反编译第三库及调试，二是使用Lib.Harmony库实现第三库拦截、伪造，三是实现同一个库支持多版本同时引用。</p>
+                </div>
+            </div>
+        </div><div class="col-md-6 col-xl-4">
+            <div class="media">
+                <div class="iconbox iconmedium rounded-circle text-salmon mr-4"><i class="fab fa-slack-hash"></i></div>
+                <div class="media-body">
+                    <h5><a href="/bbs/post/2022/11/one-of-the-best-choices-for-dotnet-cross-platform-frameworks-avalonia-ui" target="_blank">.NET跨平台客户端框架 - Avalonia UI</a></h5>
+                    <p class="text-muted">这是一个基于WPF XAML的跨平台UI框架，并支持多种操作系统（Windows（.NET Core），Linux（GTK），MacOS，Android和iOS），Web（WebAssembly）</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pt-5 pb-5 links aos-init aos-animate" data-aos="fade-up"><span>友情链接: </span><span><a href="https://www.cnblogs.com/laozhang-is-phi/" target="_blank" title="博客园大佬，学习Vue + .NET CORE Web API的好地方">老张的哲学</a></span><span><a href="https://blog.lindexi.com/" target="_blank" title="WPF大佬">林德熙</a></span><span><a href="https://www.youzack.com/" target="_blank" title="YouZack-英语听力精听、背单词">YouZack</a></span><span><a href="https://edi.wang/" target="_blank" title="一个开源的博客网站">Edi Wang</a></span><span><a href="https://wtmdoc.walkingtec.cn/" target="_blank" title="WTM框架把常规编码结构化，重复编码自动化，它不仅是一个框架，它是强有力的生产力工具！">WTM</a></span><span><a href="https://nuget.token-ai.cn/" target="_blank" title="使用NuGet Next 更快创建 .NET 程序。">NuGet Next</a></span><span><a href="http://www.volcore.xyz/" target="_blank" title=".Net Core+Vue2/Vue3+Element plus+uniapp前后端分离，全自动生成PC与移动端代码；支持移动端(uniapp)ios/android/h5/微信小程序。http://www.volcore.xyz/">Vol开发框架</a></span><span><a href="https://www.okay123.top/" target="_blank" title="欢迎来到《可乐不加冰》的博客！这是一个专注于DotNet开发的博客，为您带来关于这门令人着迷的编程语言的最新资讯、技巧和实用指南。">可乐不加冰</a></span><span><a href="http://randyfield.cn/" target="_blank" title="专注于IT互联网，只有原创，没有转载，只有实践，才会成文。">加菲的博客</a></span><span><a href="https://www.blazor.zone/" target="_blank" title="Bootstrap 风格的 Blazor UI 组件库">Bootstrap Blazor</a></span><span><a href="http://furion.baiqian.ltd/" target="_blank" title="让 .NET 开发更简单，更通用，更流行。">Furion</a></span><span><a href="https://ldqk.xyz/" target="_blank" title="一个即有稀缺资源，又有.NET技术博文的网站">懒得勤快</a></span><span><a href="https://www.coderbusy.com/" target="_blank" title="一位.NET 开发者分享技术的站点。">码农很忙</a></span><span><a href="https://www.whuanle.cn/" target="_blank" title="面向云技术架构 - 痴者工良">痴者工良</a></span><span><a href="https://www.52abp.com/" target="_blank" title="52ABP框架官网">52ABP</a></span><span><a href="https://blog.csdn.net/kebi007" target="_blank" title="一个分享.NET技术的博主">dotnet全栈开发</a></span><span><a href="http://www.hzhcontrols.com/" target="_blank" title="一个基于.Net Framework4.0,扁平化的、漂亮的、开源的Winform控件库">HZHControls</a></span><span><a href="http://blog.deali.cn" target="_blank" title="一个技术探索与分享的平台，专注于互联网热门新技术探索与团队敏捷开发实践，包括Web前后端、移动端开发、机器学习、数据分析、算法、Linux等技术，欢迎探讨、分享学习实践经验。">程序设计实验室</a></span><span><a href="https://jhrs.com/" target="_blank" title="一个分享建站技术的网站，还有技术哦">江湖人士</a></span><span><a href="https://znlive.com/" target="_blank" title="英文技术网站">Code Life</a></span><span><a href="https://menglou.github.io/king-abpvnext-pro" target="_blank" title="一个神奇的开箱即用的中后台管理系统解决方案">King-AbpVnext-Pro</a></span></div>
