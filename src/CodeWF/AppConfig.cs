@@ -6,12 +6,9 @@ public static class AppConfig
 
     public static string AppName => "码界工坊";
 
-    public static void AddCodeWF(this IServiceCollection services, Action<CMSLiteOption> action = null)
+    public static void AddCodeWF(this IServiceCollection services)
     {
         Console.WriteLine(AppName);
-
-        var option = new CMSLiteOption();
-        action?.Invoke(option);
 
         services.AddKnown(info =>
         {
@@ -23,17 +20,6 @@ public static class AppConfig
             info.Assembly = typeof(AppConfig).Assembly;
         });
 
-
-        if (option.IsSite)
-        {
-            services.AddScoped<IUIService, UIService>();
-        }
-
         Config.AddModule(typeof(AppConfig).Assembly);
     }
-}
-
-public class CMSLiteOption
-{
-    public bool IsSite { get; set; } = true;
 }
