@@ -1,0 +1,20 @@
+name: 构建Thor镜像
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: 登录Docker Hub
+        run: docker login --username=沙漠之狐546477 registry.cn-hangzhou.aliyuncs.com -p ${{ secrets.DOCKER }} 
+      - name: 构建镜像
+        run:  docker build . --file src/WebSite/Dockerfile --tag registry.cn-hangzhou.aliyuncs.com/lequ_co/dotnet9:latest 
+      - name: 推送镜像
+        run:  docker push registry.cn-hangzhou.aliyuncs.com/lequ_co/dotnet9
