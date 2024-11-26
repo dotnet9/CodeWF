@@ -2,9 +2,9 @@ name: 构建镜像
 
 on:
   push:
-    branches: ["develop"]
+    branches: ["main"]
   pull_request:
-    branches: ["develop"]
+    branches: ["main"]
 
 jobs:
   build:
