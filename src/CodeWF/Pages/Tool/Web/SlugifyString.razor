@@ -59,8 +59,8 @@
             }
         }
     }
-    function copy(){
-
+    async function copy(){
+        await navigator.clipboard.writeText($("#slug").val());
     }
 </script>
 
