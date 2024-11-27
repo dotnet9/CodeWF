@@ -17,7 +17,7 @@
             </HeadTemplate>
             <ChildContent>
                 <div class="title">@model?.Title</div>
-                <UPostInfo Title="@model?.Title" Content="@model?.HtmlContent" />
+                <UPostInfo Title="@model?.Title" Markdown="@model?.Content" Content="@model?.HtmlContent" />
                 <div class="button">
                     <a href="@ConstantUtil.GetPostGithubPath(SiteOption.Value.RemoteAssetsRepository, model)" target="_blank">在Github上编辑此文或留言</a>
                 </div>

@@ -62,6 +62,20 @@ public class AIController
         return Results.Empty;
     }
 
+    [HttpPost]
+    public async Task<IResult> ArticleSummaryAsync([FromBody] ArticleSummaryRequest request)
+    {
+        const string skPrompt = """  
+                                {{$input}}  
+
+                                - {{$length}}字总结上面的文章内容，不要进行回复我，只需要提供总结后的内容
+                                """;
+        var content = _kernel.InvokePromptStreamingAsync(skPrompt,
+            new KernelArguments { ["input"] = request.Content, ["length"] = request.Length });
+        await WriteResponseAsync(content);
+        return Results.Empty;
+    }
+
     private async Task WriteResponseAsync(IAsyncEnumerable<StreamingKernelContent> content)
     {
         Response.Headers.ContentType = "text/event-stream";
