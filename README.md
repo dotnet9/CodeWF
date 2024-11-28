@@ -178,7 +178,7 @@ Finally, relevant links are attached for everyone to understand and communicate:
 
 ## OpenAPI
 
-https://localhost:5002/swagger/v1
+https://localhost:5002//scalar/v1
 
 ## Sponsorship
 
