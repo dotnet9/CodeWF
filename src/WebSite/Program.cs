@@ -21,6 +21,8 @@ builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"))
 builder.Services.AddSingleton<AppService>();
 builder.AddApplication();
 
+builder.Services.AddResponseCompression();
+
 
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddScoped<OpenAIHttpClientHandler>();
@@ -46,6 +48,8 @@ else
     app.MapScalarApiReference();
     app.MapOpenApi();
 }
+
+app.UseResponseCompression();
 
 app.UseHttpsRedirection();
 app.UseAntiforgery();
