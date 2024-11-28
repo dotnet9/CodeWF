@@ -23,11 +23,11 @@ builder.AddApplication();
 
 builder.Services.Configure<GzipCompressionProviderOptions>(options => 
 {
-    options.Level = CompressionLevel.Optimal;
+    options.Level = CompressionLevel.SmallestSize;
 });
 builder.Services.Configure<BrotliCompressionProviderOptions>(options => 
 {
-    options.Level = CompressionLevel.Optimal;
+    options.Level = CompressionLevel.SmallestSize;
 });
     
 builder.Services.AddResponseCompression();
