@@ -21,6 +21,15 @@ builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"))
 builder.Services.AddSingleton<AppService>();
 builder.AddApplication();
 
+builder.Services.Configure<GzipCompressionProviderOptions>(options => 
+{
+    options.Level = CompressionLevel.Optimal;
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(options => 
+{
+    options.Level = CompressionLevel.Optimal;
+});
+    
 builder.Services.AddResponseCompression();
 
 
