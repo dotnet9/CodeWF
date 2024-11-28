@@ -1,4 +1,6 @@
-﻿using CodeWF.Options;
+﻿using System.IO.Compression;
+using CodeWF.Options;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
 using Scalar.AspNetCore;
 using System.Text.Encodings.Web;
