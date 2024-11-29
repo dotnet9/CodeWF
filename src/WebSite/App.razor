@@ -2,49 +2,41 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="keywords" content="blazor,ant-design,razor,dotnet">
-    <meta name="description" content="码界工坊是使用.NET 9 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码界工坊—文章启智，工具助力" />
-    <base href="/" />
-    <HeadOutlet />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/fa.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/AntBlazor/css/web.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/Known/css/web.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/CodeWF/css/editormd.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("_content/CodeWF/css/web.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/main.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/aos.css")" />
-    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/app.css")" />
-    <link rel="stylesheet" href="@Assets["WebSite.styles.css"]" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <meta name="description" content="码界工坊是使用.NET 9 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码界工坊—文章启智，工具助力"/>
+    <base href="/"/>
+    <HeadOutlet/>
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/fa.css")"/>
+    <KStyleSheet/>
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/main.css")"/>
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/aos.css")"/>
+    <link rel="stylesheet" href="@Config.GetStaticFileUrl("css/app.css")"/>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link rel="manifest" href="manifest.json"/>
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png"/>
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png"/>
     <script src="@Config.GetStaticFileUrl("js/jquery.min.js")"></script>
     <script src="@Config.GetStaticFileUrl("_content/CodeWF/js/toc.js")"></script>
-    <script src="@Config.GetStaticFileUrl("js/settings.js")"></script>
 </head>
 
 <body>
-    <Routes />
-    <script src="@Config.GetStaticFileUrl("_content/AntBlazor/js/AntBlazor.js")"></script>
-    <script src="@Config.GetStaticFileUrl("_content/Known/libs/prism.js")"></script>
-    <script src="@Config.GetStaticFileUrl("_content/Known/libs/qrcode.js")"></script>
-    <script src="@Config.GetStaticFileUrl("_content/CodeWF/js/editormd.js")"></script>
-    <script src="@Config.GetStaticFileUrl("js/bootstrap.min.js")"></script>
-    <script src="@Config.GetStaticFileUrl("js/popper.min.js")"></script>
-    <script src="@Config.GetStaticFileUrl("js/aos.js")"></script>
-    <noscript>
-        <style>
+<Routes/>
+<KScript/>
+<script src="@Config.GetStaticFileUrl("js/bootstrap.min.js")"></script>
+<script src="@Config.GetStaticFileUrl("js/popper.min.js")"></script>
+<script src="@Config.GetStaticFileUrl("js/aos.js")"></script>
+<noscript>
+    <style>
             *[data-aos] {
                 display: block !important;
                 opacity: 1 !important;
                 visibility: visible !important;
             }
         </style>
-    </noscript>
-    <script>
+</noscript>
+<script>
         AOS.init({
             duration: 700,
             disable: function () {
@@ -53,20 +45,19 @@
             }
         });
     </script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+<script>navigator.serviceWorker.register('service-worker.js');</script>
 
-    <script>
-        var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b";
-            var s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
 
-        const settings = new Settings();
-    </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8748951917303002" crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8748951917303002" crossorigin="anonymous"></script>
 </body>
 
 </html>
