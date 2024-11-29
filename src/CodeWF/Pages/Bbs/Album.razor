@@ -1,6 +1,5 @@
-﻿@page "/bbs"
-@page "/bbs/cat"
-@page "/bbs/cat/{category}"
+﻿@page "/bbs/album"
+@page "/bbs/album/{Slug}"
 
 @inherits ListComponent<BlogPost>
 @inject IOptions<SiteOption> SiteOptions
@@ -10,7 +9,7 @@
 
 <UMenuBar Target="cl-bbs-menu"/>
 <div class="container cl-container cl-bbs">
-    <UCategory/>
+    <AlbumList/>
     <CmsCard Class="cl-posts">
         <HeadTemplate>
             <CmsTitle Icon="far fa-server" Title="博客列表"/>
@@ -43,15 +42,15 @@
 @code {
     private PageData<BlogPost>? _blogPosts;
 
-    [Parameter] public string? Category { get; set; }
+    [Parameter] public string? Slug { get; set; }
     [SupplyParameterFromQuery] public string? Key { get; set; }
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        if (string.IsNullOrWhiteSpace(Category))
+        if (string.IsNullOrWhiteSpace(Slug))
         {
-            Category = ConstantUtil.DefaultCategory;
+            Slug = ConstantUtil.DefaultCategory;
         }
 
         if (string.IsNullOrWhiteSpace(Key))
@@ -59,7 +58,7 @@
             Key = Context.Request.Get<string>("Key");
         }
 
-        _blogPosts = await AppService.GetPostByCategory(Page, ConstData.PageSize, Category, Key);
+        _blogPosts = await AppService.GetPostByAlbum(Page, ConstData.PageSize, Slug, Key);
     }
 
 }

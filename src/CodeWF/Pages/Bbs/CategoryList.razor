@@ -1,10 +1,10 @@
 ﻿@inherits BaseComponent
 @inject AppService AppService
 
-<CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="博客分类">
-    @if (categories != null && categories.Count > 0)
+<CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="博文分类">
+    @if (_categories is { Count: > 0 })
     {
-        foreach (var item in categories)
+        foreach (var item in _categories)
         {
             <a href="@ConstantUtil.GetBbsCategoryUrl(item.Slug)" class="@(IsActive(item.Slug)?"active":"")">
                 @* <i class="@item.Icon" /> *@
@@ -15,13 +15,13 @@
 </CmsCard>
 
 @code {
-    private List<CategoryItem> categories = [];
+    private List<CategoryItem> _categories = [];
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
         var lists = await AppService.GetAllCategoryItemsAsync();
-        categories = lists?.OrderBy(c => c.Sort).ToList();
+        _categories = lists?.OrderBy(c => c.Sort).ToList();
     }
 
 

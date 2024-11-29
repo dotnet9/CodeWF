@@ -19,7 +19,21 @@
                     <a class="nav-link" href="/tool">工具</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="/bbs" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">博客</a>
+                    <a class="nav-link dropdown-toggle" href="/bbs" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">专辑</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        @if (_albumItems?.Any() == true)
+                        {
+                            @foreach (var album in _albumItems)
+                            {
+                                <a class="dropdown-item" href="@ConstantUtil.GetBbsAlbumUrl(album.Slug)">
+                                    @album.Name
+                                </a>
+                            }
+                        }
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/bbs" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">分类</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         @if (_categoryItems?.Any() == true)
                         {
@@ -53,7 +67,7 @@
             </ul>
             <ul class="navbar-nav ml-auto d-flex align-items-center">
                 <li class="nav-item">
-                    <SearchBox />
+                    <SearchBox/>
                 </li>
             </ul>
         </div>
@@ -64,6 +78,7 @@
     private string NavClass => IsIndex ? "index-nav" : DarkNavClass;
     public const string DarkNavClass = "bg-white navbar-light shadow-sm scrollednav";
 
+    private List<AlbumItem>? _albumItems;
     private List<CategoryItem>? _categoryItems;
 
     [Parameter] public bool IsIndex { get; set; }
@@ -71,6 +86,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _albumItems = await AppService.GetAllAlbumItemsAsync();
         _categoryItems = await AppService.GetAllCategoryItemsAsync();
     }
 

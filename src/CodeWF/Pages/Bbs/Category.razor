@@ -1,0 +1,65 @@
+﻿@page "/bbs"
+@page "/bbs/cat"
+@page "/bbs/cat/{Slug}"
+
+@inherits ListComponent<BlogPost>
+@inject IOptions<SiteOption> SiteOptions
+@inject AppService AppService 
+
+<PageTitle>博文分类 - @SiteOptions.Value.AppTitle</PageTitle>
+
+<UMenuBar Target="cl-bbs-menu"/>
+<div class="container cl-container cl-bbs">
+    <CategoryList />
+    <CmsCard Class="cl-posts">
+        <HeadTemplate>
+            <CmsTitle Icon="far fa-server" Title="博文列表"/>
+        </HeadTemplate>
+        <ChildContent>
+            @if (!(_blogPosts?.Total > 0))
+            {
+                <AntEmpty/>
+            }
+            else
+            {
+                foreach (var post in _blogPosts.Data)
+                {
+                    <UPostItem Post="post"/>
+                }
+
+                <div style="padding:15px 0;text-align:center;">
+                    <AntPagination TotalCount="@_blogPosts.Total" PageSize="ConstData.PageSize" PageIndex="@Page" Key="@Key"/>
+                </div>
+            }
+        </ChildContent>
+    </CmsCard>
+    <div>
+        <UWebSiteCount/>
+        <div style="height:20px;"></div>
+        <UPostRank/>
+    </div>
+</div>
+
+@code {
+    private PageData<BlogPost>? _blogPosts;
+
+    [Parameter] public string? Slug { get; set; }
+    [SupplyParameterFromQuery] public string? Key { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        if (string.IsNullOrWhiteSpace(Slug))
+        {
+            Slug = ConstantUtil.DefaultCategory;
+        }
+
+        if (string.IsNullOrWhiteSpace(Key))
+        {
+            Key = Context.Request.Get<string>("Key");
+        }
+
+        _blogPosts = await AppService.GetPostByCategory(Page, ConstData.PageSize, Slug, Key);
+    }
+
+}

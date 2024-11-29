@@ -71,7 +71,7 @@ blockquote p {margin-bottom:0;}
 .cl-doc {display:grid;grid-template-columns:250px calc(100% - 270px);gap:20px;}
 .cl-doc .cl-card-body {position:relative;}
 .cl-doc .cl-card-body .count {position:absolute;top:10px;right:10px;color:#8a919f;}
-.cl-doc-menu {position:sticky;top:85px;width:250px;height:fit-content;}
+.cl-doc-menu {position:sticky;top:85px;width:250px;height:fit-content; font-size: 13px}
 .cl-doc-menu div {cursor:pointer;}
 .cl-doc-menu a.active {font-weight:bold;}
 .cl-doc-body {padding:15px 20px;}
@@ -120,7 +120,7 @@ blockquote p {margin-bottom:0;}
 .cl-bbs-menu {position:sticky;top:80px;height:fit-content;}
 .cl-bbs-menu .cl-card-body {display:flex;flex-direction:column;padding:10px;}
 .cl-bbs-menu i {width:16px;text-align:center;}
-.cl-bbs-menu a {width:160px;margin:5px 0;padding:5px 20px;color:#151414;}
+.cl-bbs-menu a {width:160px;margin:5px 0;color:#151414;font-size: 13px;}
 .cl-bbs-menu a:hover, .cl-bbs-menu a.active {background-color:#f1f1f1;color:#1890ff;border-radius:5px;text-decoration:none;}
 
 .cl-bbs-post-item {padding:0.8rem 1.1rem 0 1.1rem;}

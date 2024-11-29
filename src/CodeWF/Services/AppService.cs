@@ -6,6 +6,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 {
     private List<DocItem>? _docItems;
     private List<ToolItem>? _toolItems;
+    private List<AlbumItem>? _albumItems;
     private List<CategoryItem>? _categoryItems;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
@@ -18,6 +19,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
     public async Task SeedAsync()
     {
+        await GetAllAlbumItemsAsync();
         await GetAllCategoryItemsAsync();
         await GetAllBlogPostsAsync();
         await GetAllFriendLinkItemsAsync();
@@ -137,6 +139,30 @@ public class AppService(IOptions<SiteOption> siteOption)
         return default;
     }
 
+    public async Task<List<AlbumItem>?> GetAllAlbumItemsAsync()
+    {
+        if (_albumItems?.Any() == true)
+        {
+            return _albumItems;
+        }
+
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "album.json");
+        if (!File.Exists(filePath))
+        {
+            return _albumItems;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        fileContent.FromJson(out _albumItems, out var msg);
+        if (_albumItems == null)
+        {
+            _albumItems = new List<AlbumItem>();
+        }
+
+        _albumItems.Insert(0, new AlbumItem() { Slug = ConstantUtil.DefaultCategory, Name = "所有" });
+        return _albumItems;
+    }
+
     public async Task<List<CategoryItem>?> GetAllCategoryItemsAsync()
     {
         if (_categoryItems?.Any() == true)
@@ -189,6 +215,42 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
 
         return _blogPosts;
+    }
+
+    public async Task<PageData<BlogPost>?> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
+        string? key)
+    {
+        AlbumItem? album = null;
+        if (!string.Equals(ConstantUtil.DefaultCategory, albumSlug))
+        {
+            album = _albumItems?.FirstOrDefault(albumDto => albumDto.Slug == albumSlug);
+        }
+
+        IEnumerable<BlogPost>? posts;
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            posts = _blogPosts
+                ?.Where(p => p.Title?.Contains(key) == true
+                             || p.Description?.Contains(key) == true
+                             || p.Slug?.Contains(key) == true
+                             || p.Author?.Contains(key) == true
+                             || p.LastModifyUser?.Contains(key) == true
+                             || p.Content?.Contains(key) == true);
+        }
+        else
+        {
+            posts = _blogPosts
+                ?.Where(post => album == null || (post.Albums != null && post.Albums.Contains(album.Name) == true));
+        }
+
+        var total = posts.Count();
+
+        var postDatas = posts
+            .OrderBy(post => post.Date)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+        return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
     }
 
     public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
