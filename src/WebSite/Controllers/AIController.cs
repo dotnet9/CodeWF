@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using WebSite.Models;
 using WebSite.Options;
 using WebSite.ViewModels;
+#pragma warning disable SKEXP0010
 
 namespace WebSite.Controllers;
 
@@ -14,15 +14,13 @@ public class AIController
 {
     private readonly Kernel _kernel;
 
-    public AIController(IOptions<OpenAIOption> openAIOption, OpenAIHttpClientHandler httpClientHandler,
-        ILogger<AIController> logger)
+    public AIController(IOptions<OpenAIOption> openAIOption, ILogger<AIController> logger)
     {
-        httpClientHandler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
         var builder = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
                 modelId: openAIOption.Value.ChatModel!,
                 apiKey: openAIOption.Value.Key!,
-                httpClient: new HttpClient(httpClientHandler));
+                endpoint:new Uri(openAIOption.Value.Endpoint));
         _kernel = builder.Build();
     }
 

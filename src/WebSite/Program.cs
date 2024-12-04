@@ -1,11 +1,10 @@
-﻿using System.IO.Compression;
-using CodeWF.Options;
+﻿using CodeWF.Options;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
 using Scalar.AspNetCore;
+using System.IO.Compression;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using WebSite.Models;
 using WebSite.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +35,6 @@ builder.Services.AddResponseCompression();
 
 
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
-builder.Services.AddScoped<OpenAIHttpClientHandler>();
 
 builder.Services.AddOpenApi();
 var app = builder.Build();
