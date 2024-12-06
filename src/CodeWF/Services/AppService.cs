@@ -210,7 +210,10 @@ public class AppService(IOptions<SiteOption> siteOption)
             foreach (var postFile in postFiles)
             {
                 var blogPost = await ReadBlogPostAsync(postFile);
-                _blogPosts.Add(blogPost);
+                if (!blogPost.Draft)
+                {
+                    _blogPosts.Add(blogPost);
+                }
             }
         }
 
