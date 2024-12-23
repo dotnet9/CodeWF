@@ -10,10 +10,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-	    <PackageReference Include="Known.Core" Version="3.0.0" />
+	    <PackageReference Include="Known.Core" Version="3.0.1" />
 	    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
 	    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-	    <PackageReference Include="Scalar.AspNetCore" Version="1.2.59" />
+	    <PackageReference Include="Scalar.AspNetCore" Version="1.2.70" />
 	    <PackageReference Include="Microsoft.SemanticKernel" Version="1.32.0" />
         <ProjectReference Include="..\CodeWF\CodeWF.csproj" />
     </ItemGroup>

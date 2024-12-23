@@ -1,5 +1,4 @@
-﻿@using Known.Core.Extensions
-@inject UIContext Context
+﻿@using Known.Components
 
 <KContext Value="Context">
     <Router AppAssembly="typeof(Program).Assembly">
@@ -15,6 +14,7 @@
 </KContext>
 
 @code {
+    [Inject] private UIContext Context { get; set; }
     [CascadingParameter] private HttpContext HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
