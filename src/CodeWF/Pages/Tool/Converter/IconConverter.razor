@@ -1,0 +1,30 @@
+﻿@inject IOptions<SiteOption> SiteOptions
+
+<PageTitle>在线ICO转换器 - @SiteOptions.Value.AppTitle</PageTitle>
+
+<script src="@Config.GetStaticFileUrl("_content/CodeWF/css/iconconverter.css")"></script>
+
+<form id="icoGenerator">
+    <label for="fileInput">图片文件 (格式: png、jpg、jpeg、ico、webp)</label>
+    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.ico,.webp">
+    <label for="sizeSelect">目标尺寸</label>
+    <select id="sizeSelect">
+        <option value="16x16">16x16</option>
+        <option value="24x24">24x24</option>
+        <option value="32x32">32x32</option>
+        <option value="48x48">48x48</option>
+        <option value="64x64">64x64</option>
+        <option value="128x128">128x128</option>
+        <option value="256x256">256x256</option>
+    </select>
+    <button type="button" id="mergeButton">合并生成 ico 图标</button>
+    <button type="button" id="singleButton">单独生成 ico 图标</button>
+    <a id="downloadLink" href="#" download>下载转换后的文件</a>
+</form>
+
+<script src="@Config.GetStaticFileUrl("_content/CodeWF/js/iconconverter.js")"></script>
+
+@code
+{
+    public const string Slug = "ico";
+}

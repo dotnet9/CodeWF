@@ -1,7 +1,7 @@
 ﻿@page "/tool"
 @page "/tool/{slug}"
 
-@using System.Diagnostics.Eventing.Reader
+@using CodeWF.Pages.Tool.Converter
 @using CodeWF.Pages.Tool.Web
 @inherits BaseComponent
 @inject IOptions<SiteOption> SiteOptions
@@ -30,9 +30,14 @@
             }
             else
             {
-                @if (string.Equals(Slug, SlugifyString.Slug))
+                @if (string.Equals(Slug, SlugifyString.Slug, StringComparison.OrdinalIgnoreCase))
                 {
                     <SlugifyString/>
+                }
+
+                @if (string.Equals(Slug, IconConverter.Slug, StringComparison.OrdinalIgnoreCase))
+                {
+                    <IconConverter/>
                 }
             }
         </ChildContent>
