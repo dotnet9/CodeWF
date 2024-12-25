@@ -97,7 +97,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         foreach (var item in _docItems)
         {
-            if (item.Slug == slug)
+            if (!string.IsNullOrWhiteSpace(item.Slug) && item.Slug == slug)
             {
                 await ReadContentAsync(item);
                 return item;
@@ -112,7 +112,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             }
         }
 
-        var first = _docItems.FirstOrDefault();
+        var first = _docItems.FirstOrDefault()?.Children?.FirstOrDefault();
         await ReadContentAsync(first);
 
         return first;

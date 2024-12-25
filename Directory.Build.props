@@ -1,0 +1,13 @@
+<Project>
+	<PropertyGroup>
+		<Product>CodeWF</Product>
+		<Company>codewf.com</Company>
+		<Authors>沙漠尽头的狼</Authors>
+		<Copyright>Copyright © 2024 codewf.com. All rights reserved.</Copyright>
+		<Description>码界工坊是使用.NET 9 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码界工坊—文章启智，工具助力</Description>
+		<Version>0.0.1.0</Version>
+		<AssemblyVersion>0.0.1.0</AssemblyVersion>
+		<FileVersion>0.0.1.0</FileVersion>
+		<InformationalVersion>0.0.1.0</InformationalVersion>
+	</PropertyGroup>
+</Project>

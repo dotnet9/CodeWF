@@ -4,7 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
 	    <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Authors>KnownChen</Authors>
         <Description>AntBlazor是实现AntDesign的Blazor静态组件库。</Description>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
     </PropertyGroup>

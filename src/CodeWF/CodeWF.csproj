@@ -4,12 +4,11 @@
         <TargetFramework>net9.0</TargetFramework>
 	    <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Authors>沙漠尽头的狼</Authors>
         <Description>CodeWF是基于Known的内容管理系统前台和后台共用类库。</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CodeWF.Tools" Version="1.2.5.10" />
+        <PackageReference Include="CodeWF.Tools" Version="1.2.6.2" />
         <PackageReference Include="Markdig" Version="0.39.1" />
         <PackageReference Include="Known" Version="3.0.7" />
         <ProjectReference Include="..\AntBlazor\AntBlazor.csproj" />
