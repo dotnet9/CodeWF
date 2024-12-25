@@ -10,23 +10,23 @@ public class ImageController : ControllerBase
     private const int MaxSize = 10 * 1024 * 1024;
 
     [HttpPost]
-    public async Task<IActionResult> MergeGenerateIconAsync(IFormFile sourceImage, uint[] sizes,
+    public async Task<IActionResult> MergeGenerateIconAsync(IFormFile sourceImage, uint[]? sizes,
         [FromServices] IWebHostEnvironment env)
     {
         return await ProcessIconAsync(sourceImage, sizes, env, ImageHelper.MergeGenerateIcon);
     }
 
     [HttpPost]
-    public async Task<IActionResult> SeparateGenerateIcon(IFormFile sourceImage, uint[] sizes,
+    public async Task<IActionResult> SeparateGenerateIcon(IFormFile sourceImage, uint[]? sizes,
         [FromServices] IWebHostEnvironment env)
     {
         return await ProcessIconAsync(sourceImage, sizes, env, ImageHelper.SeparateGenerateIcon);
     }
 
-    private async Task<IActionResult> ProcessIconAsync(IFormFile sourceImage, uint[] sizes,
+    private async Task<IActionResult> ProcessIconAsync(IFormFile sourceImage, uint[]? sizes,
         IWebHostEnvironment env, Func<string, string, uint[], Task> iconGenerator)
     {
-        if (sizes == null || sizes.Length <= 0)
+        if (sizes is not { Length: > 0 })
         {
             return BadRequest(new { Code = 1001, Msg = "未提供转换尺寸" });
         }
