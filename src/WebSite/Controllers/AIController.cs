@@ -52,7 +52,7 @@ public class AIController
         const string skPrompt = """  
                                 {{$input}}  
 
-                                - 将上面的输入内容转换翻译成英文Url Slug，不要进行回复我，只需要提供转换后的内容
+                                - 将上面的输入内容转换翻译成英文Url Slug，英文全小写，单词之间用'-'连接，不要使用'_'，不要进行回复我，只需要提供转换后的内容
                                 """;
         var content = _kernel.InvokePromptStreamingAsync(skPrompt,
             new KernelArguments { ["input"] = request.Content });

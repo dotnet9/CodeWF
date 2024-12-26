@@ -1,4 +1,6 @@
 ﻿using CodeWF.Options;
+using CodeWF.Tools.FileExtensions;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
 using Scalar.AspNetCore;
@@ -21,6 +23,7 @@ builder.Services.AddRazorComponents()
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 builder.Services.AddSingleton<AppService>();
 builder.AddApplication();
+builder.Services.AddSingleton<ISevenZipCompressor, SevenZipCompressor>();
 
 builder.Services.Configure<GzipCompressionProviderOptions>(options => 
 {
@@ -32,6 +35,7 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 });
     
 builder.Services.AddResponseCompression();
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
 
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));

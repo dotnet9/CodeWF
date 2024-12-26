@@ -10,6 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+	    <PackageReference Include="FluentValidation" Version="11.11.0" />
+	    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
 	    <PackageReference Include="Known.Core" Version="3.0.1" />
 	    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
 	    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
