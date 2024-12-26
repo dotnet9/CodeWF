@@ -8,6 +8,7 @@ namespace WebSite.Controllers;
 public class ImageController : ControllerBase
 {
     private const int MaxSize = 10 * 1024 * 1024;
+    private const string IconFolder = "UploadIcons";
 
     [HttpPost]
     public async Task<IActionResult> MergeGenerateIconAsync(IFormFile sourceImage, uint[]? sizes,

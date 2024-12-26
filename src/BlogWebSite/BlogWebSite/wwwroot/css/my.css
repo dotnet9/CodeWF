@@ -1,5 +1,0 @@
-﻿@charset "utf-8";
-
-[aria-expanded] .m-icon.rotate-Icon {
-    transform: rotate(calc(var(--rotate-angle) * 1deg));
-}
