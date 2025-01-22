@@ -3,15 +3,16 @@
 @inherits BaseComponent
 @inject AppService AppService
 
-<CommonMarkdown Title="关于" Content="@_html"/>
+<CommonMarkdown Title="关于" Markdown="@_markdown" HtmlContent="@_html" />
 
 @code
 {
+    private string? _markdown;
     private string? _html;
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        _html = await AppService.ReadAboutAsync();
+        (_markdown, _html) = await AppService.ReadAboutAsync();
     }
 }

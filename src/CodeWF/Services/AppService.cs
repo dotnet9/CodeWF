@@ -12,8 +12,10 @@ public class AppService(IOptions<SiteOption> siteOption)
     private List<FriendLinkItem>? _friendLinkItems;
     private List<TimeLineItem>? _TimeLineItems;
     private Dictionary<string, string>? _webSiteCountInfos;
-    private string? _donationContent;
-    private string? _aboutContent;
+    private string? _donationMarkdown;
+    private string? _donationHtmlContent;
+    private string? _aboutMarkdown;
+    private string? _aboutHtmlContent;
     private string? _rss;
     private string? _siteMap;
 
@@ -320,40 +322,40 @@ public class AppService(IOptions<SiteOption> siteOption)
         return _webSiteCountInfos;
     }
 
-    public async Task<string?> ReadAboutAsync()
+    public async Task<(string? Markdown, string? HtmlContent)> ReadAboutAsync()
     {
-        if (!string.IsNullOrWhiteSpace(_aboutContent))
+        if (!string.IsNullOrWhiteSpace(_aboutMarkdown))
         {
-            return _aboutContent;
+            return (_aboutMarkdown, _aboutHtmlContent);
         }
 
         var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "about.md");
         if (!File.Exists(filePath))
         {
-            return "## 关于";
+            return ("## 关于", "关于");
         }
 
-        var content = await File.ReadAllTextAsync(filePath);
-        _aboutContent = content.ToHtml();
-        return _aboutContent;
+        _aboutMarkdown = await File.ReadAllTextAsync(filePath);
+        _aboutHtmlContent = _aboutMarkdown.ToHtml();
+        return (_aboutMarkdown, _aboutHtmlContent);
     }
 
-    public async Task<string?> ReadDonationAsync()
+    public async Task<(string? Markdown, string? HtmlContent)> ReadDonationAsync()
     {
-        if (!string.IsNullOrWhiteSpace(_donationContent))
+        if (!string.IsNullOrWhiteSpace(_donationMarkdown))
         {
-            return _donationContent;
+            return (_donationMarkdown, _donationHtmlContent);
         }
 
         var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "pays", "Donation.md");
         if (!File.Exists(filePath))
         {
-            return "## 赞助";
+            return ("## 赞助", "赞助");
         }
 
-        var content = await File.ReadAllTextAsync(filePath);
-        _donationContent = content.ToHtml();
-        return _donationContent;
+        _donationMarkdown = await File.ReadAllTextAsync(filePath);
+        _donationHtmlContent = _donationMarkdown.ToHtml();
+        return (_donationMarkdown, _donationHtmlContent);
     }
 
     public async Task<BlogPost?> GetPostBySlug(string slug)

@@ -11,7 +11,7 @@
             </HeadTemplate>
             <ChildContent>
                 <div class="title">@Title</div>
-                <UPostInfo Title="@Title" Content="@Content" />
+                <UPostInfo Title="@Title" Markdown="@Markdown" Content="@HtmlContent" />
             </ChildContent>
         </CmsCard>
         <div style="height:20px;"></div>
@@ -26,5 +26,6 @@
 @code
 {
     [Parameter] public string Title { get; set; }
-    [Parameter] public string Content { get; set; }
+    [Parameter] public string Markdown { get; set; }
+    [Parameter] public string HtmlContent { get; set; }
 }
