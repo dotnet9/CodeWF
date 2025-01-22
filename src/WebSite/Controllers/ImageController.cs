@@ -1,17 +1,19 @@
 ﻿using CodeWF.Tools;
 using CodeWF.Tools.FileExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebSite.ViewModels;
 
 namespace WebSite.Controllers;
 
-[Route("[controller]/[action]")]
 [ApiController]
+[Route("[controller]/[action]")]
 public class ImageController : ControllerBase
 {
     private const string IconFolder = "UploadIcons";
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> MergeGenerateIconAsync([FromForm] ConvertIconRequest request,
         [FromServices] IWebHostEnvironment env)
     {
@@ -22,6 +24,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> SeparateGenerateIcon([FromForm] ConvertIconRequest request,
         [FromServices] IWebHostEnvironment env, [FromServices] ISevenZipCompressor sevenZipCompressor)
     {

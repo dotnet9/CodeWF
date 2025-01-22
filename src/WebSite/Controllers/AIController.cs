@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using WebSite.Options;
@@ -25,6 +26,7 @@ public class AIController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IResult> AskBotAsync([FromBody] AskBotRequest request)
     {
         var content = _kernel.InvokePromptStreamingAsync(request.Content);
@@ -33,6 +35,7 @@ public class AIController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IResult> PolyTranslateAsync([FromBody] PolyTranslateRequest request)
     {
         const string skPrompt = """  
@@ -47,6 +50,7 @@ public class AIController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IResult> Title2SlugAsync([FromBody] Title2SlugRequest request)
     {
         const string skPrompt = """  
@@ -61,6 +65,7 @@ public class AIController
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IResult> ArticleSummaryAsync([FromBody] ArticleSummaryRequest request)
     {
         const string skPrompt = """  

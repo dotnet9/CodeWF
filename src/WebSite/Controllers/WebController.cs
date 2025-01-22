@@ -1,15 +1,18 @@
 ﻿using CodeWF.Options;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net.Mime;
 
 namespace WebSite.Controllers;
 
+[ApiController]
 public class WebController(IOptions<SiteOption> siteOption, AppService appService) : ControllerBase
 {
     const string ContentType = "application/xml";
 
     [Route("/rss")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetRssAsync()
     {
         var rss = await appService.GetRssAsync();
@@ -18,6 +21,7 @@ public class WebController(IOptions<SiteOption> siteOption, AppService appServic
     }
 
     [Route("/sitemap.xml")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetSiteMapAsync()
     {
         const string cacheKey = "sitemap.xml";
