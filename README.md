@@ -6,7 +6,7 @@
 
 ## Introduction
 
-The Code Workshop is a website developed using .NET 9 Blazor. It features technical articles, introductions to open-source projects, and the use of online tools: Code Workshop - Enlightening with Articles, Empowering with Tools.
+The Code Workshop is a website developed using .NET 10 Blazor. It features technical articles, introductions to open-source projects, and the use of online tools: Code Workshop - Enlightening with Articles, Empowering with Tools.
 
 During the development journey of this blog website, the website owner has overcome numerous obstacles. From the initial conception to the actual implementation, various development technologies have been explored, including [MVC]([ASP.NET Core MVC Overview | Microsoft Learn](https://learn.microsoft.com/en-us/aspnet/core/mvc/overview?view=aspnetcore-9.0)), [Razor Pages]([Introduction to Razor Pages in ASP.NET Core | Microsoft Learn](https://learn.microsoft.com/en-us/aspnet/core/razor-pages/?view=aspnetcore-9.0&tabs=visual-studio)), [Vue]([Vue.js - The Progressive JavaScript Framework | Vue.js (vuejs.org)](https://vuejs.org/)), [Go]([The Go Programming Language (google.com)](https://golang.google.com/)), [Blazor]([ASP.NET Core Blazor | Microsoft Learn](https://learn.microsoft.com/en-us/aspnet/core/blazor/?view=aspnetcore-9.0)) and so on. Throughout this long process, the website has undergone nearly 10 version upgrades, with each version embodying the owner's painstaking efforts and exploration. The details of this challenging journey are thoroughly documented in [Sharing Some Materials I Accumulated When Developing the Dotnet9 Blog Website - Code Workshop](https://dotnet9.com/bbs/post/2022/3/Share-some-learning-materials-I-accumulated-when-I-was-a-blog-website).
 
@@ -28,7 +28,7 @@ The source code of this website is also open-source:
 
 - Repository: https://github.com/dotnet9/CodeWF
 
-> The Code Workshop is a website developed using.NET 9 Blazor. It features technical articles, introductions to open-source projects, and the use of online tools: Code Workshop - Enlightening with Articles, Empowering with Tools.
+> The Code Workshop is a website developed using.NET 10 Blazor. It features technical articles, introductions to open-source projects, and the use of online tools: Code Workshop - Enlightening with Articles, Empowering with Tools.
 
 ## Website Technology
 
@@ -94,7 +94,7 @@ The effect is as follows:
 
 - Website URL: https://dotnet9.com
 
-Like most websites, it first displays the website slogan **"Code Workshop: Developed using.NET 9 Web API + Blazor. Features technical articles, introductions to open-source projects, and online tools to facilitate efficient programming."**, then showcases featured article blocks, and later (currently under development) will add featured tool blocks, followed by friendly links, footer, etc.:
+Like most websites, it first displays the website slogan **"Code Workshop: Developed using.NET 10 Web API + Blazor. Features technical articles, introductions to open-source projects, and online tools to facilitate efficient programming."**, then showcases featured article blocks, and later (currently under development) will add featured tool blocks, followed by friendly links, footer, etc.:
 
 ![](https://img1.dotnet9.com/2024/11/0202.gif)
 

@@ -6,7 +6,7 @@
 
 ## 介绍
 
-码界工坊是使用.NET 9 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码界工坊—文章启智，工具助力
+码界工坊是使用.NET 10 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码界工坊—文章启智，工具助力
 
 在博客网站的开发征程中，站长可谓是一路披荆斩棘。从最初的构思到实践，先后涉足了多种开发技术，包括 [MVC]([ASP.NET Core MVC 概述 | Microsoft Learn](https://learn.microsoft.com/zh-cn/aspnet/core/mvc/overview?view=aspnetcore-9.0))、[Razor Pages]([ASP.NET Core 中的 Razor Pages 介绍 | Microsoft Learn](https://learn.microsoft.com/zh-cn/aspnet/core/razor-pages/?view=aspnetcore-9.0&tabs=visual-studio))、[Vue]([Vue.js - 渐进式 JavaScript 框架 | Vue.js (vuejs.org)](https://cn.vuejs.org/))、[Go]([The Go Programming Language (google.cn)](https://golang.google.cn/))、[Blazor]([ASP.NET Core Blazor | Microsoft Learn](https://learn.microsoft.com/zh-cn/aspnet/core/blazor/?view=aspnetcore-9.0)) 等。在这漫长的过程中，网站版本更迭近 10 次，每一个版本都凝聚着站长的心血与探索，这段充满挑战的历程详细记录于 [分享我做Dotnet9博客网站时积累的一些资料 - 码界工坊](https://dotnet9.com/bbs/post/2022/3/Share-some-learning-materials-I-accumulated-when-I-was-a-blog-website)。
 
@@ -28,7 +28,7 @@
 
 - 仓库：https://github.com/dotnet9/CodeWF
 
-> 码界工坊是使用.NET 9 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用: 码界工坊—文章启智，工具助力
+> 码界工坊是使用.NET 10 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用: 码界工坊—文章启智，工具助力
 
 ## 网站技术
 
@@ -103,7 +103,7 @@
 
 - 网址：https://dotnet9.com
 
-和大多数网站一样，先展示网站宣传语 **”码界工坊：使用.NET 9 Web API + Blazor开发。有技术文章、开源项目介绍和在线工具，助力高效编程。“**，然后展示特色文章块，后面会加上特色工具块（正在开发中），最后是友情链接、页尾等：
+和大多数网站一样，先展示网站宣传语 **”码界工坊：使用.NET 10 Web API + Blazor开发。有技术文章、开源项目介绍和在线工具，助力高效编程。“**，然后展示特色文章块，后面会加上特色工具块（正在开发中），最后是友情链接、页尾等：
 
 ![](https://img1.dotnet9.com/2024/11/0202.gif)
 
