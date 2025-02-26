@@ -20,12 +20,18 @@
         @if (Model?.Copyright == CopyRights.Original)
         {
             <p>原文标题：<a href="@ConstantUtil.GetBbsPostUrl(Model)" target="_blank">@Model.Title</a></p>
-            <p>原文链接：<a href="@ConstantUtil.GetBbsPostUrl(Model)" target="_blank">@SiteOption.Value.Domain@ConstantUtil.GetBbsPostUrl(Model)</a></p>
+            @if (ConstantUtil.GetBbsPostUrl(Model).IsNullOrEmpty() != true)
+            {
+                <p>原文链接：<a href="@ConstantUtil.GetBbsPostUrl(Model)" target="_blank">@SiteOption.Value.Domain@ConstantUtil.GetBbsPostUrl(Model)</a></p>
+            }
         }
         else
         {
             <p>原文标题：<a href="@Model?.OriginalLink" target="_blank">@(Model?.OriginalTitle ?? Model?.Title)</a></p>
-            <p>原文链接：<a href="@Model?.OriginalLink" target="_blank">@Model?.OriginalLink</a></p>
+            @if (@Model?.OriginalLink.IsNullOrEmpty() != true)
+            {
+                <p>原文链接：<a href="@Model?.OriginalLink" target="_blank">@Model?.OriginalLink</a></p>
+            }
         }
     </div>
 </div>

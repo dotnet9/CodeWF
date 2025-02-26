@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFrameworks>net10.0</TargetFrameworks>
 	    <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Description>AntBlazor是实现AntDesign的Blazor静态组件库。</Description>
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0-preview.1.25120.3" />
     </ItemGroup>
 
 </Project>

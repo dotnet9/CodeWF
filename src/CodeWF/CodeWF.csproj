@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFrameworks>net10.0</TargetFrameworks>
 	    <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Description>CodeWF是基于Known的内容管理系统前台和后台共用类库。</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CodeWF.Tools" Version="1.3.1.2" />
+        <PackageReference Include="CodeWF.Tools" Version="1.3.5" />
         <PackageReference Include="Markdig" Version="0.40.0" />
-        <PackageReference Include="Known" Version="3.1.2" />
+        <PackageReference Include="Known" Version="3.1.7" />
         <ProjectReference Include="..\AntBlazor\AntBlazor.csproj" />
     </ItemGroup>
 
