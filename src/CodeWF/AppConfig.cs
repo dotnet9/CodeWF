@@ -6,7 +6,7 @@ public static class AppConfig
 {
     public static string AppId => "CodeWF";
 
-    public static string AppName => "码界工坊";
+    public static string AppName => "码坊";
 
     public static void AddCodeWF(this IServiceCollection services)
     {
