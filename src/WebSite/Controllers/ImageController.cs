@@ -7,48 +7,90 @@ using WebSite.ViewModels;
 namespace WebSite.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[Route("api/[controller]")]
 public class ImageController : ControllerBase
 {
     private const string IconFolder = "UploadIcons";
 
-    [HttpPost]
+    [HttpPost("merge")]
     [AllowAnonymous]
-    public async Task<IActionResult> MergeGenerateIconAsync([FromForm] ConvertIconRequest request,
+    public async Task<IActionResult> MergeGenerateIconAsync([FromForm] IFormFile sourceImage, [FromForm] string sizes,
         [FromServices] IWebHostEnvironment env)
     {
-        var fullPath = await SaveFileAsync(request, env);
-        var icoFullPath = Path.ChangeExtension(fullPath, ".ico");
-        await ImageHelper.MergeGenerateIcon(fullPath, icoFullPath, request.ConvertSizes);
-        return Ok(new { Data = icoFullPath, Code = 2001, Msg = "转换成功" });
+        try
+        {
+            // 解析尺寸
+            var convertSizes = sizes.Split(',').Select(uint.Parse).ToArray();
+
+            // 保存上传的文件
+            var fullPath = await SaveFileAsync(sourceImage, env);
+            var fileName = $"{Guid.NewGuid():N}.ico";
+            var icoFullPath = Path.Combine(env.WebRootPath, IconFolder, fileName);
+
+            // 确保目录存在
+            Directory.CreateDirectory(Path.Combine(env.WebRootPath, IconFolder));
+
+            // 生成图标
+            await ImageHelper.MergeGenerateIcon(fullPath, icoFullPath, convertSizes);
+
+            // 返回可访问的URL
+            var iconUrl = $"/{IconFolder}/{fileName}";
+            return Ok(new { success = true, url = iconUrl });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
     }
 
-    [HttpPost]
+    [HttpPost("separate")]
     [AllowAnonymous]
-    public async Task<IActionResult> SeparateGenerateIcon([FromForm] ConvertIconRequest request,
-        [FromServices] IWebHostEnvironment env, [FromServices] ISevenZipCompressor sevenZipCompressor)
+    public async Task<IActionResult> SeparateGenerateIconAsync([FromForm] IFormFile sourceImage,
+        [FromForm] string sizes, [FromServices] IWebHostEnvironment env,
+        [FromServices] ISevenZipCompressor sevenZipCompressor)
     {
-        var fullPath = await SaveFileAsync(request, env);
-        var iconFolderName = Guid.NewGuid().ToString("N");
-        var iconFolderPath = Path.Combine(env.ContentRootPath, IconFolder, iconFolderName);
-        var iconZipPath = $"{iconFolderPath}.7z";
-        await ImageHelper.MergeGenerateIcon(fullPath, iconFolderPath, request.ConvertSizes);
-        sevenZipCompressor.Zip(iconFolderPath, iconZipPath);
-        return Ok(new { Data = iconZipPath, Code = 2001, Msg = "转换成功" });
+        try
+        {
+            var convertSizes = sizes.Split(',').Select(uint.Parse).ToArray();
+
+            // 创建临时文件夹存放分离的图标
+            var folderName = $"icons_{Guid.NewGuid():N}";
+            var iconFolderPath = Path.Combine(env.WebRootPath, IconFolder, folderName);
+            Directory.CreateDirectory(iconFolderPath);
+
+            // 保存上传的文件并生成图标
+            var sourceFilePath = await SaveFileAsync(sourceImage, env);
+            await ImageHelper.SeparateGenerateIcon(sourceFilePath, iconFolderPath, convertSizes);
+
+            // 创建压缩文件
+            var zipFileName = $"{folderName}.zip";
+            var zipFilePath = Path.Combine(env.WebRootPath, IconFolder, zipFileName);
+
+            // 压缩文件夹
+            await Task.Run(() => sevenZipCompressor.Zip(iconFolderPath, zipFilePath));
+
+            // 清理临时文件夹
+            Directory.Delete(iconFolderPath, true);
+
+            // 返回zip文件的URL
+            var zipUrl = $"/{IconFolder}/{zipFileName}";
+            return Ok(new { success = true, url = zipUrl });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
     }
 
-    private async Task<string> SaveFileAsync(ConvertIconRequest request, IWebHostEnvironment env)
+    private async Task<string> SaveFileAsync(IFormFile file, IWebHostEnvironment env)
     {
         var saveFileName = Guid.NewGuid().ToString("N");
-        var saveFolder = Path.Combine(env.ContentRootPath, IconFolder);
-        if (!Directory.Exists(saveFolder))
-        {
-            Directory.CreateDirectory(saveFolder);
-        }
+        var saveFolder = Path.Combine(env.WebRootPath, IconFolder);
+        Directory.CreateDirectory(saveFolder);
+
         var saveFullPath = Path.Combine(saveFolder, saveFileName);
-        await using FileStream fs = new FileStream(saveFullPath, FileMode.Create);
-        await request.SourceImage.CopyToAsync(fs);
-        fs.Flush();
+        await using var fs = new FileStream(saveFullPath, FileMode.Create);
+        await file.CopyToAsync(fs);
         return saveFullPath;
     }
 }

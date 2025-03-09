@@ -408,3 +408,4 @@ src/Build/
 src/CodeWF.WebAPI/CodeWF.db
 src/CodeWF.WebAPI/CodeWF.db-shm
 src/CodeWF.WebAPI/CodeWF.db-wal
+src/WebSite/wwwroot/UploadIcons/

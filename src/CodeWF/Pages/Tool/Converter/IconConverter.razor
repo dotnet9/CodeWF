@@ -1,30 +1,217 @@
-﻿@inject IOptions<SiteOption> SiteOptions
+﻿@using Microsoft.JSInterop
+@inject IOptions<SiteOption> SiteOptions
+@inject IJSRuntime JS
 
 <PageTitle>在线ICO转换器 - @SiteOptions.Value.AppTitle</PageTitle>
 
-<script src="@Config.GetStaticFileUrl("_content/CodeWF/css/iconconverter.css")"></script>
+<style>
+    .converter-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+    }
 
-<form id="icoGenerator">
-    <label for="fileInput">图片文件 (格式: png、jpg、jpeg、ico、webp)</label>
-    <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.ico,.webp">
-    <label for="sizeSelect">目标尺寸</label>
-    <select id="sizeSelect">
-        <option value="16x16">16x16</option>
-        <option value="24x24">24x24</option>
-        <option value="32x32">32x32</option>
-        <option value="48x48">48x48</option>
-        <option value="64x64">64x64</option>
-        <option value="128x128">128x128</option>
-        <option value="256x256">256x256</option>
-    </select>
-    <button type="button" id="mergeButton">合并生成 ico 图标</button>
-    <button type="button" id="singleButton">单独生成 ico 图标</button>
-    <a id="downloadLink" href="#" download>下载转换后的文件</a>
-</form>
+    .input-group {
+        margin-bottom: 1rem;
+    }
 
-<script src="@Config.GetStaticFileUrl("_content/CodeWF/js/iconconverter.js")"></script>
+    .size-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
 
-@code
-{
+    .size-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .button-group {
+        margin: 1.5rem 0;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .memo {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .code-block {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        font-family: Consolas, monospace;
+        margin: 1rem 0;
+    }
+
+    #result {
+        margin-top: 1rem;
+    }
+
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="converter-container">
+    <div class="converter-form">
+        <div class="input-group">
+            <label for="fileInput">选择源图片文件</label>
+            <input type="file" id="fileInput" class="form-control" accept=".png,.jpg,.jpeg,.webp" />
+            <small class="text-muted">支持的格式: PNG、JPG、JPEG、WEBP</small>
+        </div>
+
+        <div class="form-group mt-3">
+            <label>选择图标尺寸</label>
+            <div class="size-options">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="16" checked> 16x16
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="32" checked> 32x32
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="48"> 48x48
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="64"> 64x64
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="128"> 128x128
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="256"> 256x256
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group mt-3">
+            <button id="mergeButton" class="btn btn-primary me-2">合并生成ICO</button>
+            <button id="separateButton" class="btn btn-secondary">分别生成ICO</button>
+        </div>
+
+        <div id="result" style="display:none" class="mt-3">
+            <a id="downloadLink" class="btn btn-success" target="_blank">下载文件</a>
+        </div>
+    </div>
+
+    <div class="memo">
+        <h4>使用说明</h4>
+        <p>1. ICO图标文件可以包含多个不同尺寸的图像，建议至少包含16x16和32x32两种尺寸。</p>
+        <p>2. 网站图标引用代码示例：</p>
+        <div class="code-block">
+            <code>&lt;link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /&gt;</code>
+        </div>
+    </div>
+</div>
+
+@code {
     public const string Slug = "ico";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initIconConverter");
+        }
+    }
+
 }
+
+<script>
+    $(document).ready(function () {
+        function validateInput() {
+            const $fileInput = $('#fileInput');
+            if (!$fileInput[0].files || !$fileInput[0].files.length) {
+                alert('请选择图片文件');
+                return false;
+            }
+
+            const sizes = $('input[type="checkbox"]:checked')
+                .map(function () { return $(this).val(); })
+                .get();
+
+            if (sizes.length === 0) {
+                alert('请至少选择一个图标尺寸');
+                return false;
+            }
+
+            return {
+                file: $fileInput[0].files[0],
+                sizes: sizes
+            };
+        }
+
+        async function convertIcon(isMerge) {
+            const validation = validateInput();
+            if (!validation) return;
+
+            const $button = isMerge ? $('#mergeButton') : $('#separateButton');
+            const $result = $('#result');
+            const $downloadLink = $('#downloadLink');
+
+            const formData = new FormData();
+            formData.append('sourceImage', validation.file);
+            formData.append('sizes', validation.sizes.join(','));
+
+            $button.prop('disabled', true)
+                .text(isMerge ? '合并生成中...' : '分别生成中...');
+
+            try {
+                const response = await $.ajax({
+                    url: `/api/Image/${isMerge ? 'merge' : 'separate'}`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                });
+
+                if (response.success) {
+                    $downloadLink
+                        .attr('href', response.url)
+                        .text(`下载${isMerge ? 'ICO文件' : 'ZIP压缩包'}`);
+                    $result.fadeIn();
+                } else {
+                    alert('生成失败：' + response.message);
+                }
+            } catch (error) {
+                console.error('错误:', error);
+                alert('生成过程出错，请稍后重试');
+            } finally {
+                $button.prop('disabled', false)
+                    .text(isMerge ? '合并生成ICO' : '分别生成ICO');
+            }
+        }
+
+        // 绑定按钮事件
+        $('#mergeButton').click(() => convertIcon(true));
+        $('#separateButton').click(() => convertIcon(false));
+    });
+</script>
