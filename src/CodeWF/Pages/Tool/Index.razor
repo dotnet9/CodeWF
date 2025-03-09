@@ -39,6 +39,10 @@
                 {
                     <IconConverter/>
                 }
+                @if (string.Equals(Slug, Timestamp.Slug, StringComparison.OrdinalIgnoreCase))
+                {
+                    <Timestamp />
+                }
             }
         </ChildContent>
     </CmsCard>
