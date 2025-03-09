@@ -1,6 +1,4 @@
-﻿@using Microsoft.JSInterop
-@inject IOptions<SiteOption> SiteOptions
-@inject IJSRuntime JS
+﻿@inject IOptions<SiteOption> SiteOptions
 
 <PageTitle>在线ICO转换器 - @SiteOptions.Value.AppTitle</PageTitle>
 
@@ -134,15 +132,6 @@
 
 @code {
     public const string Slug = "ico";
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initIconConverter");
-        }
-    }
-
 }
 
 <script>

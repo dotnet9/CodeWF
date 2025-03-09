@@ -1,8 +1,11 @@
-﻿using CodeWF.Tools;
+﻿using CodeWF.Options;
+using CodeWF.Tools;
 using CodeWF.Tools.FileExtensions;
+using CodeWF.Tools.Image;
+using HashidsNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebSite.ViewModels;
+using Microsoft.Extensions.Options;
 
 namespace WebSite.Controllers;
 
@@ -82,6 +85,51 @@ public class ImageController : ControllerBase
         }
     }
 
+    [HttpPost("nuoche")]
+    [AllowAnonymous]
+    public async Task<IActionResult> NuoCheAsync([FromBody] NuoCheRequest request,
+        [FromServices] IWebHostEnvironment env,
+        [FromServices] IOptions<SiteOption> siteOption)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                return BadRequest(new { success = false, message = "标题和手机号码不能为空" });
+            }
+
+            if (!long.TryParse(request.PhoneNumber, out long phoneNumberLong))
+            {
+                return BadRequest(new { success = false, message = "无效的手机号码" });
+            }
+
+            var encodedPhone = new Hashids("codewf").EncodeLong(phoneNumberLong);
+            var generatedUrl = $"{siteOption.Value.Domain}/nuoche?p={encodedPhone}";
+
+            var fileName = $"qrcode_{Guid.NewGuid():N}.png";
+            var qrCodePath = Path.Combine(env.WebRootPath, IconFolder, fileName);
+
+            // 确保目录存在
+            Directory.CreateDirectory(Path.Combine(env.WebRootPath, IconFolder));
+
+            // 生成二维码
+            QrCodeGenerator.GenerateQrCode(request.Title, generatedUrl, qrCodePath);
+
+            // 返回可访问的URL
+            var qrCodeUrl = $"/{IconFolder}/{fileName}";
+            return Ok(new
+            {
+                success = true,
+                qrCodeUrl = qrCodeUrl,
+                generatedUrl = generatedUrl
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+    }
+
     private async Task<string> SaveFileAsync(IFormFile file, IWebHostEnvironment env)
     {
         var saveFileName = Guid.NewGuid().ToString("N");
@@ -92,5 +140,11 @@ public class ImageController : ControllerBase
         await using var fs = new FileStream(saveFullPath, FileMode.Create);
         await file.CopyToAsync(fs);
         return saveFullPath;
+    }
+
+    public class NuoCheRequest
+    {
+        public string Title { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }

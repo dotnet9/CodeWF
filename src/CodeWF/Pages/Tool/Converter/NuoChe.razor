@@ -7,6 +7,8 @@
     [SupplyParameterFromQuery]
     public string? P { get; set; }
 
+    public const string Slug = "nuoche";
+
     private long? _decodePhone;
 
     protected override void OnInitialized()
@@ -17,7 +19,6 @@
             _decodePhone = new Hashids("codewf").DecodeLong(P)[0];
         }
     }
-
 }
 
 <PageTitle>免费挪车码</PageTitle>
@@ -27,7 +28,30 @@
     {
         <div class="generator-container">
             <h1 class="generator-title">挪车码在线生成器</h1>
-            <p class="generator-subtitle">开发中</p>
+            <div class="input-group">
+                <label for="phoneNumber">手机号码</label>
+                <input type="tel" id="phoneNumber" placeholder="请输入手机号码" />
+            </div>
+            <div class="input-group">
+                <label for="title">标题</label>
+                <input type="text" id="title" placeholder="临时停靠，请多关照" value="临时停靠，请多关照" />
+            </div>
+            <div class="button-group">
+                <button class="primary-button" onclick="generateQrCode()">
+                    <i class="fas fa-qrcode"></i> 生成二维码
+                </button>
+            </div>
+            <div class="qr-code-container" style="display: none">
+                <img alt="挪车码" />
+                <div class="action-buttons">
+                    <a target="_blank" class="preview-link">
+                        <i class="fas fa-external-link-alt"></i> 预览
+                    </a>
+                    <a class="download-link">
+                        <i class="fas fa-download"></i> 下载
+                    </a>
+                </div>
+            </div>
         </div>
     }
     else
@@ -102,10 +126,10 @@
         text-align: center;
     }
 
-        .card-header i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
+    .card-header i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
 
     .title {
         font-size: 1.3rem;
@@ -146,16 +170,16 @@
         align-items: center;
     }
 
-        .phone-button:hover,
-        .phone-button:focus {
-            background-color: #f4511e;
-            box-shadow: 0 6px 12px rgba(255, 87, 34, 0.4);
-            transform: translateY(-2px);
-        }
+    .phone-button:hover,
+    .phone-button:focus {
+        background-color: #f4511e;
+        box-shadow: 0 6px 12px rgba(255, 87, 34, 0.4);
+        transform: translateY(-2px);
+    }
 
-        .phone-button i {
-            margin-right: 8px;
-        }
+    .phone-button i {
+        margin-right: 8px;
+    }
 
     .generate-link {
         color: #3385ff;
@@ -165,11 +189,157 @@
         padding: 5px;
     }
 
-        .generate-link:hover {
-            text-decoration: underline;
-        }
+    .generate-link:hover {
+        text-decoration: underline;
+    }
 
+    /* 添加新的样式 */
+    .input-group {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+        border-color: #3385ff;
+        outline: none;
+    }
+
+    .button-group {
+        margin: 20px 0;
+    }
+
+    .primary-button {
+        background-color: #3385ff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .primary-button:hover {
+        background-color: #2670e8;
+        transform: translateY(-2px);
+    }
+
+    .qr-code-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .qr-code-container img {
+        max-width: 340px;
+        margin-bottom: 10px;
+    }
+
+    .preview-link {
+        color: #3385ff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .preview-link:hover {
+        text-decoration: underline;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+    }
+
+    .download-link {
+        color: #28a745;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+    }
+
+    .download-link:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <!-- 添加Font Awesome图标支持 -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<!-- 在页面底部添加script标签 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    async function generateQrCode() {
+        const title = document.getElementById('title').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+
+        if (!title || !phoneNumber) {
+            alert('请输入标题和手机号码');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/Image/nuoche', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    phoneNumber: phoneNumber
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                const qrCodeContainer = document.querySelector('.qr-code-container');
+                const img = qrCodeContainer.querySelector('img');
+                img.src = data.qrCodeUrl;
+                qrCodeContainer.querySelector('.preview-link').href = data.generatedUrl;
+
+                // 添加下载功能
+                const downloadLink = qrCodeContainer.querySelector('.download-link');
+                downloadLink.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = data.qrCodeUrl;
+                    a.download = '挪车码.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+                qrCodeContainer.style.display = 'block';
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            console.error('生成二维码失败:', error);
+            alert('生成二维码失败，请稍后重试');
+        }
+    }
+</script>

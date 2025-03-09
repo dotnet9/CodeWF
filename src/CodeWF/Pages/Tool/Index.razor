@@ -39,9 +39,15 @@
                 {
                     <IconConverter/>
                 }
+
                 @if (string.Equals(Slug, Timestamp.Slug, StringComparison.OrdinalIgnoreCase))
                 {
-                    <Timestamp />
+                    <Timestamp/>
+                }
+
+                @if (string.Equals(Slug, NuoChe.Slug, StringComparison.OrdinalIgnoreCase))
+                {
+                    <NuoChe/>
                 }
             }
         </ChildContent>
