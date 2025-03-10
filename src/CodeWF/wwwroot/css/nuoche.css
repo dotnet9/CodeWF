@@ -3,10 +3,6 @@
     padding: 20px;
     max-width: 100%;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     background-color: #f5f7fa;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -20,6 +16,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
     max-width: 900px;
+    margin: 0 auto;
 }
 
 .generator-layout {
@@ -78,6 +75,7 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 
 .card-header {
@@ -350,6 +348,7 @@
 @media (max-width: 767px) {
     .generator-container {
         padding: 20px 15px;
+        margin-top: 20px;
     }
 
     .input-group {
@@ -364,6 +363,10 @@
     .button-group {
         margin: 15px 0;
     }
+    
+    .card {
+        margin-top: 20px;
+    }
 }
 
 @media (min-width: 992px) {
@@ -373,5 +376,9 @@
 
     .qr-code-container img {
         max-width: 320px;
+    }
+    
+    .generator-container, .card {
+        margin-top: 40px;
     }
 }

@@ -161,7 +161,9 @@
                 
                 // 在小屏幕上，滚动到二维码位置
                 if (window.innerWidth < 768) {
-                    qrCodeContainer.scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => {
+                        qrCodeContainer.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
                 } else {
                     // 在大屏幕上，添加active-qr类
                     document.querySelector('.generator-layout').classList.add('active-qr');
