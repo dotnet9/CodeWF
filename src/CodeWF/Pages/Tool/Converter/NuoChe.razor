@@ -36,6 +36,13 @@
                 <label for="title">标题</label>
                 <input type="text" id="title" placeholder="扫码挪车" value="扫码挪车" />
             </div>
+            <div class="input-group">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="enableSubtitle" />
+                    <label for="enableSubtitle">添加小标题</label>
+                </div>
+                <input type="text" id="subtitle" placeholder="扫码联系车主或拨打电话: 16800000000" disabled />
+            </div>
             <div class="button-group">
                 <button class="primary-button" onclick="generateQrCode()">
                     <i class="fas fa-qrcode"></i> 生成二维码
@@ -289,17 +296,48 @@
     .download-link:hover {
         text-decoration: underline;
     }
+
+    /* 添加小标题相关样式 */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        width: auto;
+        margin-right: 8px;
+    }
+
+    .checkbox-container label {
+        margin-bottom: 0;
+        font-weight: normal;
+    }
+
+    #subtitle {
+        transition: all 0.3s ease;
+    }
+
+    #subtitle:disabled {
+        background-color: #f5f5f5;
+        color: #999;
+    }
 </style>
 
-<!-- 添加Font Awesome图标支持 -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-<!-- 在页面底部添加script标签 -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     async function generateQrCode() {
         const title = document.getElementById('title').value;
         const phoneNumber = document.getElementById('phoneNumber').value;
+        const enableSubtitle = document.getElementById('enableSubtitle').checked;
+        let subtitle = null;
+        
+        if (enableSubtitle) {
+            subtitle = document.getElementById('subtitle').value.trim();
+            if (!subtitle) {
+                subtitle = `扫码联系车主或拨打电话: ${phoneNumber || "16800000000"}`;
+                document.getElementById('subtitle').value = subtitle;
+            }
+        }
 
         if (!title || !phoneNumber) {
             alert('请输入标题和手机号码');
@@ -314,7 +352,8 @@
                 },
                 body: JSON.stringify({
                     title: title,
-                    phoneNumber: phoneNumber
+                    phoneNumber: phoneNumber,
+                    subtitle: subtitle
                 })
             });
 
@@ -345,4 +384,32 @@
             alert('生成二维码失败，请稍后重试');
         }
     }
+
+    // 添加小标题复选框的事件处理
+    document.addEventListener('DOMContentLoaded', function() {
+        const enableSubtitleCheckbox = document.getElementById('enableSubtitle');
+        const subtitleInput = document.getElementById('subtitle');
+        const phoneInput = document.getElementById('phoneNumber');
+        
+        if (enableSubtitleCheckbox && subtitleInput) {
+            enableSubtitleCheckbox.addEventListener('change', function() {
+                subtitleInput.disabled = !this.checked;
+                if (this.checked) {
+                    if (!subtitleInput.value.trim()) {
+                        const phoneNumber = phoneInput.value.trim() || "16800000000";
+                        subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
+                    }
+                    subtitleInput.focus();
+                }
+            });
+            
+            // 当手机号码变化时，如果小标题已启用且使用的是默认格式，则更新小标题中的电话号码
+            phoneInput.addEventListener('input', function() {
+                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('扫码联系车主或拨打电话:')) {
+                    const phoneNumber = this.value.trim() || "16800000000";
+                    subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
+                }
+            });
+        }
+    });
 </script>

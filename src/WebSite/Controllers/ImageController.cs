@@ -22,21 +22,16 @@ public class ImageController : ControllerBase
     {
         try
         {
-            // 解析尺寸
             var convertSizes = sizes.Split(',').Select(uint.Parse).ToArray();
 
-            // 保存上传的文件
             var fullPath = await SaveFileAsync(sourceImage, env);
             var fileName = $"{Guid.NewGuid():N}.ico";
             var icoFullPath = Path.Combine(env.WebRootPath, IconFolder, fileName);
 
-            // 确保目录存在
             Directory.CreateDirectory(Path.Combine(env.WebRootPath, IconFolder));
 
-            // 生成图标
             await ImageHelper.MergeGenerateIcon(fullPath, icoFullPath, convertSizes);
 
-            // 返回可访问的URL
             var iconUrl = $"/{IconFolder}/{fileName}";
             return Ok(new { success = true, url = iconUrl });
         }
@@ -56,26 +51,20 @@ public class ImageController : ControllerBase
         {
             var convertSizes = sizes.Split(',').Select(uint.Parse).ToArray();
 
-            // 创建临时文件夹存放分离的图标
             var folderName = $"icons_{Guid.NewGuid():N}";
             var iconFolderPath = Path.Combine(env.WebRootPath, IconFolder, folderName);
             Directory.CreateDirectory(iconFolderPath);
 
-            // 保存上传的文件并生成图标
             var sourceFilePath = await SaveFileAsync(sourceImage, env);
             await ImageHelper.SeparateGenerateIcon(sourceFilePath, iconFolderPath, convertSizes);
 
-            // 创建压缩文件
             var zipFileName = $"{folderName}.zip";
             var zipFilePath = Path.Combine(env.WebRootPath, IconFolder, zipFileName);
 
-            // 压缩文件夹
             await Task.Run(() => sevenZipCompressor.Zip(iconFolderPath, zipFilePath));
 
-            // 清理临时文件夹
             Directory.Delete(iconFolderPath, true);
 
-            // 返回zip文件的URL
             var zipUrl = $"/{IconFolder}/{zipFileName}";
             return Ok(new { success = true, url = zipUrl });
         }
@@ -109,19 +98,16 @@ public class ImageController : ControllerBase
             var fileName = $"qrcode_{Guid.NewGuid():N}.png";
             var qrCodePath = Path.Combine(env.WebRootPath, IconFolder, fileName);
 
-            // 确保目录存在
             Directory.CreateDirectory(Path.Combine(env.WebRootPath, IconFolder));
 
-            // 生成二维码
-            QrCodeGenerator.GenerateQrCode(request.Title, generatedUrl, qrCodePath);
+            QrCodeGenerator.GenerateQrCode(request.Title, generatedUrl, qrCodePath, request.SubTitle);
 
-            // 返回可访问的URL
             var qrCodeUrl = $"/{IconFolder}/{fileName}";
             return Ok(new
             {
                 success = true,
-                qrCodeUrl = qrCodeUrl,
-                generatedUrl = generatedUrl
+                qrCodeUrl,
+                generatedUrl
             });
         }
         catch (Exception ex)
@@ -146,5 +132,6 @@ public class ImageController : ControllerBase
     {
         public string Title { get; set; }
         public string PhoneNumber { get; set; }
+        public string? SubTitle { get; set; }
     }
 }
