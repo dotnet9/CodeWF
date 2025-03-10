@@ -30,19 +30,30 @@
             <h1 class="generator-title">挪车码生成器</h1>
             <div class="input-group">
                 <label for="phoneNumber">手机号码</label>
-                <input type="tel" id="phoneNumber" placeholder="请输入手机号码" />
+                <input type="tel" id="phoneNumber" placeholder="请输入手机号码" value="18600000000" />
+                <div class="privacy-notice">
+                    <i class="fas fa-info-circle"></i> 您的手机号码将被用于生成挪车码，扫码者可以通过此号码联系您。
+                </div>
             </div>
             <div class="input-group">
                 <label for="title">标题</label>
-                <input type="text" id="title" placeholder="请输入标题" value="请输入标题" />
+                <input type="text" id="title" placeholder="请输入标题" value="扫码挪车" />
             </div>
             <div class="input-group">
                 <div class="checkbox-container">
                     <input type="checkbox" id="enableSubtitle" />
                     <label for="enableSubtitle">添加副标题</label>
                 </div>
-                <input type="text" id="subtitle" placeholder="请输入副标题" disabled />
+                <input type="text" id="subtitle" placeholder="请输入副标题" value="扫码联系车主或拨打电话: 18600000000" disabled />
             </div>
+            
+            <div class="privacy-consent">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="privacyConsent" />
+                    <label for="privacyConsent">我已了解并同意：我的手机号码将被收集并用于生成挪车码，扫码者可以通过此号码联系我。</label>
+                </div>
+            </div>
+            
             <div class="button-group">
                 <button class="primary-button" onclick="generateQrCode()">
                     <i class="fas fa-qrcode"></i> 生成二维码
@@ -69,10 +80,10 @@
         <div class="card">
             <div class="card-header">
                 <i class="fas fa-car"></i>
-                <h1 class="title">临时停车，请挪车</h1>
+                <h1 class="title">临时停靠，请多关照</h1>
             </div>
             <div class="card-body">
-                <p class="description">您的爱车临时停放在这里，请您挪车。</p>
+                <p class="description">如果我的车阻碍了您的车辆通行，点击下方按钮通知我，给您带来不便敬请谅解。</p>
                 <a class="phone-button" href="tel:@_decodePhone">
                     <i class="fas fa-phone-alt"></i> 联系车主
                 </a>
@@ -322,6 +333,42 @@
         background-color: #f5f5f5;
         color: #999;
     }
+
+    /* 隐私提示样式 */
+    .privacy-notice {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+        text-align: left;
+        display: flex;
+        align-items: center;
+    }
+
+    .privacy-notice i {
+        margin-right: 5px;
+        color: #3385ff;
+    }
+
+    .privacy-consent {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #3385ff;
+    }
+
+    .privacy-consent label {
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.4;
+    }
+
+    .privacy-error {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        display: none;
+    }
 </style>
 
 <script>
@@ -329,18 +376,24 @@
         const title = document.getElementById('title').value;
         const phoneNumber = document.getElementById('phoneNumber').value;
         const enableSubtitle = document.getElementById('enableSubtitle').checked;
+        const privacyConsent = document.getElementById('privacyConsent').checked;
         let subtitle = null;
         
         if (enableSubtitle) {
             subtitle = document.getElementById('subtitle').value.trim();
             if (!subtitle) {
-                subtitle = `扫码联系车主: ${phoneNumber || "16800000000"}`;
+                subtitle = `扫码联系车主或拨打电话: ${phoneNumber || "18600000000"}`;
                 document.getElementById('subtitle').value = subtitle;
             }
         }
 
         if (!title || !phoneNumber) {
             alert('请输入标题和手机号码');
+            return;
+        }
+
+        if (!privacyConsent) {
+            alert('请确认您已了解并同意隐私声明');
             return;
         }
 
@@ -385,29 +438,43 @@
         }
     }
 
-    // 副标题选择
+    // 添加小标题复选框的事件处理
     document.addEventListener('DOMContentLoaded', function() {
         const enableSubtitleCheckbox = document.getElementById('enableSubtitle');
         const subtitleInput = document.getElementById('subtitle');
         const phoneInput = document.getElementById('phoneNumber');
+        const privacyConsentCheckbox = document.getElementById('privacyConsent');
+        const privacyConsentSection = document.querySelector('.privacy-consent');
+        
+        if (privacyConsentCheckbox && privacyConsentSection) {
+            privacyConsentCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    privacyConsentSection.style.backgroundColor = '#e8f4ff';
+                    privacyConsentSection.style.borderLeftColor = '#007bff';
+                } else {
+                    privacyConsentSection.style.backgroundColor = '#f8f9fa';
+                    privacyConsentSection.style.borderLeftColor = '#3385ff';
+                }
+            });
+        }
         
         if (enableSubtitleCheckbox && subtitleInput) {
             enableSubtitleCheckbox.addEventListener('change', function() {
                 subtitleInput.disabled = !this.checked;
                 if (this.checked) {
                     if (!subtitleInput.value.trim()) {
-                        const phoneNumber = phoneInput.value.trim() || "16800000000";
-                        subtitleInput.value = `扫码联系车主: ${phoneNumber}`;
+                        const phoneNumber = phoneInput.value.trim() || "18600000000";
+                        subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
                     }
                     subtitleInput.focus();
                 }
             });
             
-            // 手机号码变化时，更新副标题
+            // 当手机号码变化时，如果小标题已启用且使用的是默认格式，则更新小标题中的电话号码
             phoneInput.addEventListener('input', function() {
-                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('扫码联系车主:')) {
-                    const phoneNumber = this.value.trim() || "16800000000";
-                    subtitleInput.value = `扫码联系车主: ${phoneNumber}`;
+                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('扫码联系车主或拨打电话:')) {
+                    const phoneNumber = this.value.trim() || "18600000000";
+                    subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
                 }
             });
         }
