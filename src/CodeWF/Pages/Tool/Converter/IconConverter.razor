@@ -76,6 +76,22 @@
     .me-2 {
         margin-right: 0.5rem;
     }
+
+    .alert {
+        padding: 0.75rem 1.25rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+    }
+
+    .mt-2 {
+        margin-top: 0.5rem;
+    }
 </style>
 
 <div class="converter-container">
@@ -117,6 +133,9 @@
 
         <div id="result" style="display:none" class="mt-3">
             <a id="downloadLink" class="btn btn-success" target="_blank">下载文件</a>
+            <div class="alert alert-warning mt-2">
+                <i class="bi bi-clock-history me-2"></i>请注意：生成的文件仅保留2分钟，请及时下载。
+            </div>
         </div>
     </div>
 
