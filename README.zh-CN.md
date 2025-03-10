@@ -187,7 +187,7 @@ CodeWF Toolbox 使用Avalonia开发的跨平台工具箱，使用了Prism做为�
 
 ## OpenAPI
 
-https://localhost:5002//scalar/v1
+https://localhost:5002/scalar/v1
 
 ## 赞助
 

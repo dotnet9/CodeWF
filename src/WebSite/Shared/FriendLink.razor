@@ -1,19 +1,23 @@
 ﻿@inherits BaseComponent
 @inject AppService AppService
 
-<div class="container pt-5 pb-5 links" data-aos="fade-up">
-    <span>友情链接: </span>
+<div class="fluent-container fluent-widget friend-links" data-aos="fade-up">
+    <div class="d-flex flex-wrap align-items-center">
+        <span class="fluent-title-small mr-3">友情链接: </span>
         @if (_links?.Any() != true)
         {
             <AntEmpty/>
         }
         else
         {
-            @foreach (var link in _links)
-            {
-                <span><a href="@link.Link" target="_blank" title="@link.Description">@link.Title</a></span>
-            }
+            <div class="fluent-links-container">
+                @foreach (var link in _links)
+                {
+                    <a href="@link.Link" target="_blank" title="@link.Description" class="fluent-link mr-3 mb-2">@link.Title</a>
+                }
+            </div>
         }
+    </div>
 </div>
 
 @code {
@@ -25,5 +29,4 @@
 
         _links = await AppService.GetAllFriendLinkItemsAsync();
     }
-
 }

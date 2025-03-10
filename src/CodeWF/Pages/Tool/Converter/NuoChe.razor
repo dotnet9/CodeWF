@@ -21,45 +21,45 @@
     }
 }
 
-<PageTitle>Ãâ·ÑÅ²³µÂë</PageTitle>
+<PageTitle>æŒªè½¦ç </PageTitle>
 
 <div class="nuoche-container">
     @if (string.IsNullOrWhiteSpace(P))
     {
         <div class="generator-container">
-            <h1 class="generator-title">Å²³µÂëÔÚÏßÉú³ÉÆ÷</h1>
+            <h1 class="generator-title">æŒªè½¦ç ç”Ÿæˆå™¨</h1>
             <div class="input-group">
-                <label for="phoneNumber">ÊÖ»úºÅÂë</label>
-                <input type="tel" id="phoneNumber" placeholder="ÇëÊäÈëÊÖ»úºÅÂë" />
+                <label for="phoneNumber">æ‰‹æœºå·ç </label>
+                <input type="tel" id="phoneNumber" placeholder="è¯·è¾“å…¥æ‰‹æœºå·ç " />
             </div>
             <div class="input-group">
-                <label for="title">±êÌâ</label>
-                <input type="text" id="title" placeholder="É¨ÂëÅ²³µ" value="É¨ÂëÅ²³µ" />
+                <label for="title">æ ‡é¢˜</label>
+                <input type="text" id="title" placeholder="è¯·è¾“å…¥æ ‡é¢˜" value="è¯·è¾“å…¥æ ‡é¢˜" />
             </div>
             <div class="input-group">
                 <div class="checkbox-container">
                     <input type="checkbox" id="enableSubtitle" />
-                    <label for="enableSubtitle">Ìí¼ÓĞ¡±êÌâ</label>
+                    <label for="enableSubtitle">æ·»åŠ å‰¯æ ‡é¢˜</label>
                 </div>
-                <input type="text" id="subtitle" placeholder="É¨ÂëÁªÏµ³µÖ÷»ò²¦´òµç»°: 16800000000" disabled />
+                <input type="text" id="subtitle" placeholder="è¯·è¾“å…¥å‰¯æ ‡é¢˜" disabled />
             </div>
             <div class="button-group">
                 <button class="primary-button" onclick="generateQrCode()">
-                    <i class="fas fa-qrcode"></i> Éú³É¶şÎ¬Âë
+                    <i class="fas fa-qrcode"></i> ç”ŸæˆäºŒç»´ç 
                 </button>
             </div>
             <div class="qr-code-container" style="display: none">
-                <img alt="Å²³µÂë" />
+                <img alt="æŒªè½¦ç " />
                 <div class="action-buttons">
                     <a target="_blank" class="preview-link">
-                        <i class="fas fa-external-link-alt"></i> Ô¤ÀÀ
+                        <i class="fas fa-external-link-alt"></i> é¢„è§ˆ
                     </a>
                     <a class="download-link">
-                        <i class="fas fa-download"></i> ÏÂÔØ
+                        <i class="fas fa-download"></i> ä¸‹è½½
                     </a>
                 </div>
                 <div class="alert alert-warning mt-2">
-                    <i class="fas fa-clock"></i> Çë×¢Òâ£ºÉú³ÉµÄÎÄ¼ş½ö±£Áô2·ÖÖÓ£¬Çë¼°Ê±ÏÂÔØ¡£
+                    <i class="fas fa-clock"></i> æ³¨æ„ï¼šç”Ÿæˆçš„å›¾ç‰‡æœ‰æ•ˆæœŸä¸º2åˆ†é’Ÿï¼Œè¯·åŠæ—¶ä¸‹è½½ã€‚
                 </div>
             </div>
         </div>
@@ -69,21 +69,21 @@
         <div class="card">
             <div class="card-header">
                 <i class="fas fa-car"></i>
-                <h1 class="title">ÁÙÊ±Í£¿¿£¬Çë¶à¹ØÕÕ</h1>
+                <h1 class="title">ä¸´æ—¶åœè½¦ï¼Œè¯·æŒªè½¦</h1>
             </div>
             <div class="card-body">
-                <p class="description">Èç¹ûÎÒµÄ³µ×è°­ÁËÄúµÄ³µÁ¾Í¨ĞĞ£¬µã»÷ÏÂ·½°´Å¥Í¨ÖªÎÒ£¬¸øÄú´øÀ´²»±ã¾´ÇëÁÂ½â¡£</p>
+                <p class="description">æ‚¨çš„çˆ±è½¦ä¸´æ—¶åœæ”¾åœ¨è¿™é‡Œï¼Œè¯·æ‚¨æŒªè½¦ã€‚</p>
                 <a class="phone-button" href="tel:@_decodePhone">
-                    <i class="fas fa-phone-alt"></i> ²¦´ò³µÖ÷µç»°
+                    <i class="fas fa-phone-alt"></i> è”ç³»è½¦ä¸»
                 </a>
-                <a class="generate-link" href="/nuoche">È¥Éú³ÉÒ»¸öÅ²³µÂë</a>
+                <a class="generate-link" href="/nuoche">å»ç”Ÿæˆä¸€ä¸ªæŒªè½¦ç </a>
             </div>
         </div>
     }
 </div>
 
 <style>
-    /* È«¾ÖÑùÊ½ */
+    /* È«ï¿½ï¿½ï¿½ï¿½Ê½ */
     .nuoche-container {
         padding: 20px;
         max-width: 100%;
@@ -96,7 +96,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* Éú³ÉÆ÷Ò³ÃæÑùÊ½ */
+    /* é¦–é¡µæ ·å¼ */
     .generator-container {
         text-align: center;
         padding: 30px 20px;
@@ -119,7 +119,7 @@
         color: #666;
     }
 
-    /* Å²³µÂëĞÅÏ¢¿¨Æ¬ÑùÊ½ */
+    /* æŒªè½¦ç ä¿¡æ¯å¡ç‰‡æ ·å¼ */
     .card {
         width: 90%;
         max-width: 400px;
@@ -203,7 +203,7 @@
         text-decoration: underline;
     }
 
-    /* Ìí¼ÓĞÂµÄÑùÊ½ */
+    /* è¾“å…¥ç»„æ ·å¼ */
     .input-group {
         width: 100%;
         margin-bottom: 20px;
@@ -297,7 +297,7 @@
         text-decoration: underline;
     }
 
-    /* Ìí¼ÓĞ¡±êÌâÏà¹ØÑùÊ½ */
+    /* å‰¯æ ‡é¢˜æ ·å¼ */
     .checkbox-container {
         display: flex;
         align-items: center;
@@ -334,13 +334,13 @@
         if (enableSubtitle) {
             subtitle = document.getElementById('subtitle').value.trim();
             if (!subtitle) {
-                subtitle = `É¨ÂëÁªÏµ³µÖ÷»ò²¦´òµç»°: ${phoneNumber || "16800000000"}`;
+                subtitle = `æ‰«ç è”ç³»è½¦ä¸»: ${phoneNumber || "16800000000"}`;
                 document.getElementById('subtitle').value = subtitle;
             }
         }
 
         if (!title || !phoneNumber) {
-            alert('ÇëÊäÈë±êÌâºÍÊÖ»úºÅÂë');
+            alert('è¯·è¾“å…¥æ ‡é¢˜å’Œæ‰‹æœºå·ç ');
             return;
         }
 
@@ -364,12 +364,12 @@
                 img.src = data.qrCodeUrl;
                 qrCodeContainer.querySelector('.preview-link').href = data.generatedUrl;
 
-                // Ìí¼ÓÏÂÔØ¹¦ÄÜ
+                // ä¸‹è½½é“¾æ¥
                 const downloadLink = qrCodeContainer.querySelector('.download-link');
                 downloadLink.onclick = () => {
                     const a = document.createElement('a');
                     a.href = data.qrCodeUrl;
-                    a.download = 'Å²³µÂë.png';
+                    a.download = 'æŒªè½¦ç .png';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -380,12 +380,12 @@
                 throw new Error(data.message);
             }
         } catch (error) {
-            console.error('Éú³É¶şÎ¬ÂëÊ§°Ü:', error);
-            alert('Éú³É¶şÎ¬ÂëÊ§°Ü£¬ÇëÉÔºóÖØÊÔ');
+            console.error('ç”ŸæˆäºŒç»´ç å¤±è´¥:', error);
+            alert('ç”ŸæˆäºŒç»´ç å¤±è´¥ï¼Œè¯·ç¨åå†è¯•');
         }
     }
 
-    // Ìí¼ÓĞ¡±êÌâ¸´Ñ¡¿òµÄÊÂ¼ş´¦Àí
+    // å‰¯æ ‡é¢˜é€‰æ‹©
     document.addEventListener('DOMContentLoaded', function() {
         const enableSubtitleCheckbox = document.getElementById('enableSubtitle');
         const subtitleInput = document.getElementById('subtitle');
@@ -397,17 +397,17 @@
                 if (this.checked) {
                     if (!subtitleInput.value.trim()) {
                         const phoneNumber = phoneInput.value.trim() || "16800000000";
-                        subtitleInput.value = `É¨ÂëÁªÏµ³µÖ÷»ò²¦´òµç»°: ${phoneNumber}`;
+                        subtitleInput.value = `æ‰«ç è”ç³»è½¦ä¸»: ${phoneNumber}`;
                     }
                     subtitleInput.focus();
                 }
             });
             
-            // µ±ÊÖ»úºÅÂë±ä»¯Ê±£¬Èç¹ûĞ¡±êÌâÒÑÆôÓÃÇÒÊ¹ÓÃµÄÊÇÄ¬ÈÏ¸ñÊ½£¬Ôò¸üĞÂĞ¡±êÌâÖĞµÄµç»°ºÅÂë
+            // æ‰‹æœºå·ç å˜åŒ–æ—¶ï¼Œæ›´æ–°å‰¯æ ‡é¢˜
             phoneInput.addEventListener('input', function() {
-                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('É¨ÂëÁªÏµ³µÖ÷»ò²¦´òµç»°:')) {
+                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('æ‰«ç è”ç³»è½¦ä¸»:')) {
                     const phoneNumber = this.value.trim() || "16800000000";
-                    subtitleInput.value = `É¨ÂëÁªÏµ³µÖ÷»ò²¦´òµç»°: ${phoneNumber}`;
+                    subtitleInput.value = `æ‰«ç è”ç³»è½¦ä¸»: ${phoneNumber}`;
                 }
             });
         }

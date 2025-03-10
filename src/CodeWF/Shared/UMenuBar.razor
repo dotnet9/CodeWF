@@ -1,15 +1,17 @@
-﻿<div class="cl-menu-bar" onclick="cl_click_bar(this)"><i class="far fa-bars" /></div>
+﻿<div class="cl-menu-bar" onclick="cl_click_bar(this)"><i class="far fa-bars"></i></div>
 <script>
     var isMenuShow = false;
     function cl_click_bar(obj) {
-        var target = '@Target';
-        var menu = $('.' + target);
+        const target = '@Target';
+        const menu = document.querySelector('.' + target);
+        if (!menu) return;
+        
         if (isMenuShow) {
-            menu.hide();
-            $(obj).css('left', 0);
+            menu.style.display = 'none';
+            obj.style.left = '0';
         } else {
-            menu.show();
-            $(obj).css('left', '199px');
+            menu.style.display = 'block';
+            obj.style.left = '199px';
         }
         isMenuShow = !isMenuShow;
     }

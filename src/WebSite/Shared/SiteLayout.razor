@@ -1,6 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
-<SiteHeader />
-@Body
-<SettingBtns/>
-<SiteFooter />
+<div class="fluent-layout">
+    <SiteHeader />
+    <main class="fluent-main">
+        @Body
+    </main>
+    <SettingBtns />
+    <SiteFooter />
+</div>
