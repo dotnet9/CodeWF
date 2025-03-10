@@ -7,6 +7,10 @@ public class FileCleanerJob(IWebHostEnvironment env) : IJob
     public Task Execute(IJobExecutionContext context)
     {
         var directoryPath = Path.Combine(env.WebRootPath, "IconFolder");
+        if (!Directory.Exists(directoryPath))
+        {
+            return Task.CompletedTask;
+        }
         try
         {
             var files = Directory.GetFiles(directoryPath);
