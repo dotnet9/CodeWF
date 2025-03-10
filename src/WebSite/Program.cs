@@ -3,10 +3,13 @@ using CodeWF.Tools.FileExtensions;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
+using Quartz;
 using Scalar.AspNetCore;
 using System.IO.Compression;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using Quartz.AspNetCore;
+using WebSite.Jobs;
 using WebSite.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +44,24 @@ builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsi
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddTransient<FileCleanerJob>();
+builder.Services.AddQuartz(q =>
+{
+    var jobKey = new JobKey("fileCleanerJob", "group1");
+    q.AddJob<FileCleanerJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("fileCleanerTrigger", "group1")
+        .StartNow()
+        .WithSimpleSchedule(x => x
+            .WithIntervalInMinutes(2)
+            .RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
 var app = builder.Build();
 
 using (var serviceScope = app.Services.CreateScope())

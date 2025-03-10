@@ -16,6 +16,7 @@
 	    <PackageReference Include="Known.Core" Version="3.1.9" />
 	    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.1.25120.3" />
 	    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+	    <PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
 	    <PackageReference Include="Scalar.AspNetCore" Version="2.0.26" />
 	    <PackageReference Include="Microsoft.SemanticKernel" Version="1.40.1" />
         <ProjectReference Include="..\CodeWF\CodeWF.csproj" />
