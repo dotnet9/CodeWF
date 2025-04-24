@@ -1,7 +1,8 @@
 ﻿@inject NavigationManager Navigation
 @inject AppService AppService
 
-<nav class="topnav navbar navbar-expand-lg navbar-dark bg-primary fixed-top @NavClass">
+<!-- 修改导航栏背景颜色和类名 -->
+<nav class="topnav navbar navbar-expand-lg navbar-dark bg-tech-nav fixed-top @NavClass">
     <div class="container">
         <Logo/>
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,6 +74,43 @@
         </div>
     </div>
 </nav>
+
+<!-- 添加自定义样式 -->
+<style>
+    /* 科技风导航栏背景颜色 */
+    .bg-tech-nav {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    }
+
+    /* 导航链接样式 */
+    .navbar-dark .navbar-nav .nav-link {
+        color: #ffffff;
+        transition: color 0.3s ease;
+    }
+
+    /* 导航链接悬停效果 */
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: #00f;
+        text-shadow: 0 0 10px #00f;
+    }
+
+    /* 下拉菜单背景颜色 */
+    .dropdown-menu {
+        background-color: #302b63;
+        border: none;
+    }
+
+    /* 下拉菜单项样式 */
+    .dropdown-item {
+        color: #ffffff;
+    }
+
+    /* 下拉菜单项悬停效果 */
+    .dropdown-item:hover {
+        background-color: #0f0c29;
+        color: #00f;
+    }
+</style>
 
 @code {
     private string NavClass => IsIndex ? "index-nav" : DarkNavClass;

@@ -3,6 +3,22 @@
 <a href="/" class="logo-link">
     <div class="logo-container">
         <img src="@SiteOption.Value.Favicon" alt="@SiteOption.Value.AppTitle" title="@SiteOption.Value.AppTitle" class="logo-image" />
-        <span class="logo-text">@SiteOption.Value.AppTitle</span>
+        <!-- 修改标题样式 -->
+        <span class="logo-text tech-logo-text">@SiteOption.Value.AppTitle</span>
     </div>
 </a>
+
+<!-- 添加自定义样式 -->
+<style>
+    .tech-logo-text {
+        color: #ffffff;
+        text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
+        transition: all 0.3s ease;
+        margin-left: 10px; /* 添加一些间距 */
+    }
+
+    .tech-logo-text:hover {
+        color: #00f;
+        text-shadow: 0 0 20px #00f, 0 0 40px #00f, 0 0 60px #00f;
+    }
+</style>

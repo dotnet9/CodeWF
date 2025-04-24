@@ -10,15 +10,32 @@
         }
         else
         {
-            <div class="fluent-links-container">
+            <!-- 调整链接容器样式 -->
+            <div class="fluent-links-container p-3 rounded bg-light">
                 @foreach (var link in _links)
                 {
-                    <a href="@link.Link" target="_blank" title="@link.Description" class="fluent-link mr-3 mb-2">@link.Title</a>
+                    <!-- 添加悬停效果 -->
+                    <a href="@link.Link" target="_blank" title="@link.Description" class="fluent-link mr-3 mb-2 hover-effect">@link.Title</a>
                 }
             </div>
         }
     </div>
 </div>
+
+<!-- 添加自定义样式 -->
+<style>
+    .hover-effect {
+        color: #007bff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .hover-effect:hover {
+        color: #0056b3;
+        text-decoration: underline;
+        transform: translateY(-2px);
+    }
+</style>
 
 @code {
     private List<FriendLinkItem>? _links;

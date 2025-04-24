@@ -7,26 +7,33 @@
 
 <PageTitle>@SiteOption.Value.AppTitle</PageTitle>
 
-<div class="jumbotron jumbotron-lg jumbotron-fluid mb-0 pb-3 bg-primary position-relative">
-    <div class="container text-white h-100">
+<!-- 修改背景颜色和文字样式 -->
+<div class="jumbotron jumbotron-lg jumbotron-fluid mb-0 pb-3 bg-dark-tech position-relative" style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+    <div class="container text-light h-100">
         <div class="d-lg-flex align-items-center justify-content-between text-center pl-lg-5">
             <div class="col pt-4 pb-4">
-                <h2 class="display-4 font-weight-bold mb-4">文章启智，工具助力</h2>
-                <h5 class="font-weight-light mb-2"><strong>码坊</strong>：使用<strong>.NET 10 Web API</strong> + <strong>Blazor</strong>开发。</h5>
-                <h5 class="font-weight-light mb-4">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
+                <h2 class="display-4 font-weight-bold mb-4" style="text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;">文章启智，工具助力</h2>
+                <h5 class="font-weight-light mb-2" style="text-shadow: 0 0 5px #0f0;">
+                    <strong>码坊</strong>：使用<strong>.NET 10 Web API</strong> + <strong>Blazor</strong>开发。
+                </h5>
+                <h5 class="font-weight-light mb-4" style="text-shadow: 0 0 5px #0f0;">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="/bbs" class="btn btn-lg btn-outline-white btn-round mr-2">博客</a>
-                    <a href="https://github.com/dotnet9/codewf" class="btn btn-lg btn-success btn-round shadow-sm" target="_blank">Github</a>
+                    <a href="/bbs" class="btn btn-lg btn-outline-light btn-round mr-2" style="box-shadow: 0 0 10px #00f;">博客</a>
+                    <a href="https://github.com/dotnet9/codewf" class="btn btn-lg btn-success btn-round shadow-sm" target="_blank" style="box-shadow: 0 0 10px #0f0;">Github</a>
                 </div>
             </div>
+            <!-- 替换为更有科技感的图片 -->
             <div class="col align-self-bottom align-items-right text-right h-max-380 position-relative z-index-1">
-                <img src="https://img1.dotnet9.com/site/banners/resource.png" class="rounded img-fluid shadow">
+                <img src="https://example.com/tech-banner.png" class="rounded img-fluid shadow" style="animation: float 3s ease-in-out infinite;">
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- 修改 SVG 颜色 -->
 <svg style="-webkit-transform:rotate(-180deg);-moz-transform:rotate(-180deg);-o-transform:rotate(-180deg);transform:rotate(-180deg);margin-top:-1px;enable-background:new 0 0 1440 126;" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewbox="0 0 1440 126" xml:space="preserve">
-    <path class="bg-primary" d="M685.6,38.8C418.7-11.1,170.2,9.9,0,30v96h1440V30C1252.7,52.2,1010,99.4,685.6,38.8z"/>
+    <path class="bg-tech" d="M685.6,38.8C418.7-11.1,170.2,9.9,0,30v96h1440V30C1252.7,52.2,1010,99.4,685.6,38.8z" fill="#302b63"/>
 </svg>
 
 <div class="container pt-5 pb-5" data-aos="fade-up">
