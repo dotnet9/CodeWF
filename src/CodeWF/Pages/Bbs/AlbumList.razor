@@ -1,62 +1,14 @@
 ﻿@inherits BaseComponent
 @inject AppService AppService
 
-<style>
-    .cl-bbs-menu {
-        background: linear-gradient(145deg, rgba(20, 25, 50, 0.8), rgba(25, 30, 60, 0.8));
-        border: 1px solid rgba(138, 43, 226, 0.2);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(8px);
-    }
-
-    .cl-bbs-menu :global(.ant-card-head) {
-        border-bottom: 1px solid rgba(138, 43, 226, 0.2);
-        padding: 0 16px;
-    }
-
-    .cl-bbs-menu :global(.ant-card-head-title) {
-        color: #fff;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
-    }
-
-    .cl-bbs-menu a {
-        display: block;
-        padding: 8px 12px;
-        color: rgba(255, 255, 255, 0.85);
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border-left: 2px solid transparent;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .cl-bbs-menu a:hover {
-        background: rgba(138, 43, 226, 0.1);
-        color: #fff;
-        border-left-color: rgba(138, 43, 226, 0.6);
-        padding-left: 16px;
-    }
-
-    .cl-bbs-menu a.active {
-        background: rgba(138, 43, 226, 0.15);
-        color: #fff;
-        border-left-color: blueviolet;
-        font-weight: 500;
-    }
-</style>
-
-<CmsCard Class="cl-bbs-menu" Title="专辑">
+<CmsCard Class="cl-bbs-menu" Icon="far fa-sitemap" Title="博文专辑">
     @if (_albums != null && _albums.Count > 0)
     {
         foreach (var item in _albums)
         {
             <a href="@ConstantUtil.GetBbsAlbumUrl(item.Slug)" class="@(IsActive(item.Slug)?"active":"")">
-                @item.Name
+                @* <i class="@item.Icon" /> *@
+                <span style="margin-left:10px;">@item.Name</span>
             </a>
         }
     }
