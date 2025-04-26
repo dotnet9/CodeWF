@@ -1,0 +1,182 @@
+﻿@inject IOptions<SiteOption> SiteOption
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md">
+                <Logo/>
+                <div class="desc">@SiteOption.Value.Memo</div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="row">
+                    <div class="col-6 col-md" style="margin-top:1rem;">
+                        <h5 class="mb-4 text-white">站点</h5>
+                        <ul class="list-unstyled text-small">
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="/donation">赞助</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="/timeline">时间线</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="/rss" target="_blank">RSS</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="/sitemap.xml" target="_blank">站点地图</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="/about">关于</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md" style="margin-top:1rem;">
+                        <h5 class="mb-4 text-white">工具资源</h5>
+                        <ul class="list-unstyled text-small">
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="https://it-tools.tech/" target="_blank">IT-Tools</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://www.cnblogs.com/Dotnet9-com/" target="_blank">博客园</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://space.bilibili.com/470546606" target="_blank">B站</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="https://www.toutiao.com/c/user/98075192460/#mid=1651788205627396" target="_blank">今日头条</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://github.com/dotnet9/" target="_blank">Github</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md" style="margin-top:1rem;">
+                        <h5 class="mb-4 text-white">社区资源</h5>
+                        <ul class="list-unstyled text-small">
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://irihi.tech/" target="_blank">铱泓科技</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="http://known.org.cn/" target="_blank">Known</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://antblazor.com" target="_blank">Ant Blazor</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right" />
+                                <a class="text-muted" href="https://masastack.com/" target="_blank">Masa</a>
+                            </li>
+                            <li>
+                                <i class="fas fa-angle-right"/>
+                                <a class="text-muted" href="https://www.youtube.com/channel/UCbkbOlw8snP93RJ2BhH44Qw" target="_blank">Murat Yücedağ</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-12 col-md" style="margin-top:1rem;">
+                        <div class="qrcode">
+                            <img src="@SiteOption.Value.WeChatImg" width="180" alt="@SiteOption.Value.WeChatName"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>©@SiteOption.Value.StartYear-@DateTime.Now.Year @SiteOption.Value.Owner</span>
+            <a class="text-muted" target="_blank" href="https://beian.miit.gov.cn">@SiteOption.Value.BaiAn</a>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer {
+        background: linear-gradient(145deg, rgba(16, 20, 40, 0.95), rgba(25, 30, 60, 0.95));
+        padding: 3rem 0 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer .desc {
+        margin-top: 1rem;
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+
+    .footer h5 {
+        color: #4a9eff;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+    }
+
+    .footer ul li {
+        margin: 0.5rem 0;
+    }
+
+    .footer ul li i {
+        color: #4a9eff;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .footer ul li a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .footer ul li:hover i {
+        transform: translateX(3px);
+    }
+
+    .footer ul li:hover a {
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .footer .qrcode {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .footer .qrcode:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer .copyright {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .footer .copyright a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        margin-left: 1rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer .copyright a:hover {
+        color: #4a9eff;
+    }
+</style>

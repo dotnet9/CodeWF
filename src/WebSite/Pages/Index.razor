@@ -1,0 +1,160 @@
+﻿@page "/"
+
+@inherits BaseComponent
+@layout HomeLayout
+@inject AppService AppService
+@inject IOptions<SiteOption> SiteOption
+
+<PageTitle>@SiteOption.Value.AppTitle</PageTitle>
+
+<style>
+    .tech-card {
+        position: relative;
+        background: rgba(20, 20, 40, 0.95);
+        border: 1px solid rgba(100, 100, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        min-height: 250px;
+        box-shadow: 0 4px 15px rgba(0, 0, 255, 0.1);
+        cursor: pointer;
+    }
+
+    .tech-card:hover {
+        transform: translateY(-5px);
+        background: rgba(30, 30, 60, 0.95);
+        border-color: rgba(100, 100, 255, 0.4);
+        box-shadow: 0 8px 25px rgba(0, 0, 255, 0.2);
+    }
+
+    .tech-card .title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.95);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-height: 1.5;
+        text-shadow: 0 0 10px rgba(0, 0, 255, 0.3);
+    }
+
+    .tech-card .description {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        line-height: 1.6;
+    }
+
+    .tech-card i {
+        font-size: 1.75rem;
+        margin-bottom: 1.25rem;
+        color: #4a9eff;
+        text-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+    }
+
+    .tech-card .stretched-link::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        content: "";
+    }
+</style>
+
+<!-- 修改背景颜色和文字样式 -->
+<div class="jumbotron jumbotron-lg jumbotron-fluid mb-0 pb-3 bg-dark-tech position-relative" style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+    <div class="container text-light h-100">
+        <div class="d-lg-flex align-items-center justify-content-between text-center pl-lg-5">
+            <div class="col pt-4 pb-4">
+                <h2 class="display-4 font-weight-bold mb-4" style="text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;">文章启智，工具助力</h2>
+                <h5 class="font-weight-light mb-2" style="text-shadow: 0 0 5px #0f0;">
+                    <strong>码坊</strong>：使用<strong>.NET 10 Web API</strong> + <strong>Blazor</strong>开发。
+                </h5>
+                <h5 class="font-weight-light mb-4" style="text-shadow: 0 0 5px #0f0;">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/bbs" class="btn btn-lg btn-outline-light btn-round mr-2" style="box-shadow: 0 0 10px #00f;">博客</a>
+                    <a href="https://github.com/dotnet9/codewf" class="btn btn-lg btn-success btn-round shadow-sm" target="_blank" style="box-shadow: 0 0 10px #0f0;">Github</a>
+                </div>
+            </div>
+            <!-- 替换为更有科技感的图片 -->
+            <div class="col align-self-bottom align-items-right text-right h-max-380 position-relative z-index-1">
+                <img src="https://img1.dotnet9.com/site/banners/banner.jpg" class="rounded img-fluid shadow" style="animation: float 3s ease-in-out infinite;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 修改 SVG 颜色 -->
+<svg style="-webkit-transform:rotate(-180deg);-moz-transform:rotate(-180deg);-o-transform:rotate(-180deg);transform:rotate(-180deg);margin-top:-1px;enable-background:new 0 0 1440 126;" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewbox="0 0 1440 126" xml:space="preserve">
+    <path class="bg-tech" d="M685.6,38.8C418.7-11.1,170.2,9.9,0,30v96h1440V30C1252.7,52.2,1010,99.4,685.6,38.8z" fill="#302b63"/>
+</svg>
+
+<div class="container pt-5 pb-5" data-aos="fade-up">
+    <div class="row gap-y">
+        @if (_posts?.Any() != true)
+        {
+            <AntEmpty/>
+        }
+        else
+        {
+            foreach (var blogPost in _posts)
+            {
+                int index = _posts.IndexOf(blogPost);
+                <div class="col-md-6 col-xl-4 mb-4">
+                    <div class="tech-card h-100">
+                        <i class="@Icons[index % Icons.Length] @GetIconStyle(index)"></i>
+                        <h3 class="title">@blogPost.Title</h3>
+                        <p class="description">@blogPost.Description</p>
+                        <a href="@ConstantUtil.GetBbsPostUrl(blogPost)" class="stretched-link"></a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const handleScroll = () => {
+            const indexNav = document.querySelector('.index-nav');
+            if (indexNav) {
+                if (window.scrollY > 50) {
+                    indexNav.classList.add('@SiteHeader.DarkNavClass');
+                } else {
+                    indexNav.classList.remove('@SiteHeader.DarkNavClass');
+                }
+            }
+        };
+        
+        window.addEventListener('scroll', handleScroll);
+        // 初始检查
+        handleScroll();
+    });
+</script>
+
+@code
+{
+    private static readonly string[] Icons = { "fas fa-paper-plane", "fas fa-shield-alt", "fas fa-layer-group", "fas fa-vector-square", "fab fa-amazon", "fab fa-slack-hash" };
+    private List<BlogPost>? _posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _posts = await AppService.GetBannerPostAsync();
+    }
+
+    private string GetIconStyle(int index)
+    {
+        string[] styles = new[] { "text-salmon", "text-primary", "text-success", "text-info", "text-warning" };
+        return styles[index % styles.Length];
+    }
+}

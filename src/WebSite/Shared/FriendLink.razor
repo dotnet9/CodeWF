@@ -1,0 +1,92 @@
+﻿@inherits BaseComponent
+@inject AppService AppService
+
+<div class="fluent-container fluent-widget friend-links" data-aos="fade-up">
+    <div class="d-flex flex-wrap align-items-center">
+        <span class="fluent-title-small mr-3">
+            <i class="fas fa-link mr-2"></i>友情链接
+        </span>
+        @if (_links?.Any() != true)
+        {
+            <AntEmpty/>
+        }
+        else
+        {
+            <div class="tech-links-container">
+                @foreach (var link in _links)
+                {
+                    <a href="@link.Link" target="_blank" title="@link.Description" class="tech-link">
+                        <span class="link-text">@link.Title</span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .tech-links-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(16, 20, 40, 0.8), rgba(20, 25, 50, 0.8));
+        border-radius: 16px;
+        border: 1px solid rgba(100, 150, 255, 0.2);
+        box-shadow: inset 0 0 30px rgba(70, 90, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .tech-link {
+        position: relative;
+        padding: 8px 16px;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        background: rgba(70, 90, 255, 0.08);
+        border: 1px solid rgba(100, 150, 255, 0.2);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .tech-link::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(45deg, transparent, rgba(100, 150, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .tech-link:hover {
+        transform: translateY(-2px);
+        background: rgba(70, 90, 255, 0.12);
+        border-color: rgba(100, 150, 255, 0.4);
+        box-shadow: 0 4px 15px rgba(70, 90, 255, 0.15),
+                   inset 0 0 10px rgba(70, 90, 255, 0.1);
+        color: #fff;
+    }
+
+    .tech-link:hover::before {
+        opacity: 1;
+    }
+
+    .link-text::before {
+        content: '# ';
+        color: rgba(100, 150, 255, 0.6);
+        margin-right: 2px;
+    }
+</style>
+
+@code {
+    private List<FriendLinkItem>? _links;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+
+        _links = await AppService.GetAllFriendLinkItemsAsync();
+    }
+}
