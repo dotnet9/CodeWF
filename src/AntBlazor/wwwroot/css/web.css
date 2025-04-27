@@ -1,0 +1,10 @@
+@import "ant-design-blazor.css";
+
+/*AntD*/
+.ant-form-item-row {align-items:center;}
+.ant-form-horizontal .ant-form-item-label {width:80px;margin-right:10px;}
+.ant-form-horizontal .button {margin-left:90px;}
+.ant-modal-close {font-size:1.2rem;padding:1rem;}
+.ant-modal-close:hover {color:#a71e1e;}
+.ant-input-affix-wrapper {align-items:center;}
+.ant-input-affix-wrapper i {color:#ccc;margin-right:10px;}

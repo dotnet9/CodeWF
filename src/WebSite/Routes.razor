@@ -1,0 +1,25 @@
+﻿@using Known.Components
+
+<KContext Value="Context">
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <KRouteData Value="routeData">
+                <RouteView RouteData="routeData" DefaultLayout="typeof(SiteLayout)" />
+            </KRouteData>
+        </Found>
+        <NotFound>
+            <p>页面不存在！</p>
+        </NotFound>
+    </Router>
+</KContext>
+
+@code {
+    [Inject] private UIContext Context { get; set; }
+    [CascadingParameter] private HttpContext HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        HttpContext.SetContext(Context);
+    }
+}

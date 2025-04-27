@@ -1,0 +1,31 @@
+﻿@inherits BaseComponent
+@inject AppService AppService
+
+<CmsCard Class="cl-rank" Icon="far fa-fire" Title="网站统计">
+    @if (_websiteCount is not { Count: > 0 })
+    {
+        <AntEmpty />
+    }
+    else
+    {
+        var index = 0;
+        foreach (var item in _websiteCount)
+        {
+            index++;
+            <div class="cl-rank-item">
+                <div class="title">@item.Key</div>
+                <div class="title">@item.Value</div>
+            </div>
+        }
+    }
+</CmsCard>
+
+@code {
+    private Dictionary<string, string>? _websiteCount;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        _websiteCount = await AppService.GetWebSiteCountAsync();
+    }
+}

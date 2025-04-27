@@ -1,0 +1,90 @@
+﻿@inherits BaseComponent
+
+<ul class="ant-pagination" unselectable="unselectable">
+    <li title="上一页" class="ant-pagination-prev">
+        <a class="ant-pagination-item-link" href="@GetUrl(PageIndex-1)">
+            <span class="anticon anticon-left" role="img"><svg focusable="false" width="1em" height="1em" fill="currentColor" style="pointer-events:none;" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024"><path d="M724 218.3V141c0-6.7-7.7-10.4-12.9-6.3L260.3 486.8a31.86 31.86 0 0 0 0 50.3l450.8 352.1c5.3 4.1 12.9.4 12.9-6.3v-77.3c0-4.9-2.3-9.6-6.1-12.6l-360-281 360-281.1c3.8-3 6.1-7.7 6.1-12.6z"></path></svg></span>
+        </a>
+    </li>
+    @if (PageCount > 1)
+    {
+        var start = 1;
+        var end = PageCount;
+        if (PageCount > 5)
+        {
+            start = PageIndex - 2 > 0 ? PageIndex - 2 : 1;
+            end = PageIndex + 5 > PageCount ? PageCount : start + 4;
+            if (end == PageCount && PageCount > 5)
+                start = PageCount - 4;
+        }
+        if (start != 1)
+        {
+            <li title="1" class="ant-pagination-item">
+                <a rel="nofollow" href="@GetUrl(1)">1</a>
+            </li>
+            <li title="向前 5 页" class="ant-pagination-jump-prev ant-pagination-jump-prev-custom-icon">
+                <a class="ant-pagination-item-link" href="@GetUrl(PageIndex-5)">
+                    <div class="ant-pagination-item-container">
+                        <span class="ant-pagination-item-link-icon anticon anticon-double-left" role="img"><svg focusable="false" width="1em" height="1em" fill="currentColor" style="pointer-events:none;" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024"><path d="M272.9 512l265.4-339.1c4.1-5.2.4-12.9-6.3-12.9h-77.3c-4.9 0-9.6 2.3-12.6 6.1L186.8 492.3a31.99 31.99 0 0 0 0 39.5l255.3 326.1c3 3.9 7.7 6.1 12.6 6.1H532c6.7 0 10.4-7.7 6.3-12.9L272.9 512zm304 0l265.4-339.1c4.1-5.2.4-12.9-6.3-12.9h-77.3c-4.9 0-9.6 2.3-12.6 6.1L490.8 492.3a31.99 31.99 0 0 0 0 39.5l255.3 326.1c3 3.9 7.7 6.1 12.6 6.1H836c6.7 0 10.4-7.7 6.3-12.9L576.9 512z"></path></svg></span>
+                        <span class="ant-pagination-item-ellipsis">•••</span>
+                    </div>
+                </a>
+            </li>
+        }
+        for (int i = start; i <= end; i++)
+        {
+            var className = "ant-pagination-item";
+            if (i == PageIndex)
+                className += " ant-pagination-item-active";
+
+            <li title="@i" class="@className">
+                <a rel="nofollow" href="@GetUrl(i)">@i</a>
+            </li>
+        }
+        if (end != PageCount)
+        {
+            <li title="向后 5 页" tabindex="0" class="ant-pagination-jump-next ant-pagination-jump-next-custom-icon">
+                <a class="ant-pagination-item-link" href="@GetUrl(PageIndex+5)">
+                    <div class="ant-pagination-item-container">
+                        <span class="ant-pagination-item-link-icon anticon anticon-double-right" role="img"><svg focusable="false" width="1em" height="1em" fill="currentColor" style="pointer-events:none;" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024"><path d="M533.2 492.3L277.9 166.1c-3-3.9-7.7-6.1-12.6-6.1H188c-6.7 0-10.4 7.7-6.3 12.9L447.1 512 181.7 851.1A7.98 7.98 0 0 0 188 864h77.3c4.9 0 9.6-2.3 12.6-6.1l255.3-326.1c9.1-11.7 9.1-27.9 0-39.5zm304 0L581.9 166.1c-3-3.9-7.7-6.1-12.6-6.1H492c-6.7 0-10.4 7.7-6.3 12.9L751.1 512 485.7 851.1A7.98 7.98 0 0 0 492 864h77.3c4.9 0 9.6-2.3 12.6-6.1l255.3-326.1c9.1-11.7 9.1-27.9 0-39.5z"></path></svg></span>
+                        <span class="ant-pagination-item-ellipsis">•••</span>
+                    </div>
+                </a>
+            </li>
+            <li title="@PageCount" class="ant-pagination-item">
+                <a rel="nofollow" href="@GetUrl(PageCount)">@PageCount</a>
+            </li>
+        }
+    }
+    else
+    {
+        <li title="1" class="ant-pagination-item ant-pagination-item-active">
+            <a rel="nofollow" href="@GetUrl(1)">1</a>
+        </li>
+    }
+    <li title="下一页" class="ant-pagination-next">
+        <a class="ant-pagination-item-link" href="@GetUrl(PageIndex+1)">
+            <span class="anticon anticon-right" role="img"><svg focusable="false" width="1em" height="1em" fill="currentColor" style="pointer-events:none;" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024"><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></span>
+        </a>
+    </li>
+</ul>
+
+@code {
+    private int PageCount => (int)Math.Ceiling(TotalCount * 1.0 / PageSize);
+
+    [Parameter] public int TotalCount { get; set; }
+    [Parameter] public int PageSize { get; set; }
+    [Parameter] public int PageIndex { get; set; }
+    [Parameter] public string? Key { get; set; }
+
+    private string GetUrl(int page)
+    {
+        if (page <= 0)
+            page = 1;
+        if (page >= PageCount)
+            page = PageCount;
+
+        var url = Navigation.Uri.Split('?')[0];
+        return string.IsNullOrWhiteSpace(Key) ? $"{url}?page={page}" : $"{url}?page={page}&key={Key}";
+    }
+}

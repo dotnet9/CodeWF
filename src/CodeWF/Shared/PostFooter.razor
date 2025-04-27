@@ -1,0 +1,42 @@
+﻿@inject IOptions<SiteOption> SiteOption
+
+<div class="share" id="down">
+    <img src="@SiteOption.Value.WeChatImg" class="qrcode" alt="">
+    <div class="share-text">
+        <p>扫码关注@(SiteOption.Value.WeChatName)微信公众号，第一时间获取网站更新动态</p>
+        @switch (Model?.Copyright)
+        {
+            case CopyRights.Reprinted:
+                <p>本文来自转载，如若二次转载请联系原作者。</p>
+                break;
+            case CopyRights.Contributes:
+                <p>本文来自网友投稿，如若转载请联系原作者。</p>
+                break;
+            default:
+                <p>本文由本站(<a href="/" target="_blank">@SiteOption.Value.Domain</a>)整理或创作，如若转载请保留原文标题及原文链接</p>
+                break;
+        }
+        <p>原文作者：<a style="color: #262626;" href="#" target="_blank">@(Model?.Author ?? @SiteOption.Value.Owner)</a></p>
+        @if (Model?.Copyright == CopyRights.Original)
+        {
+            <p>原文标题：<a href="@ConstantUtil.GetBbsPostUrl(Model)" target="_blank">@Model.Title</a></p>
+            @if (ConstantUtil.GetBbsPostUrl(Model).IsNullOrEmpty() != true)
+            {
+                <p>原文链接：<a href="@ConstantUtil.GetBbsPostUrl(Model)" target="_blank">@SiteOption.Value.Domain@ConstantUtil.GetBbsPostUrl(Model)</a></p>
+            }
+        }
+        else
+        {
+            <p>原文标题：<a href="@Model?.OriginalLink" target="_blank">@(Model?.OriginalTitle ?? Model?.Title)</a></p>
+            @if (@Model?.OriginalLink.IsNullOrEmpty() != true)
+            {
+                <p>原文链接：<a href="@Model?.OriginalLink" target="_blank">@Model?.OriginalLink</a></p>
+            }
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public BlogPost? Model { get; set; }
+}

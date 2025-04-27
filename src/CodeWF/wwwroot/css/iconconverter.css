@@ -1,0 +1,304 @@
+﻿/* Fluent UI 风格样式 - 修复容器溢出问题 */
+.fluent-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #323130;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fluent-header {
+    margin-bottom: 24px;
+}
+
+.fluent-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #0078d4;
+    word-wrap: break-word;
+}
+
+.fluent-subtitle {
+    font-size: 16px;
+    margin: 0;
+    color: #605e5c;
+    word-wrap: break-word;
+}
+
+.fluent-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    width: 100%;
+}
+
+@@media (max-width: 768px) {
+    .fluent-content {
+        grid-template-columns: 1fr;
+    }
+
+    .fluent-container {
+        padding: 16px;
+    }
+
+    .fluent-actions {
+        flex-direction: column;
+    }
+
+    .fluent-button {
+        width: 100%;
+    }
+}
+
+.fluent-card {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+    transition: box-shadow 0.3s ease;
+    overflow: hidden;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+    .fluent-card:hover {
+        box-shadow: 0 6.4px 14.4px 0 rgba(0,0,0,0.132), 0 1.2px 3.6px 0 rgba(0,0,0,0.108);
+    }
+
+.fluent-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #edebe9;
+}
+
+    .fluent-card-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+.fluent-card-content {
+    padding: 20px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.fluent-form-group {
+    margin-bottom: 24px;
+}
+
+.fluent-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.fluent-file-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    overflow: hidden;
+    height: 36px;
+    width: 100%;
+}
+
+    .fluent-file-input input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+.fluent-file-button {
+    background-color: #f3f2f1;
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #8a8886;
+    font-size: 14px;
+}
+
+.fluent-file-name {
+    padding: 0 12px;
+    font-size: 14px;
+    color: #605e5c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.fluent-hint {
+    font-size: 12px;
+    color: #605e5c;
+    margin-top: 4px;
+}
+
+.fluent-checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
+    width: 100%;
+}
+
+.fluent-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+    .fluent-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .fluent-checkbox label {
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+.fluent-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.fluent-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    height: 36px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fluent-primary {
+    background-color: #0078d4;
+    color: white;
+}
+
+    .fluent-primary:hover {
+        background-color: #106ebe;
+    }
+
+    .fluent-primary:active {
+        background-color: #005a9e;
+    }
+
+.fluent-secondary {
+    background-color: #f3f2f1;
+    color: #323130;
+    border: 1px solid #8a8886;
+}
+
+    .fluent-secondary:hover {
+        background-color: #edebe9;
+    }
+
+    .fluent-secondary:active {
+        background-color: #e1dfdd;
+    }
+
+.fluent-success {
+    background-color: #107c10;
+    color: white;
+}
+
+    .fluent-success:hover {
+        background-color: #0b6a0b;
+    }
+
+    .fluent-success:active {
+        background-color: #094e09;
+    }
+
+.fluent-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.fluent-result {
+    display: none;
+}
+
+.fluent-success-message,
+.fluent-warning-message {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    word-wrap: break-word;
+}
+
+    .fluent-success-message span,
+    .fluent-warning-message span {
+        flex: 1;
+    }
+
+.fluent-list {
+    padding-left: 20px;
+    margin: 0 0 20px 0;
+}
+
+    .fluent-list li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+
+.fluent-code-block {
+    background-color: #f3f2f1;
+    border-radius: 2px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.fluent-code-title {
+    background-color: #edebe9;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.fluent-code-block pre {
+    margin: 0;
+    padding: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.fluent-code-block code {
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 13px;
+    color: #323130;
+}
+
+/* 确保所有元素都使用border-box盒模型 */
+*, *::before, *::after {
+    box-sizing: border-box;
+}

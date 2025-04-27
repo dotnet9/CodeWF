@@ -1,0 +1,25 @@
+﻿<div class="cl-card @Class">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <div class="cl-card-head">
+            <CmsTitle Icon="@Icon" Title="@Title" />
+        </div>
+    }
+    else if (HeadTemplate != null)
+    {
+        <div class="cl-card-head">
+            @HeadTemplate
+        </div>
+    }
+    <div class="cl-card-body">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Class { get; set; }
+    [Parameter] public string Icon { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public RenderFragment HeadTemplate { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

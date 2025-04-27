@@ -1,0 +1,25 @@
+﻿@inherits BaseComponent
+
+@if (IsColor)
+{
+    <span class="ant-tag ant-tag-has-color" style="background-color:@Color;" @attributes="InputAttributes">@ChildContent</span>
+}
+else
+{
+    <span class="ant-tag ant-tag-@Color" @attributes="InputAttributes">@ChildContent</span>
+}
+
+@code {
+    [Parameter] public string Color { get; set; }
+    [Parameter] public string OnClick { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        InputAttributes.Clear();
+        InputAttributes.AddItem("onclick", OnClick);
+    }
+
+    private bool IsColor => Color.StartsWith("#") || Color.StartsWith("rgb(");
+}

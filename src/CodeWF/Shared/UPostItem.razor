@@ -1,0 +1,20 @@
+﻿<div class="cl-bbs-post-item">
+    <div class="item">
+        <div>
+            <a href="@ConstantUtil.GetBbsPostUrl(Post)" target="_blank">
+                <div class="title">@Post.Title</div>
+                <div class="summary">@Post.Description</div>
+            </a>
+            <UPostTags Tags="@Post.Tags"/>
+            <UPostCount Post="Post" ShowEdit="false" />
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Post.Cover))
+        {
+            <div><img src="@Post.Cover" /></div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public BlogPost Post { get; set; }
+}

@@ -1,0 +1,77 @@
+﻿@inherits BaseComponent
+
+<div id="@_mdId">
+    <div id="toc">
+        <div>
+            <a class="item-title" href="@GetTopLink()" title="@Title">@Title</a>
+        </div>
+    </div>
+    
+    <div id="summary" style="margin: 20px auto; padding: 10px; background: linear-gradient(135deg, #2980b9, #8e44ad); box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); border-radius: 10px; font-family: Arial, sans-serif; position: relative; overflow: hidden;">
+        <p style="color: white; text-align: justify; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 10px;">Ai摘要</p>
+        <p id="post_summary" style="color: white; line-height: 1.6; text-align: justify;"></p>
+        <p style="color: #ddd; margin-bottom: 0px;">摘要由站长通过智能技术生成</p>
+    </div>
+
+    <div class="post" id="post">
+        @if (!string.IsNullOrWhiteSpace(Content))
+        {
+            @((MarkupString)Content)
+        }
+    </div>
+</div>
+<script>
+    async function summary(content){
+        $("#post_summary").val('AI总结：');
+
+        const response = await fetch('/ai/articlesummary', {
+            method:"POST",
+            body: JSON.stringify({
+                content: content,
+                length: 200
+            }),
+            headers: {
+                "content-type": "application/json"
+            }
+        });
+        // 解析这个response的sse返回流
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader?.read() || {};
+            if (done) break;
+
+            // 解码二进制数据
+            const chunk = decoder.decode(value);
+
+            // 按行分割数据
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                // 跳过空行
+                if (!line.trim()) continue;
+
+                // 移除 "data: " 前缀
+                const message = line.replace(/^data: /, '');
+
+                // 检查流是否结束
+                if (message === '[DONE]') {
+                    return;
+                }
+                $("#post_summary").html($("#post_summary").html() + message); // 这里你可以处理返回的文本片段
+            }
+        }
+    }
+    $(getTOC('@_mdId'));
+    summary('@Markdown');
+</script>
+
+@code {
+    Guid _mdId = Guid.NewGuid();
+    string GetTopLink() => Navigation.GetPageUrl().Split('#')[0] + '#' + _mdId;
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Markdown { get; set; }
+    [Parameter] public string? Content { get; set; }
+}

@@ -1,0 +1,23 @@
+﻿@inherits BaseComponent
+
+<div id="@Id" class="ant-modal-root" style="display:none;">
+    <div class="ant-modal-mask"></div>
+    <div class="ant-modal-wrap">
+        <div class="ant-modal" style="width:@(Width)px;">
+            <div class="ant-modal-content">
+                <div class="ant-modal-header">
+                    <div class="ant-modal-title">@Name</div>
+                    <div class="ant-modal-close"><i class="far fa-times" /></div>
+                </div>
+                <div class="ant-modal-body">
+                    @ChildContent
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Width { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

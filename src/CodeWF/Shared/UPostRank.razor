@@ -1,0 +1,33 @@
+﻿@inherits BaseComponent
+@inject AppService AppService
+
+<CmsCard Class="cl-rank" Icon="far fa-fire" Title="站长推荐">
+    @if (_posts is not { Count: > 0 })
+    {
+        <AntEmpty />
+    }
+    else
+    {
+        var index = 0;
+        foreach (var item in _posts)
+        {
+            index++;
+            <div class="cl-rank-item">
+                <div class="@($"index index{index}")">@index</div>
+                <div class="title">
+                    <a class="ask-title" href="@ConstantUtil.GetBbsPostUrl(item)">@item.Title</a>
+                </div>
+            </div>
+        }
+    }
+</CmsCard>
+
+@code {
+    private List<BlogPost>? _posts;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        _posts = await AppService.GetBannerPostAsync();
+    }
+}

@@ -1,0 +1,14 @@
+[
+    {
+        "Name": "Web",
+        "Children": 
+        [
+            {
+                "Name": "标题转URL",
+                "Memo": "文章标题转URL友好的别名",
+                "Slug": "slugify-string",
+                "Repository": "https://github.com/dotnet9/CodeWF.EventBus"
+            }
+        ]
+    }
+]

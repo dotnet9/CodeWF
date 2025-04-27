@@ -1,0 +1,33 @@
+﻿@inject IOptions<SiteOption> SiteOption
+@inject NavigationManager Navigation
+
+<PageTitle>@Title - @SiteOption.Value.AppTitle</PageTitle>
+
+<div class="container fluent-container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="fluent-card shadow-sm mb-4 fluent-animated fluent-slide-up fluent-duration-normal">
+                <div class="fluent-card-header">
+                    <h2 class="fluent-title">@Title</h2>
+                    <WechatPublicLink />
+                </div>
+                <div class="fluent-card-content">
+                    <UPostInfo Title="@Title" Markdown="@Markdown" Content="@HtmlContent" />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="fluent-sidebar">
+                <UWebSiteCount class="fluent-widget shadow-sm mb-4 fluent-animated fluent-slide-left fluent-duration-normal fluent-delay-200" />
+                <UPostRank class="fluent-widget shadow-sm fluent-animated fluent-slide-left fluent-duration-normal fluent-delay-300" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Markdown { get; set; }
+    [Parameter] public string HtmlContent { get; set; }
+}

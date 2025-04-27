@@ -1,0 +1,232 @@
+﻿@inject IOptions<SiteOption> SiteOptions
+
+<PageTitle>在线ICO转换器 - @SiteOptions.Value.AppTitle</PageTitle>
+
+<div class="fluent-container">
+    <div class="fluent-header">
+        <h2 class="fluent-title">ICO 图标转换工具</h2>
+        <p class="fluent-subtitle">将您的图片转换为多尺寸的 ICO 图标文件</p>
+    </div>
+
+    <div class="fluent-content">
+        <div class="fluent-main">
+            <div class="fluent-card">
+                <div class="fluent-card-content">
+                    <div class="fluent-form-group">
+                        <label for="fileInput" class="fluent-label">选择源图片文件</label>
+                        <div class="fluent-file-input">
+                            <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.webp" />
+                            <span class="fluent-file-button">浏览文件</span>
+                            <span class="fluent-file-name">未选择文件</span>
+                        </div>
+                        <div class="fluent-hint">支持的格式: PNG、JPG、JPEG、WEBP</div>
+                    </div>
+
+                    <div class="fluent-form-group">
+                        <label class="fluent-label">选择图标尺寸</label>
+                        <div class="fluent-checkbox-group">
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size16" value="16" checked>
+                                <label for="size16">16x16</label>
+                            </div>
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size32" value="32" checked>
+                                <label for="size32">32x32</label>
+                            </div>
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size48" value="48">
+                                <label for="size48">48x48</label>
+                            </div>
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size64" value="64">
+                                <label for="size64">64x64</label>
+                            </div>
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size128" value="128">
+                                <label for="size128">128x128</label>
+                            </div>
+                            <div class="fluent-checkbox">
+                                <input type="checkbox" id="size256" value="256">
+                                <label for="size256">256x256</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fluent-actions">
+                        <button id="mergeButton" class="fluent-button fluent-primary">
+                            <svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M4 21h16v-2H4v2zm0-4h16v-2H4v2zm0-4h16v-2H4v2zm0-4h16V7H4v2zm0-6v2h16V3H4z"/>
+                            </svg>
+                            合并生成ICO
+                        </button>
+                        <button id="separateButton" class="fluent-button fluent-secondary">
+                            <svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M3 3v6h6V3H3zm8 0v6h6V3h-6zm-8 8v6h6v-6H3zm8 0v6h6v-6h-6z"/>
+                            </svg>
+                            分别生成ICO
+                        </button>
+                    </div>
+
+                    <div id="result" class="fluent-result">
+                        <div class="fluent-success-message">
+                            <svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                            <span>转换成功! 请点击下方按钮下载文件。</span>
+                        </div>
+                        <a id="downloadLink" class="fluent-button fluent-success" target="_blank">
+                            <svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                            下载文件
+                        </a>
+                        <div class="fluent-warning-message">
+                            <svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                            </svg>
+                            <span>请注意：生成的文件仅保留2分钟，请及时下载。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fluent-sidebar">
+            <div class="fluent-card">
+                <div class="fluent-card-header">
+                    <h3>使用说明</h3>
+                </div>
+                <div class="fluent-card-content">
+                    <ol class="fluent-list">
+                        <li>选择一个图片文件作为源文件</li>
+                        <li>选择需要的图标尺寸（建议至少包含16x16和32x32）</li>
+                        <li>点击"合并生成ICO"将所有尺寸合并到一个ICO文件中</li>
+                        <li>或点击"分别生成ICO"获取每个尺寸的单独文件</li>
+                    </ol>
+                    <div class="fluent-code-block">
+                        <div class="fluent-code-title">网站图标引用代码</div>
+                        <pre><code>&lt;link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="_content/CodeWF/css/iconconverter.css" rel="stylesheet" />
+
+@code {
+    public const string Slug = "ico";
+}
+
+<script>
+    $(document).ready(function () {
+        // 文件输入框美化
+        $('#fileInput').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            if (fileName) {
+                $('.fluent-file-name').text(fileName);
+            } else {
+                $('.fluent-file-name').text('未选择文件');
+            }
+        });
+
+        function validateInput() {
+            const $fileInput = $('#fileInput');
+            if (!$fileInput[0].files || !$fileInput[0].files.length) {
+                alert('请选择图片文件');
+                return false;
+            }
+
+            const sizes = $('input[type="checkbox"]:checked')
+                .map(function () { return $(this).val(); })
+                .get();
+
+            if (sizes.length === 0) {
+                alert('请至少选择一个图标尺寸');
+                return false;
+            }
+
+            return {
+                file: $fileInput[0].files[0],
+                sizes: sizes
+            };
+        }
+
+        async function convertIcon(isMerge) {
+            const validation = validateInput();
+            if (!validation) return;
+
+            const $button = isMerge ? $('#mergeButton') : $('#separateButton');
+            const $result = $('.fluent-result');
+            const $downloadLink = $('#downloadLink');
+            
+            // 保存原始按钮内容
+            const originalHtml = $button.html();
+
+            // 添加加载状态
+            $button.prop('disabled', true)
+                .html(`<div class="fluent-spinner"></div><span>${isMerge ? '合并生成中...' : '分别生成中...'}</span>`);
+
+            try {
+                const formData = new FormData();
+                formData.append('sourceImage', validation.file);
+                formData.append('sizes', validation.sizes.join(','));
+
+                const response = await $.ajax({
+                    url: `/api/Image/${isMerge ? 'merge' : 'separate'}`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false
+                });
+
+                if (response.success) {
+                    $downloadLink
+                        .attr('href', response.url)
+                        .html(`<svg class="fluent-icon" viewBox="0 0 24 24">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                              </svg> 下载${isMerge ? 'ICO文件' : 'ZIP压缩包'}`);
+                    $result.fadeIn(300);
+                } else {
+                    alert('生成失败：' + response.message);
+                }
+            } catch (error) {
+                console.error('错误:', error);
+                alert('生成过程出错，请稍后重试');
+            } finally {
+                $button.prop('disabled', false).html(originalHtml);
+            }
+        }
+
+        // 添加加载动画样式
+        $('<style>')
+            .text(`
+                .fluent-spinner {
+                    width: 16px;
+                    height: 16px;
+                    margin-right: 8px;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    border-top-color: #fff;
+                    animation: spin 0.8s linear infinite;
+                }
+                
+                @@keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `)
+            .appendTo('head');
+
+        // 绑定按钮事件
+        $('#mergeButton').click(() => convertIcon(true));
+        $('#separateButton').click(() => convertIcon(false));
+        
+        // 添加按钮悬停效果
+        $('.fluent-button').on('mousedown', function() {
+            $(this).css('transform', 'scale(0.98)');
+        }).on('mouseup mouseleave', function() {
+            $(this).css('transform', 'scale(1)');
+        });
+    });
+</script>

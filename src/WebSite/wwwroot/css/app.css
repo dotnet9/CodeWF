@@ -1,0 +1,146 @@
+@charset "UTF-8";
+@import url(../_content/CodeWF/css/toc.css);
+/*site*/
+
+/* 2024年10月23日 */
+:root {
+  /* 深色模式下的 `悬停` 颜色 */
+  --color-dark-hover: rgba(255, 255, 255, 1);
+  /* 深色模式下的 `文字` 颜色 */
+  --color-dark-text: rgba(255, 255, 255, 0.85);
+  /* 浅色模式下的 `悬停` 颜色 */
+  --color-light-hover: rgba(0, 0, 0, 1);
+  /* 浅色模式下的 `文字` 颜色 */
+  --color-light-text: rgba(44, 44, 44, 0.85);
+  /* 彩条颜色 自己改成想要的*/
+  --background-hover: linear-gradient(to right, #ef85b2, #e16fc1, #c462d7, #8c5ff0) no-repeat left bottom;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 6px 1em;
+  margin-block: -6px;
+  background: var(--background-hover);
+  background-size: 0% 6px;
+
+  color: var(--color-light-text);
+  transition: all 0.5s ease;
+}
+.footer .logo-link {
+  color: var(--color-dark-text);
+  padding: unset;
+  margin-block: unset;
+  &:hover {
+    color: var(--color-dark-hover);
+  }
+}
+
+.navbar-dark .logo-link {
+  color: var(--color-dark-text);
+  &:hover {
+    color: var(--color-dark-hover);
+    background-size: 100% 5px;
+  }
+}
+
+.navbar-light .logo-link {
+  color: var(--color-light-text);
+
+  &:hover {
+    color: var(--color-light-hover);
+    background-size: 100% 5px;
+  }
+}
+/* 2024年10月23日 */
+
+body {
+  background-color: #f2f3f5;
+  font-family: Lato, PingFang SC, Microsoft YaHei, sans-serif;
+}
+.fixed-top {
+  z-index: 1000;
+}
+.navbar-brand {
+  background: url(../img/logo.png);
+  display: block;
+  width: 180px;
+  height: 50px;
+}
+
+.logo-container {
+  gap: 10px;
+}
+.logo-image {
+  height: 28px;
+  width: auto;
+}
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.bg-white .navbar-brand {
+  background: url(../img/logo1.png);
+}
+.navbar-nav .nav-link {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+.navbar-light .navbar-nav .nav-link {
+  color: #201f21;
+}
+.navbar-light .navbar-nav .active > .nav-link {
+  color: #7832e2;
+}
+.navbar-nav .dropdown-item {
+  font-weight: 500;
+}
+.bg-primary {
+  background-color: #1c66b9 !important;
+  fill: #1c66b9 !important;
+}
+.bg-white {
+  background-color: #fff !important;
+  fill: #fff !important;
+}
+.text-muted {
+  margin-left: 6px;
+}
+.links {
+  background: #fdfdfd;
+  border-bottom: 1px solid #e3e3e3;
+  line-height: 1;
+  margin-bottom: 15px;
+  margin-top: -15px;
+  padding: 10px;
+}
+.links a {
+  border-right: 1px solid #e3e3e3;
+  padding: 0 8px;
+  color: #999;
+  display: inline-block;
+  margin: 5px 0;
+}
+
+.footer {
+  background-color: #202942;
+  color: #adb5bd;
+  padding: 3rem 0 2rem 0;
+}
+.copyright {
+  text-align: center;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+.blockquote {font-size:1rem;}
+
+@media screen and (max-width: 768px) {
+  .qrcode {
+    text-align: center;
+  }
+  .copyright {
+    flex-direction: column;
+  }
+}

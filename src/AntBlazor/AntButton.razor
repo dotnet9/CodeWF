@@ -1,0 +1,16 @@
+﻿@inherits BaseComponent
+
+<button class="@ClassName" onclick="@OnClick">@Name</button>
+
+@code {
+    private string ClassName => CssBuilder.Default("ant-btn")
+                                          .AddClass($"ant-btn-{Type}")
+                                          .AddClass("ant-btn-block", Block)
+                                          .AddClass("ant-btn-dangerous", Danger)
+                                          .BuildClass();
+
+    [Parameter] public string Type { get; set; } = "primary";
+    [Parameter] public bool Block { get; set; }
+    [Parameter] public bool Danger { get; set; }
+    [Parameter] public string OnClick { get; set; }
+}

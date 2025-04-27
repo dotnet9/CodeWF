@@ -1,0 +1,71 @@
+﻿@page "/timeline"
+
+@inherits BaseComponent
+@inject AppService AppService
+@inject IOptions<SiteOption> SiteOption
+
+<PageTitle>时间线 - @SiteOption.Value.AppTitle</PageTitle>
+
+<div class="container cl-container cl-post responsive-container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div id="@_mdId">
+                <CmsCard class="card-enhanced">
+                    <HeadTemplate>
+                        <WechatPublicLink />
+                    </HeadTemplate>
+                    <ChildContent>
+                        <div class="title font-weight-bold mb-4">时间线</div>
+                        <div id="toc" class="mb-4">
+                            <div>
+                                <a class="item-title" href="@GetTopLink()" title="时间线">时间线</a>
+                            </div>
+                        </div>
+                        <div>
+                            @if (_items?.Any() == true)
+                            {
+                                @foreach (var (item, index) in _items.Select((item, index) => (item, index)))
+                                {
+                                    <div class="timeline-item @(index % 2 == 0 ? "slide-up" : "fade-in")" style="animation-delay: @(index * 0.1)s">
+                                        <h2 class="text-primary">@item.Time?.ToString("yyyy-MM-dd")</h2>
+                                        <h3 class="mb-2">@item.Title</h3>
+                                        <p class="text-muted">@item.Content</p>
+                                        <hr class="my-4" />
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <AntEmpty/>
+                            }
+                        </div>
+                    </ChildContent>
+                </CmsCard>
+            </div>
+            <div style="height:20px;"></div>
+        </div>
+        <div class="col-lg-4">
+            <UWebSiteCount/>
+            <div style="height: 20px;"></div>
+            <UPostRank/>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(getTOC('@_mdId'));
+</script>
+
+@code
+{
+    Guid _mdId = Guid.NewGuid();
+    string GetTopLink() => Navigation.GetPageUrl().Split('#')[0] + '#' + _mdId;
+
+    private List<TimeLineItem>? _items;
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        _items = await AppService.GetTimeLineItemsAsync();
+    }
+}
