@@ -1,6 +1,5 @@
 ﻿using CodeWF.Options;
 using CodeWF.Tools.FileExtensions;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
 using Quartz;
@@ -8,7 +7,6 @@ using Scalar.AspNetCore;
 using System.IO.Compression;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using Quartz.AspNetCore;
 using WebSite.Jobs;
 using WebSite.Options;
 
@@ -38,7 +36,7 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 });
     
 builder.Services.AddResponseCompression();
-builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+//builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
 
 builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
