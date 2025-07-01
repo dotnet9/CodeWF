@@ -49,6 +49,11 @@
                 {
                     <NuoChe/>
                 }
+
+                @if (string.Equals(Slug, FuLi.Slug, StringComparison.OrdinalIgnoreCase))
+                {
+                    <FuLi/>
+                }
             }
         </ChildContent>
     </CmsCard>

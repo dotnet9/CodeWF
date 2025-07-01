@@ -1,0 +1,206 @@
+@code {
+    public const string Slug = "fuli";
+}
+
+<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.bootcdn.net/ajax/libs/chart.js/3.7.1/chart.min.js"></script>
+<style>
+    .calculator-box {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    .result-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .result-table {
+        height: 500px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #resultChart {
+        height: 500px!important;
+    }
+</style>
+
+<div class="calculator-box">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <!-- 第一行 -->
+                <div class="col-md-6">
+                    <label class="form-label">复利方式</label>
+                    <select class="form-select" id="compoundType" onchange="calculate()">
+                        <option value="year">按年复利</option>
+                        <option value="month">按月复利</option>
+                        <option value="day">按日复利</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="form-label">利率类型</label>
+                    <select class="form-select" id="rateType" onchange="updateRatePlaceholder()">
+                        <option value="annual">年利率</option>
+                        <option value="monthly">月利率</option>
+                        <option value="daily">日利率</option>
+                    </select>
+                </div>
+
+                <!-- 第二行 -->
+                <div class="col-md-6">
+                    <label class="form-label">利率值（%）</label>
+                    <input type="number" class="form-control" id="rateValue" min="0" step="0.1" value="3" oninput="calculate()">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">本金（元）</label>
+                    <input type="number" class="form-control" id="principal" min="0" step="100" value="10000" oninput="calculate()">
+                </div>
+
+                <!-- 第三行 -->
+                <div class="col-md-6">
+                    <label class="form-label">存入期限类型</label>
+                    <select class="form-select" id="durationType" onchange="calculate()">
+                        <option value="year">年</option>
+                        <option value="month">月</option>
+                        <option value="day">日</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">存入期限数</label>
+                    <input type="number" class="form-control" id="durationValue" min="1" value="1" oninput="calculate()">
+                </div>
+
+                <!-- 计算按钮 -->
+                <div class="col-12 text-center mt-3">
+                    <button class="btn btn-primary px-4" onclick="calculate()">
+                        <i class="bi bi-calculator me-2"></i>立即计算
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-grid mt-4">
+        <div class="result-table">
+            <table class="table table-hover align-middle">
+                <thead class="sticky-top bg-white">
+                    <tr>
+                        <th>期数</th>
+                        <th>本息合计</th>
+                        <th>累计利息</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTable" class="font-monospace"></tbody>
+            </table>
+        </div>
+        
+        <div>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-3">
+                    <canvas id="resultChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 表格更新函数
+    async function updateTable(results, principal) {
+        const tableBody = document.getElementById('resultTableBody');
+        tableBody.innerHTML = results.map((amount, index) => 
+            `<tr>
+                <td>第${index + 1}期</td>
+                <td>¥${principal.toFixed(2)}</td>
+                <td>¥${(amount - principal).toFixed(2)}</td>
+                <td>¥${amount.toFixed(2)}</td>
+            </tr>`
+        ).join('');
+    }
+
+    async function initChart(results) {
+        const ctx = document.getElementById('resultChart');
+        if(window.chartInstance) window.chartInstance.destroy();
+        
+        window.chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: results.map((_,i) => i+1),
+                datasets: [{
+                    label: '资金增长曲线',
+                    data: results,
+                    borderColor: '#1890ff',
+                    tension: 0.1
+                }]
+            }
+        });
+    }
+
+    let chartInstance;
+
+    // 确保全局可访问
+    async function calculate() {
+        const principal = parseFloat(document.getElementById('principal').value);
+        const rateValue = document.getElementById('rateValue').value;
+        const durationValue = document.getElementById('durationValue').value;
+        
+        if (isNaN(principal) || principal <= 0) {
+            alert('请输入有效的本金金额');
+            return;
+        }
+    
+        // 复利计算核心逻辑
+        const results = [];
+        const periods = document.querySelector('input[name="period"]:checked').value === 'year' ? durationValue : durationValue * 12;
+        // 新增日利率计算
+        const ratePerPeriod = document.querySelector('input[name="period"]:checked').value === 'day' 
+          ? parseFloat(rateValue) / 100 / 365
+          : (原有计算逻辑);
+    
+        // 使用decimal.js精确计算
+        import * as Decimal from './decimal.js';
+        let current = new Decimal(principal);
+        for (let i = 0; i < periods; i++) {
+            const interest = current * ratePerPeriod;
+            current += interest;
+            results.push({
+                period: i + 1,
+                principal: principal,
+                interest: Number(interest.toFixed(2)),
+                total: Number(current.toFixed(2))
+            });
+        }
+    
+        updateTable(results, principal);
+        initChart(results);
+    };
+    
+    function updateRatePlaceholder() {
+        const rateType = document.getElementById('rateType').value;
+        const label = document.querySelector("label[for='rateValue']");
+        
+        if(rateType === 'monthly') label.innerHTML = '月利率（%）';
+        else if(rateType === 'daily') label.innerHTML = '日利率（%）';
+        else label.innerHTML = '年利率（%）';
+    }
+</script>
+
+复利计算器使用的是一种利滚利的计算方式，即将前一期利息计入下一期本金一并计算，也就是利上有利，与单利（只对本金计息）不同，复利通过时间放大收益，利息不断加入本金再投资，时间越长，财富增长越快（如“滚雪球”效应）。
+使用本复利计算器可以计算复利终值和复利现值，计算收益或反算本金，支持按年、月、日多种复利方式计算，并可查看计算明细。
+<p>
+    <b>复利计算公式:</b><br>
+    A = P(1 + r)^n<br>
+    公式描述：<br>
+    (A)：未来值（本金与利息之和）<br>
+    (P)：本金<br>
+    (r)：每期利率（需与期数单位一致，如年利率为5%，则r=0.05）<br>
+    (n)：复利的期数（如投资5年，每年复利一次，则n=5）<br>
+    例如，假设某人在银行存入本金1000元，年利率为5%，计息周期为一年，那么在第一年的末尾，将会获得50元的收益。在第二年的末尾，本利和为1050元，此时的利息将是52.5元，而不是简单计息方式下的50元，因为利息的计算是基于1050元而不是1000元。
+    <br>复利的威力在于时间积累，长期投资中即使小额本金也能通过复利显著增长。计算时需注意利率与周期的匹配，并区分名义利率和实际利率（考虑通胀等因素）。
+</p>
