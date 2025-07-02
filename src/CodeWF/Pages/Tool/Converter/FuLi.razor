@@ -112,54 +112,127 @@
 
 <script>
     // 表格更新函数
-    async function updateTable(results, principal) {
+    async function updateTable(results) {
         const tableBody = document.getElementById('resultTable');
-        tableBody.innerHTML = results.map((amount, index) => 
+        tableBody.innerHTML = results.map((item) => 
             `<tr>
-                <td>第${index + 1}期</td>
-                <td>¥${amount.total.toFixed(2)}</td>
-                <td>¥${amount.interest.toFixed(2)}</td>
+                <td>第${item.period}期</td>
+                <td>¥${item.total.toFixed(2)}</td>
+                <td>¥${item.interest.toFixed(2)}</td>
             </tr>`
         ).join('');
     }
 
     // 图表初始化函数
+    // 添加Chart.js库引用
+    const chartScript = document.createElement('script');
+    chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js';
+    document.head.appendChild(chartScript);
+    
+    let myChart = null; // 存储图表实例
+    
+    async function updateTable(results) {
+        const tableBody = document.getElementById('resultTable');
+        tableBody.innerHTML = results.map((item, index) => 
+            `<tr>
+                <td>第${item.period}期</td>
+                <td>¥${item.total.toFixed(2)}</td>
+                <td>¥${item.interest.toFixed(2)}</td>
+            </tr>`
+        ).join('');
+    }
+    
     async function initChart(results) {
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js is not loaded.');
-            return;
-        }
-
         const ctx = document.getElementById('resultChart').getContext('2d');
-        new Chart(ctx, {
+        
+        // 销毁旧图表
+        if (myChart) {
+            myChart.destroy();
+        }
+    
+        myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: results.map((_, i) => `期${i + 1}`),
+                labels: results.map(r => `第${r.period}期`),
                 datasets: [{
+                    label: '本息合计',
+                    data: results.map(r => r.total),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },{
                     label: '累计利息',
                     data: results.map(r => r.interest),
-                    fill: false,
-                    borderColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(255, 99, 132)',
                     tension: 0.1
                 }]
             },
-            options: {}
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
         });
     }
 
     // 其他函数...
 
     // 计算函数
+    // 在计算按钮下方添加结果展示
+    const resultBox = document.createElement('div');
+    resultBox.id = 'quickResult';
+    resultBox.style.marginTop = '10px';
+    document.querySelector('button.btn-primary').parentNode.appendChild(resultBox);
+    
+    // 更新计算函数
     function calculate() {
-        // 你的计算逻辑
-        const results = []; // 假设这是你的计算结果
-        const principal = 10000; // 假设这是你的本金
-
-        // 更新表格
-        updateTable(results, principal);
-
-        // 初始化图表
+        const principal = parseFloat(document.getElementById('principal').value);
+        const rateValue = document.getElementById('rateValue').value;
+        const durationValue = document.getElementById('durationValue').value;
+        
+        if (isNaN(principal) || principal <= 0) {
+            alert('请输入有效的本金金额');
+            return;
+        }
+    
+        const compoundType = document.getElementById('compoundType').value;
+        const results = [];
+        
+        // 计算总周期数
+        let periods = durationValue;
+        if (compoundType === 'month') periods *= 12;
+        if (compoundType === 'day') periods *= 365;
+    
+        // 计算周期利率
+        let ratePerPeriod = parseFloat(rateValue) / 100;
+        if (compoundType === 'month') ratePerPeriod /= 12;
+        if (compoundType === 'day') ratePerPeriod /= 365;
+    
+        // 复利计算
+        let current = principal;
+        // 复利计算循环
+        for (let i = 0; i < periods; i++) {
+            const interest = current * ratePerPeriod;
+            current += interest;
+            results.push({
+                period: i + 1,  // 显式设置期数
+                principal: principal,
+                interest: Number(interest.toFixed(2)),
+                total: Number(current.toFixed(2))
+            });
+        }
+    
+        updateTable(results);
         initChart(results);
+    
+        // 更新快速结果
+        if(results.length > 0) {
+            const lastResult = results[results.length - 1];
+            document.getElementById('quickResult').innerHTML = `
+                <div class="alert alert-success">
+                    最终本息：¥${lastResult.total.toFixed(2)}<br>
+                    总利息：¥${lastResult.interest.toFixed(2)}
+                </div>
+            `;
+        }
     }
     
     function updateRatePlaceholder() {
