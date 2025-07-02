@@ -183,44 +183,58 @@
     document.querySelector('button.btn-primary').parentNode.appendChild(resultBox);
     
     // 更新计算函数
-    function calculate() {
+    async function calculate() {
         const principal = parseFloat(document.getElementById('principal').value);
-        const rateValue = document.getElementById('rateValue').value;
-        const durationValue = document.getElementById('durationValue').value;
-        
-        if (isNaN(principal) || principal <= 0) {
-            alert('请输入有效的本金金额');
+        const rateValue = parseFloat(document.getElementById('rateValue').value);
+        const durationValue = parseFloat(document.getElementById('durationValue').value);
+        const rateType = document.getElementById('rateType').value;
+        const durationType = document.getElementById('durationType').value;
+        const compoundType = document.getElementById('compoundType').value;
+    
+        // 参数有效性验证
+        if (isNaN(principal) || principal <= 0 || isNaN(rateValue) || rateValue <= 0 || isNaN(durationValue) || durationValue <= 0) {
+            alert('请输入有效的数值');
             return;
         }
     
-        const compoundType = document.getElementById('compoundType').value;
-        const results = [];
-        
+        // 利率转换逻辑
+        let annualRate = rateValue;
+        if (rateType === 'monthly') annualRate = rateValue * 12;
+        if (rateType === 'daily') annualRate = rateValue * 365;
+    
+        // 期限转换逻辑
+        let totalYears = durationValue;
+        if (durationType === 'month') totalYears = durationValue / 12;
+        if (durationType === 'day') totalYears = durationValue / 365;
+    
         // 计算总周期数
-        let periods = durationValue;
-        if (compoundType === 'month') periods *= 12;
-        if (compoundType === 'day') periods *= 365;
+        let periods = totalYears;
+        if (compoundType === 'month') periods = totalYears * 12;
+        if (compoundType === 'day') periods = totalYears * 365;
+        periods = Math.round(periods);
     
         // 计算周期利率
-        let ratePerPeriod = parseFloat(rateValue) / 100;
-        if (compoundType === 'month') ratePerPeriod /= 12;
-        if (compoundType === 'day') ratePerPeriod /= 365;
+        const ratePerPeriod = annualRate / 100 / (compoundType === 'year' ? 1 : compoundType === 'month' ? 12 : 365);
     
-        // 复利计算
+        // 复利计算核心逻辑
+        const results = [];
         let current = principal;
-        // 复利计算循环
+        let totalInterest = 0;
+    
         for (let i = 0; i < periods; i++) {
             const interest = current * ratePerPeriod;
+            totalInterest += interest;
             current += interest;
+    
             results.push({
-                period: i + 1,  // 显式设置期数
+                period: i + 1,
                 principal: principal,
-                interest: Number(interest.toFixed(2)),
+                interest: Number(totalInterest.toFixed(2)),
                 total: Number(current.toFixed(2))
             });
         }
     
-        updateTable(results);
+        await updateTable(results);
         initChart(results);
     
         // 更新快速结果
