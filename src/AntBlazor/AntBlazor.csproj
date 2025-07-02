@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Description>AntBlazor是实现AntDesign的Blazor静态组件库。</Description>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

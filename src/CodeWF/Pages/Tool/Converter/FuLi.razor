@@ -113,73 +113,54 @@
 <script>
     // 表格更新函数
     async function updateTable(results, principal) {
-        const tableBody = document.getElementById('resultTableBody');
+        const tableBody = document.getElementById('resultTable');
         tableBody.innerHTML = results.map((amount, index) => 
             `<tr>
                 <td>第${index + 1}期</td>
-                <td>¥${principal.toFixed(2)}</td>
-                <td>¥${(amount - principal).toFixed(2)}</td>
-                <td>¥${amount.toFixed(2)}</td>
+                <td>¥${amount.total.toFixed(2)}</td>
+                <td>¥${amount.interest.toFixed(2)}</td>
             </tr>`
         ).join('');
     }
 
+    // 图表初始化函数
     async function initChart(results) {
-        const ctx = document.getElementById('resultChart');
-        if(window.chartInstance) window.chartInstance.destroy();
-        
-        window.chartInstance = new Chart(ctx, {
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded.');
+            return;
+        }
+
+        const ctx = document.getElementById('resultChart').getContext('2d');
+        new Chart(ctx, {
             type: 'line',
             data: {
-                labels: results.map((_,i) => i+1),
+                labels: results.map((_, i) => `期${i + 1}`),
                 datasets: [{
-                    label: '资金增长曲线',
-                    data: results,
-                    borderColor: '#1890ff',
+                    label: '累计利息',
+                    data: results.map(r => r.interest),
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1
                 }]
-            }
+            },
+            options: {}
         });
     }
 
-    let chartInstance;
+    // 其他函数...
 
-    // 确保全局可访问
-    async function calculate() {
-        const principal = parseFloat(document.getElementById('principal').value);
-        const rateValue = document.getElementById('rateValue').value;
-        const durationValue = document.getElementById('durationValue').value;
-        
-        if (isNaN(principal) || principal <= 0) {
-            alert('请输入有效的本金金额');
-            return;
-        }
-    
-        // 复利计算核心逻辑
-        const results = [];
-        const periods = document.querySelector('input[name="period"]:checked').value === 'year' ? durationValue : durationValue * 12;
-        // 新增日利率计算
-        const ratePerPeriod = document.querySelector('input[name="period"]:checked').value === 'day' 
-          ? parseFloat(rateValue) / 100 / 365
-          : (原有计算逻辑);
-    
-        // 使用decimal.js精确计算
-        import * as Decimal from './decimal.js';
-        let current = new Decimal(principal);
-        for (let i = 0; i < periods; i++) {
-            const interest = current * ratePerPeriod;
-            current += interest;
-            results.push({
-                period: i + 1,
-                principal: principal,
-                interest: Number(interest.toFixed(2)),
-                total: Number(current.toFixed(2))
-            });
-        }
-    
+    // 计算函数
+    function calculate() {
+        // 你的计算逻辑
+        const results = []; // 假设这是你的计算结果
+        const principal = 10000; // 假设这是你的本金
+
+        // 更新表格
         updateTable(results, principal);
+
+        // 初始化图表
         initChart(results);
-    };
+    }
     
     function updateRatePlaceholder() {
         const rateType = document.getElementById('rateType').value;
