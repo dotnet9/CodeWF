@@ -192,8 +192,8 @@
         const compoundType = document.getElementById('compoundType').value;
     
         // 参数有效性验证
-        if (isNaN(principal) || principal <= 0 || isNaN(rateValue) || rateValue <= 0 || isNaN(durationValue) || durationValue <= 0) {
-            alert('请输入有效的数值');
+        if (isNaN(principal) || principal <= 0 || isNaN(rateValue) || isNaN(durationValue) || durationValue <= 0) {
+            alert('请输入有效的数值（本金和期限必须大于 0）');
             return;
         }
     
