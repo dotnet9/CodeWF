@@ -87,28 +87,47 @@
         </div>
     </div>
 
-    <div class="result-grid mt-4">
-        <div class="result-table">
-            <table class="table table-hover align-middle">
-                <thead class="sticky-top bg-white">
-                    <tr>
-                        <th>期数</th>
-                        <th>本息合计</th>
-                        <th>累计利息</th>
-                    </tr>
-                </thead>
-                <tbody id="resultTable" class="font-monospace"></tbody>
-            </table>
+    <div class="mt-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <canvas id="resultChart"></canvas>
+            </div>
         </div>
-        
-        <div>
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-3">
-                    <canvas id="resultChart"></canvas>
+        <div class="text-center mt-3">
+            <button class="btn btn-info" onclick="toggleTable()">显示计算明细</button>
+        </div>
+        <div id="resultTableContainer" style="display: none;">
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <div class="result-table">
+                        <table class="table table-hover align-middle">
+                            <thead class="sticky-top bg-white">
+                                <tr>
+                                    <th>期数</th>
+                                    <th>本息合计</th>
+                                    <th>累计利息</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTable" class="font-monospace"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        function toggleTable() {
+            const tableContainer = document.getElementById('resultTableContainer');
+            const button = event.target;
+            if (tableContainer.style.display === 'none') {
+                tableContainer.style.display = 'block';
+                button.textContent = '隐藏计算明细';
+            } else {
+                tableContainer.style.display = 'none';
+                button.textContent = '显示计算明细';
+            }
+        }
+    </script>
 </div>
 
 <script>
