@@ -30,10 +30,11 @@
 <div class="calculator-box">
     <div class="card shadow-sm mb-4">
         <div class="card-body">
+            <h5 class="card-title mb-3">复利计算</h5>
             <div class="row g-3">
                 <!-- 第一行 -->
                 <div class="col-md-6">
-                    <label class="form-label">复利方式</label>
+                    <label class="form-label">复利方式 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="选择利息计算的复利周期"></i></label>
                     <select class="form-select" id="compoundType" onchange="calculate()">
                         <option value="year">按年复利</option>
                         <option value="month">按月复利</option>
@@ -42,7 +43,7 @@
                 </div>
                 
                 <div class="col-md-6">
-                    <label class="form-label">利率类型</label>
+                    <label class="form-label">利率类型 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="选择输入利率的时间单位"></i></label>
                     <select class="form-select" id="rateType" onchange="updateRatePlaceholder()">
                         <option value="annual">年利率</option>
                         <option value="monthly">月利率</option>
@@ -52,18 +53,18 @@
 
                 <!-- 第二行 -->
                 <div class="col-md-6">
-                    <label class="form-label">利率值（%）</label>
-                    <input type="number" class="form-control" id="rateValue" min="0" step="0.1" value="3" oninput="calculate()">
+                    <label class="form-label">利率值（%） <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="输入对应的利率值，负数可用于计算亏损情况"></i></label>
+                    <input type="number" class="form-control" id="rateValue" step="0.1" value="3" oninput="calculate()" placeholder="可输入负数">
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">本金（元）</label>
+                    <label class="form-label">本金（元） <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="输入初始投资的本金金额，必须大于 0"></i></label>
                     <input type="number" class="form-control" id="principal" min="0" step="100" value="10000" oninput="calculate()">
                 </div>
 
                 <!-- 第三行 -->
                 <div class="col-md-6">
-                    <label class="form-label">存入期限类型</label>
+                    <label class="form-label">存入期限类型 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="选择存入期限的时间单位"></i></label>
                     <select class="form-select" id="durationType" onchange="calculate()">
                         <option value="year">年</option>
                         <option value="month">月</option>
@@ -72,7 +73,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label">存入期限数</label>
+                    <label class="form-label">存入期限数 <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="输入对应的存入期限数量，必须大于 0"></i></label>
                     <input type="number" class="form-control" id="durationValue" min="1" value="1" oninput="calculate()">
                 </div>
 
@@ -259,16 +260,28 @@
     }
 </script>
 
-复利计算器使用的是一种利滚利的计算方式，即将前一期利息计入下一期本金一并计算，也就是利上有利，与单利（只对本金计息）不同，复利通过时间放大收益，利息不断加入本金再投资，时间越长，财富增长越快（如“滚雪球”效应）。
-使用本复利计算器可以计算复利终值和复利现值，计算收益或反算本金，支持按年、月、日多种复利方式计算，并可查看计算明细。
-<p>
-    <b>复利计算公式:</b><br>
-    A = P(1 + r)^n<br>
-    公式描述：<br>
-    (A)：未来值（本金与利息之和）<br>
-    (P)：本金<br>
-    (r)：每期利率（需与期数单位一致，如年利率为5%，则r=0.05）<br>
-    (n)：复利的期数（如投资5年，每年复利一次，则n=5）<br>
-    例如，假设某人在银行存入本金1000元，年利率为5%，计息周期为一年，那么在第一年的末尾，将会获得50元的收益。在第二年的末尾，本利和为1050元，此时的利息将是52.5元，而不是简单计息方式下的50元，因为利息的计算是基于1050元而不是1000元。
-    <br>复利的威力在于时间积累，长期投资中即使小额本金也能通过复利显著增长。计算时需注意利率与周期的匹配，并区分名义利率和实际利率（考虑通胀等因素）。
-</p>
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">复利知识科普</h5>
+        <p class="card-text">复利计算器采用利滚利的计算方式，将前一期利息计入下一期本金一并计算，实现利上有利。与单利（仅对本金计息）不同，复利借助时间放大收益，利息持续加入本金再投资，时间越久，财富增长越显著，呈现出“滚雪球”效应。</p>
+        <p class="card-text">使用本复利计算器，您可以计算复利终值和复利现值，计算收益或反算本金。计算器支持按年、月、日多种复利方式计算，并提供计算明细查看功能。</p>
+        <div class="bg-light p-3 rounded">
+            <h6 class="mb-3">复利计算公式</h6>
+            <p>A = P(1 + r)^n</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>(A)</strong>：未来值（本金与利息之和）</p>
+                    <p><strong>(P)</strong>：本金</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>(r)</strong>：每期利率（需与期数单位一致，如年利率为5%，则r=0.05）</p>
+                    <p><strong>(n)</strong>：复利的期数（如投资5年，每年复利一次，则n=5）</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <p class="card-text">例如，假设某人在银行存入本金1000元，年利率为5%，计息周期为一年。在第一年的末尾，将会获得50元的收益；在第二年的末尾，本利和为1050元，此时的利息为52.5元，而非简单计息方式下的50元，因为利息计算基于1050元而非1000元。</p>
+            <p class="card-text">复利的威力在于时间积累，长期投资中即使小额本金也能通过复利显著增长。计算时需注意利率与周期的匹配，并区分名义利率和实际利率（考虑通胀等因素）。</p>
+        </div>
+    </div>
+</div>
