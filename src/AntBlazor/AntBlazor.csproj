@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0-preview.5.25277.114" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0-preview.6.25358.103" />
     </ItemGroup>
 
 </Project>
