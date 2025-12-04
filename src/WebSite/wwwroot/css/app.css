@@ -55,9 +55,18 @@
 }
 /* 2024年10月23日 */
 
+html {
+  overflow-y: auto;
+  height: 100%;
+}
+
 body {
   background-color: #f2f3f5;
   font-family: Lato, PingFang SC, Microsoft YaHei, sans-serif;
+  overflow-y: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 .fixed-top {
   z-index: 1000;
@@ -129,12 +138,26 @@ body {
   padding: 3rem 0 2rem 0;
 }
 .copyright {
-  text-align: center;
-  margin-top: 1rem;
-  display: flex;
-  justify-content: space-between;
+    text-align: center;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
 }
 .blockquote {font-size:1rem;}
+
+/* 确保布局容器不会阻止滚动 */
+.fluent-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.fluent-main {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+}
 
 @media screen and (max-width: 768px) {
   .qrcode {

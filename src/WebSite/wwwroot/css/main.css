@@ -9092,7 +9092,7 @@ html {
 /* Custom Mixins -------------------- */
 /* Base Styles -------------------- */
 body {
-  overflow-x: hidden;
+  overflow-x: visible;
   font-size: 15px; }
 
 img {

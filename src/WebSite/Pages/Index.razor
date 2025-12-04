@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 
 @inherits BaseComponent
 @layout HomeLayout
@@ -54,10 +54,11 @@
         const handleScroll = () => {
             const indexNav = document.querySelector('.index-nav');
             if (indexNav) {
+                const darkNavClasses = '@SiteHeader.DarkNavClass'.split(' ');
                 if (window.scrollY > 50) {
-                    indexNav.classList.add('@SiteHeader.DarkNavClass');
+                    darkNavClasses.forEach(cls => indexNav.classList.add(cls));
                 } else {
-                    indexNav.classList.remove('@SiteHeader.DarkNavClass');
+                    darkNavClasses.forEach(cls => indexNav.classList.remove(cls));
                 }
             }
         };
