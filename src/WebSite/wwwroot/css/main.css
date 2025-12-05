@@ -31,9 +31,15 @@ body {
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.6;
-  color: #212529;
+  color: var(--text-primary);
   text-align: left;
-  background-color: #fff; }
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(120, 50, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(53, 189, 255, 0.1) 0%, transparent 50%);
+  background-attachment: fixed;
+  transition: var(--transition);
+}
 
 [tabindex="-1"]:focus {
   outline: 0 !important; }
@@ -305,6 +311,20 @@ template {
   --gray: #ced4da;
   --indigo: #502c6c;
   --orange: #fbb500;
+  --bg-dark: #0a0a1a;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-hover: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --glow-blue: 0 0 15px rgba(53, 189, 255, 0.5);
+  --glow-purple: 0 0 15px rgba(173, 110, 221, 0.5);
+  --glow-teal: 0 0 15px rgba(9, 235, 175, 0.5);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --border-radius: 12px;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;

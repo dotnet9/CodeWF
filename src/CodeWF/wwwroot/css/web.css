@@ -2,23 +2,173 @@
 .editormd-fullscreen {z-index:1000;}
 
 /*CmsLite*/
-.cl-card {background-color:#fff;border-radius:5px;}
-.cl-card-head {
-    border-bottom:1px solid #e4e6eb;padding:10px 20px;
-    display:flex;justify-content:space-between;align-items:center;
+.cl-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
 }
-.cl-card-head .title {font-size:16px;font-weight:bold;}
-.cl-card-head .counts {font-size:14px;color:#8a919f;}
-.cl-card-body {padding:15px;}
+
+.cl-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #35bdff, #44c553, #7832e2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cl-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(53, 189, 255, 0.15);
+    border-color: rgba(53, 189, 255, 0.3);
+}
+
+.cl-card:hover::before {
+    opacity: 1;
+}
+
+.cl-card-head {
+    border-bottom: 1px solid rgba(228, 230, 235, 0.5);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.cl-card-head .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(37, 41, 51, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cl-card-head .title i {
+    color: #35bdff;
+    text-shadow: 0 0 10px rgba(53, 189, 255, 0.3);
+}
+
+.cl-card-head .counts {
+    font-size: 14px;
+    color: rgba(138, 145, 159, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cl-card-body {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9);
+}
 .cl-hide {display:none;}
 .cl-show {display:block;}
 
 .counts .like {cursor:pointer;margin-left:10px;}
-.counts .like:hover {color:#1890ff;}
+.counts .like:hover {color:#35bdff;}
 
-code {padding: 0 2.5px;}
-blockquote {border-left:5px solid #ffe58f;padding:10px;background-color:#fffbe6;border-radius:3px;overflow:auto;}
-blockquote p {margin-bottom:0;}
+/* 链接样式优化 */
+a {
+    color: #35bdff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #35bdff, #7832e2);
+    transition: width 0.3s ease;
+}
+
+a:hover {
+    color: #7832e2;
+    text-shadow: 0 0 10px rgba(53, 189, 255, 0.3);
+}
+
+a:hover::after {
+    width: 100%;
+}
+
+/* 代码块样式优化 */
+code {
+    padding: 2px 6px;
+    background: rgba(53, 189, 255, 0.1);
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #7832e2;
+    border: 1px solid rgba(53, 189, 255, 0.2);
+}
+
+pre {
+    border-left: 5px solid #35bdff !important;
+    padding: 15px !important;
+    background: rgba(241, 241, 241, 0.8) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: auto;
+    backdrop-filter: blur(5px);
+}
+
+pre code {
+    background: transparent !important;
+    border: none !important;
+    color: #252933 !important;
+}
+
+/* 引用块样式优化 */
+blockquote {
+    border-left: 5px solid #35bdff;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, rgba(53, 189, 255, 0.05), rgba(120, 50, 226, 0.05));
+    border-radius: 8px;
+    overflow: auto;
+    border-right: 1px solid rgba(53, 189, 255, 0.2);
+    border-bottom: 1px solid rgba(53, 189, 255, 0.2);
+}
+
+blockquote p {
+    margin-bottom: 0;
+    color: rgba(37, 41, 51, 0.8);
+    font-style: italic;
+}
+
+/* 按钮样式优化 */
+button, .button {
+    background: linear-gradient(135deg, #35bdff, #7832e2) !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 10px 25px !important;
+    font-weight: 600 !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(53, 189, 255, 0.3) !important;
+}
+
+button:hover, .button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(53, 189, 255, 0.4) !important;
+}
+
+button:active, .button:active {
+    transform: translateY(0) !important;
+}
 
 /*Login*/
 .cl-login {padding:0 30px;}
