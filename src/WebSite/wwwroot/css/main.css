@@ -9093,6 +9093,7 @@ html {
 /* Base Styles -------------------- */
 body {
   overflow-x: hidden;
+  overflow-y: auto;
   font-size: 15px; }
 
 img {
