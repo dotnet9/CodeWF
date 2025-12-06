@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net10.0</TargetFrameworks>
 	    <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Description>AntBlazor是实现AntDesign的Blazor静态组件库。</Description>
