@@ -9112,8 +9112,10 @@ html {
 /* Custom Mixins -------------------- */
 /* Base Styles -------------------- */
 body {
-  overflow-x: hidden;
-  font-size: 15px; }
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 15px;
+}
 
 img {
   max-width: 100%; }
