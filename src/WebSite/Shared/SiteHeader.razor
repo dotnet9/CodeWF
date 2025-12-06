@@ -77,24 +77,24 @@
 
 <!-- 添加自定义样式 -->
 <style>
-    /* 科技风导航栏背景颜色 */
+    /* 软件博客导航栏背景颜色 */
     .bg-tech-nav {
-        background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        background: var(--bg-header);
         backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
     }
 
     /* 滚动时的导航栏样式 */
     .scrollednav {
-        background: rgba(15, 12, 41, 0.95) !important;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        background: var(--bg-header) !important;
+        box-shadow: var(--shadow-lg);
         transition: var(--transition);
     }
 
     /* 导航链接样式 */
     .navbar-dark .navbar-nav .nav-link {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
         padding: 0.75rem 1rem;
         margin: 0 0.25rem;
         border-radius: 8px;
@@ -105,33 +105,31 @@
 
     /* 导航链接悬停效果 */
     .navbar-dark .navbar-nav .nav-link:hover {
-        color: #35bdff;
-        background: rgba(53, 189, 255, 0.1);
-        box-shadow: var(--glow-blue);
+        color: var(--text-primary);
+        background: var(--bg-hover);
         transform: translateY(-2px);
     }
 
     /* 活跃导航链接 */
     .navbar-dark .navbar-nav .nav-item.active .nav-link {
-        color: #35bdff;
-        background: rgba(53, 189, 255, 0.15);
-        box-shadow: var(--glow-blue);
+        color: var(--text-primary);
+        background: var(--bg-active);
     }
 
     /* 下拉菜单背景颜色 */
     .dropdown-menu {
-        background: rgba(48, 43, 99, 0.95);
+        background: var(--bg-card);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
         border-radius: 12px;
         padding: 0.5rem;
         margin-top: 0.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        box-shadow: var(--shadow-lg);
     }
 
     /* 下拉菜单项样式 */
     .dropdown-item {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
         padding: 0.75rem 1rem;
         margin: 0.25rem 0;
         border-radius: 8px;
@@ -140,29 +138,27 @@
 
     /* 下拉菜单项悬停效果 */
     .dropdown-item:hover {
-        background: rgba(53, 189, 255, 0.15);
-        color: #35bdff;
-        box-shadow: var(--glow-blue);
+        background: var(--bg-hover);
+        color: var(--accent-color);
         transform: translateX(8px);
     }
 
     /* 导航栏切换按钮 */
     .navbar-toggler {
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 0.5rem;
         transition: all 0.3s ease;
     }
 
     .navbar-toggler:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: #35bdff;
-        box-shadow: var(--glow-blue);
+        background: var(--bg-hover);
+        border-color: var(--accent-color);
     }
 
     /* 导航栏切换图标 */
     .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='var(--text-primary)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
     }
 </style>
 

@@ -1,4 +1,4 @@
-﻿@inherits BaseComponent
+@inherits BaseComponent
 @inject AppService AppService
 
 <div class="fluent-container fluent-widget friend-links" data-aos="fade-up">
@@ -30,22 +30,22 @@
         flex-wrap: wrap;
         gap: 10px;
         padding: 20px;
-        background: linear-gradient(135deg, rgba(16, 20, 40, 0.8), rgba(20, 25, 50, 0.8));
+        background: var(--bg-card);
         border-radius: 16px;
-        border: 1px solid rgba(100, 150, 255, 0.2);
-        box-shadow: inset 0 0 30px rgba(70, 90, 255, 0.1);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-md);
         backdrop-filter: blur(10px);
     }
 
     .tech-link {
         position: relative;
         padding: 8px 16px;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
         text-decoration: none;
-        background: rgba(70, 90, 255, 0.08);
-        border: 1px solid rgba(100, 150, 255, 0.2);
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
-        transition: all 0.3s ease;
+        transition: var(--transition);
         font-size: 0.95rem;
         display: flex;
         align-items: center;
@@ -55,18 +55,17 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(45deg, transparent, rgba(100, 150, 255, 0.1), transparent);
+        background: linear-gradient(45deg, transparent, var(--bg-hover), transparent);
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity var(--transition);
     }
 
     .tech-link:hover {
         transform: translateY(-2px);
-        background: rgba(70, 90, 255, 0.12);
-        border-color: rgba(100, 150, 255, 0.4);
-        box-shadow: 0 4px 15px rgba(70, 90, 255, 0.15),
-                   inset 0 0 10px rgba(70, 90, 255, 0.1);
-        color: #fff;
+        background: var(--bg-active);
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-lg);
+        color: var(--text-primary);
     }
 
     .tech-link:hover::before {
@@ -75,7 +74,7 @@
 
     .link-text::before {
         content: '# ';
-        color: rgba(100, 150, 255, 0.6);
+        color: var(--accent-color);
         margin-right: 2px;
     }
 </style>

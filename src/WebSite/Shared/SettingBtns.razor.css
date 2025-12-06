@@ -1,4 +1,4 @@
-﻿/* 容器设置 */
+/* 容器设置 */
 .floating-btn-container {
   z-index: 1001;
   position: fixed;
@@ -27,26 +27,24 @@
   width: var(--btn-size);
   height: var(--btn-size);
 
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   font-size: 24px;
   -webkit-user-select: none;
   user-select: none;
   font-weight: bold;
   opacity: 0.3;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-out;
-  transition-property: opacity, box-shadow;
+  transition: var(--transition);
 
   &:hover {
     opacity: 1;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
   }
 
   & div.far {
@@ -146,24 +144,20 @@
     align-items: center;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition-duration: 0.3s;
-    transition-timing-function: ease-out;
-    transition-property: transform;
-    background-color: white;
-    color: inherit;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
     &::before {
       content: "\f00c";
-      color: #12aa9c;
+      color: var(--success-color);
       /* font-weight: bold; */
       font-family: "Font Awesome 5 Pro";
       position: absolute;
       font-size: 20px;
       opacity: 0;
       pointer-events: none;
-      transition-duration: 0.3s;
-      transition-timing-function: ease-out;
-      transition-property: opacity, transform;
+      transition: var(--transition);
     }
 
 
@@ -187,15 +181,15 @@
 
     &::after {
       content: attr(title);
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--bg-card);
+      color: var(--text-primary);
       position: absolute;
 
       font-size: 0.7em;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow-md);
       opacity: 0;
-      transition-duration: 0.3s;
-      transition-timing-function: ease-out;
-      transition-property: opacity;
+      transition: var(--transition);
+      border-radius: 4px;
     }
 
     & div.far {
@@ -254,12 +248,12 @@
 ::deep [not-release].btn,
 ::deep [not-release] > .btn{
     pointer-events: none !important;
-    background-color: rgba(99, 99, 99, .5) !important;
-    color: grey !important;
+    background-color: var(--bg-disabled) !important;
+    color: var(--text-disabled) !important;
     &::after {
     content: attr(title) " - 未实装" !important;
     opacity: 1 !important;
-    color: rgba(255, 69, 0, 1) !important;
+    color: var(--danger-color) !important;
   }
 
 

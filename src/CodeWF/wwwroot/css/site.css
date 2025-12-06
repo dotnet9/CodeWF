@@ -1,0 +1,125 @@
+/* 软件博客专业配色方案 */
+:root {
+  /* 主色调 */
+  --primary-color: #1976d2;
+  --primary-dark: #1565c0;
+  --primary-light: #42a5f5;
+  
+  /* 辅助色 */
+  --secondary-color: #3f51b5;
+  --accent-color: #64b5f6;
+  
+  /* 文本颜色 */
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --text-light: #9e9e9e;
+  
+  /* 背景颜色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e3f2fd;
+  
+  /* 边框颜色 */
+  --border-color: #e0e0e0;
+  --border-light: #f0f0f0;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
+  
+  /* 过渡效果 */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 卡片样式 */
+.cl-card {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.cl-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.cl-card-head {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  background-color: var(--bg-secondary);
+}
+
+.cl-card-body {
+  padding: 1.5rem;
+}
+
+/* 标题样式 */
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title i {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+}
+
+/* 链接样式 */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .cl-card {
+    margin-bottom: 1rem;
+  }
+  
+  .cl-card-head,
+  .cl-card-body {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 1.1rem;
+  }
+}
