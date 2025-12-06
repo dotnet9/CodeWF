@@ -101,11 +101,11 @@
 
 <style>
     .footer {
-        background: #1a1a2e;
+        background: linear-gradient(145deg, var(--bg-dark), var(--bg-card));
         padding: 3rem 0 1rem;
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(53, 189, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         position: relative;
         overflow: hidden;
     }
@@ -166,13 +166,12 @@
     }
 
     .footer ul li a {
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.7);
         text-decoration: none;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 1rem;
+        font-size: 0.95rem;
         position: relative;
         padding: 0.25rem 0;
-        font-weight: 600;
     }
 
     .footer ul li a::after {
@@ -187,8 +186,8 @@
     }
 
     .footer ul li:hover a {
-        color: var(--primary-color);
-        text-shadow: var(--glow-blue);
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
     .footer ul li:hover a::after {
@@ -245,13 +244,12 @@
     }
 
     .footer .copyright a {
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.7);
         text-decoration: none;
         margin: 0 0.75rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         padding: 0.25rem 0;
-        font-weight: 600;
     }
 
     .footer .copyright a::after {
@@ -268,7 +266,6 @@
     .footer .copyright a:hover {
         color: var(--primary-color);
         text-shadow: var(--glow-blue);
-        transform: translateY(-2px);
     }
 
     .footer .copyright a:hover::after {
