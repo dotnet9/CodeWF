@@ -25,57 +25,101 @@
 </div>
 
 <style>
+    /* 友情链接容器 */
     .tech-links-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        padding: 20px;
+        gap: 12px;
+        padding: 24px;
         background: var(--bg-card);
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-md);
-        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(20px);
+        transition: all 0.3s ease;
     }
 
+    /* 友情链接悬停容器效果 */
+    .tech-links-container:hover {
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 单个友情链接样式 */
     .tech-link {
         position: relative;
-        padding: 8px 16px;
+        padding: 10px 18px;
         color: var(--text-primary);
         text-decoration: none;
-        background: var(--bg-hover);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 0.95rem;
+        font-weight: 500;
         display: flex;
         align-items: center;
+        overflow: hidden;
     }
 
+    /* 链接背景渐变效果 */
     .tech-link::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(45deg, transparent, var(--bg-hover), transparent);
+        background: var(--gradient-primary);
         opacity: 0;
-        transition: opacity var(--transition);
+        transition: opacity 0.3s ease;
+        z-index: 0;
     }
 
+    /* 链接文字 */
+    .link-text {
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    /* 链接文字前缀 */
+    .link-text::before {
+        content: '# ';
+        color: var(--primary-color);
+        margin-right: 4px;
+        transition: color 0.3s ease;
+    }
+
+    /* 友情链接悬停效果 */
     .tech-link:hover {
-        transform: translateY(-2px);
-        background: var(--bg-active);
-        border-color: var(--accent-color);
-        box-shadow: var(--shadow-lg);
-        color: var(--text-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(25, 118, 210, 0.3);
+        border-color: var(--primary-color);
     }
 
+    /* 友情链接悬停时的渐变背景 */
     .tech-link:hover::before {
         opacity: 1;
     }
 
-    .link-text::before {
-        content: '# ';
-        color: var(--accent-color);
-        margin-right: 2px;
+    /* 友情链接悬停时的文字颜色 */
+    .tech-link:hover .link-text {
+        color: #1976d2;
+    }
+
+    /* 友情链接悬停时的前缀颜色 */
+    .tech-link:hover .link-text::before {
+        color: #1976d2;
+    }
+
+    /* 响应式调整 */
+    @@media (max-width: 768px) {
+        .tech-links-container {
+            padding: 16px;
+            gap: 8px;
+        }
+        
+        .tech-link {
+            padding: 8px 14px;
+            font-size: 0.9rem;
+        }
     }
 </style>
 
