@@ -160,12 +160,14 @@
     /* 下拉菜单项样式 */
     .dropdown-item {
         color: var(--text-primary);
-        padding: 0.85rem 1.25rem;
-        margin: 0.25rem 0;
-        border-radius: 12px;
+        padding: 0.35rem 0.8rem;
+        margin: 0.05rem 0;
+        border-radius: 8px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 500;
         position: relative;
+        font-size: 0.9rem;
+        line-height: 1.2;
     }
 
     /* 下拉菜单项悬停效果 */
@@ -176,20 +178,9 @@
         box-shadow: 0 4px 15px rgba(25, 118, 210, 0.25);
     }
 
-    /* 下拉菜单项图标 */
+    /* 移除下拉菜单项符号 */
     .dropdown-item::before {
-        content: '>';
-        position: absolute;
-        left: 0.5rem;
-        opacity: 0;
-        transition: all 0.3s ease;
-        color: #212121;
-        font-weight: bold;
-    }
-
-    .dropdown-item:hover::before {
-        opacity: 1;
-        transform: translateX(5px);
+        content: none;
     }
 
     /* 导航栏切换按钮 */
