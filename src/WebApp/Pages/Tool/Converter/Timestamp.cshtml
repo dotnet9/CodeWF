@@ -1,0 +1,188 @@
+@page "/Tool/Converter/Timestamp"
+@{ ViewData["Title"] = "时间戳转换工具 - 码坊"; }
+
+<div class="container">
+    <h1 class="mb-4">时间戳转换工具</h1>
+
+    <div class="row mb-3">
+        <div class="col d-flex align-items-center gap-2 flex-wrap">
+            <span class="fw-bold">当前时间戳:</span>
+            <span class="text-danger fs-5" id="currentTimestamp"></span>
+            <button class="btn btn-primary btn-sm" onclick="startRefreshing()">开始刷新</button>
+            <button class="btn btn-secondary btn-sm" onclick="stopRefreshing()">停止刷新</button>
+            <button class="btn btn-info btn-sm" onclick="refreshTimestamp()">刷新</button>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">时间戳 → 日期</h5>
+            <div class="row mb-3">
+                <div class="col d-flex align-items-center gap-2 flex-wrap">
+                    <span>时间戳:</span>
+                    <input type="text" class="form-control" style="width: 200px;" id="inputTimestamp" placeholder="输入时间戳" />
+                    <select class="form-select" style="width: 100px;" id="timestampUnit">
+                        <option value="s">秒</option>
+                        <option value="ms">毫秒</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="convertTimestampToDate()">转换为日期</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex align-items-center gap-2 flex-wrap">
+                    <span>日期结果:</span>
+                    <input type="text" class="form-control" style="width: 300px;" id="outputDate" readonly placeholder="转换结果" />
+                    <select class="form-select" style="width: 200px;" id="dateFormat">
+                        <option value="yyyy-MM-dd HH:mm:ss">yyyy-MM-dd HH:mm:ss</option>
+                        <option value="yyyy-MM-dd HH:mm:ss.fff" selected>yyyy-MM-dd HH:mm:ss.fff</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">日期 → 时间戳</h5>
+            <div class="row mb-3">
+                <div class="col d-flex align-items-center gap-2 flex-wrap">
+                    <span>日期时间:</span>
+                    <input type="text" class="form-control" style="width: 250px;" id="inputDate" placeholder="yyyy-MM-dd HH:mm:ss.fff" />
+                    <button class="btn btn-primary btn-sm" onclick="convertDateToTimestamp()">转换为时间戳</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col d-flex align-items-center gap-2 flex-wrap">
+                    <span>时间戳结果:</span>
+                    <input type="text" class="form-control" style="width: 200px;" id="outputTimestamp" readonly placeholder="转换结果" />
+                    <select class="form-select" style="width: 100px;" id="outputUnit">
+                        <option value="s">秒</option>
+                        <option value="ms">毫秒</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <small class="text-muted">提示：支持手动输入，格式如 2024-01-01 12:30:45.123</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .gap-2 {
+        gap: 0.5rem;
+    }
+</style>
+
+@section Scripts {
+<script>
+    let timer = null;
+
+    function refreshTimestamp() {
+        const now = Date.now();
+        document.getElementById('currentTimestamp').textContent = Math.floor(now / 1000);
+    }
+
+    function startRefreshing() {
+        stopRefreshing();
+        refreshTimestamp();
+        timer = setInterval(refreshTimestamp, 1000);
+    }
+
+    function stopRefreshing() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    function convertTimestampToDate() {
+        const timestamp = document.getElementById('inputTimestamp').value;
+        const unit = document.getElementById('timestampUnit').value;
+        const format = document.getElementById('dateFormat').value;
+        const outputElement = document.getElementById('outputDate');
+
+        if (!timestamp || isNaN(timestamp)) {
+            outputElement.value = '无效的时间戳';
+            return;
+        }
+
+        try {
+            const timestampNum = parseInt(timestamp);
+            const date = new Date(unit === 'ms' ? timestampNum : timestampNum * 1000);
+
+            if (isNaN(date.getTime())) {
+                outputElement.value = '无效的时间戳';
+                return;
+            }
+
+            outputElement.value = formatDate(date, format);
+        } catch {
+            outputElement.value = '转换失败';
+        }
+    }
+
+    function convertDateToTimestamp() {
+        const dateStr = document.getElementById('inputDate').value.trim();
+        const unit = document.getElementById('outputUnit').value;
+        const outputElement = document.getElementById('outputTimestamp');
+
+        if (!dateStr) {
+            outputElement.value = '';
+            return;
+        }
+
+        try {
+            let timestamp;
+            const parts = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/);
+
+            if (parts) {
+                const year = parseInt(parts[1]);
+                const month = parseInt(parts[2]) - 1;
+                const day = parseInt(parts[3]);
+                const hour = parseInt(parts[4]);
+                const minute = parseInt(parts[5]);
+                const second = parseInt(parts[6]);
+                const millis = parts[7] ? parseInt(parts[7].padEnd(3, '0')) : 0;
+
+                timestamp = Date.UTC(year, month, day, hour, minute, second, millis);
+                timestamp = new Date(timestamp).getTime();
+            } else {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    outputElement.value = '无效的日期格式';
+                    return;
+                }
+                timestamp = date.getTime();
+            }
+
+            outputElement.value = unit === 'ms' ? timestamp : Math.floor(timestamp / 1000);
+        } catch {
+            outputElement.value = '转换失败';
+        }
+    }
+
+    function formatDate(date, format) {
+        const pad = (n) => n.toString().padStart(2, '0');
+
+        let result = format;
+        result = result.replace('yyyy', date.getFullYear());
+        result = result.replace('MM', pad(date.getMonth() + 1));
+        result = result.replace('dd', pad(date.getDate()));
+        result = result.replace('HH', pad(date.getHours()));
+        result = result.replace('mm', pad(date.getMinutes()));
+        result = result.replace('ss', pad(date.getSeconds()));
+        result = result.replace('fff', date.getMilliseconds().toString().padStart(3, '0'));
+
+        return result;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshTimestamp();
+        const now = new Date();
+        document.getElementById('inputDate').value = formatDate(now, 'yyyy-MM-dd HH:mm:ss.fff');
+    });
+</script>
+}

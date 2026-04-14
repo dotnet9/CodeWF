@@ -1,0 +1,21 @@
+@page
+@model WebApp.Pages.AboutModel
+@{    ViewData["Title"] = "关于 - 码坊";}
+
+<div class="container">
+    <h1 class="mb-4">关于我们</h1>
+    <div class="card">
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.HtmlContent))
+            {
+                <div class="markdown-content" asp-prerender="true">
+                    @Html.Raw(Model.HtmlContent)
+                </div>
+            }
+            else
+            {
+                <p>关于码坊...</p>
+            }
+        </div>
+    </div>
+</div>

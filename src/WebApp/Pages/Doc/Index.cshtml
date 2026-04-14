@@ -1,0 +1,47 @@
+@page "/doc"
+@model WebApp.Pages.Doc.IndexModel
+@{
+    ViewData["Title"] = "文档 - 码坊";
+}
+
+<div class="container">
+    <h1 class="mb-4">文档中心</h1>
+    <div class="row">
+        @if (Model.DocItems == null || !Model.DocItems.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">暂无文档</p>
+            </div>
+        }
+        else
+        {
+            foreach (var doc in Model.DocItems)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-book me-2 text-primary"></i>@doc.Name
+                            </h5>
+                            @if (!string.IsNullOrEmpty(doc.Memo))
+                            {
+                                <p class="card-text text-muted">@doc.Memo</p>
+                            }
+                            @if (doc.Children != null && doc.Children.Any())
+                            {
+                                <ul class="list-group list-group-flush mt-3">
+                                    @foreach (var child in doc.Children)
+                                    {
+                                        <li class="list-group-item">
+                                            <a href="/doc/@child.Slug">@child.Name</a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,113 @@
+@page "/doc/{slug}"
+@model WebApp.Pages.Doc.DetailModel
+@using CodeWF.Extensions
+@{
+    ViewData["Title"] = $"{Model.Doc?.Name ?? "文档"} - 文档中心 - 码坊";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            @if (Model.Doc == null)
+            {
+                <div class="alert alert-danger">文档不存在或已被删除</div>
+            }
+            else
+            {
+                <article class="doc-content">
+                    <h1 class="mb-4">@Model.Doc.Name</h1>
+                    @if (!string.IsNullOrEmpty(Model.Doc.Memo))
+                    {
+                        <p class="text-muted mb-4">@Model.Doc.Memo</p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Doc.HtmlContent))
+                    {
+                        <div class="markdown-content">
+                            @Html.Raw(Model.Doc.HtmlContent)
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.Doc.Content))
+                    {
+                        <div class="markdown-content">
+                            @Html.Raw(Model.Doc.Content.ToHtml())
+                        </div>
+                    }
+                </article>
+            }
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-folder me-2"></i>文档目录
+                </div>
+                <div class="card-body">
+                    @if (Model.DocItems != null && Model.DocItems.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var doc in Model.DocItems)
+                            {
+                                <li class="list-group-item @(doc.Slug == Model.Doc?.Slug ? "active" : "")">
+                                    <a href="/doc/@doc.Slug" class="text-decoration-none @(doc.Slug == Model.Doc?.Slug ? "text-white" : "")">
+                                        @doc.Name
+                                    </a>
+                                </li>
+                                @if (doc.Children != null && doc.Children.Any())
+                                {
+                                    @foreach (var child in doc.Children)
+                                    {
+                                        <li class="list-group-item ps-4 @(child.Slug == Model.Doc?.Slug ? "active" : "")">
+                                            <a href="/doc/@child.Slug" class="text-decoration-none @(child.Slug == Model.Doc?.Slug ? "text-white" : "")">
+                                                @child.Name
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .doc-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .markdown-content {
+        line-height: 1.8;
+    }
+
+    .markdown-content h2 {
+        margin-top: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .markdown-content h3 {
+        margin-top: 1.5rem;
+    }
+
+    .markdown-content p {
+        margin-bottom: 1rem;
+    }
+
+    .markdown-content pre {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+    }
+
+    .markdown-content code {
+        background: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.9em;
+    }
+</style>

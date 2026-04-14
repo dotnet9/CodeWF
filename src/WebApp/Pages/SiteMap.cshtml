@@ -1,0 +1,7 @@
+@page "/sitemap"
+@model WebApp.Pages.SiteMapModel
+@{
+    Layout = null;
+    Response.ContentType = "text/xml; charset=utf-8";
+}
+@Html.Raw(Model.SiteMapContent)

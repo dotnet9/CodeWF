@@ -1,0 +1,47 @@
+@page
+@model WebApp.Pages.Tool.IndexModel
+@{
+    ViewData["Title"] = "工具 - 码坊";
+}
+
+<div class="container">
+    <h1 class="mb-4">在线工具</h1>
+    <div class="row">
+        @foreach (var tool in Model.Tools)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h4 class="card-title">@tool.Name</h4>
+                        @if (!string.IsNullOrEmpty(tool.Memo))
+                        {
+                            <p class="card-text text-muted">@tool.Memo</p>
+                        }
+                        @if (tool.Children != null && tool.Children.Any())
+                        {
+                            <ul class="list-group list-group-flush mt-3">
+                                @foreach (var child in tool.Children)
+                                {
+                                    <li class="list-group-item">
+                                        @{
+                                            var toolLink = child.Slug switch
+                                            {
+                                                "slugify-string" => "/Tool/Web/SlugifyString",
+                                                "timestamp" => "/Tool/Converter/Timestamp",
+                                                "ico" => "/Tool/Icon",
+                                                "nuoche" => "/Tool/NuoChe",
+                                                "fuli" => "/Tool/Converter/FuLi",
+                                                _ => $"/Tool/{child.Slug}"
+                                            };
+                                        }
+                                        <a href="@toolLink">@child.Name</a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

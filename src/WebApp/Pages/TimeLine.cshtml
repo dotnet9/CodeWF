@@ -1,0 +1,66 @@
+@page "/timeline"
+@model WebApp.Pages.TimeLineModel
+@{
+    ViewData["Title"] = "时间线 - 码坊";
+}
+
+<div class="container">
+    <h1 class="mb-4">时间线</h1>
+    <div class="timeline">
+        @if (Model.TimeLines == null || !Model.TimeLines.Any())
+        {
+            <div class="alert alert-info">暂无时间线数据</div>
+        }
+        else
+        {
+            @foreach (var item in Model.TimeLines)
+            {
+                <div class="timeline-item">
+                    <div class="timeline-date">@item.Time?.ToString("yyyy-MM")</div>
+                    <div class="timeline-content">
+                        <h4>@item.Title</h4>
+                        <p>@item.Content</p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        width: 2px;
+        height: 100%;
+        background: #007bff;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        display: flex;
+    }
+
+    .timeline-date {
+        width: 50%;
+        padding-right: 30px;
+        text-align: right;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .timeline-content {
+        width: 50%;
+        padding-left: 30px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+    }
+</style>

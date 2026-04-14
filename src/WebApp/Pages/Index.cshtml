@@ -1,0 +1,84 @@
+@page "/"
+@model IndexModel
+@{
+    ViewData["Title"] = "首页 - 码坊";
+    string[] icons = { "fas fa-paper-plane", "fas fa-shield-alt", "fas fa-layer-group", "fas fa-vector-square", "fab fa-amazon", "fab fa-slack-hash" };
+}
+
+<div style="position: relative; overflow: hidden; background: #1a1a1a; color: white; padding: 6rem 0; margin-bottom: 2rem;">
+    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(25, 118, 210, 0.15), transparent 70%); animation: float 20s ease-in-out infinite; z-index: 0;"></div>
+    <div style="position: absolute; bottom: -30%; right: -20%; width: 150%; height: 150%; background: radial-gradient(circle, rgba(63, 81, 181, 0.1), transparent 70%); animation: float 25s ease-in-out infinite reverse; z-index: 0;"></div>
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-left">
+                <h2 class="mb-4" style="font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; background: linear-gradient(90deg, #007bff, #6c757d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">文章启智，工具助力</h2>
+                <h5 class="font-weight-light mb-3">
+                    <strong>码坊</strong>：使用<strong>.NET 11 Razor Pages</strong>开发。
+                </h5>
+                <h5 class="font-weight-light mb-4 opacity-90">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-4">
+                    <a href="/Bbs" class="btn btn-lg btn-primary">
+                        <i class="fas fa-book mr-2"></i> 博客
+                    </a>
+                    <a href="https://github.com/dotnet9/codewf" class="btn btn-lg btn-outline-light" target="_blank">
+                        <i class="fab fa-github mr-2"></i> GitHub
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4 mt-md-0 d-none d-md-block">
+                <img src="https://img1.dotnet9.com/site/banners/banner.jpg" class="rounded-2xl img-fluid shadow" style="animation: float 6s ease-in-out infinite;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -50px) rotate(120deg); }
+    66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+</style>
+
+<div class="container pt-5 pb-5">
+    <h3 class="mb-4">推荐文章</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        @if (Model.Posts == null || !Model.Posts.Any())
+        {
+            <div class="col-12 d-flex justify-content-center align-items-center py-5">
+                <p class="text-muted">暂无推荐文章</p>
+            </div>
+        }
+        else
+        {
+            for (int i = 0; i < Model.Posts.Count; i++)
+            {
+                var post = Model.Posts[i];
+                var icon = icons[i % icons.Length];
+                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                <div class="tech-card" style="position: relative; padding: 0; background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); transition: all 0.3s ease; overflow: hidden;">
+                    @if (!string.IsNullOrEmpty(post.Cover))
+                    {
+                        <div style="padding: 1rem 1rem 0 1rem;">
+                            <img src="@post.Cover" alt="@post.Title" class="img-fluid rounded" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem;">
+                        </div>
+                    }
+                    else
+                    {
+                        <i class="@icon text-primary mb-4" style="display: block; padding: 2rem 2rem 0 2rem; font-size: 2.5rem;"></i>
+                    }
+                    <h3 class="title" style="font-size: 1.2rem; font-weight: 700; margin: 1rem; line-height: 1.4; padding-left: 1.5rem; padding-right: 1.5rem;">@post.Title</h3>
+                    <p class="description" style="color: #6c757d; font-size: 0.95rem; line-height: 1.6; margin: 0 1rem 1rem 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding-left: 1.5rem; padding-right: 1.5rem;">@post.Description</p>
+                    <div class="post-meta mt-3" style="font-size: 0.85rem; padding: 0 1rem 1rem 1rem; padding-left: 1.5rem; padding-right: 1.5rem;">
+                        <span class="text-muted"><i class="fas fa-calendar-alt me-1"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                        @if (!string.IsNullOrEmpty(post.Author))
+                        {
+                            <span class="text-muted ms-3"><i class="fas fa-user me-1"></i>@post.Author</span>
+                        }
+                    </div>
+                    <a href="@postUrl" class="stretched-link" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 1;"></a>
+                </div>
+            }
+        }
+    </div>
+</div>

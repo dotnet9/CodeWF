@@ -1,0 +1,20 @@
+@model WebApp.Components.NavigationViewModel
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="/album" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">专辑</a>
+    <div class="dropdown-menu">
+        @foreach (var album in Model.Albums)
+        {
+            <a class="dropdown-item" href="/bbs/album/@album.Slug">@album.Name</a>
+        }
+    </div>
+</li>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="/bbs" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">分类</a>
+    <div class="dropdown-menu">
+        @foreach (var cat in Model.Categories)
+        {
+            <a class="dropdown-item" href="/Bbs/Category/@cat.Slug">@cat.Name</a>
+        }
+    </div>
+</li>

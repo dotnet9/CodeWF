@@ -1,0 +1,54 @@
+@page "/bbs/album/{slug}"
+@model WebApp.Pages.Bbs.Album.IndexModel
+@{
+    ViewData["Title"] = $"{Model.AlbumName} - 专辑 - 码坊";
+}
+
+<div class="container">
+    <h1 class="mb-4">@Model.AlbumName</h1>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card-grid">
+                @if (Model.Posts == null || !Model.Posts.Any())
+                {
+                    <div class="col-12 text-center py-8">
+                        <p>该专辑下暂无文章</p>
+                    </div>
+                }
+                else
+                {
+                    foreach (var post in Model.Posts)
+                    {
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h4 class="card-title">@post.Title</h4>
+                                <p class="card-text text-muted">@post.Description</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    <a href="/Bbs/Post/@post.Date?.Year/@post.Date?.Month/@post.Slug" class="btn btn-primary">阅读更多</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    文章专辑
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var album in Model.Albums)
+                        {
+                            <li class="list-group-item">
+                                <a href="/bbs/album/@album.Slug">@album.Name</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

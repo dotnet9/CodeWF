@@ -1,0 +1,59 @@
+@page "/Tool/Web/SlugifyString"
+@model WebApp.Pages.Tool.Web.SlugifyStringModel
+@{ ViewData["Title"] = "标题转URL别名 - 码坊"; }
+
+<div class="container">
+    <h1 class="mb-4">标题转URL别名</h1>
+    <p class="text-muted">将中文标题翻译为英文，再转为URL友好的slug格式</p>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div class="form-group mb-3">
+                    <label for="inputString">输入标题</label>
+                    <textarea class="form-control" id="inputString" name="InputString" rows="3" placeholder="输入要转换的标题，如：Slug转换工具">@Model.InputString</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">转换</button>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.TranslatedResult))
+            {
+                <div class="mt-4">
+                    <div class="alert alert-secondary">
+                        <strong>英文翻译：</strong>
+                        <code>@Model.TranslatedResult</code>
+                    </div>
+                    <div class="alert alert-success">
+                        <strong>Slug别名：</strong>
+                        <code style="font-size: 1.2em;">@Model.SlugResult</code>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('@Model.SlugResult')">复制</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5>使用说明</h5>
+            <ul>
+                <li>输入中文标题，点击"转换"按钮</li>
+                <li>系统自动将中文翻译为英文</li>
+                <li>再将英文转换为URL友好的slug格式（如：slug-conversion-tool）</li>
+                <li>使用MyMemory免费翻译API</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('已复制到剪贴板！');
+        }, function(err) {
+            console.error('复制失败:', err);
+        });
+    }
+</script>
+}

@@ -1,0 +1,133 @@
+@inject CodeWF.Services.AppService AppService
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="blazor,ant-design,razor,dotnet" />
+    <meta name="description" content="码坊是使用.NET 10 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码坊—文章启智，工具助力" />
+    <title>@ViewData["Title"] - 码坊</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toc/1.0.1/bootstrap-toc.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="https://img1.dotnet9.com/site/favicon/logo.png" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-tech-nav fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <strong>码坊</strong>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse" id="navbarColor02">
+                    <ul class="navbar-nav me-auto d-flex align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/doc">文档</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/tool">工具</a>
+                        </li>
+                        @await Component.InvokeAsync("Navigation")
+                        <li>
+                            <a class="nav-link" href="https://github.com/dotnet9/Assets.Dotnet9" target="_blank">投稿</a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="https://github.com/dotnet9/CodeWF/issues" target="_blank">Bug反馈</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="/about" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">关于</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/donation">赞助</a>
+                                <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank">博客园</a>
+                                <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank">B站</a>
+                                <a class="dropdown-item" href="/timeline">时间线</a>
+                                <a class="dropdown-item" href="/rss">RSS</a>
+                                <a class="dropdown-item" href="/sitemap.xml">站点地图</a>
+                                <a class="dropdown-item" href="/about">关于</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div style="padding-top: 80px;">
+        @RenderBody()
+    </div>
+
+    @await Component.InvokeAsync("FriendLink")
+
+    <footer class="footer mt-5">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-12 col-md-4 mb-4">
+                    <div class="footer-logo">码坊</div>
+                    <p class="footer-desc">码坊是使用.NET技术开发的网站，这里有技术文章、开源项目介绍和在线工具</p>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h5 class="footer-title">站点</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/donation" class="footer-link"><i class="fas fa-angle-right me-2"></i>赞助</a></li>
+                        <li><a href="/timeline" class="footer-link"><i class="fas fa-angle-right me-2"></i>时间线</a></li>
+                        <li><a href="/rss" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>RSS</a></li>
+                        <li><a href="/sitemap.xml" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>站点地图</a></li>
+                        <li><a href="/about" class="footer-link"><i class="fas fa-angle-right me-2"></i>关于</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h5 class="footer-title">工具资源</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://it-tools.tech/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>IT-Tools</a></li>
+                        <li><a href="https://www.cnblogs.com/Dotnet9-com/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>博客园</a></li>
+                        <li><a href="https://space.bilibili.com/470546606" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>B站</a></li>
+                        <li><a href="https://github.com/dotnet9/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Github</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-2">
+                    <h5 class="footer-title">社区资源</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://irihi.tech/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>铱泓科技</a></li>
+                        <li><a href="https://antblazor.com" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Ant Blazor</a></li>
+                        <li><a href="https://masastack.com/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Masa</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="footer-qrcode">
+                        <img src="https://img1.dotnet9.com/site/favicon/wechatpublic.jpg" width="120" alt="微信公众号" class="img-fluid rounded" />
+                    </div>
+                </div>
+            </div>
+            <hr class="footer-divider" />
+            <div class="text-center">
+                <span>&copy; 2019-@DateTime.Now.Year 沙漠尽头的狼</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-aspnet.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toc/1.0.1/bootstrap-toc.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
