@@ -1,7 +1,7 @@
 @page
 @model WebApp.Pages.Tool.IndexModel
 @{
-    ViewData["Title"] = "工具 - 码坊";
+    ViewData["Title"] = "工具";
 }
 
 <div class="container">
@@ -26,11 +26,11 @@
                                         @{
                                             var toolLink = child.Slug switch
                                             {
-                                                "slugify-string" => "/Tool/Web/SlugifyString",
-                                                "timestamp" => "/Tool/Converter/Timestamp",
-                                                "ico" => "/Tool/Icon",
-                                                "nuoche" => "/Tool/NuoChe",
-                                                "fuli" => "/Tool/Converter/FuLi",
+                                                "slugify-string" => "/SlugifyString",
+                                                "timestamp" => "/Timestamp",
+                                                "ico" => "/Icon",
+                                                "nuoche" => "/NuoChe",
+                                                "fuli" => "/FuLi",
                                                 _ => $"/Tool/{child.Slug}"
                                             };
                                         }

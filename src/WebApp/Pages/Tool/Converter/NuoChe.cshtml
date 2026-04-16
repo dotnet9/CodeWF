@@ -1,4 +1,5 @@
-@page "/Tool/NuoChe"
+@page "/NuoChe"
+@model WebApp.Pages.Tool.Converter.NuoCheModel
 
 <style>
 .nuoche-container {
@@ -338,7 +339,9 @@
 </style>
 
 <div class="nuoche-container">
-    <div class="generator-container">
+    @if (string.IsNullOrWhiteSpace(Model.P))
+    {
+        <div class="generator-container">
         <h1 class="generator-title">挪车码生成器</h1>
         <div class="generator-layout">
             <div class="config-section">
@@ -391,6 +394,23 @@
             </div>
         </div>
     </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-car"></i>
+                <h1 class="title">临时停靠，请多关照</h1>
+            </div>
+            <div class="card-body">
+                <p class="description">如果我的车阻碍了您的车辆通行，点击下方按钮通知我，给您带来不便敬请谅解。</p>
+                <a class="phone-button" href="tel:@Model.DecodePhone">
+                    <i class="fas fa-phone-alt"></i> 联系车主
+                </a>
+                <a class="generate-link" href="/Tool/NuoChe">去生成一个挪车码</a>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts {

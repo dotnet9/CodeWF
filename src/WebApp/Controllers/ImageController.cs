@@ -3,6 +3,8 @@ using System.IO.Compression;
 using HashidsNet;
 using CodeWF.Tools;
 using QRCoder;
+using Microsoft.Extensions.Options;
+using CodeWF.Options;
 
 namespace WebApp.Controllers;
 
@@ -12,10 +14,12 @@ public class ImageController : ControllerBase
 {
     private const string IconFolder = "UploadIcons";
     private readonly ILogger<ImageController> _logger;
+    private readonly IOptions<SiteOption> _siteOption;
 
-    public ImageController(ILogger<ImageController> logger)
+    public ImageController(ILogger<ImageController> logger, IOptions<SiteOption> siteOption)
     {
         _logger = logger;
+        _siteOption = siteOption;
     }
 
     [HttpPost("merge")]
@@ -113,7 +117,9 @@ public class ImageController : ControllerBase
                 return BadRequest(new { success = false, message = "无效的手机号码" });
 
             var encodedPhone = new Hashids("codewf").EncodeLong(long.Parse(request.PhoneNumber));
-            var domain = "http://localhost:5224";
+            var domain = env.IsDevelopment()
+                ? $"{Request.Scheme}://{Request.Host}"
+                : _siteOption.Value.Domain;
             var generatedUrl = $"{domain}/nuoche?p={encodedPhone}";
 
             var folderPath = Path.Combine(env.WebRootPath, IconFolder);
