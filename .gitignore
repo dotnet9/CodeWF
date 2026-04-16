@@ -5,3 +5,5 @@
 /.vs
 /.vs
 /src/CodeWF/bin
+/src/WebApp/wwwroot/UploadIcons
+src/WebApp/WebApp.csproj.user

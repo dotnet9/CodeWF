@@ -19,7 +19,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("merge")]
-    public IActionResult MergeGenerateIcon([FromForm] IFormFile sourceImage, [FromForm] string sizes)
+    public async Task<IActionResult> MergeGenerateIcon([FromForm] IFormFile sourceImage, [FromForm] string sizes)
     {
         try
         {
@@ -34,13 +34,13 @@ public class ImageController : ControllerBase
             var sourcePath = Path.Combine(folderPath, $"{Guid.NewGuid():N}.png");
             var icoFullPath = Path.Combine(folderPath, $"{Guid.NewGuid():N}.ico");
 
-            using (var fs = new FileStream(sourcePath, FileMode.Create))
+            await using (var fs = new FileStream(sourcePath, FileMode.Create))
             {
-                sourceImage.CopyTo(fs);
+                await sourceImage.CopyToAsync(fs);
             }
 
             _logger.LogInformation("调用ImageHelper.MergeGenerateIcon, sourcePath={sourcePath}, icoFullPath={icoFullPath}, sizes={sizes}", sourcePath, icoFullPath, string.Join(",", convertSizes));
-            ImageHelper.MergeGenerateIcon(sourcePath, icoFullPath, convertSizes);
+            await ImageHelper.MergeGenerateIcon(sourcePath, icoFullPath, convertSizes);
 
             System.IO.File.Delete(sourcePath);
 
@@ -55,7 +55,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("separate")]
-    public IActionResult SeparateGenerateIcon([FromForm] IFormFile sourceImage, [FromForm] string sizes)
+    public async Task<IActionResult> SeparateGenerateIcon([FromForm] IFormFile sourceImage, [FromForm] string sizes)
     {
         try
         {
@@ -69,13 +69,13 @@ public class ImageController : ControllerBase
             Directory.CreateDirectory(iconFolderPath);
 
             var sourcePath = Path.Combine(env.WebRootPath, IconFolder, $"{Guid.NewGuid():N}.png");
-            using (var fs = new FileStream(sourcePath, FileMode.Create))
+            await using (var fs = new FileStream(sourcePath, FileMode.Create))
             {
-                sourceImage.CopyTo(fs);
+                await sourceImage.CopyToAsync(fs);
             }
 
             _logger.LogInformation("调用ImageHelper.SeparateGenerateIcon, sourcePath={sourcePath}, iconFolderPath={iconFolderPath}, sizes={sizes}", sourcePath, iconFolderPath, string.Join(",", convertSizes));
-            ImageHelper.SeparateGenerateIcon(sourcePath, iconFolderPath, convertSizes);
+            await ImageHelper.SeparateGenerateIcon(sourcePath, iconFolderPath, convertSizes);
 
             System.IO.File.Delete(sourcePath);
 
@@ -85,7 +85,7 @@ public class ImageController : ControllerBase
             if (System.IO.File.Exists(zipFilePath))
                 System.IO.File.Delete(zipFilePath);
 
-            ZipFile.CreateFromDirectory(iconFolderPath, zipFilePath);
+            await ZipFile.CreateFromDirectoryAsync(iconFolderPath, zipFilePath);
             Directory.Delete(iconFolderPath, true);
 
             var zipUrl = $"/{IconFolder}/{zipFileName}";
@@ -99,7 +99,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("nuoche")]
-    public IActionResult NuoChe([FromBody] NuoCheRequest request)
+    public async Task<IActionResult> NuoChe([FromBody] NuoCheRequest request)
     {
         try
         {
@@ -126,7 +126,7 @@ public class ImageController : ControllerBase
             var qrCodeData = qrGenerator.CreateQrCode(generatedUrl, QRCodeGenerator.ECCLevel.Q);
             using var qrCode = new PngByteQRCode(qrCodeData);
             var qrCodeBytes = qrCode.GetGraphic(10);
-            System.IO.File.WriteAllBytes(qrCodePath, qrCodeBytes);
+            await System.IO.File.WriteAllBytesAsync(qrCodePath, qrCodeBytes);
 
             var qrCodeUrl = $"/{IconFolder}/{fileName}";
             return Ok(new { success = true, qrCodeUrl, generatedUrl });
