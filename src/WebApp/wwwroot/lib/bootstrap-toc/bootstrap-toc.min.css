@@ -1,0 +1,75 @@
+nav[data-toggle="toc"] {
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: .75rem;
+}
+
+nav[data-toggle="toc"] .nav > li > a {
+  display: block;
+  padding: .25rem .75rem;
+  font-size: 85%;
+  color: rgba(0,0,0,.65);
+}
+
+nav[data-toggle="toc"] .nav > li > a:hover,
+nav[data-toggle="toc"] .nav > li > a:focus {
+  color: rgba(0,0,0,1);
+  background-color: transparent;
+  border-left: 1px solid rgba(0,0,0,.5);
+}
+
+nav[data-toggle="toc"] .nav > .active > a,
+nav[data-toggle="toc"] .nav > .active:hover > a,
+nav[data-toggle="toc"] .nav > .active:focus > a {
+  color: rgba(0,0,0,1);
+  background-color: transparent;
+  border-left: 2px solid rgba(0,0,0,.5);
+}
+
+nav[data-toggle="toc"] .nav > .active > a:before,
+nav[data-toggle="toc"] .nav > .active:hover > a:before,
+nav[data-toggle="toc"] .nav > .active:focus > a:before {
+  font-family: 'Font Awesome 6 Free';
+  content: '\f0da';
+  font-weight: 900;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+  padding-right: .5em;
+  font-size: x-small;
+  vertical-align: middle;
+}
+
+nav[data-toggle="toc"] .nav > li > ul {
+  margin-bottom: 0;
+}
+
+nav[data-toggle="toc"] .nav > li > ul > li > a {
+  padding-left: 1.25rem;
+  font-size: 80%;
+}
+
+nav[data-toggle="toc"] .nav-pills > li > a.active {
+  color: rgba(0,0,0,.85);
+  border-left: 2px solid rgba(0,0,0,.85);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+nav[data-toggle="toc"] .nav-pills > li > a:hover {
+  color: rgba(0,0,0,.85);
+  background-color: transparent;
+}
+
+nav[data-toggle="toc"] .nav-pills > li > a.active:before {
+  font-family: 'Font Awesome 6 Free';
+  content: '\f0da';
+  font-weight: 900;
+  font-size: x-small;
+  padding-right: .5em;
+}
