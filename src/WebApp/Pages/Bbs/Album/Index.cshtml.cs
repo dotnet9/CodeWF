@@ -16,14 +16,21 @@ public class IndexModel : PageModel
     public List<AlbumItem>? Albums { get; set; }
     public string Owner => _siteOption.Value.Owner ?? "沙漠尽头的狼";
 
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public int Total { get; set; }
+    public int TotalPages => (int)Math.Ceiling(Total / (double)PageSize);
+
     public IndexModel(AppService appService, IOptions<SiteOption> siteOption)
     {
         _appService = appService;
         _siteOption = siteOption;
     }
 
-    public async Task OnGetAsync(string slug)
+    public async Task OnGetAsync(string slug, int pageIndex = 1)
     {
+        PageIndex = pageIndex > 0 ? pageIndex : 1;
+
         Albums = await _appService.GetAllAlbumItemsAsync();
         var album = Albums?.FirstOrDefault(c => c.Slug == slug);
         if (album != null)
@@ -31,7 +38,8 @@ public class IndexModel : PageModel
             AlbumName = album.Name ?? "所有专辑";
         }
 
-        var pageData = await _appService.GetPostByAlbum(1, 100, slug, null);
+        var pageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
         Posts = pageData?.Data;
+        Total = pageData?.Total ?? 0;
     }
 }

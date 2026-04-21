@@ -2,6 +2,7 @@
 @model WebApp.Pages.Bbs.Album.IndexModel
 @{
     ViewData["Title"] = $"{Model.AlbumName} - 专辑";
+    var albumSlug = ViewContext.RouteData.Values["slug"]?.ToString() ?? "";
 }
 
 <div class="container">
@@ -46,6 +47,64 @@
                     }
                 }
             </div>
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="分页">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                        </li>
+                        @{
+                            int startPage = Math.Max(1, Model.PageIndex - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+                            if (endPage - startPage < 4)
+                            {
+                                if (startPage == 1)
+                                {
+                                    endPage = Math.Min(Model.TotalPages, startPage + 4);
+                                }
+                                else if (endPage == Model.TotalPages)
+                                {
+                                    startPage = Math.Max(1, endPage - 4);
+                                }
+                            }
+                        }
+                        @if (startPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=1">1</a>
+                            </li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                        }
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                                <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@i">@i</a>
+                            </li>
+                        }
+                        @if (endPage < Model.TotalPages)
+                        {
+                            @if (endPage < Model.TotalPages - 1)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
         </div>
         <div class="col-md-4">
             <div class="card mb-4">
