@@ -4,7 +4,7 @@ using HashidsNet;
 using CodeWF.Tools;
 using QRCoder;
 using Microsoft.Extensions.Options;
-using CodeWF.Options;
+using WebApp.Options;
 
 namespace WebApp.Controllers;
 

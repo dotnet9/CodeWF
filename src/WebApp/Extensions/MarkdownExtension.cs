@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Markdig;
 
-namespace CodeWF.Extensions;
+namespace WebApp.Extensions;
 
 public static class MarkdownExtension
 {

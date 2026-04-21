@@ -1,4 +1,4 @@
-namespace CodeWF.Options;
+namespace WebApp.Options;
 
 public class SiteOption
 {

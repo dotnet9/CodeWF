@@ -1,6 +1,6 @@
-namespace CodeWF.Models;
+namespace WebApp.Models;
 
-public class AlbumItem
+public class CategoryItem
 {
     public int Sort { get; set; }
 

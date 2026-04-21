@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using HashidsNet;
-using CodeWF.Options;
+using WebApp.Options;
 using Microsoft.Extensions.Options;
 
 namespace WebApp.Pages.Tool.Converter;

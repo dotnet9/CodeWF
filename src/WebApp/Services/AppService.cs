@@ -1,13 +1,13 @@
 using System.Text;
 using System.Text.Json;
-using CodeWF.Extensions;
-using CodeWF.Models;
-using CodeWF.Options;
+using WebApp.Extensions;
+using WebApp.Models;
+using WebApp.Options;
 using Microsoft.Extensions.Options;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace CodeWF.Services;
+namespace WebApp.Services;
 
 public class AppService(IOptions<SiteOption> siteOption)
 {

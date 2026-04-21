@@ -1,6 +1,6 @@
-using CodeWF.Models;
+using WebApp.Models;
 
-namespace CodeWF.Extensions;
+namespace WebApp.Extensions;
 
 public static class ConstantUtil
 {

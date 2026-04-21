@@ -1,4 +1,4 @@
-namespace CodeWF.Models;
+namespace WebApp.Models;
 
 public class SitemapNode
 {

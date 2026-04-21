@@ -2,6 +2,5 @@
   <Folder Name="/解决方案项/">
     <File Path="a.xml" />
   </Folder>
-  <Project Path="src\CodeWF\CodeWF.csproj" />
   <Project Path="src\WebApp\WebApp.csproj" />
 </Solution>

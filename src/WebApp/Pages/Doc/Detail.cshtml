@@ -1,6 +1,6 @@
 @page "/doc/{slug}"
 @model WebApp.Pages.Doc.DetailModel
-@using CodeWF.Extensions
+@using WebApp.Extensions
 @{
     ViewData["Title"] = $"{Model.Doc?.Name ?? "文档"} - 文档中心";
 }
