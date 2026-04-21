@@ -1,5 +1,8 @@
 using WebApp.Options;
 using WebApp.Services;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using Microsoft.Extensions.WebEncoders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<AppService>();
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
+builder.Services.Configure<WebEncoderOptions>(options =>
+    options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
+builder.Services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 
 var app = builder.Build();
 
