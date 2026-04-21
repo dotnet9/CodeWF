@@ -2,83 +2,338 @@
 @model IndexModel
 @{
     ViewData["Title"] = "首页";
-    string[] icons = { "fas fa-paper-plane", "fas fa-shield-alt", "fas fa-layer-group", "fas fa-vector-square", "fab fa-amazon", "fab fa-slack-hash" };
 }
 
-<div style="position: relative; overflow: hidden; background: #1a1a1a; color: white; padding: 6rem 0; margin-bottom: 2rem;">
-    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(25, 118, 210, 0.15), transparent 70%); animation: float 20s ease-in-out infinite; z-index: 0;"></div>
-    <div style="position: absolute; bottom: -30%; right: -20%; width: 150%; height: 150%; background: radial-gradient(circle, rgba(63, 81, 181, 0.1), transparent 70%); animation: float 25s ease-in-out infinite reverse; z-index: 0;"></div>
-    <div class="container position-relative" style="z-index: 1;">
+<div class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-left">
-                <h2 class="mb-4" style="font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; background: linear-gradient(90deg, #007bff, #6c757d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">文章启智，工具助力</h2>
-                <h5 class="font-weight-light mb-3">
-                    <strong>码坊</strong>：使用<strong>.NET 11 Razor Pages</strong>开发。
-                </h5>
-                <h5 class="font-weight-light mb-4 opacity-90">有技术文章、开源项目介绍和在线工具，助力高效编程。</h5>
-                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-4">
-                    <a href="/Bbs" class="btn btn-lg btn-primary">
-                        <i class="fas fa-book mr-2"></i> 博客
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3 animate-fade-in">
+                    <span class="gradient-text">文章启智，工具助力</span>
+                </h1>
+                <p class="lead text-muted mb-4 animate-fade-in" style="animation-delay: 0.1s;">
+                    <strong>码坊</strong>：使用 <span class="badge-tag">.NET 11</span> <span class="badge-tag">Razor Pages</span> 开发。
+                </p>
+                <p class="text-muted mb-4 animate-fade-in" style="animation-delay: 0.2s;">有技术文章、开源项目介绍和在线工具，助力高效编程。</p>
+                <div class="d-flex flex-wrap gap-3 animate-fade-in" style="animation-delay: 0.3s;">
+                    <a href="/Bbs" class="btn btn-primary btn-lg pulse-button">
+                        <i class="fas fa-book me-2"></i>博客
                     </a>
-                    <a href="https://github.com/dotnet9/codewf" class="btn btn-lg btn-outline-light" target="_blank">
-                        <i class="fab fa-github mr-2"></i> GitHub
+                    <a href="https://github.com/dotnet9/codewf" class="btn btn-outline-secondary btn-lg" target="_blank">
+                        <i class="fab fa-github me-2"></i>GitHub
                     </a>
                 </div>
             </div>
-            <div class="col-md-6 mt-4 mt-md-0 d-none d-md-block">
-                <img src="https://img1.dotnet9.com/site/banners/banner.jpg" class="rounded-2xl img-fluid shadow" style="animation: float 6s ease-in-out infinite;">
+            <div class="col-lg-5 d-none d-lg-block text-center animate-float">
+                <div class="tech-icon mx-auto" style="width: 120px; height: 120px; font-size: 3rem;">
+                    <i class="fas fa-code"></i>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-@@keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    33% { transform: translate(30px, -50px) rotate(120deg); }
-    66% { transform: translate(-20px, 20px) rotate(240deg); }
-}
-</style>
-
-<div class="container pt-5 pb-5">
-    <h3 class="mb-4">推荐文章</h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
-        @if (Model.Posts == null || !Model.Posts.Any())
-        {
-            <div class="col-12 d-flex justify-content-center align-items-center py-5">
-                <p class="text-muted">暂无推荐文章</p>
-            </div>
-        }
-        else
-        {
-            for (int i = 0; i < Model.Posts.Count; i++)
-            {
-                var post = Model.Posts[i];
-                var icon = icons[i % icons.Length];
-                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
-                <div class="tech-card" style="position: relative; padding: 0; background: white; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07); transition: all 0.3s ease; overflow: hidden;">
-                    @if (!string.IsNullOrEmpty(post.Cover))
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100 animate-slide-up">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0"><i class="fas fa-folder-open me-2 text-primary"></i>专辑分类</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Albums == null || !Model.Albums.Any())
                     {
-                        <div style="padding: 1rem 1rem 0 1rem;">
-                            <img src="@post.Cover" alt="@post.Title" class="img-fluid rounded" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem;">
-                        </div>
+                        <p class="text-muted mb-0">暂无专辑</p>
                     }
                     else
                     {
-                        <i class="@icon text-primary mb-4" style="display: block; padding: 2rem 2rem 0 2rem; font-size: 2.5rem;"></i>
+                        <div class="row g-3">
+                            @{
+                                int albumIndex = 0;
+                            }
+                            @foreach (var album in Model.Albums)
+                            {
+                                <div class="col-4 col-md-3 animate-item" style="animation-delay: @(albumIndex * 0.05)s;">
+                                    <a href="/bbs/album/@album.Slug" class="text-decoration-none">
+                                        <div class="category-chip py-2 px-3 rounded-pill text-center">
+                                            <span class="fw-medium">@album.Name</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                albumIndex++;
+                            }
+                        </div>
                     }
-                    <h3 class="title" style="font-size: 1.2rem; font-weight: 700; margin: 1rem; line-height: 1.4; padding-left: 1.5rem; padding-right: 1.5rem;">@post.Title</h3>
-                    <p class="description" style="color: #6c757d; font-size: 0.95rem; line-height: 1.6; margin: 0 1rem 1rem 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; padding-left: 1.5rem; padding-right: 1.5rem;">@post.Description</p>
-                    <div class="post-meta mt-3" style="font-size: 0.85rem; padding: 0 1rem 1rem 1rem; padding-left: 1.5rem; padding-right: 1.5rem;">
-                        <span class="text-muted"><i class="fas fa-calendar-alt me-1"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
-                        @if (!string.IsNullOrEmpty(post.Author))
-                        {
-                            <span class="text-muted ms-3"><i class="fas fa-user me-1"></i>@post.Author</span>
-                        }
-                    </div>
-                    <a href="@postUrl" class="stretched-link" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 1;"></a>
                 </div>
-            }
-        }
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100 animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0"><i class="fas fa-tags me-2 text-success"></i>文章分类</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Categories == null || !Model.Categories.Any())
+                    {
+                        <p class="text-muted mb-0">暂无分类</p>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            @{
+                                int catIndex = 0;
+                            }
+                            @foreach (var category in Model.Categories)
+                            {
+                                <div class="col-4 col-md-3 animate-item" style="animation-delay: @(catIndex * 0.05)s;">
+                                    <a href="/Bbs/Category/@category.Slug" class="text-decoration-none">
+                                        <div class="category-chip py-2 px-3 rounded-pill text-center">
+                                            <span class="fw-medium">@category.Name</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                catIndex++;
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div class="container mt-5">
+    <h3 class="mb-4 animate-slide-up"><i class="fas fa-star me-2 text-warning"></i>推荐文章</h3>
+    @if (Model.Posts == null || !Model.Posts.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">暂无推荐文章</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @{
+                int postIndex = 0;
+            }
+            @foreach (var post in Model.Posts)
+            {
+                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                <div class="col-md-6 col-lg-4 animate-item" style="animation-delay: @(postIndex * 0.1)s;">
+                    <a href="@postUrl" class="text-decoration-none">
+                        <div class="card h-100 shadow-sm post-card">
+                            @if (!string.IsNullOrEmpty(post.Cover))
+                            {
+                                <div class="img-wrapper">
+                                    <img src="@post.Cover" alt="@post.Title" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                                    <i class="fas fa-file-alt text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">@post.Title</h5>
+                                <p class="card-text text-muted small">@post.Description</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <div class="d-flex justify-content-between align-items-center text-muted small">
+                                    <span><i class="fas fa-calendar-alt me-1"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    @if (!string.IsNullOrEmpty(post.Author))
+                                    {
+                                        <span><i class="fas fa-user me-1"></i>@post.Author</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                postIndex++;
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .hero-section {
+        position: relative;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(32, 201, 151, 0.08));
+        z-index: 0;
+    }
+
+    .hero-bg::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(13, 110, 253, 0.1) 0%, transparent 50%);
+        animation: pulse-glow 8s ease-in-out infinite;
+    }
+
+    .hero-bg::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        right: -20%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(32, 201, 151, 0.08) 0%, transparent 50%);
+        animation: pulse-glow 10s ease-in-out infinite reverse;
+    }
+
+    @@keyframes pulse-glow {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    @@keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes slide-up {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.6s ease-out forwards;
+    }
+
+    .animate-slide-up {
+        animation: slide-up 0.6s ease-out forwards;
+    }
+
+    .animate-float {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    .animate-item {
+        opacity: 0;
+        animation: slide-up 0.5s ease-out forwards;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #0d6efd, #20c997, #0d6efd);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradient-flow 3s ease-in-out infinite;
+    }
+
+    @@keyframes gradient-flow {
+        0%, 100% { background-position: 0% center; }
+        50% { background-position: 100% center; }
+    }
+
+    .category-chip {
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(32, 201, 151, 0.1));
+        border: 1px solid var(--border-color);
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .category-chip:hover {
+        background: linear-gradient(135deg, #0d6efd, #20c997);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .post-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg) !important;
+    }
+
+    .post-card .card-title {
+        transition: color 0.3s ease;
+    }
+
+    .post-card:hover .card-title {
+        color: var(--primary-color) !important;
+    }
+
+    .img-wrapper {
+        overflow: hidden;
+    }
+
+    .img-wrapper img {
+        transition: transform 0.5s ease;
+    }
+
+    .post-card:hover .img-wrapper img {
+        transform: scale(1.1);
+    }
+
+    .pulse-button {
+        animation: pulse-shadow 2s ease-in-out infinite;
+    }
+
+    @@keyframes pulse-shadow {
+        0%, 100% { box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); }
+        50% { box-shadow: 0 4px 25px rgba(13, 110, 253, 0.5); }
+    }
+
+    .pulse-button:hover {
+        animation: none;
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+    }
+
+    .badge-tag {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 6px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .badge-tag:hover {
+        background: #0d6efd;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .tech-icon {
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(32, 201, 151, 0.15));
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0d6efd;
+        box-shadow: 0 10px 40px rgba(13, 110, 253, 0.2);
+    }
+</style>
