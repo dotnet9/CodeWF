@@ -20,12 +20,26 @@
                     foreach (var post in Model.Posts)
                     {
                         <div class="card shadow-sm mb-4">
-                            <div class="card-body">
-                                <h4 class="card-title">@post.Title</h4>
-                                <p class="card-text text-muted">@post.Description</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">@post.Date?.ToString("yyyy-MM-dd")</span>
-                                    <a href="/Bbs/Post/@post.Date?.Year/@post.Date?.Month/@post.Slug" class="btn btn-primary">阅读更多</a>
+                            <div class="row g-0">
+                                @if (!string.IsNullOrEmpty(post.Cover))
+                                {
+                                    <div class="col-md-3">
+                                        <a href="/Bbs/Post/@post.Date?.Year/@post.Date?.Month/@post.Slug">
+                                            <img src="@post.Cover" class="img-fluid rounded-start" alt="@post.Title" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </a>
+                                    </div>
+                                }
+                                <div class="col-md-9">
+                                    <div class="card-body">
+                                        <a href="/Bbs/Post/@post.Date?.Year/@post.Date?.Month/@post.Slug" class="text-decoration-none">
+                                            <h4 class="card-title text-dark">@post.Title</h4>
+                                        </a>
+                                        <p class="card-text text-muted">@post.Description</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">作者：@(string.IsNullOrEmpty(post.Author) ? Model.Owner : post.Author)</small>
+                                            <small class="text-muted">@post.Date?.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
