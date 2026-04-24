@@ -3,111 +3,84 @@
 @using WebApp.Extensions
 @{
     ViewData["Title"] = $"{Model.Doc?.Name ?? "文档"} - 文档中心";
+    ViewData["Description"] = Model.Doc?.Memo ?? "浏览码坊文档内容。";
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8">
-            @if (Model.Doc == null)
-            {
-                <div class="alert alert-danger">文档不存在或已被删除</div>
-            }
-            else
-            {
-                <article class="doc-content">
-                    <h1 class="mb-4">@Model.Doc.Name</h1>
-                    @if (!string.IsNullOrEmpty(Model.Doc.Memo))
+<section class="page-shell">
+    <div class="container">
+        @if (Model.Doc == null)
+        {
+            <div class="empty-state">
+                <h2>文档不存在或已删除</h2>
+                <p>可以返回文档中心查看其他内容。</p>
+            </div>
+        }
+        else
+        {
+            <div class="page-banner">
+                <div>
+                    <span class="eyebrow">Documentation</span>
+                    <h1 class="page-title">@Model.Doc.Name</h1>
+                    @if (!string.IsNullOrWhiteSpace(Model.Doc.Memo))
                     {
-                        <p class="text-muted mb-4">@Model.Doc.Memo</p>
+                        <p class="page-description">@Model.Doc.Memo</p>
                     }
-                    @if (!string.IsNullOrEmpty(Model.Doc.HtmlContent))
+                </div>
+                <div class="page-banner__meta">
+                    <span class="meta-chip">结构化文档</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.Doc.Repository))
                     {
-                        <div class="markdown-content">
+                        <a class="meta-chip" href="@Model.Doc.Repository" target="_blank" rel="noreferrer">
+                            <i class="fab fa-github"></i>相关仓库
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <div class="content-grid content-grid--article">
+                <article class="surface-panel article-panel">
+                    @if (!string.IsNullOrWhiteSpace(Model.Doc.HtmlContent))
+                    {
+                        <div class="prose doc-content">
                             @Html.Raw(Model.Doc.HtmlContent)
                         </div>
                     }
-                    else if (!string.IsNullOrEmpty(Model.Doc.Content))
+                    else if (!string.IsNullOrWhiteSpace(Model.Doc.Content))
                     {
-                        <div class="markdown-content">
+                        <div class="prose doc-content">
                             @Html.Raw(Model.Doc.Content.ToHtml())
                         </div>
                     }
                 </article>
-            }
-        </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-folder me-2"></i>文档目录
-                </div>
-                <div class="card-body">
-                    @if (Model.DocItems != null && Model.DocItems.Any())
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var doc in Model.DocItems)
+
+                <aside class="content-sidebar">
+                    <div class="surface-panel sidebar-panel sticky-panel">
+                        <h2 class="sidebar-title">文档目录</h2>
+                        <div class="sidebar-link-list">
+                            @if (Model.DocItems != null && Model.DocItems.Any())
                             {
-                                <li class="list-group-item @(doc.Slug == Model.Doc?.Slug ? "active" : "")">
-                                    <a href="/doc/@doc.Slug" class="text-decoration-none @(doc.Slug == Model.Doc?.Slug ? "text-white" : "")">
-                                        @doc.Name
-                                    </a>
-                                </li>
-                                @if (doc.Children != null && doc.Children.Any())
+                                @foreach (var doc in Model.DocItems)
                                 {
-                                    @foreach (var child in doc.Children)
+                                    <a href="/doc/@doc.Slug" class="sidebar-link @(doc.Slug == Model.Doc.Slug ? "is-current" : string.Empty)">
+                                        <span>@doc.Name</span>
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                    @if (doc.Children != null && doc.Children.Any())
                                     {
-                                        <li class="list-group-item ps-4 @(child.Slug == Model.Doc?.Slug ? "active" : "")">
-                                            <a href="/doc/@child.Slug" class="text-decoration-none @(child.Slug == Model.Doc?.Slug ? "text-white" : "")">
-                                                @child.Name
+                                        @foreach (var child in doc.Children)
+                                        {
+                                            <a href="/doc/@child.Slug" class="sidebar-link sidebar-link--child @(child.Slug == Model.Doc.Slug ? "is-current" : string.Empty)">
+                                                <span>@child.Name</span>
+                                                <i class="fas fa-angle-right"></i>
                                             </a>
-                                        </li>
+                                        }
                                     }
                                 }
                             }
-                        </ul>
-                    }
-                </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
-        </div>
+        }
     </div>
-</div>
-
-<style>
-    .doc-content {
-        background: white;
-        padding: 2rem;
-        border-radius: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .markdown-content {
-        line-height: 1.8;
-    }
-
-    .markdown-content h2 {
-        margin-top: 2rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e9ecef;
-    }
-
-    .markdown-content h3 {
-        margin-top: 1.5rem;
-    }
-
-    .markdown-content p {
-        margin-bottom: 1rem;
-    }
-
-    .markdown-content pre {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        overflow-x: auto;
-    }
-
-    .markdown-content code {
-        background: #f8f9fa;
-        padding: 0.2rem 0.4rem;
-        border-radius: 0.25rem;
-        font-size: 0.9em;
-    }
-</style>
+</section>

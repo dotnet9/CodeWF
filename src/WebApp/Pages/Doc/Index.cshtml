@@ -2,46 +2,63 @@
 @model WebApp.Pages.Doc.IndexModel
 @{
     ViewData["Title"] = "文档";
+    ViewData["Description"] = "浏览码坊文档中心，按主题和目录快速定位内容。";
 }
 
-<div class="container">
-    <h1 class="mb-4">文档中心</h1>
-    <div class="row">
+<section class="page-shell">
+    <div class="container">
+        <div class="page-banner">
+            <div>
+                <span class="eyebrow">Documentation</span>
+                <h1 class="page-title">文档中心</h1>
+                <p class="page-description">
+                    把常用知识点和项目说明沉淀成目录化文档，减少重复检索的时间成本。
+                </p>
+            </div>
+            <div class="page-banner__meta">
+                <span class="meta-chip">结构化内容</span>
+                <span class="meta-chip">按主题导航</span>
+                <span class="meta-chip">便于快速复用</span>
+            </div>
+        </div>
+
         @if (Model.DocItems == null || !Model.DocItems.Any())
         {
-            <div class="col-12 text-center py-5">
-                <p class="text-muted">暂无文档</p>
+            <div class="empty-state">
+                <h2>文档内容暂未就绪</h2>
+                <p>可以稍后再来查看，或先浏览博客里的技术文章。</p>
             </div>
         }
         else
         {
-            foreach (var doc in Model.DocItems)
-            {
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm doc-card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="fas fa-book me-2 text-primary"></i>@doc.Name
-                            </h5>
-                            @if (!string.IsNullOrEmpty(doc.Memo))
+            <div class="post-grid">
+                @foreach (var doc in Model.DocItems)
+                {
+                    <article class="resource-card">
+                        <div class="resource-card__body">
+                            <span class="card-kicker">文档分组</span>
+                            <h2 class="resource-card__title">@doc.Name</h2>
+                            @if (!string.IsNullOrWhiteSpace(doc.Memo))
                             {
-                                <p class="card-text text-muted">@doc.Memo</p>
+                                <p class="resource-card__desc">@doc.Memo</p>
                             }
+
                             @if (doc.Children != null && doc.Children.Any())
                             {
-                                <ul class="list-group list-group-flush mt-3">
+                                <div class="sidebar-link-list sidebar-link-list--compact">
                                     @foreach (var child in doc.Children)
                                     {
-                                        <li class="list-group-item">
-                                            <a href="/doc/@child.Slug">@child.Name</a>
-                                        </li>
+                                        <a href="/doc/@child.Slug" class="sidebar-link">
+                                            <span>@child.Name</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
                                     }
-                                </ul>
+                                </div>
                             }
                         </div>
-                    </div>
-                </div>
-            }
+                    </article>
+                }
+            </div>
         }
     </div>
-</div>
+</section>

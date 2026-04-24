@@ -304,6 +304,11 @@ public class AppService(IOptions<SiteOption> siteOption)
             }
         }
 
+        _blogPosts = _blogPosts
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue)
+            .ToList();
+
         return _blogPosts;
     }
 
@@ -336,7 +341,8 @@ public class AppService(IOptions<SiteOption> siteOption)
         var total = posts?.Count() ?? 0;
 
         var postDatas = posts
-            ?.OrderBy(post => post.Date)
+            ?.OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();

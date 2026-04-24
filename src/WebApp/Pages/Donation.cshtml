@@ -1,34 +1,53 @@
 @page "/donation"
 @model WebApp.Pages.DonationModel
-@{ ViewData["Title"] = "赞助"; }
+@{
+    ViewData["Title"] = "赞助";
+    ViewData["Description"] = "如果码坊的内容对你有帮助，欢迎通过赞助支持持续更新。";
+}
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <h1 class="mb-4">赞助</h1>
-            <div class="card">
-                <div class="card-body">
+<section class="page-shell">
+    <div class="container">
+        <div class="page-banner">
+            <div>
+                <span class="eyebrow">Support</span>
+                <h1 class="page-title">赞助与支持</h1>
+                <p class="page-description">
+                    如果这里的内容和工具帮到了你，欢迎通过赞助支持站点继续维护与更新。
+                </p>
+            </div>
+            <div class="page-banner__meta">
+                <span class="meta-chip">支持持续创作</span>
+                <span class="meta-chip">支持工具维护</span>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="content-primary">
+                <div class="surface-panel prose-panel">
                     @Html.Raw(Model.HtmlContent)
                 </div>
             </div>
-            <div class="card mt-3">
-                <div class="card-header">调试信息</div>
-                <div class="card-body">
-                    @Html.Raw(Model.DebugInfo)
+
+            <aside class="content-sidebar">
+                <div class="surface-panel sidebar-panel sticky-panel">
+                    <h2 class="sidebar-title">你也可以从这里继续逛</h2>
+                    <p class="sidebar-copy">如果暂时不赞助，也欢迎继续阅读、订阅或反馈建议。</p>
+                    <div class="sidebar-link-list">
+                        <a href="/rss" class="sidebar-link">
+                            <span>RSS 订阅</span>
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="/sitemap" class="sidebar-link">
+                            <span>站点地图</span>
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="/about" class="sidebar-link">
+                            <span>关于站点</span>
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">其他页面</div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><a href="/rss">RSS订阅</a></li>
-                        <li class="list-group-item"><a href="/sitemap">站点地图</a></li>
-                        <li class="list-group-item"><a href="/about">关于我们</a></li>
-                    </ul>
-                </div>
-            </div>
+            </aside>
         </div>
     </div>
-</div>
+</section>

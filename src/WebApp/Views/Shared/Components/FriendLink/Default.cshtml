@@ -1,77 +1,32 @@
 @model WebApp.Components.FriendLinkViewModel
 
-<div class="friend-links mt-4 mb-4">
-    <div class="d-flex flex-wrap align-items-center justify-content-center">
-        <span class="me-3 mb-2">
-            <i class="fas fa-link me-2"></i>友情链接
-        </span>
-        @if (Model.Links?.Any() != true)
-        {
-            <span class="text-muted">暂无友情链接</span>
-        }
-        else
-        {
-            <div class="tech-links-container">
-                @foreach (var link in Model.Links)
-                {
-                    <a href="@link.Link" target="_blank" title="@link.Description" class="tech-link">
-                        <span class="link-text">@link.Title</span>
-                    </a>
-                }
-            </div>
-        }
+<div class="friend-links">
+    <div class="section-heading section-heading--compact">
+        <div>
+            <span class="eyebrow">友情链接</span>
+            <h2 class="section-title">值得一看的技术站点</h2>
+        </div>
     </div>
+
+    @if (Model.Links?.Any() != true)
+    {
+        <div class="empty-state">
+            <h2>友情链接暂未配置</h2>
+            <p>后续可以在这里补充合作站点与推荐资源。</p>
+        </div>
+    }
+    else
+    {
+        <div class="friend-links__grid">
+            @foreach (var link in Model.Links.OrderBy(item => item.Index))
+            {
+                var tooltip = !string.IsNullOrWhiteSpace(link.Description)
+                    ? $"{link.Title} - {link.Description}"
+                    : link.Title;
+                <a href="@link.Link" target="_blank" rel="noreferrer" title="@tooltip" aria-label="@tooltip" class="friend-link-card">
+                    <span class="friend-link-card__title">@link.Title</span>
+                </a>
+            }
+        </div>
+    }
 </div>
-
-<style>
-    .tech-links-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 16px 24px;
-        background: #f8f9fa;
-        border-radius: 12px;
-        border: 1px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-
-    .tech-link {
-        position: relative;
-        padding: 8px 16px;
-        color: #333;
-        text-decoration: none;
-        background: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-    }
-
-    .tech-link:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
-        border-color: #007bff;
-        color: #007bff;
-    }
-
-    .link-text::before {
-        content: '# ';
-        color: #007bff;
-        margin-right: 4px;
-    }
-
-    @@media (max-width: 768px) {
-        .tech-links-container {
-            padding: 12px 16px;
-            gap: 8px;
-        }
-
-        .tech-link {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-        }
-    }
-</style>

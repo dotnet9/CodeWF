@@ -2,338 +2,234 @@
 @model IndexModel
 @{
     ViewData["Title"] = "首页";
+    ViewData["Description"] = "码坊聚合 .NET 技术文章、专题文档与在线工具，帮助开发者更高效地获取和实践知识。";
+    var spotlight = Model.SpotlightPost;
 }
 
-<div class="hero-section">
-    <div class="hero-bg"></div>
-    <div class="container position-relative" style="z-index: 2;">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <h1 class="display-4 fw-bold mb-3 animate-fade-in">
-                    <span class="gradient-text">文章启智，工具助力</span>
-                </h1>
-                <p class="lead text-muted mb-4 animate-fade-in" style="animation-delay: 0.1s;">
-                    <strong>码坊</strong>：使用 <span class="badge-tag">.NET 11</span> <span class="badge-tag">Razor Pages</span> 开发。
+<section class="hero-band">
+    <div class="container">
+        <div class="home-hero">
+            <div class="home-hero__content">
+                <span class="eyebrow">Razor Pages · Content Hub</span>
+                <h1>把文章、文档和工具组织成更专业的开发者入口</h1>
+                <p class="hero-copy">
+                    码坊围绕 .NET 与泛开发主题沉淀内容，强化专题浏览、文档导航与在线工具三个核心入口，让阅读、检索与实践形成闭环。
                 </p>
-                <p class="text-muted mb-4 animate-fade-in" style="animation-delay: 0.2s;">有技术文章、开源项目介绍和在线工具，助力高效编程。</p>
-                <div class="d-flex flex-wrap gap-3 animate-fade-in" style="animation-delay: 0.3s;">
-                    <a href="/Bbs" class="btn btn-primary btn-lg pulse-button">
-                        <i class="fas fa-book me-2"></i>博客
-                    </a>
-                    <a href="https://github.com/dotnet9/codewf" class="btn btn-outline-secondary btn-lg" target="_blank">
-                        <i class="fab fa-github me-2"></i>GitHub
-                    </a>
-                </div>
-            </div>
-            <div class="col-lg-5 d-none d-lg-block text-center animate-float">
-                <div class="tech-icon mx-auto" style="width: 120px; height: 120px; font-size: 3rem;">
-                    <i class="fas fa-code"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="container mt-5">
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100 animate-slide-up">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0"><i class="fas fa-folder-open me-2 text-primary"></i>专辑分类</h4>
+                <div class="hero-actions">
+                    <a href="/bbs" class="btn btn-primary btn-lg">
+                        <i class="fas fa-book-open me-2"></i>浏览文章
+                    </a>
+                    <a href="/doc" class="btn btn-ghost btn-lg">
+                        <i class="fas fa-compass me-2"></i>进入文档
+                    </a>
                 </div>
-                <div class="card-body">
-                    @if (Model.Albums == null || !Model.Albums.Any())
-                    {
-                        <p class="text-muted mb-0">暂无专辑</p>
-                    }
-                    else
-                    {
-                        <div class="row g-3">
-                            @{
-                                int albumIndex = 0;
-                            }
-                            @foreach (var album in Model.Albums)
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <strong>@Model.TotalPosts</strong>
+                        <span>累计文章</span>
+                    </div>
+                    <div class="metric-card">
+                        <strong>@Model.TotalAlbums</strong>
+                        <span>专题沉淀</span>
+                    </div>
+                    <div class="metric-card">
+                        <strong>@Model.TotalCategories</strong>
+                        <span>技术分类</span>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="surface-panel hero-spotlight">
+                <p class="panel-kicker">Spotlight</p>
+                @if (spotlight != null)
+                {
+                    var spotlightUrl = $"/Bbs/Post/{spotlight.Date?.Year}/{spotlight.Date?.Month}/{spotlight.Slug}";
+                    <div class="spotlight-card">
+                        <span class="spotlight-card__label">推荐文章</span>
+                        <h2>@spotlight.Title</h2>
+                        @if (!string.IsNullOrWhiteSpace(spotlight.Description))
+                        {
+                            <p>@spotlight.Description</p>
+                        }
+                        <div class="spotlight-meta">
+                            <span><i class="far fa-calendar"></i>@spotlight.Date?.ToString("yyyy-MM-dd")</span>
+                            @if (!string.IsNullOrWhiteSpace(spotlight.Author))
                             {
-                                <div class="col-4 col-md-3 animate-item" style="animation-delay: @(albumIndex * 0.05)s;">
-                                    <a href="/bbs/album/@album.Slug" class="text-decoration-none">
-                                        <div class="category-chip py-2 px-3 rounded-pill text-center">
-                                            <span class="fw-medium">@album.Name</span>
-                                        </div>
-                                    </a>
-                                </div>
-                                albumIndex++;
+                                <span><i class="far fa-user"></i>@spotlight.Author</span>
                             }
                         </div>
-                    }
-                </div>
-            </div>
-        </div>
+                        <a href="@spotlightUrl" class="spotlight-link">
+                            阅读这篇文章
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                }
 
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100 animate-slide-up" style="animation-delay: 0.1s;">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0"><i class="fas fa-tags me-2 text-success"></i>文章分类</h4>
-                </div>
-                <div class="card-body">
-                    @if (Model.Categories == null || !Model.Categories.Any())
-                    {
-                        <p class="text-muted mb-0">暂无分类</p>
-                    }
-                    else
-                    {
-                        <div class="row g-3">
-                            @{
-                                int catIndex = 0;
-                            }
-                            @foreach (var category in Model.Categories)
-                            {
-                                <div class="col-4 col-md-3 animate-item" style="animation-delay: @(catIndex * 0.05)s;">
-                                    <a href="/Bbs/Category/@category.Slug" class="text-decoration-none">
-                                        <div class="category-chip py-2 px-3 rounded-pill text-center">
-                                            <span class="fw-medium">@category.Name</span>
-                                        </div>
-                                    </a>
-                                </div>
-                                catIndex++;
-                            }
+                <div class="pillar-list">
+                    <div class="pillar-item">
+                        <div class="pillar-item__icon">
+                            <i class="fas fa-layer-group"></i>
                         </div>
-                    }
+                        <div>
+                            <h3>专题沉淀</h3>
+                            <p>用专辑组织系列内容，适合连续阅读与长期积累。</p>
+                        </div>
+                    </div>
+                    <div class="pillar-item">
+                        <div class="pillar-item__icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <h3>文档导航</h3>
+                            <p>把知识点整理成结构化目录，降低查找与复用成本。</p>
+                        </div>
+                    </div>
+                    <div class="pillar-item">
+                        <div class="pillar-item__icon">
+                            <i class="fas fa-screwdriver-wrench"></i>
+                        </div>
+                        <div>
+                            <h3>在线工具</h3>
+                            <p>让常用开发小工具直接可用，而不是只停留在介绍层面。</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
-</div>
+</section>
 
-<div class="container mt-5">
-    <h3 class="mb-4 animate-slide-up"><i class="fas fa-star me-2 text-warning"></i>推荐文章</h3>
-    @if (Model.Posts == null || !Model.Posts.Any())
-    {
-        <div class="text-center py-5">
-            <p class="text-muted">暂无推荐文章</p>
+<section class="page-shell">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Explore</span>
+                <h2 class="section-title">从专题和分类切入内容</h2>
+            </div>
+            <p class="section-description">
+                对初次访问者来说，先看入口比先看列表更重要。这里把高频的浏览方式整理成了更直观的入口层。
+            </p>
         </div>
-    }
-    else
-    {
+
         <div class="row g-4">
-            @{
-                int postIndex = 0;
-            }
-            @foreach (var post in Model.Posts)
-            {
-                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
-                <div class="col-md-6 col-lg-4 animate-item" style="animation-delay: @(postIndex * 0.1)s;">
-                    <a href="@postUrl" class="text-decoration-none">
-                        <div class="card h-100 shadow-sm post-card">
-                            @if (!string.IsNullOrEmpty(post.Cover))
+            <div class="col-lg-6">
+                <div class="surface-panel">
+                    <div class="surface-panel__header">
+                        <div>
+                            <span class="eyebrow">Albums</span>
+                            <h3 class="surface-title">专题专栏</h3>
+                        </div>
+                        <a href="/bbs" class="surface-link">全部文章</a>
+                    </div>
+
+                    @if (!Model.Albums.Any(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        <div class="empty-state empty-state--compact">
+                            <p>暂未配置专题内容。</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="chip-cloud">
+                            @foreach (var album in Model.Albums.Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)).Take(18))
                             {
-                                <div class="img-wrapper">
-                                    <img src="@post.Cover" alt="@post.Title" class="card-img-top" style="height: 180px; object-fit: cover;">
-                                </div>
+                                <a href="/bbs/album/@album.Slug" class="chip-link">@album.Name</a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="surface-panel">
+                    <div class="surface-panel__header">
+                        <div>
+                            <span class="eyebrow">Categories</span>
+                            <h3 class="surface-title">技术分类</h3>
+                        </div>
+                        <a href="/bbs" class="surface-link">查看最新</a>
+                    </div>
+
+                    @if (!Model.Categories.Any(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        <div class="empty-state empty-state--compact">
+                            <p>暂未配置文章分类。</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="chip-cloud">
+                            @foreach (var category in Model.Categories.Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)).Take(24))
+                            {
+                                <a href="/Bbs/Category/@category.Slug" class="chip-link">@category.Name</a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="page-shell page-shell--tight">
+    <div class="container">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Featured Posts</span>
+                <h2 class="section-title">推荐阅读</h2>
+            </div>
+            <p class="section-description">
+                精选近期值得打开的内容，优先展示站点里更适合首页承接的文章。
+            </p>
+        </div>
+
+        @if (!Model.Posts.Any())
+        {
+            <div class="empty-state">
+                <h2>推荐内容还在整理中</h2>
+                <p>可以先从博客列表或文档中心开始浏览。</p>
+            </div>
+        }
+        else
+        {
+            <div class="post-grid">
+                @foreach (var post in Model.Posts)
+                {
+                    var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                    <article class="resource-card">
+                        <a href="@postUrl" class="resource-card__media">
+                            @if (!string.IsNullOrWhiteSpace(post.Cover))
+                            {
+                                <img src="@post.Cover" alt="@post.Title" class="cover-media" />
                             }
                             else
                             {
-                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
-                                    <i class="fas fa-file-alt text-muted" style="font-size: 3rem;"></i>
+                                <div class="media-placeholder">
+                                    <i class="fas fa-file-lines"></i>
                                 </div>
                             }
-                            <div class="card-body">
-                                <h5 class="card-title text-dark">@post.Title</h5>
-                                <p class="card-text text-muted small">@post.Description</p>
-                            </div>
-                            <div class="card-footer bg-white border-top-0">
-                                <div class="d-flex justify-content-between align-items-center text-muted small">
-                                    <span><i class="fas fa-calendar-alt me-1"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
-                                    @if (!string.IsNullOrEmpty(post.Author))
-                                    {
-                                        <span><i class="fas fa-user me-1"></i>@post.Author</span>
-                                    }
-                                </div>
+                        </a>
+                        <div class="resource-card__body">
+                            <h3 class="resource-card__title">
+                                <a href="@postUrl">@post.Title</a>
+                            </h3>
+                            @if (!string.IsNullOrWhiteSpace(post.Description))
+                            {
+                                <p class="resource-card__desc">@post.Description</p>
+                            }
+                            <div class="resource-card__meta">
+                                <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                @if (!string.IsNullOrWhiteSpace(post.Author))
+                                {
+                                    <span><i class="far fa-user"></i>@post.Author</span>
+                                }
                             </div>
                         </div>
-                    </a>
-                </div>
-                postIndex++;
-            }
-        </div>
-    }
-</div>
-
-<style>
-    .hero-section {
-        position: relative;
-        padding: 4rem 0;
-        margin-bottom: 2rem;
-        overflow: hidden;
-    }
-
-    .hero-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(32, 201, 151, 0.08));
-        z-index: 0;
-    }
-
-    .hero-bg::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(13, 110, 253, 0.1) 0%, transparent 50%);
-        animation: pulse-glow 8s ease-in-out infinite;
-    }
-
-    .hero-bg::after {
-        content: '';
-        position: absolute;
-        bottom: -30%;
-        right: -20%;
-        width: 150%;
-        height: 150%;
-        background: radial-gradient(circle, rgba(32, 201, 151, 0.08) 0%, transparent 50%);
-        animation: pulse-glow 10s ease-in-out infinite reverse;
-    }
-
-    @@keyframes pulse-glow {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-    }
-
-    @@keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-    }
-
-    @@keyframes fade-in {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    @@keyframes slide-up {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .animate-fade-in {
-        animation: fade-in 0.6s ease-out forwards;
-    }
-
-    .animate-slide-up {
-        animation: slide-up 0.6s ease-out forwards;
-    }
-
-    .animate-float {
-        animation: float 4s ease-in-out infinite;
-    }
-
-    .animate-item {
-        opacity: 0;
-        animation: slide-up 0.5s ease-out forwards;
-    }
-
-    .gradient-text {
-        background: linear-gradient(135deg, #0d6efd, #20c997, #0d6efd);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: gradient-flow 3s ease-in-out infinite;
-    }
-
-    @@keyframes gradient-flow {
-        0%, 100% { background-position: 0% center; }
-        50% { background-position: 100% center; }
-    }
-
-    .category-chip {
-        background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(32, 201, 151, 0.1));
-        border: 1px solid var(--border-color);
-        color: var(--primary-color);
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-
-    .category-chip:hover {
-        background: linear-gradient(135deg, #0d6efd, #20c997);
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-    }
-
-    .post-card {
-        transition: all 0.3s ease;
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-    }
-
-    .post-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg) !important;
-    }
-
-    .post-card .card-title {
-        transition: color 0.3s ease;
-    }
-
-    .post-card:hover .card-title {
-        color: var(--primary-color) !important;
-    }
-
-    .img-wrapper {
-        overflow: hidden;
-    }
-
-    .img-wrapper img {
-        transition: transform 0.5s ease;
-    }
-
-    .post-card:hover .img-wrapper img {
-        transform: scale(1.1);
-    }
-
-    .pulse-button {
-        animation: pulse-shadow 2s ease-in-out infinite;
-    }
-
-    @@keyframes pulse-shadow {
-        0%, 100% { box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); }
-        50% { box-shadow: 0 4px 25px rgba(13, 110, 253, 0.5); }
-    }
-
-    .pulse-button:hover {
-        animation: none;
-        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
-    }
-
-    .badge-tag {
-        background: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-right: 6px;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-
-    .badge-tag:hover {
-        background: #0d6efd;
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
-    .tech-icon {
-        background: linear-gradient(135deg, rgba(13, 110, 253, 0.15), rgba(32, 201, 151, 0.15));
-        border-radius: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #0d6efd;
-        box-shadow: 0 10px 40px rgba(13, 110, 253, 0.2);
-    }
-</style>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

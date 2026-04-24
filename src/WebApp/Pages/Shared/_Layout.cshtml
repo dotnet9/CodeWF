@@ -1,124 +1,179 @@
-@inject WebApp.Services.AppService AppService
+@using Microsoft.Extensions.Options
+@inject IOptions<WebApp.Options.SiteOption> SiteOptions
+@{
+    var site = SiteOptions.Value;
+    var appTitle = site.AppTitle ?? "码坊";
+    var pageTitle = ViewData["Title"] as string;
+    var siteDescription = ViewData["Description"] as string
+        ?? site.Memo
+        ?? "面向 .NET 开发者的技术内容、专题文档与在线工具站点。";
+    var currentPath = (Context.Request.Path.Value ?? "/").TrimEnd('/');
+    if (string.IsNullOrEmpty(currentPath))
+    {
+        currentPath = "/";
+    }
+
+    string NavClass(string href)
+    {
+        if (href == "/")
+        {
+            return currentPath == "/" ? "nav-link is-active" : "nav-link";
+        }
+
+        return currentPath.StartsWith(href, StringComparison.OrdinalIgnoreCase)
+            ? "nav-link is-active"
+            : "nav-link";
+    }
+
+    var moreActive = currentPath.StartsWith("/about", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/timeline", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/donation", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/rss", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/sitemap", StringComparison.OrdinalIgnoreCase);
+}
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="keywords" content="blazor,ant-design,razor,dotnet" />
-    <meta name="description" content="码坊是使用.NET 10 Blazor开发的一个网站，这里有技术文章，有开源项目介绍，有在线工具使用:  码坊—文章启智，工具助力" />
-    <title>@ViewData["Title"] - 码坊</title>
+    <meta name="keywords" content=".NET,Razor Pages,ASP.NET Core,开发工具,技术文章,码坊" />
+    <meta name="description" content="@siteDescription" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>@(string.IsNullOrWhiteSpace(pageTitle) || pageTitle == "首页" ? appTitle : $"{pageTitle} - {appTitle}")</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Outfit:wght@500;600;700;800&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="~/lib/bootstrap-toc/bootstrap-toc.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="icon" type="image/png" href="https://img1.dotnet9.com/site/favicon/logo.png" />
+    <link rel="icon" type="image/png" href="@(site.Favicon ?? Url.Content("~/favicon.png"))" />
     <script async src="https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b"></script>
-
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-tech-nav fixed-top">
+    <header class="site-header">
+        <nav class="navbar navbar-expand-xl fixed-top site-navbar">
             <div class="container">
-                <a class="navbar-brand" href="/">
-                    <strong>码坊</strong>
+                <a class="navbar-brand site-brand" href="/">
+                    <span class="site-brand__mark">@appTitle</span>
+                    <span class="site-brand__meta">.NET 内容与工具站</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler site-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="切换导航">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse" id="navbarColor02">
-                    <ul class="navbar-nav me-auto d-flex align-items-center">
+
+                <div class="collapse navbar-collapse" id="mainNavigation">
+                    <ul class="navbar-nav me-auto align-items-xl-center">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">首页</a>
+                            <a class="@(NavClass("/"))" href="/">首页</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/doc">文档</a>
+                            <a class="@(NavClass("/bbs"))" href="/bbs">博客</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/tool">工具</a>
+                            <a class="@(NavClass("/doc"))" href="/doc">文档</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="@(NavClass("/tool"))" href="/tool">工具</a>
                         </li>
                         @await Component.InvokeAsync("Navigation")
-                        <li>
-                            <a class="nav-link" href="https://github.com/dotnet9/Assets.Dotnet9" target="_blank">投稿</a>
-                        </li>
-                        <li>
-                            <a class="nav-link" href="https://github.com/dotnet9/CodeWF/issues" target="_blank">Bug反馈</a>
-                        </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="/about" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">关于</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/donation">赞助</a>
-                                <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank">博客园</a>
-                                <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank">B站</a>
-                                <a class="dropdown-item" href="/timeline">时间线</a>
-                                <a class="dropdown-item" href="/rss">RSS</a>
-                                <a class="dropdown-item" href="/sitemap">站点地图</a>
+                            <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
+                            <div class="dropdown-menu site-dropdown">
                                 <a class="dropdown-item" href="/about">关于</a>
+                                <a class="dropdown-item" href="/timeline">时间线</a>
+                                <a class="dropdown-item" href="/donation">赞助</a>
+                                <a class="dropdown-item" href="/rss" target="_blank" rel="noreferrer">RSS</a>
+                                <a class="dropdown-item" href="/sitemap" target="_blank" rel="noreferrer">站点地图</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a>
+                                <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
                             </div>
                         </li>
                     </ul>
+
+                    <div class="site-actions">
+                        <a class="btn btn-ghost" href="https://github.com/dotnet9/CodeWF" target="_blank" rel="noreferrer">
+                            <i class="fab fa-github me-2"></i>查看源码
+                        </a>
+                        <a class="btn btn-primary" href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">
+                            <i class="fas fa-bug me-2"></i>反馈问题
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div style="padding-top: 80px;">
+    <main class="site-main">
         @RenderBody()
-    </div>
+    </main>
 
-    @await Component.InvokeAsync("FriendLink")
+    <section class="site-links-shell">
+        <div class="container">
+            @await Component.InvokeAsync("FriendLink")
+        </div>
+    </section>
 
-    <footer class="footer mt-5">
-        <div class="container py-4">
-            <div class="row">
-                <div class="col-12 col-md-4 mb-4">
-                    <div class="footer-logo">码坊</div>
-                    <p class="footer-desc">码坊是使用.NET技术开发的网站，这里有技术文章、开源项目介绍和在线工具</p>
-                </div>
-                <div class="col-6 col-md-2">
-                    <h5 class="footer-title">站点</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/donation" class="footer-link"><i class="fas fa-angle-right me-2"></i>赞助</a></li>
-                        <li><a href="/timeline" class="footer-link"><i class="fas fa-angle-right me-2"></i>时间线</a></li>
-                        <li><a href="/rss" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>RSS</a></li>
-                        <li><a href="/sitemap.xml" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>站点地图</a></li>
-                        <li><a href="/about" class="footer-link"><i class="fas fa-angle-right me-2"></i>关于</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md-2">
-                    <h5 class="footer-title">工具资源</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://it-tools.tech/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>IT-Tools</a></li>
-                        <li><a href="https://www.cnblogs.com/Dotnet9-com/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>博客园</a></li>
-                        <li><a href="https://space.bilibili.com/470546606" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>B站</a></li>
-                        <li><a href="https://github.com/dotnet9/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Github</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md-2">
-                    <h5 class="footer-title">社区资源</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://irihi.tech/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>铱泓科技</a></li>
-                        <li><a href="https://antblazor.com" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Ant Blazor</a></li>
-                        <li><a href="https://masastack.com/" class="footer-link" target="_blank"><i class="fas fa-angle-right me-2"></i>Masa</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-md-2">
-                    <div class="footer-qrcode text-center">
-                        <div class="qrcode-wrapper">
-                            <img src="https://img1.dotnet9.com/site/favicon/wechatpublic.jpg" alt="微信公众号" class="img-fluid rounded" />
-                            <div class="qrcode-overlay">
-                                <i class="fas fa-scan"></i>
-                            </div>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="surface-panel footer-shell">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <span class="footer-brand__mark">@appTitle</span>
+                        <p class="footer-brand__copy">@siteDescription</p>
+                        <div class="footer-badges">
+                            <span>.NET 11</span>
+                            <span>Razor Pages</span>
+                            <span>技术内容沉淀</span>
                         </div>
-                        <p class="qrcode-text mt-3 mb-0">
-                            <i class="fas fa-star me-1"></i>关注网站公众号
-                        </p>
+                    </div>
+
+                    <div>
+                        <h2 class="footer-title">站点导航</h2>
+                        <ul class="footer-list">
+                            <li><a href="/bbs">博客</a></li>
+                            <li><a href="/doc">文档</a></li>
+                            <li><a href="/tool">工具</a></li>
+                            <li><a href="/timeline">时间线</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h2 class="footer-title">社区链接</h2>
+                        <ul class="footer-list">
+                            <li><a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a></li>
+                            <li><a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a></li>
+                            <li><a href="https://github.com/dotnet9" target="_blank" rel="noreferrer">GitHub</a></li>
+                            <li><a href="https://irihi.tech/" target="_blank" rel="noreferrer">铱泓科技</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h2 class="footer-title">常用入口</h2>
+                        <ul class="footer-list">
+                            <li><a href="/about">关于站点</a></li>
+                            <li><a href="/donation">支持作者</a></li>
+                            <li><a href="/rss" target="_blank" rel="noreferrer">RSS 订阅</a></li>
+                            <li><a href="/sitemap" target="_blank" rel="noreferrer">站点地图</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-qr">
+                        <img src="@(site.WeChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg")" alt="@($"{site.WeChatName ?? appTitle} 微信公众号")" />
+                        <p>关注公众号<br />@(site.WeChatName ?? appTitle)</p>
                     </div>
                 </div>
-            </div>
-            <hr class="footer-divider" />
-            <div class="text-center">
-                <span>&copy; 2019-@DateTime.Now.Year 沙漠尽头的狼</span>
+
+                <div class="footer-bottom">
+                    <span>&copy; @site.StartYear-@DateTime.Now.Year @(site.Owner ?? "码坊")</span>
+                    @if (!string.IsNullOrWhiteSpace(site.BaiAn))
+                    {
+                        <span>@site.BaiAn</span>
+                    }
+                </div>
             </div>
         </div>
     </footer>
@@ -136,8 +191,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-aspnet.min.js"></script>
-    <script src="~/lib/bootstrap-toc/bootstrap-toc.min.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

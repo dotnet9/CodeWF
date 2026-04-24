@@ -2,144 +2,123 @@
 @model WebApp.Pages.Bbs.Post.IndexModel
 @{
     ViewData["Title"] = Model.Post?.Title ?? "文章详情";
+    ViewData["Description"] = Model.Post?.Description ?? "浏览码坊技术文章。";
 }
 
-<div class="container">
-    @if (Model.Post != null)
-    {
-        <div class="row">
-            <div class="col-lg-8">
-                <article class="mb-4">
-                    <h1 class="mb-4">@Model.Post.Title</h1>
-                    <div class="text-muted mb-4">
-                        <span>发布时间：@Model.Post.Date?.ToString("yyyy-MM-dd")</span>
-                        @if (Model.Post.Lastmod.HasValue)
-                        {
-                            <span class="ml-4">更新时间：@Model.Post.Lastmod.Value.ToString("yyyy-MM-dd")</span>
-                        }
-                        @if (!string.IsNullOrEmpty(Model.Post.Author))
-                        {
-                            <span class="ml-4">作者：@Model.Post.Author</span>
-                        }
-                    </div>
-
-                    @if (Model.Post.Categories != null && Model.Post.Categories.Any())
+<section class="page-shell">
+    <div class="container">
+        @if (Model.Post == null)
+        {
+            <div class="empty-state">
+                <h2>文章不存在或已下线</h2>
+                <p>可以返回博客首页继续浏览其他内容。</p>
+            </div>
+        }
+        else
+        {
+            <div class="page-banner">
+                <div>
+                    <span class="eyebrow">Article</span>
+                    <h1 class="page-title">@Model.Post.Title</h1>
+                    @if (!string.IsNullOrWhiteSpace(Model.Post.Description))
                     {
-                        <div class="mb-4">
-                            <strong>分类：</strong>
-                            @foreach (var category in Model.Post.Categories)
-                            {
-                                <span class="badge bg-primary mr-2">@category</span>
-                            }
+                        <p class="page-description">@Model.Post.Description</p>
+                    }
+                </div>
+                <div class="page-banner__meta">
+                    <span class="meta-chip"><i class="far fa-calendar"></i>发布于 @Model.Post.Date?.ToString("yyyy-MM-dd")</span>
+                    @if (Model.Post.Lastmod.HasValue)
+                    {
+                        <span class="meta-chip"><i class="fas fa-rotate-right"></i>更新于 @Model.Post.Lastmod.Value.ToString("yyyy-MM-dd")</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Post.Author))
+                    {
+                        <span class="meta-chip"><i class="far fa-user"></i>@Model.Post.Author</span>
+                    }
+                </div>
+            </div>
+
+            <div class="article-layout">
+                <div class="article-main">
+                    @if (!string.IsNullOrWhiteSpace(Model.Post.Cover))
+                    {
+                        <div class="surface-panel article-cover">
+                            <img src="@Model.Post.Cover" alt="@Model.Post.Title" class="cover-media cover-media--hero" />
                         </div>
                     }
 
-                    @if (Model.Post.Tags != null && Model.Post.Tags.Any())
-                    {
-                        <div class="mb-4">
-                            <strong>标签：</strong>
-                            @foreach (var tag in Model.Post.Tags)
-                            {
-                                <span class="badge bg-secondary mr-2">@tag</span>
-                            }
+                    <article class="surface-panel article-panel">
+                        @if (Model.Post.Categories?.Any() == true)
+                        {
+                            <div class="chip-row">
+                                @foreach (var category in Model.Post.Categories)
+                                {
+                                    <span class="tag-chip"><i class="fas fa-folder-open"></i>@category</span>
+                                }
+                            </div>
+                        }
+
+                        @if (Model.Post.Tags?.Any() == true)
+                        {
+                            <div class="chip-row chip-row--secondary">
+                                @foreach (var tag in Model.Post.Tags)
+                                {
+                                    <span class="tag-chip tag-chip--muted"><i class="fas fa-hashtag"></i>@tag</span>
+                                }
+                            </div>
+                        }
+
+                        <div class="prose article-content" data-article-body>
+                            @Html.Raw(Model.Post.HtmlContent)
                         </div>
-                    }
+                    </article>
+                </div>
 
-                    <div class="content" data-toggle="toc" data-spy="scroll" data-target="#toc">
-                        @Html.Raw(Model.Post.HtmlContent)
+                <aside class="article-aside sticky-panel">
+                    <div id="toc" class="surface-panel toc-panel">
+                        <h2 class="sidebar-title">目录</h2>
+                        <div class="toc-nav"></div>
                     </div>
-                </article>
+                </aside>
             </div>
-            <div class="col-lg-4">
-                <nav id="toc" class="navbar navbar-light bg-light flex-column align-items-start p-3 sticky-top">
-                    <h5 class="mb-3">目录</h5>
-                    <nav class="nav nav-pills flex-column"></nav>
-                </nav>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            文章不存在或已被删除
-        </div>
-    }
-</div>
-
-<style>
-    #toc {
-        top: 100px;
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-    }
-
-    #toc .nav-link {
-        font-size: 0.85rem;
-        padding: 0.25rem 0.75rem;
-    }
-
-    #toc .nav-pills .nav-link.active,
-    #toc .nav-pills .show > .nav-link {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .content h2 {
-        margin-top: 2rem;
-        padding-top: 1rem;
-    }
-
-    .content h3 {
-        margin-top: 1.5rem;
-    }
-</style>
+        }
+    </div>
+</section>
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            if (typeof Prism !== 'undefined') {
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof Prism !== "undefined") {
                 Prism.highlightAll();
             }
 
-            $('[data-toggle="toc"]').each(function() {
-                var $this = $(this);
-                var entries = [];
+            const article = document.querySelector("[data-article-body]");
+            const tocContainer = document.querySelector("#toc .toc-nav");
 
-                $this.find('h2, h3, h4').each(function() {
-                    var $heading = $(this);
-                    var level = parseInt(this.tagName.substring(1)) - 1;
-                    var text = $heading.text();
-                    var id = $heading.attr('id') || text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            if (!article || !tocContainer) {
+                return;
+            }
 
-                    if (!$heading.attr('id')) {
-                        $heading.attr('id', id);
-                    }
+            const headings = Array.from(article.querySelectorAll("h2, h3, h4"));
+            if (!headings.length) {
+                tocContainer.innerHTML = '<p class="toc-empty">当前文章没有可生成的目录。</p>';
+                return;
+            }
 
-                    entries.push({
-                        level: level,
-                        id: id,
-                        text: text
-                    });
-                });
+            const fragment = document.createDocumentFragment();
+            headings.forEach((heading, index) => {
+                if (!heading.id) {
+                    heading.id = `section-${index + 1}`;
+                }
 
-                var $tocNav = $('#toc .nav');
-                entries.forEach(function(entry) {
-                    var $link = $('<a class="nav-link"></a>')
-                        .attr('href', '#' + entry.id)
-                        .text(entry.text)
-                        .css('padding-left', (entry.level * 0.75) + 'rem');
-
-                    $tocNav.append($link);
-                });
-
-                $tocNav.find('a').on('click', function(e) {
-                    e.preventDefault();
-                    var targetId = $(this).attr('href');
-                    $('html, body').animate({
-                        scrollTop: $(targetId).offset().top - 80
-                    }, 500);
-                });
+                const link = document.createElement("a");
+                link.href = `#${heading.id}`;
+                link.textContent = heading.textContent?.trim() || `章节 ${index + 1}`;
+                link.className = `toc-link toc-link--${heading.tagName.toLowerCase()}`;
+                fragment.appendChild(link);
             });
+
+            tocContainer.appendChild(fragment);
         });
     </script>
 }

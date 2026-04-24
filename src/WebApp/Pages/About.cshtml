@@ -1,21 +1,39 @@
 @page
 @model WebApp.Pages.AboutModel
-@{    ViewData["Title"] = "关于";}
+@{
+    ViewData["Title"] = "关于";
+    ViewData["Description"] = "了解码坊的定位、内容方向与维护理念。";
+}
 
-<div class="container">
-    <h1 class="mb-4">关于我们</h1>
-    <div class="card">
-        <div class="card-body">
-            @if (!string.IsNullOrEmpty(Model.HtmlContent))
-            {
-                <div class="markdown-content" asp-prerender="true">
-                    @Html.Raw(Model.HtmlContent)
-                </div>
-            }
-            else
-            {
-                <p>关于码坊...</p>
-            }
+<section class="page-shell">
+    <div class="page-banner">
+        <div>
+            <span class="eyebrow">About CodeWF</span>
+            <h1 class="page-title">一个把文章、文档和工具串起来的技术站点</h1>
+            <p class="page-description">
+                码坊聚焦 .NET 与泛开发领域内容建设，强调可复用的知识沉淀、可检索的文档结构，以及能直接落地的在线工具。
+            </p>
+        </div>
+        <div class="page-banner__meta">
+            <span>持续沉淀技术内容</span>
+            <span>面向开发者的实用工具</span>
+            <span>专题化组织知识资产</span>
         </div>
     </div>
-</div>
+
+    <div class="surface-panel prose-panel">
+        @if (!string.IsNullOrEmpty(Model.HtmlContent))
+        {
+            <div class="prose" asp-prerender="true">
+                @Html.Raw(Model.HtmlContent)
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <h2>内容准备中</h2>
+                <p>关于页的详细介绍还没有加载出来，稍后可以再来看。</p>
+            </div>
+        }
+    </div>
+</section>

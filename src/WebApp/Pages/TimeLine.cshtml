@@ -2,65 +2,42 @@
 @model WebApp.Pages.TimeLineModel
 @{
     ViewData["Title"] = "时间线";
+    ViewData["Description"] = "查看码坊站点和内容建设的时间线记录。";
 }
 
-<div class="container">
-    <h1 class="mb-4">时间线</h1>
-    <div class="timeline">
+<section class="page-shell">
+    <div class="container">
+        <div class="page-banner">
+            <div>
+                <span class="eyebrow">Timeline</span>
+                <h1 class="page-title">时间线</h1>
+                <p class="page-description">
+                    用时间轴回看站点的迭代与内容节点，让长期建设更容易被感知。
+                </p>
+            </div>
+        </div>
+
         @if (Model.TimeLines == null || !Model.TimeLines.Any())
         {
-            <div class="alert alert-info">暂无时间线数据</div>
+            <div class="empty-state">
+                <h2>暂无时间线数据</h2>
+                <p>后续的关键版本和里程碑会展示在这里。</p>
+            </div>
         }
         else
         {
-            @foreach (var item in Model.TimeLines)
-            {
-                <div class="timeline-item">
-                    <div class="timeline-date">@item.Time?.ToString("yyyy-MM")</div>
-                    <div class="timeline-content">
-                        <h4>@item.Title</h4>
-                        <p>@item.Content</p>
+            <div class="timeline-stream">
+                @foreach (var item in Model.TimeLines.OrderByDescending(t => t.Time))
+                {
+                    <div class="timeline-item">
+                        <div class="timeline-date">@item.Time?.ToString("yyyy-MM")</div>
+                        <div class="timeline-card">
+                            <h2>@item.Title</h2>
+                            <p>@item.Content</p>
+                        </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         }
     </div>
-</div>
-
-<style>
-    .timeline {
-        position: relative;
-        padding: 20px 0;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 50%;
-        width: 2px;
-        height: 100%;
-        background: #007bff;
-    }
-
-    .timeline-item {
-        position: relative;
-        margin-bottom: 30px;
-        display: flex;
-    }
-
-    .timeline-date {
-        width: 50%;
-        padding-right: 30px;
-        text-align: right;
-        font-weight: bold;
-        color: #007bff;
-    }
-
-    .timeline-content {
-        width: 50%;
-        padding-left: 30px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-    }
-</style>
+</section>

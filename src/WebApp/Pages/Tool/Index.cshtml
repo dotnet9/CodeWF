@@ -2,46 +2,70 @@
 @model WebApp.Pages.Tool.IndexModel
 @{
     ViewData["Title"] = "工具";
+    ViewData["Description"] = "查看码坊提供的在线开发工具，提高日常开发效率。";
 }
 
-<div class="container">
-    <h1 class="mb-4">在线工具</h1>
-    <div class="row">
-        @foreach (var tool in Model.Tools)
+<section class="page-shell">
+    <div class="container">
+        <div class="page-banner">
+            <div>
+                <span class="eyebrow">Toolbox</span>
+                <h1 class="page-title">在线工具</h1>
+                <p class="page-description">
+                    面向日常开发场景整理的小工具集合，优先覆盖高频、直接、可以马上派上用场的能力。
+                </p>
+            </div>
+            <div class="page-banner__meta">
+                <span class="meta-chip">即开即用</span>
+                <span class="meta-chip">面向开发场景</span>
+                <span class="meta-chip">减少来回切换</span>
+            </div>
+        </div>
+
+        @if (Model.Tools == null || !Model.Tools.Any())
         {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <h4 class="card-title">@tool.Name</h4>
-                        @if (!string.IsNullOrEmpty(tool.Memo))
-                        {
-                            <p class="card-text text-muted">@tool.Memo</p>
-                        }
-                        @if (tool.Children != null && tool.Children.Any())
-                        {
-                            <ul class="list-group list-group-flush mt-3">
-                                @foreach (var child in tool.Children)
-                                {
-                                    <li class="list-group-item">
-                                        @{
-                                            var toolLink = child.Slug switch
-                                            {
-                                                "slugify-string" => "/SlugifyString",
-                                                "timestamp" => "/Timestamp",
-                                                "ico" => "/Icon",
-                                                "nuoche" => "/NuoChe",
-                                                "fuli" => "/FuLi",
-                                                _ => $"/Tool/{child.Slug}"
-                                            };
-                                        }
-                                        <a href="@toolLink">@child.Name</a>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    </div>
-                </div>
+            <div class="empty-state">
+                <h2>工具列表暂未配置</h2>
+                <p>后续可以在这里继续补充更多贴近开发流程的小工具。</p>
+            </div>
+        }
+        else
+        {
+            <div class="post-grid">
+                @foreach (var tool in Model.Tools)
+                {
+                    <article class="resource-card">
+                        <div class="resource-card__body">
+                            <span class="card-kicker">工具分组</span>
+                            <h2 class="resource-card__title">@tool.Name</h2>
+                            @if (!string.IsNullOrWhiteSpace(tool.Memo))
+                            {
+                                <p class="resource-card__desc">@tool.Memo</p>
+                            }
+
+                            @if (tool.Children != null && tool.Children.Any())
+                            {
+                                <div class="chip-cloud">
+                                    @foreach (var child in tool.Children)
+                                    {
+                                        var toolLink = child.Slug switch
+                                        {
+                                            "slugify-string" => "/SlugifyString",
+                                            "timestamp" => "/Timestamp",
+                                            "ico" => "/Icon",
+                                            "nuoche" => "/NuoChe",
+                                            "fuli" => "/FuLi",
+                                            _ => $"/Tool/{child.Slug}"
+                                        };
+
+                                        <a href="@toolLink" class="chip-link">@child.Name</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </article>
+                }
             </div>
         }
     </div>
-</div>
+</section>

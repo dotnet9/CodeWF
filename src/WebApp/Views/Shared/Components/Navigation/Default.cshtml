@@ -1,20 +1,49 @@
 @model WebApp.Components.NavigationViewModel
+@{
+    var albums = Model.Albums
+        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+    var categories = Model.Categories
+        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+}
 
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="/album" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">专辑</a>
-    <div class="dropdown-menu">
-        @foreach (var album in Model.Albums)
-        {
-            <a class="dropdown-item" href="/bbs/album/@album.Slug">@album.Name</a>
-        }
-    </div>
-</li>
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="/bbs" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">分类</a>
-    <div class="dropdown-menu">
-        @foreach (var cat in Model.Categories)
-        {
-            <a class="dropdown-item" href="/Bbs/Category/@cat.Slug">@cat.Name</a>
-        }
-    </div>
-</li>
+@if (albums.Any())
+{
+    <li class="nav-item dropdown">
+        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">专题</button>
+        <div class="dropdown-menu nav-mega-menu">
+            <div class="nav-mega-menu__header">
+                <span class="nav-mega-menu__eyebrow">Albums</span>
+                <strong>按专题快速浏览文章</strong>
+            </div>
+            <div class="nav-chip-grid">
+                @foreach (var album in albums)
+                {
+                    <a class="nav-chip" href="/bbs/album/@album.Slug">@album.Name</a>
+                }
+            </div>
+            <a class="nav-mega-menu__more" href="/bbs">查看全部文章</a>
+        </div>
+    </li>
+}
+
+@if (categories.Any())
+{
+    <li class="nav-item dropdown">
+        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">分类</button>
+        <div class="dropdown-menu nav-mega-menu">
+            <div class="nav-mega-menu__header">
+                <span class="nav-mega-menu__eyebrow">Categories</span>
+                <strong>按技术主题筛选内容</strong>
+            </div>
+            <div class="nav-chip-grid">
+                @foreach (var category in categories)
+                {
+                    <a class="nav-chip" href="/Bbs/Category/@category.Slug">@category.Name</a>
+                }
+            </div>
+            <a class="nav-mega-menu__more" href="/bbs">浏览最新文章</a>
+        </div>
+    </li>
+}

@@ -1,52 +1,102 @@
 @page
 @model WebApp.Pages.Bbs.IndexModel
-@{    ViewData["Title"] = "博客";}
+@{
+    ViewData["Title"] = "博客";
+    ViewData["Description"] = "浏览码坊博客内容，按时间查看最新技术文章。";
+}
 
-<div class="container">
-    <h1 class="mb-4">博客</h1>
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card-grid">
-                @if (Model.Posts == null || !Model.Posts.Any())
+<section class="page-shell">
+    <div class="container">
+        <div class="page-banner">
+            <div>
+                <span class="eyebrow">Blog</span>
+                <h1 class="page-title">技术文章</h1>
+                <p class="page-description">
+                    这里收录站点的文章正文，覆盖 .NET、桌面开发、工程实践与通用开发话题。
+                </p>
+            </div>
+            <div class="page-banner__stats">
+                <div class="stat-chip">
+                    <strong>@Model.Posts.Count</strong>
+                    <span>篇文章</span>
+                </div>
+                <div class="stat-chip">
+                    <strong>@Math.Max(0, Model.Categories.Count - 1)</strong>
+                    <span>个分类</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="content-primary">
+                @if (!Model.Posts.Any())
                 {
-                    <div class="col-12 text-center py-8">
-                        <p>暂无文章</p>
+                    <div class="empty-state">
+                        <h2>还没有文章</h2>
+                        <p>当前博客列表为空，后续内容会在这里展示。</p>
                     </div>
                 }
                 else
                 {
-                    foreach (var post in Model.Posts)
-                    {
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-body">
-                                <h4 class="card-title">@post.Title</h4>
-                                <p class="card-text text-muted">@post.Description</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">@post.Date?.ToString("yyyy-MM-dd")</span>
-                                    <a href="/Bbs/Post/@post.Date?.Year/@post.Date?.Month/@post.Slug" class="btn btn-primary">阅读更多</a>
+                    <div class="post-list">
+                        @foreach (var post in Model.Posts)
+                        {
+                            var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                            var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
+
+                            <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
+                                @if (hasCover)
+                                {
+                                    <a href="@postUrl" class="post-list-card__cover">
+                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" />
+                                    </a>
+                                }
+
+                                <div class="post-list-card__body">
+                                    <h2 class="post-list-card__title">
+                                        <a href="@postUrl">@post.Title</a>
+                                    </h2>
+                                    @if (!string.IsNullOrWhiteSpace(post.Description))
+                                    {
+                                        <p class="post-list-card__excerpt">@post.Description</p>
+                                    }
+                                    <div class="meta-line">
+                                        <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                        @if (!string.IsNullOrWhiteSpace(post.Author))
+                                        {
+                                            <span><i class="far fa-user"></i>@post.Author</span>
+                                        }
+                                        @if (post.Categories?.Any() == true)
+                                        {
+                                            <span><i class="far fa-folder-open"></i>@string.Join(" / ", post.Categories.Take(2))</span>
+                                        }
+                                    </div>
+                                    <a href="@postUrl" class="inline-link">
+                                        阅读全文
+                                        <i class="fas fa-arrow-right"></i>
+                                    </a>
                                 </div>
-                            </div>
-                        </div>
-                    }
+                            </article>
+                        }
+                    </div>
                 }
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    文章分类
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
+
+            <aside class="content-sidebar">
+                <div class="surface-panel sidebar-panel sticky-panel">
+                    <h2 class="sidebar-title">文章分类</h2>
+                    <p class="sidebar-copy">按分类浏览，更快定位你想看的技术主题。</p>
+                    <div class="sidebar-link-list">
                         @foreach (var category in Model.Categories)
                         {
-                            <li class="list-group-item">
-                                <a href="/Bbs/Category/@category.Slug">@category.Name</a>
-                            </li>
+                            <a href="/Bbs/Category/@category.Slug" class="sidebar-link">
+                                <span>@category.Name</span>
+                                <i class="fas fa-angle-right"></i>
+                            </a>
                         }
-                    </ul>
+                    </div>
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
-</div>
+</section>

@@ -10,3 +10,4 @@ src/WebApp/WebApp.csproj.user
 src/WebApp/appsettings.Development.json
 src/WebApp/appsettings.Production.json
 src/WebApp/Properties/PublishProfiles/FolderProfile.pubxml.user
+/.dotnet
