@@ -12,8 +12,8 @@ public class IndexModel : PageModel
     private readonly IOptions<SiteOption> _siteOption;
 
     public string CategoryName { get; set; } = "所有文章";
-    public List<BlogPost>? Posts { get; set; }
-    public List<CategoryItem>? Categories { get; set; }
+    public List<BlogPost> Posts { get; set; } = [];
+    public List<CategoryItem> Categories { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? "沙漠尽头的狼";
 
     public int PageIndex { get; set; } = 1;
@@ -31,15 +31,15 @@ public class IndexModel : PageModel
     {
         PageIndex = pageIndex > 0 ? pageIndex : 1;
 
-        Categories = await _appService.GetAllCategoryItemsAsync();
-        var category = Categories?.FirstOrDefault(c => c.Slug == slug);
+        Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
+        var category = Categories.FirstOrDefault(c => c.Slug == slug);
         if (category != null)
         {
-            CategoryName = category.Name;
+            CategoryName = category.Name ?? CategoryName;
         }
 
         var pageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
-        Posts = pageData?.Data;
-        Total = pageData?.Total ?? 0;
+        Posts = pageData.Data;
+        Total = pageData.Total;
     }
 }

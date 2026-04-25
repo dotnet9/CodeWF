@@ -10,15 +10,22 @@ public class IndexModel : PageModel
 
     public List<BlogPost> Posts { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
+    public int PageIndex { get; private set; } = 1;
+    public int PageSize { get; private set; } = 10;
+    public int Total { get; private set; }
+    public int TotalPages => (int)Math.Ceiling(Total / (double)PageSize);
 
     public IndexModel(AppService appService)
     {
         _appService = appService;
     }
 
-    public async Task OnGetAsync()
+    public async Task OnGetAsync(int pageIndex = 1)
     {
-        Posts = await _appService.GetAllBlogPostsAsync() ?? [];
+        PageIndex = pageIndex > 0 ? pageIndex : 1;
+        var pageData = await _appService.GetPagedBlogPostsAsync(PageIndex, PageSize);
+        Posts = pageData.Data;
+        Total = pageData.Total;
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
     }
 }

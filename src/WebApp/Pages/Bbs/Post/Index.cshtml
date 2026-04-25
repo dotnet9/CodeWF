@@ -5,6 +5,10 @@
     ViewData["Description"] = Model.Post?.Description ?? "浏览码坊技术文章。";
 }
 
+@section Head {
+    <partial name="_CodeHighlightHead" />
+}
+
 <section class="page-shell">
     <div class="container">
         @if (Model.Post == null)
@@ -43,7 +47,7 @@
                     @if (!string.IsNullOrWhiteSpace(Model.Post.Cover))
                     {
                         <div class="surface-panel article-cover">
-                            <img src="@Model.Post.Cover" alt="@Model.Post.Title" class="cover-media cover-media--hero" />
+                            <img src="@Model.Post.Cover" alt="@Model.Post.Title" class="cover-media cover-media--hero" decoding="async" fetchpriority="high" />
                         </div>
                     }
 
@@ -68,14 +72,59 @@
                             </div>
                         }
 
-                        <div class="prose article-content" data-article-body>
+                        <div class="prose article-content" data-reading-body>
                             @Html.Raw(Model.Post.HtmlContent)
                         </div>
                     </article>
+
+                    @if (Model.PreviousPost != null || Model.NextPost != null)
+                    {
+                        <nav class="doc-pager" aria-label="文章阅读导航">
+                            @if (Model.PreviousPost != null)
+                            {
+                                var previousUrl = $"/Bbs/Post/{Model.PreviousPost.Date?.Year}/{Model.PreviousPost.Date?.Month}/{Model.PreviousPost.Slug}";
+                                <a href="@previousUrl" class="surface-panel doc-pager__item doc-pager__item--prev">
+                                    <span class="doc-pager__label">
+                                        <i class="fas fa-arrow-left"></i>
+                                        上一篇
+                                    </span>
+                                    <strong>@Model.PreviousPost.Title</strong>
+                                    @if (!string.IsNullOrWhiteSpace(Model.PreviousPost.Description))
+                                    {
+                                        <p>@Model.PreviousPost.Description</p>
+                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="surface-panel doc-pager__item doc-pager__item--empty" aria-hidden="true"></div>
+                            }
+
+                            @if (Model.NextPost != null)
+                            {
+                                var nextUrl = $"/Bbs/Post/{Model.NextPost.Date?.Year}/{Model.NextPost.Date?.Month}/{Model.NextPost.Slug}";
+                                <a href="@nextUrl" class="surface-panel doc-pager__item doc-pager__item--next">
+                                    <span class="doc-pager__label">
+                                        下一篇
+                                        <i class="fas fa-arrow-right"></i>
+                                    </span>
+                                    <strong>@Model.NextPost.Title</strong>
+                                    @if (!string.IsNullOrWhiteSpace(Model.NextPost.Description))
+                                    {
+                                        <p>@Model.NextPost.Description</p>
+                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="surface-panel doc-pager__item doc-pager__item--empty" aria-hidden="true"></div>
+                            }
+                        </nav>
+                    }
                 </div>
 
                 <aside class="article-aside sticky-panel">
-                    <div id="toc" class="surface-panel toc-panel">
+                    <div id="toc" class="surface-panel toc-panel" data-reading-toc>
                         <h2 class="sidebar-title">目录</h2>
                         <div class="toc-nav"></div>
                     </div>
@@ -86,39 +135,5 @@
 </section>
 
 @section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if (typeof Prism !== "undefined") {
-                Prism.highlightAll();
-            }
-
-            const article = document.querySelector("[data-article-body]");
-            const tocContainer = document.querySelector("#toc .toc-nav");
-
-            if (!article || !tocContainer) {
-                return;
-            }
-
-            const headings = Array.from(article.querySelectorAll("h2, h3, h4"));
-            if (!headings.length) {
-                tocContainer.innerHTML = '<p class="toc-empty">当前文章没有可生成的目录。</p>';
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            headings.forEach((heading, index) => {
-                if (!heading.id) {
-                    heading.id = `section-${index + 1}`;
-                }
-
-                const link = document.createElement("a");
-                link.href = `#${heading.id}`;
-                link.textContent = heading.textContent?.trim() || `章节 ${index + 1}`;
-                link.className = `toc-link toc-link--${heading.tagName.toLowerCase()}`;
-                fragment.appendChild(link);
-            });
-
-            tocContainer.appendChild(fragment);
-        });
-    </script>
+    <partial name="_CodeHighlightScripts" />
 }

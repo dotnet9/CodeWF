@@ -11,3 +11,12 @@ src/WebApp/appsettings.Development.json
 src/WebApp/appsettings.Production.json
 src/WebApp/Properties/PublishProfiles/FolderProfile.pubxml.user
 /.dotnet
+/.codex-build
+.codex-webapp-final.err
+.codex-webapp-final.log
+.codex-webapp-verify.err
+.codex-webapp-verify.log
+.codex-webapp-verify2.err
+.codex-webapp-verify2.log
+.codex-webapp.err
+.codex-webapp.log

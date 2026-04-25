@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using WebApp.Extensions;
 using WebApp.Models;
 using WebApp.Options;
@@ -32,6 +33,10 @@ public class AppService(IOptions<SiteOption> siteOption)
     private string? _aboutHtmlContent;
     private string? _rss;
     private string? _siteMap;
+
+    private sealed record SearchField(string? Text, int ExactScore, int PrefixScore, int ContainsScore);
+    private sealed record SearchableToolNode(ToolItem Item, string? GroupName);
+    private sealed record SearchableDocNode(DocItem Item, string? ContextLabel, string? RelativeDir);
 
     public async Task SeedAsync()
     {
@@ -111,30 +116,6 @@ public class AppService(IOptions<SiteOption> siteOption)
 
     public async Task<DocItem?> GetDocItemAsync(string slug)
     {
-        async Task ReadContentAsync(DocItem item, string? parentDir = default)
-        {
-            if (!string.IsNullOrWhiteSpace(item.Content))
-            {
-                return;
-            }
-
-            if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-            {
-                return;
-            }
-
-            var contentPath = string.Empty;
-            contentPath = string.IsNullOrWhiteSpace(parentDir)
-                ? Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", $"{item.Slug}.md")
-                : Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
-
-            if (File.Exists(contentPath))
-            {
-                item.Content = await File.ReadAllTextAsync(contentPath);
-                item.HtmlContent = item.Content.ToHtml();
-            }
-        }
-
         if (_docItems?.Any() != true)
         {
             return default;
@@ -144,7 +125,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         {
             if (!string.IsNullOrWhiteSpace(item.Slug) && item.Slug == slug)
             {
-                await ReadContentAsync(item);
+                await LoadDocContentAsync(item);
                 return item;
             }
 
@@ -152,7 +133,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
             foreach (var itemChild in item.Children.Where(itemChild => itemChild.Slug == slug))
             {
-                await ReadContentAsync(itemChild, item.Slug);
+                await LoadDocContentAsync(itemChild, item.Slug);
                 return itemChild;
             }
         }
@@ -160,7 +141,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         var first = _docItems.FirstOrDefault()?.Children?.FirstOrDefault();
         if (first != null)
         {
-            await ReadContentAsync(first);
+            await LoadDocContentAsync(first);
         }
 
         return first;
@@ -185,6 +166,432 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
 
         return default;
+    }
+
+    public async Task<SearchResultPageData> SearchAsync(string? query, int pageIndex, int pageSize, SearchResultKind? kind = null)
+    {
+        var normalizedQuery = query?.Trim() ?? string.Empty;
+        var safePageIndex = Math.Max(1, pageIndex);
+        var safePageSize = pageSize <= 0 ? 10 : pageSize;
+
+        if (string.IsNullOrWhiteSpace(normalizedQuery))
+        {
+            return new SearchResultPageData(safePageIndex, safePageSize, 0, [], 0, 0, 0);
+        }
+
+        await GetAllBlogPostsAsync();
+        await GetAllDocItemsAsync();
+        await GetAllToolItemsAsync();
+
+        var tokens = SplitSearchTokens(normalizedQuery);
+        if (tokens.Count == 0)
+        {
+            return new SearchResultPageData(safePageIndex, safePageSize, 0, [], 0, 0, 0);
+        }
+
+        var results = new List<SearchResultItem>();
+
+        foreach (var tool in GetSearchableToolNodes())
+        {
+            var score = CalculateSearchScore(
+                normalizedQuery,
+                tokens,
+                new SearchField(tool.Item.Name, 220, 170, 130),
+                new SearchField(tool.Item.Slug, 180, 140, 100),
+                new SearchField(tool.Item.Memo, 90, 60, 36),
+                new SearchField(tool.GroupName, 70, 45, 24));
+
+            if (score <= 0)
+            {
+                continue;
+            }
+
+            var summary = SelectSummary(normalizedQuery, tool.Item.Memo, tool.GroupName);
+            var matchedSnippet = SelectSnippet(normalizedQuery, tool.Item.Memo, tool.GroupName);
+
+            results.Add(new SearchResultItem
+            {
+                Kind = SearchResultKind.Tool,
+                Title = tool.Item.Name?.Trim() ?? "未命名工具",
+                Url = ConstantUtil.GetToolUrl(tool.Item.Slug),
+                Summary = summary,
+                MatchedSnippet = matchedSnippet,
+                Context = tool.GroupName,
+                Slug = tool.Item.Slug,
+                Score = score
+            });
+        }
+
+        var searchableDocs = await GetSearchableDocNodesAsync();
+        foreach (var doc in searchableDocs)
+        {
+            var plainContent = CleanSearchText(doc.Item.Content);
+            var score = CalculateSearchScore(
+                normalizedQuery,
+                tokens,
+                new SearchField(doc.Item.Name, 220, 170, 130),
+                new SearchField(doc.Item.Slug, 180, 140, 100),
+                new SearchField(doc.Item.Memo, 90, 60, 36),
+                new SearchField(doc.ContextLabel, 70, 45, 24),
+                new SearchField(plainContent, 26, 18, 12));
+
+            if (score <= 0)
+            {
+                continue;
+            }
+
+            var summary = SelectSummary(normalizedQuery, doc.Item.Memo, plainContent);
+            var matchedSnippet = SelectSnippet(normalizedQuery, doc.Item.Memo, plainContent);
+
+            results.Add(new SearchResultItem
+            {
+                Kind = SearchResultKind.Doc,
+                Title = doc.Item.Name?.Trim() ?? "未命名文档",
+                Url = ConstantUtil.GetDocUrl(doc.Item.Slug),
+                Summary = summary,
+                MatchedSnippet = matchedSnippet,
+                Context = doc.ContextLabel,
+                Slug = doc.Item.Slug,
+                Score = score
+            });
+        }
+
+        foreach (var post in _blogPosts ?? [])
+        {
+            var plainContent = CleanSearchText(post.Content);
+            var categoryText = string.Join(" / ", post.Categories?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+            var albumText = string.Join(" / ", post.Albums?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+            var tagText = string.Join(" / ", post.Tags?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+            var score = CalculateSearchScore(
+                normalizedQuery,
+                tokens,
+                new SearchField(post.Title, 230, 180, 135),
+                new SearchField(post.Slug, 185, 145, 105),
+                new SearchField(post.Description, 95, 65, 40),
+                new SearchField(categoryText, 75, 48, 28),
+                new SearchField(albumText, 60, 42, 24),
+                new SearchField(tagText, 60, 42, 24),
+                new SearchField(post.Author, 48, 36, 22),
+                new SearchField(plainContent, 28, 20, 14));
+
+            if (score <= 0)
+            {
+                continue;
+            }
+
+            var summary = SelectSummary(normalizedQuery, post.Description, plainContent);
+            var matchedSnippet = SelectSnippet(normalizedQuery, post.Description, plainContent);
+            var context = !string.IsNullOrWhiteSpace(categoryText)
+                ? categoryText
+                : !string.IsNullOrWhiteSpace(albumText)
+                    ? albumText
+                    : null;
+
+            results.Add(new SearchResultItem
+            {
+                Kind = SearchResultKind.Post,
+                Title = post.Title?.Trim() ?? "未命名文章",
+                Url = ConstantUtil.GetBbsPostUrl(post),
+                Summary = summary,
+                MatchedSnippet = matchedSnippet,
+                Context = context,
+                Slug = post.Slug,
+                UpdatedAt = post.Lastmod ?? post.Date,
+                Score = score
+            });
+        }
+
+        var ordered = results
+            .OrderBy(result => result.Kind)
+            .ThenByDescending(result => result.Score)
+            .ThenByDescending(result => result.UpdatedAt ?? DateTime.MinValue)
+            .ThenBy(result => result.Title, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        var filtered = kind.HasValue
+            ? ordered.Where(result => result.Kind == kind.Value).ToList()
+            : ordered;
+
+        var totalCount = filtered.Count;
+        var totalPages = totalCount <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)safePageSize);
+        var currentPageIndex = totalPages <= 0
+            ? 1
+            : Math.Min(safePageIndex, totalPages);
+
+        var data = filtered
+            .Skip((currentPageIndex - 1) * safePageSize)
+            .Take(safePageSize)
+            .ToList();
+
+        return new SearchResultPageData(
+            currentPageIndex,
+            safePageSize,
+            totalCount,
+            data,
+            ordered.Count(result => result.Kind == SearchResultKind.Tool),
+            ordered.Count(result => result.Kind == SearchResultKind.Doc),
+            ordered.Count(result => result.Kind == SearchResultKind.Post));
+    }
+
+    private async Task LoadDocContentAsync(DocItem item, string? parentDir = default)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Content))
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir) || string.IsNullOrWhiteSpace(item.Slug))
+        {
+            return;
+        }
+
+        var contentPath = string.IsNullOrWhiteSpace(parentDir)
+            ? Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", $"{item.Slug}.md")
+            : Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
+
+        if (!File.Exists(contentPath))
+        {
+            return;
+        }
+
+        item.Content = await File.ReadAllTextAsync(contentPath);
+        item.HtmlContent = item.Content.ToHtml();
+    }
+
+    private IEnumerable<SearchableToolNode> GetSearchableToolNodes()
+    {
+        if (_toolItems?.Any() != true)
+        {
+            yield break;
+        }
+
+        foreach (var item in _toolItems)
+        {
+            if (item.Children?.Any() == true)
+            {
+                foreach (var child in item.Children.Where(static child =>
+                             !string.IsNullOrWhiteSpace(child.Name) || !string.IsNullOrWhiteSpace(child.Slug)))
+                {
+                    yield return new SearchableToolNode(child, item.Name);
+                }
+
+                continue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.Name) || !string.IsNullOrWhiteSpace(item.Slug))
+            {
+                yield return new SearchableToolNode(item, null);
+            }
+        }
+    }
+
+    private async Task<List<SearchableDocNode>> GetSearchableDocNodesAsync()
+    {
+        var nodes = new List<SearchableDocNode>();
+        if (_docItems?.Any() != true)
+        {
+            return nodes;
+        }
+
+        async Task TraverseAsync(IEnumerable<DocItem> items, string? parentLabel = null, string? parentDir = null)
+        {
+            foreach (var item in items)
+            {
+                await LoadDocContentAsync(item, parentDir);
+                nodes.Add(new SearchableDocNode(item, parentLabel, parentDir));
+
+                if (item.Children?.Any() != true || string.IsNullOrWhiteSpace(item.Slug))
+                {
+                    continue;
+                }
+
+                var nextParentLabel = string.IsNullOrWhiteSpace(parentLabel)
+                    ? item.Name
+                    : $"{parentLabel} / {item.Name}";
+                var nextParentDir = string.IsNullOrWhiteSpace(parentDir)
+                    ? item.Slug
+                    : Path.Combine(parentDir, item.Slug);
+
+                await TraverseAsync(item.Children, nextParentLabel, nextParentDir);
+            }
+        }
+
+        await TraverseAsync(_docItems);
+        return nodes;
+    }
+
+    private static int CalculateSearchScore(string query, IReadOnlyCollection<string> tokens, params SearchField[] fields)
+    {
+        if (tokens.Count == 0 || fields.Length == 0)
+        {
+            return 0;
+        }
+
+        var totalScore = 0;
+
+        foreach (var token in tokens)
+        {
+            var tokenScore = 0;
+            foreach (var field in fields)
+            {
+                tokenScore = Math.Max(tokenScore,
+                    GetMatchScore(field.Text, token, field.ExactScore, field.PrefixScore, field.ContainsScore));
+            }
+
+            if (tokenScore <= 0)
+            {
+                return 0;
+            }
+
+            totalScore += tokenScore;
+        }
+
+        foreach (var field in fields)
+        {
+            totalScore += GetFullQueryBonus(field.Text, query, field.ExactScore, field.PrefixScore, field.ContainsScore);
+        }
+
+        return totalScore;
+    }
+
+    private static int GetMatchScore(string? source, string token, int exactScore, int prefixScore, int containsScore)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return 0;
+        }
+
+        var text = source.Trim();
+        if (text.Equals(token, StringComparison.OrdinalIgnoreCase))
+        {
+            return exactScore;
+        }
+
+        if (text.StartsWith(token, StringComparison.OrdinalIgnoreCase))
+        {
+            return prefixScore;
+        }
+
+        return text.Contains(token, StringComparison.OrdinalIgnoreCase) ? containsScore : 0;
+    }
+
+    private static int GetFullQueryBonus(string? source, string query, int exactScore, int prefixScore, int containsScore)
+    {
+        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(query))
+        {
+            return 0;
+        }
+
+        var text = source.Trim();
+        if (text.Equals(query, StringComparison.OrdinalIgnoreCase))
+        {
+            return exactScore / 2;
+        }
+
+        if (text.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+        {
+            return prefixScore / 2;
+        }
+
+        return text.Contains(query, StringComparison.OrdinalIgnoreCase) ? Math.Max(containsScore / 2, 1) : 0;
+    }
+
+    private static List<string> SplitSearchTokens(string? query) =>
+        (query ?? string.Empty)
+        .Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    private static string? SelectSummary(string query, params string?[] candidates)
+    {
+        foreach (var candidate in candidates)
+        {
+            var snippet = SelectSnippet(query, candidate);
+            if (!string.IsNullOrWhiteSpace(snippet))
+            {
+                return snippet;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? SelectSnippet(string query, params string?[] candidates)
+    {
+        foreach (var candidate in candidates)
+        {
+            var snippet = SelectSnippet(query, candidate, 130);
+            if (!string.IsNullOrWhiteSpace(snippet))
+            {
+                return snippet;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? SelectSnippet(string query, string? source, int maxLength = 130)
+    {
+        var cleaned = CleanSearchText(source);
+        if (string.IsNullOrWhiteSpace(cleaned))
+        {
+            return null;
+        }
+
+        if (cleaned.Length <= maxLength)
+        {
+            return cleaned;
+        }
+
+        var index = cleaned.IndexOf(query, StringComparison.OrdinalIgnoreCase);
+        if (index < 0)
+        {
+            foreach (var token in SplitSearchTokens(query))
+            {
+                index = cleaned.IndexOf(token, StringComparison.OrdinalIgnoreCase);
+                if (index >= 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (index < 0)
+        {
+            return $"{cleaned[..maxLength].Trim()}...";
+        }
+
+        var start = Math.Max(0, index - (maxLength / 3));
+        var length = Math.Min(maxLength, cleaned.Length - start);
+        var snippet = cleaned.Substring(start, length).Trim();
+
+        if (start > 0)
+        {
+            snippet = $"...{snippet}";
+        }
+
+        if (start + length < cleaned.Length)
+        {
+            snippet = $"{snippet}...";
+        }
+
+        return snippet;
+    }
+
+    private static string CleanSearchText(string? source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return string.Empty;
+        }
+
+        var cleaned = source;
+        cleaned = Regex.Replace(cleaned, "<[^>]+>", " ");
+        cleaned = Regex.Replace(cleaned, @"!\[[^\]]*\]\([^)]+\)", " ");
+        cleaned = Regex.Replace(cleaned, @"\[(.*?)\]\([^)]+\)", "$1");
+        cleaned = Regex.Replace(cleaned, @"[`*_>#\-]+", " ");
+        cleaned = Regex.Replace(cleaned, @"\s+", " ");
+        return cleaned.Trim();
     }
 
     public async Task<List<AlbumItem>?> GetAllAlbumItemsAsync()
@@ -312,7 +719,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         return _blogPosts;
     }
 
-    public async Task<PageData<BlogPost>?> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
+    public Task<PageData<BlogPost>> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
         string? key)
     {
         AlbumItem? album = null;
@@ -321,35 +728,38 @@ public class AppService(IOptions<SiteOption> siteOption)
             album = _albumItems?.FirstOrDefault(albumDto => albumDto.Slug == albumSlug);
         }
 
-        IEnumerable<BlogPost>? posts;
+        IEnumerable<BlogPost> posts;
         if (!string.IsNullOrWhiteSpace(key))
         {
-            posts = _blogPosts
-                ?.Where(p => p.Title?.Contains(key) == true
-                             || p.Description?.Contains(key) == true
-                             || p.Slug?.Contains(key) == true
-                             || p.Author?.Contains(key) == true
-                             || p.LastModifyUser?.Contains(key) == true
-                             || p.Content?.Contains(key) == true);
+            posts = (_blogPosts ?? [])
+                .Where(p => p.Title?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Description?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Slug?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Author?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.LastModifyUser?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Content?.Contains(key, StringComparison.OrdinalIgnoreCase) == true);
         }
         else
         {
-            posts = _blogPosts
-                ?.Where(post => album == null || (post.Albums != null && post.Albums.Contains(album.Name) == true));
+            posts = (_blogPosts ?? [])
+                .Where(post => album == null
+                               || (!string.IsNullOrWhiteSpace(album.Name)
+                                   && post.Albums?.Contains(album.Name, StringComparer.OrdinalIgnoreCase) == true));
         }
 
-        var total = posts?.Count() ?? 0;
+        var ordered = posts
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue);
 
-        var postDatas = posts
-            ?.OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
-            .ThenByDescending(post => post.Date ?? DateTime.MinValue)
+        var total = ordered.Count();
+        var postDatas = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();
-        return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
+        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, postDatas));
     }
 
-    public async Task<PageData<BlogPost>?> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
+    public Task<PageData<BlogPost>> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
         string? key)
     {
         CategoryItem? cat = null;
@@ -358,59 +768,89 @@ public class AppService(IOptions<SiteOption> siteOption)
             cat = _categoryItems?.FirstOrDefault(cat => cat.Slug == categorySlug);
         }
 
-        IEnumerable<BlogPost>? posts;
+        IEnumerable<BlogPost> posts;
         if (!string.IsNullOrWhiteSpace(key))
         {
-            posts = _blogPosts
-                ?.Where(p => p.Title?.Contains(key) == true
-                             || p.Description?.Contains(key) == true
-                             || p.Slug?.Contains(key) == true
-                             || p.Author?.Contains(key) == true
-                             || p.LastModifyUser?.Contains(key) == true
-                             || p.Content?.Contains(key) == true);
+            posts = (_blogPosts ?? [])
+                .Where(p => p.Title?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Description?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Slug?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Author?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.LastModifyUser?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Content?.Contains(key, StringComparison.OrdinalIgnoreCase) == true);
         }
         else
         {
-            posts = _blogPosts
-                ?.Where(post => cat == null || (post.Categories != null && post.Categories.Contains(cat.Name) == true));
+            posts = (_blogPosts ?? [])
+                .Where(post => cat == null
+                               || (!string.IsNullOrWhiteSpace(cat.Name)
+                                   && post.Categories?.Contains(cat.Name, StringComparer.OrdinalIgnoreCase) == true));
         }
 
-        var total = posts?.Count() ?? 0;
+        var ordered = posts
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue);
 
-        var postDatas = posts
-            ?.OrderByDescending(post => post.Lastmod)
-            .ThenByDescending(post => post.Date)
+        var total = ordered.Count();
+        var postDatas = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();
-        return new PageData<BlogPost>(pageIndex, pageSize, total, postDatas);
+        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, postDatas));
     }
 
-    public async Task<List<BlogPost>?> GetBannerPostAsync()
+    public Task<List<BlogPost>?> GetBannerPostAsync()
     {
         var posts = _blogPosts
             ?.Where(post => post.Banner)
             .OrderByDescending(post => post.Date)
             .ToList();
-        return posts;
+        return Task.FromResult(posts);
     }
 
-    public async Task<Dictionary<string, string>> GetWebSiteCountAsync()
+    public Task<PageData<BlogPost>> GetPagedBlogPostsAsync(int pageIndex, int pageSize, string? key = null)
+    {
+        var source = _blogPosts?.AsEnumerable() ?? [];
+
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            source = source.Where(post =>
+                post.Title?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                || post.Description?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                || post.Slug?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                || post.Author?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                || post.Content?.Contains(key, StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        var ordered = source
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue);
+
+        var total = ordered.Count();
+        var data = ordered
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, data));
+    }
+
+    public Task<Dictionary<string, string>> GetWebSiteCountAsync()
     {
         if (_webSiteCountInfos != null)
         {
-            return _webSiteCountInfos;
+            return Task.FromResult(_webSiteCountInfos);
         }
 
         _webSiteCountInfos = new();
-        var total = _blogPosts?.Count;
-        var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author));
+        var total = _blogPosts?.Count ?? 0;
+        var original = _blogPosts?.Count(post => string.IsNullOrWhiteSpace(post.Author)) ?? 0;
         var originalPercentage = total > 0 ? (double)original / total * 100 : 0;
         _webSiteCountInfos["网站创建"] = $"{DateTime.Now.Year - siteOption.Value.StartYear}年";
         _webSiteCountInfos["文章分类"] = $"{_categoryItems?.Count}个";
         _webSiteCountInfos["文章总计"] = $"{total}篇";
         _webSiteCountInfos["文章原创"] = $"{original}篇({originalPercentage:F2}%)";
-        return _webSiteCountInfos;
+        return Task.FromResult(_webSiteCountInfos);
     }
 
     public async Task<(string? Markdown, string? HtmlContent)> ReadAboutAsync()
@@ -497,9 +937,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
         catch (Exception ex)
         {
-            string a = ex.Message;
-            Console.WriteLine(
-                $"Blog post deserialize exception, file path is 【{markdownFilePath}】, exception information: {ex}");
+            Console.WriteLine($"Failed to deserialize blog post front matter: {markdownFilePath}. {ex.Message}");
 
             blogPost = new BlogPost();
         }
@@ -605,7 +1043,7 @@ public class AppService(IOptions<SiteOption> siteOption)
                     $"<link>{siteOption.Value.Domain}/bbs/post/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</link>");
                 sb.Append($"<description>{item.Description}</description>");
                 sb.Append($"<author>({item.Author ?? siteOption.Value.Owner})</author>");
-                sb.Append($"<category>{string.Join(",", item.Categories)}</category>");
+                sb.Append($"<category>{string.Join(",", item.Categories ?? [])}</category>");
                 sb.Append(
                     $"<guid>{siteOption.Value.Domain}/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</guid>");
                 sb.Append($"<pubDate>{item.Date:R}</pubDate>");

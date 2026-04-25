@@ -8,7 +8,7 @@ public class IndexModel : PageModel
 {
     private readonly AppService _appService;
 
-    public List<ToolItem>? Tools { get; set; }
+    public List<ToolItem> Tools { get; set; } = [];
 
     public IndexModel(AppService appService)
     {
@@ -17,6 +17,6 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Tools = await _appService.GetAllToolItemsAsync();
+        Tools = await _appService.GetAllToolItemsAsync() ?? [];
     }
 }

@@ -3,10 +3,22 @@ using WebApp.Services;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.Extensions.WebEncoders;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(["image/svg+xml"]);
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
@@ -34,7 +46,45 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseResponseCompression();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            return;
+        }
+
+        var extension = Path.GetExtension(context.File.Name);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            return;
+        }
+
+        var cacheableExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".css",
+            ".js",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".svg",
+            ".ico",
+            ".woff",
+            ".woff2",
+            ".json"
+        };
+
+        if (!cacheableExtensions.Contains(extension))
+        {
+            return;
+        }
+
+        context.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=604800";
+    }
+});
 
 app.UseRouting();
 

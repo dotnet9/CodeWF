@@ -3,26 +3,20 @@
 @{
     ViewData["Title"] = "工具";
     ViewData["Description"] = "查看码坊提供的在线开发工具，提高日常开发效率。";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Toolbox",
+        Title = "在线工具",
+        Description = "面向日常开发场景整理的小工具集合，优先覆盖高频、直接、可以马上派上用场的能力。",
+        MetaItems = ["即开即用", "面向开发场景", "减少来回切换"]
+    };
 }
 
 <section class="page-shell">
     <div class="container">
-        <div class="page-banner">
-            <div>
-                <span class="eyebrow">Toolbox</span>
-                <h1 class="page-title">在线工具</h1>
-                <p class="page-description">
-                    面向日常开发场景整理的小工具集合，优先覆盖高频、直接、可以马上派上用场的能力。
-                </p>
-            </div>
-            <div class="page-banner__meta">
-                <span class="meta-chip">即开即用</span>
-                <span class="meta-chip">面向开发场景</span>
-                <span class="meta-chip">减少来回切换</span>
-            </div>
-        </div>
+        <partial name="_PageBanner" model="banner" />
 
-        @if (Model.Tools == null || !Model.Tools.Any())
+        @if (!Model.Tools.Any())
         {
             <div class="empty-state">
                 <h2>工具列表暂未配置</h2>

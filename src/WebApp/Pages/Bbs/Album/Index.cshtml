@@ -28,7 +28,7 @@
 
         <div class="content-grid">
             <div class="content-primary">
-                @if (Model.Posts == null || !Model.Posts.Any())
+                @if (!Model.Posts.Any())
                 {
                     <div class="empty-state">
                         <h2>该专辑下暂无文章</h2>
@@ -46,7 +46,7 @@
                                 @if (hasCover)
                                 {
                                     <a href="@postUrl" class="post-list-card__cover">
-                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" />
+                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
                                     </a>
                                 }
                                 <div class="post-list-card__body">
@@ -72,7 +72,8 @@
                 @if (Model.TotalPages > 1)
                 {
                     <nav class="pagination-shell" aria-label="专辑分页">
-                        <ul class="pagination justify-content-center">
+                        <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
+                        <ul class="pagination justify-content-center pagination-list">
                             <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
                                 <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
                             </li>
@@ -133,7 +134,7 @@
                 <div class="surface-panel sidebar-panel sticky-panel">
                     <h2 class="sidebar-title">全部专辑</h2>
                     <div class="sidebar-link-list">
-                        @foreach (var album in Model.Albums ?? [])
+                        @foreach (var album in Model.Albums)
                         {
                             <a href="/bbs/album/@album.Slug" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
                                 <span>@album.Name</span>

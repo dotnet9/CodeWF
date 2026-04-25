@@ -3,18 +3,39 @@
 @{
     ViewData["Title"] = "首页";
     ViewData["Description"] = "码坊聚合 .NET 技术文章、专题文档与在线工具，帮助开发者更高效地获取和实践知识。";
+    ViewData["BodyClass"] = "home-page";
     var spotlight = Model.SpotlightPost;
+    var latestPosts = Model.LatestPosts.Skip(1).Take(3).ToList();
+    if (!latestPosts.Any())
+    {
+        latestPosts = Model.Posts
+            .Where(post => spotlight == null || !string.Equals(post.Slug, spotlight.Slug, StringComparison.OrdinalIgnoreCase))
+            .Take(3)
+            .ToList();
+    }
+
+    var albums = Model.Albums
+        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
+        .Take(14)
+        .ToList();
+    var categories = Model.Categories
+        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
+        .Take(18)
+        .ToList();
 }
 
-<section class="hero-band">
+@section Head {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<section class="hero-band hero-band--home">
     <div class="container">
         <div class="home-hero">
             <div class="home-hero__content">
-                <span class="eyebrow">Razor Pages · Content Hub</span>
-                <h1>把文章、文档和工具组织成更专业的开发者入口</h1>
-                <p class="hero-copy">
-                    码坊围绕 .NET 与泛开发主题沉淀内容，强化专题浏览、文档导航与在线工具三个核心入口，让阅读、检索与实践形成闭环。
-                </p>
+                <span class="eyebrow eyebrow--tech">TECH BLOG · .NET · ENGINEERING</span>
+                <p class="hero-intro">技术内容系统化，阅读路径更清晰</p>
+                <h1>持续更新的 .NET 技术博客</h1>
+                <p class="hero-copy">把文章、文档和工具放进同一个入口，方便你更快找到能直接上手的内容。</p>
 
                 <div class="hero-actions">
                     <a href="/bbs" class="btn btn-primary btn-lg">
@@ -22,6 +43,9 @@
                     </a>
                     <a href="/doc" class="btn btn-ghost btn-lg">
                         <i class="fas fa-compass me-2"></i>进入文档
+                    </a>
+                    <a href="/search?q=dotnet" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-magnifying-glass me-2"></i>全站搜索
                     </a>
                 </div>
 
@@ -39,136 +63,204 @@
                         <span>技术分类</span>
                     </div>
                 </div>
+
+                <div class="quick-path-grid">
+                    <a href="/bbs" class="quick-path-card">
+                        <span class="quick-path-card__label">博客主线</span>
+                        <strong>@Model.TotalPosts 篇内容</strong>
+                        <p>先看最新更新。</p>
+                    </a>
+                    <a href="/doc" class="quick-path-card">
+                        <span class="quick-path-card__label">文档体系</span>
+                        <strong>@Model.TotalDocNodes 个节点</strong>
+                        <p>按主题直接查找。</p>
+                    </a>
+                    <a href="/tool" class="quick-path-card">
+                        <span class="quick-path-card__label">工具箱</span>
+                        <strong>@Model.TotalToolEntries 个入口</strong>
+                        <p>打开就能用。</p>
+                    </a>
+                </div>
             </div>
 
-            <aside class="surface-panel hero-spotlight">
-                <p class="panel-kicker">Spotlight</p>
+            <aside class="surface-panel hero-terminal">
+                <div class="terminal-head">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <p>content-index@codewf</p>
+                </div>
+
+                <div class="terminal-screen">
+                    <div class="terminal-line terminal-line--command">
+                        <span class="terminal-prompt">$</span>
+                        <span>site status</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span>posts</span>
+                        <strong>@Model.TotalPosts</strong>
+                    </div>
+                    <div class="terminal-line">
+                        <span>albums</span>
+                        <strong>@Model.TotalAlbums</strong>
+                    </div>
+                    <div class="terminal-line">
+                        <span>categories</span>
+                        <strong>@Model.TotalCategories</strong>
+                    </div>
+                    <div class="terminal-line">
+                        <span>docs</span>
+                        <strong>@Model.TotalDocNodes</strong>
+                    </div>
+                    <div class="terminal-line">
+                        <span>tools</span>
+                        <strong>@Model.TotalToolEntries</strong>
+                    </div>
+                </div>
+
                 @if (spotlight != null)
                 {
                     var spotlightUrl = $"/Bbs/Post/{spotlight.Date?.Year}/{spotlight.Date?.Month}/{spotlight.Slug}";
-                    <div class="spotlight-card">
-                        <span class="spotlight-card__label">推荐文章</span>
+                    <a href="@spotlightUrl" class="spotlight-story">
+                        <span class="spotlight-story__label">Featured Story</span>
                         <h2>@spotlight.Title</h2>
                         @if (!string.IsNullOrWhiteSpace(spotlight.Description))
                         {
                             <p>@spotlight.Description</p>
                         }
-                        <div class="spotlight-meta">
+                        <div class="spotlight-story__meta">
                             <span><i class="far fa-calendar"></i>@spotlight.Date?.ToString("yyyy-MM-dd")</span>
                             @if (!string.IsNullOrWhiteSpace(spotlight.Author))
                             {
                                 <span><i class="far fa-user"></i>@spotlight.Author</span>
                             }
                         </div>
-                        <a href="@spotlightUrl" class="spotlight-link">
-                            阅读这篇文章
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
+                    </a>
                 }
 
-                <div class="pillar-list">
-                    <div class="pillar-item">
-                        <div class="pillar-item__icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <div>
-                            <h3>专题沉淀</h3>
-                            <p>用专辑组织系列内容，适合连续阅读与长期积累。</p>
-                        </div>
-                    </div>
-                    <div class="pillar-item">
-                        <div class="pillar-item__icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div>
-                            <h3>文档导航</h3>
-                            <p>把知识点整理成结构化目录，降低查找与复用成本。</p>
-                        </div>
-                    </div>
-                    <div class="pillar-item">
-                        <div class="pillar-item__icon">
-                            <i class="fas fa-screwdriver-wrench"></i>
-                        </div>
-                        <div>
-                            <h3>在线工具</h3>
-                            <p>让常用开发小工具直接可用，而不是只停留在介绍层面。</p>
-                        </div>
-                    </div>
+                <div class="signal-card-grid">
+                    <a href="/bbs" class="signal-card">
+                        <strong>按更新阅读</strong>
+                        <p>从最新文章进入。</p>
+                    </a>
+                    <a href="/doc" class="signal-card">
+                        <strong>按主题查找</strong>
+                        <p>从文档目录切入。</p>
+                    </a>
+                    <a href="/tool" class="signal-card">
+                        <strong>边看边实操</strong>
+                        <p>常用工具直接打开。</p>
+                    </a>
                 </div>
             </aside>
         </div>
     </div>
 </section>
 
-<section class="page-shell">
+<section class="page-shell page-shell--home-grid">
     <div class="container">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">Explore</span>
-                <h2 class="section-title">从专题和分类切入内容</h2>
-            </div>
-            <p class="section-description">
-                对初次访问者来说，先看入口比先看列表更重要。这里把高频的浏览方式整理成了更直观的入口层。
-            </p>
-        </div>
+        <div class="home-layout-grid">
+            <div class="surface-panel home-curation">
+                <div class="section-heading section-heading--compact">
+                    <div>
+                        <span class="eyebrow">Content Map</span>
+                        <h2 class="section-title">从专题和分类切入内容</h2>
+                    </div>
+                    <p class="section-description">
+                        先找到入口，再决定继续深入文章、文档还是工具。
+                    </p>
+                </div>
 
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="surface-panel">
-                    <div class="surface-panel__header">
-                        <div>
-                            <span class="eyebrow">Albums</span>
-                            <h3 class="surface-title">专题专栏</h3>
+                <div class="home-index-grid">
+                    <article class="home-index-card">
+                        <div class="home-index-card__header">
+                            <div>
+                                <span class="eyebrow">Albums</span>
+                                <h3 class="surface-title">专题专栏</h3>
+                            </div>
+                            <a href="/bbs" class="surface-link">全部文章</a>
                         </div>
-                        <a href="/bbs" class="surface-link">全部文章</a>
+
+                        @if (!albums.Any())
+                        {
+                            <div class="empty-state empty-state--compact">
+                                <p>暂未配置专题内容。</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="chip-cloud">
+                                @foreach (var album in albums)
+                                {
+                                    <a href="/bbs/album/@album.Slug" class="chip-link">@album.Name</a>
+                                }
+                            </div>
+                        }
+                    </article>
+
+                    <article class="home-index-card">
+                        <div class="home-index-card__header">
+                            <div>
+                                <span class="eyebrow">Categories</span>
+                                <h3 class="surface-title">技术分类</h3>
+                            </div>
+                            <a href="/bbs" class="surface-link">查看最新</a>
+                        </div>
+
+                        @if (!categories.Any())
+                        {
+                            <div class="empty-state empty-state--compact">
+                                <p>暂未配置文章分类。</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="chip-cloud">
+                                @foreach (var category in categories)
+                                {
+                                    <a href="/Bbs/Category/@category.Slug" class="chip-link">@category.Name</a>
+                                }
+                            </div>
+                        }
+                    </article>
+                </div>
+            </div>
+
+            <aside class="home-rail">
+                <div class="surface-panel dispatch-panel">
+                    <div class="dispatch-panel__header">
+                        <div>
+                            <span class="panel-kicker">Latest Dispatches</span>
+                            <h2 class="surface-title">近期更新</h2>
+                        </div>
+                        <a href="/bbs" class="surface-link">进入博客</a>
                     </div>
 
-                    @if (!Model.Albums.Any(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)))
+                    @if (!latestPosts.Any())
                     {
                         <div class="empty-state empty-state--compact">
-                            <p>暂未配置专题内容。</p>
+                            <p>近期更新会在这里展示。</p>
                         </div>
                     }
                     else
                     {
-                        <div class="chip-cloud">
-                            @foreach (var album in Model.Albums.Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)).Take(18))
+                        <div class="dispatch-list">
+                            @foreach (var post in latestPosts)
                             {
-                                <a href="/bbs/album/@album.Slug" class="chip-link">@album.Name</a>
+                                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                                <a href="@postUrl" class="dispatch-item">
+                                    <span class="dispatch-item__meta">@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    <strong>@post.Title</strong>
+                                    @if (!string.IsNullOrWhiteSpace(post.Description))
+                                    {
+                                        <p>@post.Description</p>
+                                    }
+                                </a>
                             }
                         </div>
                     }
                 </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="surface-panel">
-                    <div class="surface-panel__header">
-                        <div>
-                            <span class="eyebrow">Categories</span>
-                            <h3 class="surface-title">技术分类</h3>
-                        </div>
-                        <a href="/bbs" class="surface-link">查看最新</a>
-                    </div>
-
-                    @if (!Model.Categories.Any(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        <div class="empty-state empty-state--compact">
-                            <p>暂未配置文章分类。</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="chip-cloud">
-                            @foreach (var category in Model.Categories.Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)).Take(24))
-                            {
-                                <a href="/Bbs/Category/@category.Slug" class="chip-link">@category.Name</a>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
+            </aside>
         </div>
     </div>
 </section>
@@ -178,10 +270,10 @@
         <div class="section-heading">
             <div>
                 <span class="eyebrow">Featured Posts</span>
-                <h2 class="section-title">推荐阅读</h2>
+                <h2 class="section-title">精选文章</h2>
             </div>
             <p class="section-description">
-                精选近期值得打开的内容，优先展示站点里更适合首页承接的文章。
+                从这些文章开始，可以快速感受站点的主要内容方向。
             </p>
         </div>
 
@@ -194,7 +286,7 @@
         }
         else
         {
-            <div class="post-grid">
+            <div class="post-grid feature-grid">
                 @foreach (var post in Model.Posts)
                 {
                     var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
@@ -202,7 +294,7 @@
                         <a href="@postUrl" class="resource-card__media">
                             @if (!string.IsNullOrWhiteSpace(post.Cover))
                             {
-                                <img src="@post.Cover" alt="@post.Title" class="cover-media" />
+                                <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
                             }
                             else
                             {
@@ -226,6 +318,10 @@
                                     <span><i class="far fa-user"></i>@post.Author</span>
                                 }
                             </div>
+                            <a href="@postUrl" class="inline-link">
+                                阅读全文
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
                     </article>
                 }

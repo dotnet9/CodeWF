@@ -19,6 +19,7 @@ public static class MarkdownExtension
         var html = Markdown.ToHtml(markdown, pipeline);
 
         html = AddCodeBlockLanguageClass(html);
+        html = AddImagePerformanceAttributes(html);
 
         return html;
     }
@@ -99,5 +100,16 @@ public static class MarkdownExtension
         }
 
         return "language-text";
+    }
+
+    private static string AddImagePerformanceAttributes(string html)
+    {
+        var imagePattern = new Regex(@"<img\b(?![^>]*\bloading=)(?![^>]*\bdecoding=)([^>]*?)\s*/?>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+        return imagePattern.Replace(html, match =>
+        {
+            var attributes = match.Groups[1].Value.TrimEnd();
+            return $"<img {attributes} loading=\"lazy\" decoding=\"async\" />";
+        });
     }
 }

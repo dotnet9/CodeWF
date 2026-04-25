@@ -1,0 +1,24 @@
+@model WebApp.Models.PageBannerViewModel
+
+<div class="page-banner">
+    <div>
+        @if (!string.IsNullOrWhiteSpace(Model.Eyebrow))
+        {
+            <span class="eyebrow">@Model.Eyebrow</span>
+        }
+        <h1 class="page-title">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="page-description">@Model.Description</p>
+        }
+    </div>
+    @if (Model.MetaItems.Any())
+    {
+        <div class="page-banner__meta">
+            @foreach (var item in Model.MetaItems)
+            {
+                <span class="meta-chip">@item</span>
+            }
+        </div>
+    }
+</div>

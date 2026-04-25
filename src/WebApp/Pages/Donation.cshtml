@@ -3,23 +3,22 @@
 @{
     ViewData["Title"] = "赞助";
     ViewData["Description"] = "如果码坊的内容对你有帮助，欢迎通过赞助支持持续更新。";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Support",
+        Title = "赞助与支持",
+        Description = "如果这里的内容和工具帮到了你，欢迎通过赞助支持站点继续维护与更新。",
+        MetaItems = ["支持持续创作", "支持工具维护"]
+    };
+}
+
+@section Head {
+    <partial name="_CodeHighlightHead" />
 }
 
 <section class="page-shell">
     <div class="container">
-        <div class="page-banner">
-            <div>
-                <span class="eyebrow">Support</span>
-                <h1 class="page-title">赞助与支持</h1>
-                <p class="page-description">
-                    如果这里的内容和工具帮到了你，欢迎通过赞助支持站点继续维护与更新。
-                </p>
-            </div>
-            <div class="page-banner__meta">
-                <span class="meta-chip">支持持续创作</span>
-                <span class="meta-chip">支持工具维护</span>
-            </div>
-        </div>
+        <partial name="_PageBanner" model="banner" />
 
         <div class="content-grid">
             <div class="content-primary">
@@ -30,7 +29,7 @@
 
             <aside class="content-sidebar">
                 <div class="surface-panel sidebar-panel sticky-panel">
-                    <h2 class="sidebar-title">你也可以从这里继续逛</h2>
+                    <h2 class="sidebar-title">你也可以从这里继续</h2>
                     <p class="sidebar-copy">如果暂时不赞助，也欢迎继续阅读、订阅或反馈建议。</p>
                     <div class="sidebar-link-list">
                         <a href="/rss" class="sidebar-link">
@@ -51,3 +50,7 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <partial name="_CodeHighlightScripts" />
+}

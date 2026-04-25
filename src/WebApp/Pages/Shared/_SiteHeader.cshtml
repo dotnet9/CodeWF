@@ -1,0 +1,102 @@
+@using Microsoft.Extensions.Options
+@inject IOptions<WebApp.Options.SiteOption> SiteOptions
+@{
+    var site = SiteOptions.Value;
+    var appTitle = site.AppTitle ?? "码坊";
+    var searchQuery = Context.Request.Query["q"].ToString();
+    var currentPath = (Context.Request.Path.Value ?? "/").TrimEnd('/');
+    if (string.IsNullOrEmpty(currentPath))
+    {
+        currentPath = "/";
+    }
+
+    string NavClass(string href)
+    {
+        if (href == "/")
+        {
+            return currentPath == "/" ? "nav-link is-active" : "nav-link";
+        }
+
+        return currentPath.StartsWith(href, StringComparison.OrdinalIgnoreCase)
+            ? "nav-link is-active"
+            : "nav-link";
+    }
+
+    var moreActive = currentPath.StartsWith("/about", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/timeline", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/donation", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/rss", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/sitemap", StringComparison.OrdinalIgnoreCase);
+}
+
+<header class="site-header">
+    <nav class="navbar navbar-expand-xl fixed-top site-navbar">
+        <div class="container">
+            <a class="navbar-brand site-brand" href="/">
+                <span class="site-brand__mark">@appTitle</span>
+                <span class="site-brand__meta">.NET 内容与工具站</span>
+            </a>
+
+            <button class="navbar-toggler site-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavigation">
+                <ul class="navbar-nav me-auto align-items-xl-center">
+                    <li class="nav-item">
+                        <a class="@(NavClass("/"))" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="@(NavClass("/bbs"))" href="/bbs">博客</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="@(NavClass("/doc"))" href="/doc">文档</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="@(NavClass("/tool"))" href="/tool">工具</a>
+                    </li>
+                    @await Component.InvokeAsync("Navigation")
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
+                        <div class="dropdown-menu site-dropdown">
+                            <a class="dropdown-item" href="/about">关于</a>
+                            <a class="dropdown-item" href="/timeline">时间线</a>
+                            <a class="dropdown-item" href="/donation">赞助</a>
+                            <a class="dropdown-item" href="/rss" target="_blank" rel="noreferrer">RSS</a>
+                            <a class="dropdown-item" href="/sitemap" target="_blank" rel="noreferrer">站点地图</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a>
+                            <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="site-utility-bar">
+                    <form class="site-search-form" method="get" action="/search" role="search">
+                        <label class="visually-hidden" for="global-search-query">全局搜索</label>
+                        <span class="site-search-form__icon" aria-hidden="true">
+                            <i class="fas fa-magnifying-glass"></i>
+                        </span>
+                        <input
+                            id="global-search-query"
+                            class="site-search-input"
+                            type="search"
+                            name="q"
+                            value="@searchQuery"
+                            placeholder="搜索文档、工具、文章" />
+                        <button type="submit" class="site-search-submit">搜索</button>
+                    </form>
+
+                    <div class="site-actions">
+                        <a class="btn btn-ghost" href="https://github.com/dotnet9/CodeWF" target="_blank" rel="noreferrer">
+                            <i class="fab fa-github me-2"></i>查看源码
+                        </a>
+                        <a class="btn btn-primary" href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">
+                            <i class="fas fa-bug me-2"></i>反馈问题
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

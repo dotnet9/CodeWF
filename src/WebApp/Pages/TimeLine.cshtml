@@ -3,19 +3,17 @@
 @{
     ViewData["Title"] = "时间线";
     ViewData["Description"] = "查看码坊站点和内容建设的时间线记录。";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Timeline",
+        Title = "时间线",
+        Description = "用时间轴回看站点的迭代与内容节点，让长期建设更容易被感知。"
+    };
 }
 
 <section class="page-shell">
     <div class="container">
-        <div class="page-banner">
-            <div>
-                <span class="eyebrow">Timeline</span>
-                <h1 class="page-title">时间线</h1>
-                <p class="page-description">
-                    用时间轴回看站点的迭代与内容节点，让长期建设更容易被感知。
-                </p>
-            </div>
-        </div>
+        <partial name="_PageBanner" model="banner" />
 
         @if (Model.TimeLines == null || !Model.TimeLines.Any())
         {

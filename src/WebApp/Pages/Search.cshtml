@@ -1,0 +1,188 @@
+﻿@page "/search"
+@model WebApp.Pages.SearchModel
+@{
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Global Search",
+        Title = "搜索工具、文档与文章",
+        Description = "一个入口检索站内内容，优先返回最相关的工具、文档与技术文章。"
+    };
+    var startPage = Math.Max(1, Model.PageIndex - 2);
+    var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+    if (endPage - startPage < 4)
+    {
+        if (startPage == 1)
+        {
+            endPage = Math.Min(Model.TotalPages, startPage + 4);
+        }
+        else if (endPage == Model.TotalPages)
+        {
+            startPage = Math.Max(1, endPage - 4);
+        }
+    }
+
+    var previousPage = Math.Max(1, Model.PageIndex - 1);
+    var nextPage = Model.TotalPages <= 0 ? 1 : Math.Min(Model.TotalPages, Model.PageIndex + 1);
+}
+
+<section class="page-shell">
+    <div class="container">
+        <div class="search-banner">
+            <partial name="_PageBanner" model="banner" />
+            <form class="search-page-form" method="get" action="/search" role="search">
+                <label class="visually-hidden" for="search-page-query">搜索关键字</label>
+                <div class="search-page-form__shell">
+                    <span class="search-page-form__icon" aria-hidden="true">
+                        <i class="fas fa-magnifying-glass"></i>
+                    </span>
+                    <input
+                        id="search-page-query"
+                        class="search-page-input"
+                        type="search"
+                        name="q"
+                        value="@Model.Query"
+                        placeholder="输入工具、文档或文章关键字" />
+                    <button type="submit" class="btn btn-primary search-page-submit">搜索</button>
+                </div>
+            </form>
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(Model.Query))
+        {
+            <div class="empty-state">
+                <h2>输入关键字开始搜索</h2>
+                <p>可以直接搜索工具名、文档标题、文章标题、分类名，或者正文里的技术关键词。</p>
+                <div class="chip-row chip-row--secondary">
+                    <span class="tag-chip tag-chip--muted">工具</span>
+                    <span class="tag-chip tag-chip--muted">文档</span>
+                    <span class="tag-chip tag-chip--muted">文章</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="search-summary-row">
+                <div class="page-banner__meta">
+                    <span class="meta-chip">关键字：@Model.Query</span>
+                    <span class="meta-chip">共 @Model.Total 条结果</span>
+                </div>
+                <div class="page-banner__meta">
+                    <span class="meta-chip">工具 @Model.ToolCount</span>
+                    <span class="meta-chip">文档 @Model.DocCount</span>
+                    <span class="meta-chip">文章 @Model.PostCount</span>
+                </div>
+            </div>
+
+            @if (!Model.Results.Any())
+            {
+                <div class="empty-state">
+                    <h2>没有找到相关结果</h2>
+                    <p>可以试试更短的关键词，或者直接搜索工具名、文档标题、文章标题中的核心词。</p>
+                </div>
+            }
+            else
+            {
+                <div class="search-result-list">
+                    @foreach (var result in Model.Results)
+                    {
+                        var summary = string.Equals(result.Summary?.Trim(), result.Title?.Trim(), StringComparison.Ordinal)
+                            ? null
+                            : result.Summary;
+                        var snippet = string.Equals(result.MatchedSnippet, result.Summary, StringComparison.Ordinal)
+                            ? null
+                            : result.MatchedSnippet;
+
+                        <article class="surface-panel search-result-card">
+                            <div class="search-result-card__head">
+                                <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@result.KindLabel</span>
+                                @if (result.UpdatedAt.HasValue)
+                                {
+                                    <span class="search-result-card__date">@result.UpdatedAt.Value.ToString("yyyy-MM-dd")</span>
+                                }
+                            </div>
+
+                            <h2 class="search-result-card__title">
+                                <a href="@result.Url">@result.Title</a>
+                            </h2>
+
+                            @if (!string.IsNullOrWhiteSpace(summary))
+                            {
+                                <p class="search-result-card__summary">@summary</p>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(snippet))
+                            {
+                                <p class="search-result-card__matched">匹配内容：@snippet</p>
+                            }
+
+                            <div class="search-result-card__meta">
+                                @if (!string.IsNullOrWhiteSpace(result.Context))
+                                {
+                                    <span><i class="fas fa-diagram-project"></i>@result.Context</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(result.Slug))
+                                {
+                                    <span><i class="fas fa-link"></i>@result.Slug</span>
+                                }
+                            </div>
+
+                            <a href="@result.Url" class="inline-link">
+                                查看结果
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </article>
+                    }
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="pagination-shell" aria-label="搜索分页">
+                        <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 条结果</p>
+                        <ul class="pagination justify-content-center pagination-list">
+                            <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Page("/Search", new { q = Model.Query, pageIndex = previousPage })">上一页</a>
+                            </li>
+
+                            @if (startPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Page("/Search", new { q = Model.Query, pageIndex = 1 })">1</a>
+                                </li>
+                                @if (startPage > 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+                            }
+
+                            @for (var i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                                    <a class="page-link" href="@Url.Page("/Search", new { q = Model.Query, pageIndex = i })">@i</a>
+                                </li>
+                            }
+
+                            @if (endPage < Model.TotalPages)
+                            {
+                                @if (endPage < Model.TotalPages - 1)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Page("/Search", new { q = Model.Query, pageIndex = Model.TotalPages })">@Model.TotalPages</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Page("/Search", new { q = Model.Query, pageIndex = nextPage })">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+        }
+    </div>
+</section>

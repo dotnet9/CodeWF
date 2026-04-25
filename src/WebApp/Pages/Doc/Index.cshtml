@@ -3,24 +3,18 @@
 @{
     ViewData["Title"] = "文档";
     ViewData["Description"] = "浏览码坊文档中心，按主题和目录快速定位内容。";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Documentation",
+        Title = "文档中心",
+        Description = "把常用知识点和项目说明沉淀成目录化文档，减少重复检索的时间成本。",
+        MetaItems = ["结构化内容", "按主题导航", "便于快速复用"]
+    };
 }
 
 <section class="page-shell">
     <div class="container">
-        <div class="page-banner">
-            <div>
-                <span class="eyebrow">Documentation</span>
-                <h1 class="page-title">文档中心</h1>
-                <p class="page-description">
-                    把常用知识点和项目说明沉淀成目录化文档，减少重复检索的时间成本。
-                </p>
-            </div>
-            <div class="page-banner__meta">
-                <span class="meta-chip">结构化内容</span>
-                <span class="meta-chip">按主题导航</span>
-                <span class="meta-chip">便于快速复用</span>
-            </div>
-        </div>
+        <partial name="_PageBanner" model="banner" />
 
         @if (Model.DocItems == null || !Model.DocItems.Any())
         {

@@ -1,58 +1,74 @@
 @page "/SlugifyString"
 @model WebApp.Pages.Tool.Web.SlugifyStringModel
-@{ ViewData["Title"] = "标题转URL别名"; }
+@{
+    ViewData["Title"] = "标题转 URL 别名";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "Tool",
+        Title = "标题转 URL 别名",
+        Description = "将中文标题翻译为英文，再转换为适合文章链接、路由和 SEO 的 slug 格式。",
+        MetaItems = ["URL alias", "文章别名", "SEO 友好"]
+    };
+}
 
-<div class="container">
-    <h1 class="mb-4">标题转URL别名</h1>
-    <p class="text-muted">将中文标题翻译为英文，再转为URL友好的slug格式</p>
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
 
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                <div class="form-group mb-3">
-                    <label for="inputString">输入标题</label>
-                    <textarea class="form-control" id="inputString" name="InputString" rows="3" placeholder="输入要转换的标题，如：Slug转换工具">@Model.InputString</textarea>
+        <div class="content-grid">
+            <div class="content-primary">
+                <div class="surface-panel">
+                    <form method="post" class="tool-form-stack">
+                        <div class="mb-3">
+                            <label class="form-label" for="inputString">输入标题</label>
+                            <textarea class="form-control" id="inputString" name="InputString" rows="4" placeholder="例如：Slug 转换工具">@Model.InputString</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">转换</button>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.TranslatedResult))
+                    {
+                        <div class="tool-result-grid">
+                            <div class="tool-result-card">
+                                <span class="card-kicker">Translation</span>
+                                <h2 class="surface-title">英文翻译</h2>
+                                <code class="tool-code-block">@Model.TranslatedResult</code>
+                            </div>
+                            <div class="tool-result-card">
+                                <span class="card-kicker">Slug</span>
+                                <h2 class="surface-title">URL 别名</h2>
+                                <div class="tool-copy-row">
+                                    <code class="tool-code-block">@Model.SlugResult</code>
+                                    <button class="btn btn-ghost btn-sm" type="button" onclick="copyToClipboard('@Model.SlugResult')">复制</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
-                <button type="submit" class="btn btn-primary">转换</button>
-            </form>
+            </div>
 
-            @if (!string.IsNullOrEmpty(Model.TranslatedResult))
-            {
-                <div class="mt-4">
-                    <div class="alert alert-secondary">
-                        <strong>英文翻译：</strong>
-                        <code>@Model.TranslatedResult</code>
-                    </div>
-                    <div class="alert alert-success">
-                        <strong>Slug别名：</strong>
-                        <code style="font-size: 1.2em;">@Model.SlugResult</code>
-                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('@Model.SlugResult')">复制</button>
+            <aside class="content-sidebar">
+                <div class="surface-panel sidebar-panel sticky-panel">
+                    <h2 class="sidebar-title">使用说明</h2>
+                    <div class="sidebar-link-list tool-note-list">
+                        <div class="sidebar-link sidebar-link--static"><span>输入中文标题后点击转换</span></div>
+                        <div class="sidebar-link sidebar-link--static"><span>系统会先翻译，再生成 slug</span></div>
+                        <div class="sidebar-link sidebar-link--static"><span>适合文章链接、路由和页面别名</span></div>
+                        <div class="sidebar-link sidebar-link--static"><span>当前使用 MyMemory 免费翻译 API</span></div>
                     </div>
                 </div>
-            }
+            </aside>
         </div>
     </div>
-
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5>使用说明</h5>
-            <ul>
-                <li>输入中文标题，点击"转换"按钮</li>
-                <li>系统自动将中文翻译为英文</li>
-                <li>再将英文转换为URL友好的slug格式（如：slug-conversion-tool）</li>
-                <li>使用MyMemory免费翻译API</li>
-            </ul>
-        </div>
-    </div>
-</div>
+</section>
 
 @section Scripts {
 <script>
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
-            alert('已复制到剪贴板！');
+            alert("已复制到剪贴板");
         }, function(err) {
-            console.error('复制失败:', err);
+            console.error("复制失败:", err);
         });
     }
 </script>

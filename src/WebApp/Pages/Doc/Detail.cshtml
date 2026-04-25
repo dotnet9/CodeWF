@@ -4,6 +4,19 @@
 @{
     ViewData["Title"] = $"{Model.Doc?.Name ?? "文档"} - 文档中心";
     ViewData["Description"] = Model.Doc?.Memo ?? "浏览码坊文档内容。";
+    var banner = Model.Doc == null
+        ? null
+        : new WebApp.Models.PageBannerViewModel
+        {
+            Eyebrow = "Documentation",
+            Title = Model.Doc.Name ?? "文档",
+            Description = Model.Doc.Memo,
+            MetaItems = ["结构化文档"]
+        };
+}
+
+@section Head {
+    <partial name="_CodeHighlightHead" />
 }
 
 <section class="page-shell">
@@ -17,70 +30,88 @@
         }
         else
         {
-            <div class="page-banner">
-                <div>
-                    <span class="eyebrow">Documentation</span>
-                    <h1 class="page-title">@Model.Doc.Name</h1>
-                    @if (!string.IsNullOrWhiteSpace(Model.Doc.Memo))
-                    {
-                        <p class="page-description">@Model.Doc.Memo</p>
-                    }
-                </div>
+            <partial name="_PageBanner" model="banner" />
+            @if (!string.IsNullOrWhiteSpace(Model.Doc.Repository))
+            {
                 <div class="page-banner__meta">
-                    <span class="meta-chip">结构化文档</span>
-                    @if (!string.IsNullOrWhiteSpace(Model.Doc.Repository))
+                    <a class="meta-chip" href="@Model.Doc.Repository" target="_blank" rel="noreferrer">
+                        <i class="fab fa-github"></i>相关仓库
+                    </a>
+                </div>
+            }
+
+            <div class="article-layout">
+                <div class="article-main">
+                    <article class="surface-panel article-panel">
+                        @if (!string.IsNullOrWhiteSpace(Model.Doc.HtmlContent))
+                        {
+                            <div class="prose doc-content" data-reading-body>
+                                @Html.Raw(Model.Doc.HtmlContent)
+                            </div>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.Doc.Content))
+                        {
+                            <div class="prose doc-content" data-reading-body>
+                                @Html.Raw(Model.Doc.Content.ToHtml())
+                            </div>
+                        }
+                    </article>
+
+                    @if (Model.PreviousDoc != null || Model.NextDoc != null)
                     {
-                        <a class="meta-chip" href="@Model.Doc.Repository" target="_blank" rel="noreferrer">
-                            <i class="fab fa-github"></i>相关仓库
-                        </a>
+                        <nav class="doc-pager" aria-label="文档阅读导航">
+                            @if (Model.PreviousDoc != null)
+                            {
+                                <a href="/doc/@Model.PreviousDoc.Slug" class="surface-panel doc-pager__item doc-pager__item--prev">
+                                    <span class="doc-pager__label">
+                                        <i class="fas fa-arrow-left"></i>
+                                        上一篇
+                                    </span>
+                                    <strong>@Model.PreviousDoc.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(Model.PreviousDoc.Memo))
+                                    {
+                                        <p>@Model.PreviousDoc.Memo</p>
+                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="surface-panel doc-pager__item doc-pager__item--empty" aria-hidden="true"></div>
+                            }
+
+                            @if (Model.NextDoc != null)
+                            {
+                                <a href="/doc/@Model.NextDoc.Slug" class="surface-panel doc-pager__item doc-pager__item--next">
+                                    <span class="doc-pager__label">
+                                        下一篇
+                                        <i class="fas fa-arrow-right"></i>
+                                    </span>
+                                    <strong>@Model.NextDoc.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(Model.NextDoc.Memo))
+                                    {
+                                        <p>@Model.NextDoc.Memo</p>
+                                    }
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="surface-panel doc-pager__item doc-pager__item--empty" aria-hidden="true"></div>
+                            }
+                        </nav>
                     }
                 </div>
-            </div>
 
-            <div class="content-grid content-grid--article">
-                <article class="surface-panel article-panel">
-                    @if (!string.IsNullOrWhiteSpace(Model.Doc.HtmlContent))
-                    {
-                        <div class="prose doc-content">
-                            @Html.Raw(Model.Doc.HtmlContent)
-                        </div>
-                    }
-                    else if (!string.IsNullOrWhiteSpace(Model.Doc.Content))
-                    {
-                        <div class="prose doc-content">
-                            @Html.Raw(Model.Doc.Content.ToHtml())
-                        </div>
-                    }
-                </article>
-
-                <aside class="content-sidebar">
-                    <div class="surface-panel sidebar-panel sticky-panel">
-                        <h2 class="sidebar-title">文档目录</h2>
-                        <div class="sidebar-link-list">
-                            @if (Model.DocItems != null && Model.DocItems.Any())
-                            {
-                                @foreach (var doc in Model.DocItems)
-                                {
-                                    <a href="/doc/@doc.Slug" class="sidebar-link @(doc.Slug == Model.Doc.Slug ? "is-current" : string.Empty)">
-                                        <span>@doc.Name</span>
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                    @if (doc.Children != null && doc.Children.Any())
-                                    {
-                                        @foreach (var child in doc.Children)
-                                        {
-                                            <a href="/doc/@child.Slug" class="sidebar-link sidebar-link--child @(child.Slug == Model.Doc.Slug ? "is-current" : string.Empty)">
-                                                <span>@child.Name</span>
-                                                <i class="fas fa-angle-right"></i>
-                                            </a>
-                                        }
-                                    }
-                                }
-                            }
-                        </div>
+                <aside class="article-aside sticky-panel">
+                    <div class="surface-panel toc-panel" data-reading-toc data-toc-hide-empty="true">
+                        <h2 class="sidebar-title">目录</h2>
+                        <div class="toc-nav"></div>
                     </div>
                 </aside>
             </div>
         }
     </div>
 </section>
+
+@section Scripts {
+    <partial name="_CodeHighlightScripts" />
+}

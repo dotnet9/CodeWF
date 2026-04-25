@@ -1,35 +1,9 @@
-@using Microsoft.Extensions.Options
-@inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @{
-    var site = SiteOptions.Value;
-    var appTitle = site.AppTitle ?? "码坊";
+    var appTitle = "码坊";
     var pageTitle = ViewData["Title"] as string;
+    var bodyClass = ViewData["BodyClass"] as string;
     var siteDescription = ViewData["Description"] as string
-        ?? site.Memo
         ?? "面向 .NET 开发者的技术内容、专题文档与在线工具站点。";
-    var currentPath = (Context.Request.Path.Value ?? "/").TrimEnd('/');
-    if (string.IsNullOrEmpty(currentPath))
-    {
-        currentPath = "/";
-    }
-
-    string NavClass(string href)
-    {
-        if (href == "/")
-        {
-            return currentPath == "/" ? "nav-link is-active" : "nav-link";
-        }
-
-        return currentPath.StartsWith(href, StringComparison.OrdinalIgnoreCase)
-            ? "nav-link is-active"
-            : "nav-link";
-    }
-
-    var moreActive = currentPath.StartsWith("/about", StringComparison.OrdinalIgnoreCase)
-        || currentPath.StartsWith("/timeline", StringComparison.OrdinalIgnoreCase)
-        || currentPath.StartsWith("/donation", StringComparison.OrdinalIgnoreCase)
-        || currentPath.StartsWith("/rss", StringComparison.OrdinalIgnoreCase)
-        || currentPath.StartsWith("/sitemap", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -41,156 +15,26 @@
     <meta name="theme-color" content="#0f172a" />
     <title>@(string.IsNullOrWhiteSpace(pageTitle) || pageTitle == "首页" ? appTitle : $"{pageTitle} - {appTitle}")</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Outfit:wght@500;600;700;800&display=swap" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="icon" type="image/png" href="@(site.Favicon ?? Url.Content("~/favicon.png"))" />
+    @await RenderSectionAsync("Head", required: false)
+    <link rel="icon" type="image/png" href="~/favicon.png" asp-append-version="true" />
     <script async src="https://hm.baidu.com/hm.js?b1c5c62f256893710ae912468261bf6b"></script>
 </head>
-<body>
-    <header class="site-header">
-        <nav class="navbar navbar-expand-xl fixed-top site-navbar">
-            <div class="container">
-                <a class="navbar-brand site-brand" href="/">
-                    <span class="site-brand__mark">@appTitle</span>
-                    <span class="site-brand__meta">.NET 内容与工具站</span>
-                </a>
-
-                <button class="navbar-toggler site-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="切换导航">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="mainNavigation">
-                    <ul class="navbar-nav me-auto align-items-xl-center">
-                        <li class="nav-item">
-                            <a class="@(NavClass("/"))" href="/">首页</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="@(NavClass("/bbs"))" href="/bbs">博客</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="@(NavClass("/doc"))" href="/doc">文档</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="@(NavClass("/tool"))" href="/tool">工具</a>
-                        </li>
-                        @await Component.InvokeAsync("Navigation")
-                        <li class="nav-item dropdown">
-                            <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
-                            <div class="dropdown-menu site-dropdown">
-                                <a class="dropdown-item" href="/about">关于</a>
-                                <a class="dropdown-item" href="/timeline">时间线</a>
-                                <a class="dropdown-item" href="/donation">赞助</a>
-                                <a class="dropdown-item" href="/rss" target="_blank" rel="noreferrer">RSS</a>
-                                <a class="dropdown-item" href="/sitemap" target="_blank" rel="noreferrer">站点地图</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a>
-                                <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
-                            </div>
-                        </li>
-                    </ul>
-
-                    <div class="site-actions">
-                        <a class="btn btn-ghost" href="https://github.com/dotnet9/CodeWF" target="_blank" rel="noreferrer">
-                            <i class="fab fa-github me-2"></i>查看源码
-                        </a>
-                        <a class="btn btn-primary" href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">
-                            <i class="fas fa-bug me-2"></i>反馈问题
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
+<body class="@bodyClass">
+    <partial name="_SiteHeader" />
 
     <main class="site-main">
         @RenderBody()
     </main>
 
-    <section class="site-links-shell">
-        <div class="container">
-            @await Component.InvokeAsync("FriendLink")
-        </div>
-    </section>
+    <partial name="_SiteFooter" />
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="surface-panel footer-shell">
-                <div class="footer-grid">
-                    <div class="footer-brand">
-                        <span class="footer-brand__mark">@appTitle</span>
-                        <p class="footer-brand__copy">@siteDescription</p>
-                        <div class="footer-badges">
-                            <span>.NET 11</span>
-                            <span>Razor Pages</span>
-                            <span>技术内容沉淀</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h2 class="footer-title">站点导航</h2>
-                        <ul class="footer-list">
-                            <li><a href="/bbs">博客</a></li>
-                            <li><a href="/doc">文档</a></li>
-                            <li><a href="/tool">工具</a></li>
-                            <li><a href="/timeline">时间线</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h2 class="footer-title">社区链接</h2>
-                        <ul class="footer-list">
-                            <li><a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a></li>
-                            <li><a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a></li>
-                            <li><a href="https://github.com/dotnet9" target="_blank" rel="noreferrer">GitHub</a></li>
-                            <li><a href="https://irihi.tech/" target="_blank" rel="noreferrer">铱泓科技</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h2 class="footer-title">常用入口</h2>
-                        <ul class="footer-list">
-                            <li><a href="/about">关于站点</a></li>
-                            <li><a href="/donation">支持作者</a></li>
-                            <li><a href="/rss" target="_blank" rel="noreferrer">RSS 订阅</a></li>
-                            <li><a href="/sitemap" target="_blank" rel="noreferrer">站点地图</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-qr">
-                        <img src="@(site.WeChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg")" alt="@($"{site.WeChatName ?? appTitle} 微信公众号")" />
-                        <p>关注公众号<br />@(site.WeChatName ?? appTitle)</p>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-                    <span>&copy; @site.StartYear-@DateTime.Now.Year @(site.Owner ?? "码坊")</span>
-                    @if (!string.IsNullOrWhiteSpace(site.BaiAn))
-                    {
-                        <span>@site.BaiAn</span>
-                    }
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-aspnet.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

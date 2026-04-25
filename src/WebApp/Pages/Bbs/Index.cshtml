@@ -3,6 +3,19 @@
 @{
     ViewData["Title"] = "博客";
     ViewData["Description"] = "浏览码坊博客内容，按时间查看最新技术文章。";
+    var startPage = Math.Max(1, Model.PageIndex - 2);
+    var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+    if (endPage - startPage < 4)
+    {
+        if (startPage == 1)
+        {
+            endPage = Math.Min(Model.TotalPages, startPage + 4);
+        }
+        else if (endPage == Model.TotalPages)
+        {
+            startPage = Math.Max(1, endPage - 4);
+        }
+    }
 }
 
 <section class="page-shell">
@@ -17,7 +30,7 @@
             </div>
             <div class="page-banner__stats">
                 <div class="stat-chip">
-                    <strong>@Model.Posts.Count</strong>
+                    <strong>@Model.Total</strong>
                     <span>篇文章</span>
                 </div>
                 <div class="stat-chip">
@@ -48,7 +61,7 @@
                                 @if (hasCover)
                                 {
                                     <a href="@postUrl" class="post-list-card__cover">
-                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" />
+                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
                                     </a>
                                 }
 
@@ -79,6 +92,51 @@
                             </article>
                         }
                     </div>
+                }
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="pagination-shell" aria-label="博客分页">
+                        <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
+                        <ul class="pagination justify-content-center pagination-list">
+                            <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="/bbs?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                            </li>
+                            @if (startPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="/bbs?pageIndex=1">1</a>
+                                </li>
+                                @if (startPage > 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+                            }
+                            @for (var i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                                    <a class="page-link" href="/bbs?pageIndex=@i">@i</a>
+                                </li>
+                            }
+                            @if (endPage < Model.TotalPages)
+                            {
+                                @if (endPage < Model.TotalPages - 1)
+                                {
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" href="/bbs?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="/bbs?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
                 }
             </div>
 
