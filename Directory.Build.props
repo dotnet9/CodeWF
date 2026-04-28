@@ -4,8 +4,8 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
-    <Authors>dotnet9</Authors>
-    <Company>dotnet9</Company>
+    <Authors>沙漠尽头的狼</Authors>
+    <Company>dotnet9.com</Company>
     <Product>CodeWF</Product>
     <RepositoryUrl>https://github.com/dotnet9/CodeWF</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
