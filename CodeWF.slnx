@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="CHANGELOG-zh_CN.md" />
     <File Path="CHANGELOG.md" />
+    <File Path="Directory.Build.props" />
     <File Path="README-zh_CN.md" />
     <File Path="README.md" />
   </Folder>

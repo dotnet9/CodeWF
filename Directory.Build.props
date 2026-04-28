@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <Authors>dotnet9</Authors>
+    <Company>dotnet9</Company>
+    <Product>CodeWF</Product>
+    <RepositoryUrl>https://github.com/dotnet9/CodeWF</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>
