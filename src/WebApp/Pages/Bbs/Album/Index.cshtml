@@ -1,9 +1,14 @@
-@page "/bbs/album/{slug}"
+@page "/bbs/album/{slug?}"
 @model WebApp.Pages.Bbs.Album.IndexModel
 @{
-    ViewData["Title"] = $"{Model.AlbumName} - 专辑";
-    ViewData["Description"] = $"查看 {Model.AlbumName} 专辑下的文章内容。";
-    var albumSlug = ViewContext.RouteData.Values["slug"]?.ToString() ?? "";
+    ViewData["Title"] = Model.IsDirectoryPage ? "专题" : $"{Model.AlbumName} - 专题";
+    ViewData["Description"] = Model.IsDirectoryPage
+        ? "浏览码坊全部专题。"
+        : $"查看 {Model.AlbumName} 专题下的文章内容。";
+    var albumSlug = Model.CurrentSlug ?? string.Empty;
+    var albums = Model.Albums
+        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
+        .ToList();
 }
 
 <section class="page-shell">
@@ -11,139 +16,176 @@
         <div class="page-banner">
             <div>
                 <span class="eyebrow">Album</span>
-                <h1 class="page-title">@Model.AlbumName</h1>
-                <p class="page-description">按系列化内容连续阅读，更适合跟着主题系统学习。</p>
+                <h1 class="page-title">@(Model.IsDirectoryPage ? "全部专题" : Model.AlbumName)</h1>
+                <p class="page-description">@(Model.IsDirectoryPage ? "按专题浏览站内文章内容。" : "按系列化内容连续阅读，更适合跟着主题系统学习。")</p>
             </div>
-            <div class="page-banner__stats">
-                <div class="stat-chip">
-                    <strong>@Model.Total</strong>
-                    <span>篇文章</span>
+            @if (!Model.IsDirectoryPage)
+            {
+                <div class="page-banner__stats">
+                    <div class="stat-chip">
+                        <strong>@Model.Total</strong>
+                        <span>篇文章</span>
+                    </div>
+                    <div class="stat-chip">
+                        <strong>@Model.PageIndex</strong>
+                        <span>当前页</span>
+                    </div>
                 </div>
-                <div class="stat-chip">
-                    <strong>@Model.PageIndex</strong>
-                    <span>当前页</span>
-                </div>
-            </div>
+            }
         </div>
 
-        <div class="content-grid">
-            <div class="content-primary">
-                @if (!Model.Posts.Any())
+        @if (Model.IsDirectoryPage)
+        {
+            <div class="surface-panel directory-panel">
+                @if (!albums.Any())
                 {
                     <div class="empty-state">
-                        <h2>该专辑下暂无文章</h2>
-                        <p>可以先返回博客首页，或切换到其他专辑继续浏览。</p>
+                        <h2>暂未配置专题</h2>
+                        <p>后续会在这里展示全部专题。</p>
                     </div>
                 }
                 else
                 {
-                    <div class="post-list">
-                        @foreach (var post in Model.Posts)
+                    <div class="directory-grid">
+                        @foreach (var album in albums)
                         {
-                            var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
-                            var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
-                            <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
-                                @if (hasCover)
+                            <a href="/bbs/album/@album.Slug" class="directory-card">
+                                <strong>@album.Name</strong>
+                                @if (!string.IsNullOrWhiteSpace(album.Memo))
                                 {
-                                    <a href="@postUrl" class="post-list-card__cover">
-                                        <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
-                                    </a>
+                                    <p>@album.Memo</p>
                                 }
-                                <div class="post-list-card__body">
-                                    <h2 class="post-list-card__title"><a href="@postUrl">@post.Title</a></h2>
-                                    @if (!string.IsNullOrWhiteSpace(post.Description))
-                                    {
-                                        <p class="post-list-card__excerpt">@post.Description</p>
-                                    }
-                                    <div class="meta-line">
-                                        <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
-                                        <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd HH:mm")</span>
-                                    </div>
-                                    <a href="@postUrl" class="inline-link">
-                                        阅读全文
-                                        <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </article>
-                        }
-                    </div>
-                }
-
-                @if (Model.TotalPages > 1)
-                {
-                    <nav class="pagination-shell" aria-label="专辑分页">
-                        <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
-                        <ul class="pagination justify-content-center pagination-list">
-                            <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
-                            </li>
-                            @{
-                                var startPage = Math.Max(1, Model.PageIndex - 2);
-                                var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
-                                if (endPage - startPage < 4)
-                                {
-                                    if (startPage == 1)
-                                    {
-                                        endPage = Math.Min(Model.TotalPages, startPage + 4);
-                                    }
-                                    else if (endPage == Model.TotalPages)
-                                    {
-                                        startPage = Math.Max(1, endPage - 4);
-                                    }
-                                }
-                            }
-                            @if (startPage > 1)
-                            {
-                                <li class="page-item">
-                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=1">1</a>
-                                </li>
-                                @if (startPage > 2)
-                                {
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                }
-                            }
-                            @for (var i = startPage; i <= endPage; i++)
-                            {
-                                <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@i">@i</a>
-                                </li>
-                            }
-                            @if (endPage < Model.TotalPages)
-                            {
-                                @if (endPage < Model.TotalPages - 1)
-                                {
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                }
-                                <li class="page-item">
-                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
-                                </li>
-                            }
-                            <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex + 1)">下一页</a>
-                            </li>
-                        </ul>
-                    </nav>
-                }
-            </div>
-
-            <aside class="content-sidebar">
-                <div class="surface-panel sidebar-panel sticky-panel">
-                    <h2 class="sidebar-title">全部专辑</h2>
-                    <div class="sidebar-link-list">
-                        @foreach (var album in Model.Albums)
-                        {
-                            <a href="/bbs/album/@album.Slug" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
-                                <span>@album.Name</span>
-                                <i class="fas fa-angle-right"></i>
+                                <span class="directory-card__action">
+                                    查看专题
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
                             </a>
                         }
                     </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="content-grid">
+                <div class="content-primary">
+                    @if (!Model.Posts.Any())
+                    {
+                        <div class="empty-state">
+                            <h2>该专题下暂无文章</h2>
+                            <p>可以先返回博客首页，或切换到其他专题继续浏览。</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="post-list">
+                            @foreach (var post in Model.Posts)
+                            {
+                                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                                var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
+                                <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
+                                    @if (hasCover)
+                                    {
+                                        <a href="@postUrl" class="post-list-card__cover">
+                                            <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
+                                        </a>
+                                    }
+                                    <div class="post-list-card__body">
+                                        <h2 class="post-list-card__title"><a href="@postUrl">@post.Title</a></h2>
+                                        @if (!string.IsNullOrWhiteSpace(post.Description))
+                                        {
+                                            <p class="post-list-card__excerpt">@post.Description</p>
+                                        }
+                                        <div class="meta-line">
+                                            <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
+                                            <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd HH:mm")</span>
+                                        </div>
+                                        <a href="@postUrl" class="inline-link">
+                                            阅读全文
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    }
+
+                    @if (Model.TotalPages > 1)
+                    {
+                        <nav class="pagination-shell" aria-label="专辑分页">
+                            <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
+                            <ul class="pagination justify-content-center pagination-list">
+                                <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
+                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                                </li>
+                                @{
+                                    var startPage = Math.Max(1, Model.PageIndex - 2);
+                                    var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+                                    if (endPage - startPage < 4)
+                                    {
+                                        if (startPage == 1)
+                                        {
+                                            endPage = Math.Min(Model.TotalPages, startPage + 4);
+                                        }
+                                        else if (endPage == Model.TotalPages)
+                                        {
+                                            startPage = Math.Max(1, endPage - 4);
+                                        }
+                                    }
+                                }
+                                @if (startPage > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=1">1</a>
+                                    </li>
+                                    @if (startPage > 2)
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    }
+                                }
+                                @for (var i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(Model.PageIndex == i ? "active" : "")">
+                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@i">@i</a>
+                                    </li>
+                                }
+                                @if (endPage < Model.TotalPages)
+                                {
+                                    @if (endPage < Model.TotalPages - 1)
+                                    {
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
                 </div>
-            </aside>
-        </div>
+
+                <aside class="content-sidebar">
+                    <div class="surface-panel sidebar-panel sticky-panel">
+                        <h2 class="sidebar-title">全部专题</h2>
+                        <div class="sidebar-link-list">
+                            @foreach (var album in albums)
+                            {
+                                <a href="/bbs/album/@album.Slug" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
+                                    <span>@album.Name</span>
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        }
     </div>
 </section>

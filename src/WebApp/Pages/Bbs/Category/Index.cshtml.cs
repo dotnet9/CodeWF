@@ -12,9 +12,11 @@ public class IndexModel : PageModel
     private readonly IOptions<SiteOption> _siteOption;
 
     public string CategoryName { get; set; } = "所有文章";
+    public string? CurrentSlug { get; private set; }
+    public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
     public List<BlogPost> Posts { get; set; } = [];
     public List<CategoryItem> Categories { get; set; } = [];
-    public string Owner => _siteOption.Value.Owner ?? "沙漠尽头的狼";
+    public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
 
     public int PageIndex { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -27,17 +29,37 @@ public class IndexModel : PageModel
         _siteOption = siteOption;
     }
 
-    public async Task OnGetAsync(string slug, int pageIndex = 1)
+    public async Task OnGetAsync(string? slug, int pageIndex = 1)
     {
+        CurrentSlug = slug;
         PageIndex = pageIndex > 0 ? pageIndex : 1;
 
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
-        var category = Categories.FirstOrDefault(c => c.Slug == slug);
-        if (category != null)
+        if (string.IsNullOrWhiteSpace(slug))
         {
-            CategoryName = category.Name ?? CategoryName;
+            CategoryName = "全部分类";
+            return;
         }
 
+        if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
+        {
+            CategoryName = "所有分类";
+            var defaultPageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
+            Posts = defaultPageData.Data;
+            Total = defaultPageData.Total;
+            return;
+        }
+
+        var category = Categories.FirstOrDefault(c => c.Slug == slug);
+        if (category == null)
+        {
+            CategoryName = "分类不存在";
+            Posts = [];
+            Total = 0;
+            return;
+        }
+
+        CategoryName = category.Name ?? CategoryName;
         var pageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;

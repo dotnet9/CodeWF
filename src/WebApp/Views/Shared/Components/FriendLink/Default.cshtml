@@ -1,22 +1,16 @@
 @model WebApp.Components.FriendLinkViewModel
 
 <div class="friend-links">
-    <div class="section-heading section-heading--compact">
-        <div>
-            <span class="eyebrow">友情链接</span>
-            <h2 class="section-title">值得一看的技术站点</h2>
-        </div>
-    </div>
-
     @if (Model.Links?.Any() != true)
     {
         <div class="empty-state">
             <h2>友情链接暂未配置</h2>
-            <p>后续可以在这里补充合作站点与推荐资源。</p>
+            <p>后续可在这里补充站点链接。</p>
         </div>
     }
     else
     {
+        <div class="friend-links__label">友情链接</div>
         <div class="friend-links__grid">
             @foreach (var link in Model.Links.OrderBy(item => item.Index))
             {

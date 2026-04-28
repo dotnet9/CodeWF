@@ -1,8 +1,11 @@
 @page
+@using Microsoft.Extensions.Options
+@inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model WebApp.Pages.Bbs.IndexModel
 @{
     ViewData["Title"] = "博客";
     ViewData["Description"] = "浏览码坊博客内容，按时间查看最新技术文章。";
+    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
     var startPage = Math.Max(1, Model.PageIndex - 2);
     var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
     if (endPage - startPage < 4)
@@ -56,6 +59,7 @@
                         {
                             var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
                             var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
+                            var authorName = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
 
                             <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
                                 @if (hasCover)
@@ -75,10 +79,7 @@
                                     }
                                     <div class="meta-line">
                                         <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
-                                        @if (!string.IsNullOrWhiteSpace(post.Author))
-                                        {
-                                            <span><i class="far fa-user"></i>@post.Author</span>
-                                        }
+                                        <span><i class="far fa-user"></i>@authorName</span>
                                         @if (post.Categories?.Any() == true)
                                         {
                                             <span><i class="far fa-folder-open"></i>@string.Join(" / ", post.Categories.Take(2))</span>

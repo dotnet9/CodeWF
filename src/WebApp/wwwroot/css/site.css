@@ -683,8 +683,9 @@ footer {
 }
 
 ::selection {
-  background: rgba(13, 110, 253, 0.2);
-  color: var(--dark-color);
+  background: rgba(29, 111, 255, 0.26);
+  color: #08111f;
+  text-shadow: none;
 }
 
 .post-list {
@@ -1486,16 +1487,23 @@ button.site-menu-toggle {
   margin: 0.55rem 0 0.7rem;
   font-size: 1.12rem;
   line-height: 1.4;
-  text-wrap: balance;
 }
 
 .resource-card__title a {
+  display: block;
   color: var(--text-1);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .resource-card__desc {
   margin: 0;
-  min-height: 3.5em;
+  min-height: 3.4em;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .resource-card__meta {
@@ -1740,10 +1748,25 @@ button.site-menu-toggle {
 .article-content a,
 .doc-content a {
   color: var(--primary-dark);
-  text-decoration: underline;
-  text-decoration-color: rgba(29, 111, 255, 0.28);
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.18em;
+  font-weight: 600;
+  text-decoration: none;
+  background-image: linear-gradient(180deg, rgba(29, 111, 255, 0.16), rgba(29, 111, 255, 0.16));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.34em;
+  box-shadow: inset 0 -1px 0 rgba(29, 111, 255, 0.24);
+  transition: color 0.2s ease, background-size 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prose a:hover,
+.prose a:focus-visible,
+.article-content a:hover,
+.article-content a:focus-visible,
+.doc-content a:hover,
+.doc-content a:focus-visible {
+  color: #0d4db8;
+  background-size: 100% 100%;
+  box-shadow: inset 0 -1px 0 transparent;
 }
 
 .prose strong,
@@ -1831,23 +1854,41 @@ button.site-menu-toggle {
 .prose table,
 .article-content table,
 .doc-content table {
+  display: block;
   width: 100%;
+  max-width: 100%;
   margin: 1.4rem 0;
-  border-collapse: collapse;
+  overflow-x: auto;
+  border-collapse: separate;
+  border-spacing: 0;
   overflow: hidden;
   border-radius: 18px;
   border: 1px solid rgba(29, 111, 255, 0.12);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow-soft);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 111, 255, 0.48) rgba(29, 111, 255, 0.08);
+}
+
+.prose caption,
+.article-content caption,
+.doc-content caption {
+  margin-bottom: 0.75rem;
+  padding: 0 0.1rem;
+  color: var(--text-3);
+  font-size: 0.92rem;
+  text-align: left;
 }
 
 .prose thead th,
 .article-content thead th,
 .doc-content thead th {
   padding: 0.85rem 1rem;
-  background: rgba(29, 111, 255, 0.08);
+  background: linear-gradient(180deg, rgba(29, 111, 255, 0.1), rgba(90, 169, 255, 0.08));
   color: var(--text-1);
   font-size: 0.93rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 .prose td,
@@ -1860,6 +1901,32 @@ button.site-menu-toggle {
   border-bottom: 1px solid rgba(29, 111, 255, 0.08);
   text-align: left;
   vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.prose tbody tr:nth-child(even) td,
+.article-content tbody tr:nth-child(even) td,
+.doc-content tbody tr:nth-child(even) td {
+  background: rgba(247, 250, 255, 0.92);
+}
+
+.prose tbody tr:hover td,
+.article-content tbody tr:hover td,
+.doc-content tbody tr:hover td {
+  background: rgba(232, 242, 255, 0.96);
+}
+
+.prose tbody tr:last-child td,
+.article-content tbody tr:last-child td,
+.doc-content tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.prose ::selection,
+.article-content ::selection,
+.doc-content ::selection {
+  background: rgba(90, 169, 255, 0.34);
+  color: #071120;
 }
 
 .chip-row {
@@ -1955,6 +2022,58 @@ button.site-menu-toggle {
 
 .sidebar-link--child {
   margin-left: 1rem;
+}
+
+.directory-panel {
+  padding: 1.2rem;
+}
+
+.directory-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.directory-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-height: 100%;
+  padding: 1.1rem 1.15rem;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(250, 252, 255, 0.98), rgba(244, 248, 255, 0.94));
+  color: var(--text-2);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.05);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+}
+
+.directory-card:hover {
+  color: var(--text-1);
+  transform: translateY(-3px);
+  border-color: rgba(17, 100, 255, 0.16);
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+}
+
+.directory-card strong {
+  color: var(--text-1);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.directory-card p {
+  margin: 0;
+  color: var(--text-3);
+  line-height: 1.7;
+}
+
+.directory-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  color: var(--primary-dark);
+  font-weight: 700;
 }
 
 .tool-form-stack {
@@ -2434,17 +2553,22 @@ button.site-menu-toggle {
 }
 
 .site-links-shell {
-  padding: 0 0 2rem;
+  padding: 0 0 1.6rem;
 }
 
 .friend-links {
-  padding: 1.15rem 1.25rem;
-  border-radius: 32px;
-  background:
-    linear-gradient(135deg, rgba(17, 100, 255, 0.07), rgba(15, 118, 110, 0.07)),
-    rgba(255, 255, 255, 0.72);
+  padding: 1rem 1.1rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.76);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
+}
+
+.friend-links__label {
+  margin-bottom: 0.75rem;
+  color: var(--text-3);
+  font-size: 0.88rem;
+  font-weight: 700;
 }
 
 .friend-links__grid {
@@ -2475,25 +2599,17 @@ button.site-menu-toggle {
   font-weight: 800;
 }
 
-.friend-link-card__desc {
-  display: none;
-}
-
-.friend-link-card__action {
-  display: none;
-}
-
 .site-footer {
   padding: 0 0 2.6rem;
 }
 
 .footer-shell {
-  padding: 1.7rem;
+  padding: 1.55rem;
 }
 
 .footer-grid {
   display: grid;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 @media (min-width: 992px) {
@@ -2512,30 +2628,12 @@ button.site-menu-toggle {
 }
 
 .footer-brand__copy {
-  margin-bottom: 1rem;
-}
-
-.footer-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.footer-badges span {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45rem 0.7rem;
-  border-radius: 999px;
-  background: var(--surface-muted);
-  border: 1px solid var(--line);
-  color: var(--text-2);
-  font-size: 0.85rem;
-  font-weight: 700;
+  margin-bottom: 0;
 }
 
 .footer-title {
-  margin-bottom: 0.95rem;
-  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.96rem;
 }
 
 .footer-title::after {
@@ -2588,7 +2686,7 @@ button.site-menu-toggle {
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem 1.2rem;
-  margin-top: 1.5rem;
+  margin-top: 1.3rem;
   padding-top: 1.15rem;
   border-top: 1px solid var(--line);
   color: var(--text-3);

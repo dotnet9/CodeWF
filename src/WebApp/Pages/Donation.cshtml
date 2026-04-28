@@ -23,7 +23,9 @@
         <div class="content-grid">
             <div class="content-primary">
                 <div class="surface-panel prose-panel">
-                    @Html.Raw(Model.HtmlContent)
+                    <div class="prose article-content" data-reading-body asp-prerender="true">
+                        @Html.Raw(Model.HtmlContent)
+                    </div>
                 </div>
             </div>
 

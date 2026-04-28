@@ -3,8 +3,7 @@
 @{
     var site = SiteOptions.Value;
     var appTitle = site.AppTitle ?? "码坊";
-    var defaultSiteDescription = site.Memo
-        ?? "面向 .NET 开发者的技术内容、专题文档与在线工具站点。";
+    var defaultSiteDescription = "技术文章、文档与在线工具";
 }
 
 <section class="site-links-shell">
@@ -20,15 +19,10 @@
                 <div class="footer-brand">
                     <span class="footer-brand__mark">@appTitle</span>
                     <p class="footer-brand__copy">@defaultSiteDescription</p>
-                    <div class="footer-badges">
-                        <span>.NET 11</span>
-                        <span>Razor Pages</span>
-                        <span>技术内容沉淀</span>
-                    </div>
                 </div>
 
                 <div>
-                    <h2 class="footer-title">站点导航</h2>
+                    <h2 class="footer-title">导航</h2>
                     <ul class="footer-list">
                         <li><a href="/bbs">博客</a></li>
                         <li><a href="/doc">文档</a></li>
@@ -38,7 +32,7 @@
                 </div>
 
                 <div>
-                    <h2 class="footer-title">社区链接</h2>
+                    <h2 class="footer-title">社区</h2>
                     <ul class="footer-list">
                         <li><a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a></li>
                         <li><a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a></li>
@@ -48,7 +42,7 @@
                 </div>
 
                 <div>
-                    <h2 class="footer-title">常用入口</h2>
+                    <h2 class="footer-title">入口</h2>
                     <ul class="footer-list">
                         <li><a href="/about">关于站点</a></li>
                         <li><a href="/donation">支持作者</a></li>
@@ -65,10 +59,6 @@
 
             <div class="footer-bottom">
                 <span>&copy; @site.StartYear-@DateTime.Now.Year @(site.Owner ?? "码坊")</span>
-                @if (!string.IsNullOrWhiteSpace(site.BaiAn))
-                {
-                    <span>@site.BaiAn</span>
-                }
             </div>
         </div>
     </div>

@@ -1,9 +1,13 @@
 @page "/"
+@using Microsoft.Extensions.Options
+@inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model IndexModel
 @{
     ViewData["Title"] = "首页";
-    ViewData["Description"] = "码坊聚合 .NET 技术文章、专题文档与在线工具，帮助开发者更高效地获取和实践知识。";
+    ViewData["Description"] = "码坊聚合 .NET 文章、文档与在线工具。";
     ViewData["BodyClass"] = "home-page";
+    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
+
     var spotlight = Model.SpotlightPost;
     var latestPosts = Model.LatestPosts.Skip(1).Take(3).ToList();
     if (!latestPosts.Any())
@@ -14,14 +18,8 @@
             .ToList();
     }
 
-    var albums = Model.Albums
-        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
-        .Take(14)
-        .ToList();
-    var categories = Model.Categories
-        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
-        .Take(18)
-        .ToList();
+    var albums = Model.FeaturedAlbums.ToList();
+    var categories = Model.FeaturedCategories.ToList();
 }
 
 @section Head {
@@ -32,10 +30,7 @@
     <div class="container">
         <div class="home-hero">
             <div class="home-hero__content">
-                <span class="eyebrow eyebrow--tech">TECH BLOG · .NET · ENGINEERING</span>
-                <p class="hero-intro">技术内容系统化，阅读路径更清晰</p>
-                <h1>持续更新的 .NET 技术博客</h1>
-                <p class="hero-copy">把文章、文档和工具放进同一个入口，方便你更快找到能直接上手的内容。</p>
+                <h1>持续更新的 .NET 文章、文档与工具</h1>
 
                 <div class="hero-actions">
                     <a href="/bbs" class="btn btn-primary btn-lg">
@@ -49,80 +44,19 @@
                     </a>
                 </div>
 
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <strong>@Model.TotalPosts</strong>
-                        <span>累计文章</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>@Model.TotalAlbums</strong>
-                        <span>专题沉淀</span>
-                    </div>
-                    <div class="metric-card">
-                        <strong>@Model.TotalCategories</strong>
-                        <span>技术分类</span>
-                    </div>
-                </div>
-
-                <div class="quick-path-grid">
-                    <a href="/bbs" class="quick-path-card">
-                        <span class="quick-path-card__label">博客主线</span>
-                        <strong>@Model.TotalPosts 篇内容</strong>
-                        <p>先看最新更新。</p>
-                    </a>
-                    <a href="/doc" class="quick-path-card">
-                        <span class="quick-path-card__label">文档体系</span>
-                        <strong>@Model.TotalDocNodes 个节点</strong>
-                        <p>按主题直接查找。</p>
-                    </a>
-                    <a href="/tool" class="quick-path-card">
-                        <span class="quick-path-card__label">工具箱</span>
-                        <strong>@Model.TotalToolEntries 个入口</strong>
-                        <p>打开就能用。</p>
-                    </a>
+                <div class="hero-trustline">
+                    <span>@Model.TotalPosts 篇文章</span>
+                    <span>@Model.TotalDocNodes 个文档节点</span>
+                    <span>@Model.TotalToolEntries 个工具入口</span>
                 </div>
             </div>
 
-            <aside class="surface-panel hero-terminal">
-                <div class="terminal-head">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <p>content-index@codewf</p>
-                </div>
-
-                <div class="terminal-screen">
-                    <div class="terminal-line terminal-line--command">
-                        <span class="terminal-prompt">$</span>
-                        <span>site status</span>
-                    </div>
-                    <div class="terminal-line">
-                        <span>posts</span>
-                        <strong>@Model.TotalPosts</strong>
-                    </div>
-                    <div class="terminal-line">
-                        <span>albums</span>
-                        <strong>@Model.TotalAlbums</strong>
-                    </div>
-                    <div class="terminal-line">
-                        <span>categories</span>
-                        <strong>@Model.TotalCategories</strong>
-                    </div>
-                    <div class="terminal-line">
-                        <span>docs</span>
-                        <strong>@Model.TotalDocNodes</strong>
-                    </div>
-                    <div class="terminal-line">
-                        <span>tools</span>
-                        <strong>@Model.TotalToolEntries</strong>
-                    </div>
-                </div>
-
+            <aside class="surface-panel hero-terminal hero-terminal--focus">
                 @if (spotlight != null)
                 {
                     var spotlightUrl = $"/Bbs/Post/{spotlight.Date?.Year}/{spotlight.Date?.Month}/{spotlight.Slug}";
-                    <a href="@spotlightUrl" class="spotlight-story">
-                        <span class="spotlight-story__label">Featured Story</span>
+                    var spotlightAuthor = string.IsNullOrWhiteSpace(spotlight.Author) ? siteOwner : spotlight.Author;
+                    <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
                         <h2>@spotlight.Title</h2>
                         @if (!string.IsNullOrWhiteSpace(spotlight.Description))
                         {
@@ -130,28 +64,16 @@
                         }
                         <div class="spotlight-story__meta">
                             <span><i class="far fa-calendar"></i>@spotlight.Date?.ToString("yyyy-MM-dd")</span>
-                            @if (!string.IsNullOrWhiteSpace(spotlight.Author))
-                            {
-                                <span><i class="far fa-user"></i>@spotlight.Author</span>
-                            }
+                            <span><i class="far fa-user"></i>@spotlightAuthor</span>
                         </div>
                     </a>
                 }
-
-                <div class="signal-card-grid">
-                    <a href="/bbs" class="signal-card">
-                        <strong>按更新阅读</strong>
-                        <p>从最新文章进入。</p>
-                    </a>
-                    <a href="/doc" class="signal-card">
-                        <strong>按主题查找</strong>
-                        <p>从文档目录切入。</p>
-                    </a>
-                    <a href="/tool" class="signal-card">
-                        <strong>边看边实操</strong>
-                        <p>常用工具直接打开。</p>
-                    </a>
-                </div>
+                else
+                {
+                    <div class="empty-state empty-state--compact">
+                        <p>暂无推荐内容。</p>
+                    </div>
+                }
             </aside>
         </div>
     </div>
@@ -161,24 +83,11 @@
     <div class="container">
         <div class="home-layout-grid">
             <div class="surface-panel home-curation">
-                <div class="section-heading section-heading--compact">
-                    <div>
-                        <span class="eyebrow">Content Map</span>
-                        <h2 class="section-title">从专题和分类切入内容</h2>
-                    </div>
-                    <p class="section-description">
-                        先找到入口，再决定继续深入文章、文档还是工具。
-                    </p>
-                </div>
-
                 <div class="home-index-grid">
                     <article class="home-index-card">
                         <div class="home-index-card__header">
-                            <div>
-                                <span class="eyebrow">Albums</span>
-                                <h3 class="surface-title">专题专栏</h3>
-                            </div>
-                            <a href="/bbs" class="surface-link">全部文章</a>
+                            <h2 class="surface-title home-index-card__title">专题</h2>
+                            <a href="/bbs/album" class="surface-link">查看更多</a>
                         </div>
 
                         @if (!albums.Any())
@@ -189,10 +98,19 @@
                         }
                         else
                         {
-                            <div class="chip-cloud">
+                            <div class="topic-list">
                                 @foreach (var album in albums)
                                 {
-                                    <a href="/bbs/album/@album.Slug" class="chip-link">@album.Name</a>
+                                    <a href="/bbs/album/@album.Slug" class="topic-list__item">
+                                        <div class="topic-list__content">
+                                            <strong>@album.Name</strong>
+                                            @if (!string.IsNullOrWhiteSpace(album.Memo))
+                                            {
+                                                <p>@album.Memo</p>
+                                            }
+                                        </div>
+                                        <span class="topic-list__count">@album.PostCount</span>
+                                    </a>
                                 }
                             </div>
                         }
@@ -200,11 +118,8 @@
 
                     <article class="home-index-card">
                         <div class="home-index-card__header">
-                            <div>
-                                <span class="eyebrow">Categories</span>
-                                <h3 class="surface-title">技术分类</h3>
-                            </div>
-                            <a href="/bbs" class="surface-link">查看最新</a>
+                            <h2 class="surface-title home-index-card__title">分类</h2>
+                            <a href="/Bbs/Category" class="surface-link">查看更多</a>
                         </div>
 
                         @if (!categories.Any())
@@ -215,10 +130,19 @@
                         }
                         else
                         {
-                            <div class="chip-cloud">
+                            <div class="topic-list">
                                 @foreach (var category in categories)
                                 {
-                                    <a href="/Bbs/Category/@category.Slug" class="chip-link">@category.Name</a>
+                                    <a href="/Bbs/Category/@category.Slug" class="topic-list__item">
+                                        <div class="topic-list__content">
+                                            <strong>@category.Name</strong>
+                                            @if (!string.IsNullOrWhiteSpace(category.Memo))
+                                            {
+                                                <p>@category.Memo</p>
+                                            }
+                                        </div>
+                                        <span class="topic-list__count">@category.PostCount</span>
+                                    </a>
                                 }
                             </div>
                         }
@@ -229,11 +153,8 @@
             <aside class="home-rail">
                 <div class="surface-panel dispatch-panel">
                     <div class="dispatch-panel__header">
-                        <div>
-                            <span class="panel-kicker">Latest Dispatches</span>
-                            <h2 class="surface-title">近期更新</h2>
-                        </div>
-                        <a href="/bbs" class="surface-link">进入博客</a>
+                        <h2 class="surface-title dispatch-panel__title">最新文章</h2>
+                        <a href="/bbs" class="surface-link">更多</a>
                     </div>
 
                     @if (!latestPosts.Any())
@@ -265,23 +186,13 @@
     </div>
 </section>
 
-<section class="page-shell page-shell--tight">
+<section class="page-shell page-shell--tight page-shell--featured">
     <div class="container">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">Featured Posts</span>
-                <h2 class="section-title">精选文章</h2>
-            </div>
-            <p class="section-description">
-                从这些文章开始，可以快速感受站点的主要内容方向。
-            </p>
-        </div>
-
         @if (!Model.Posts.Any())
         {
             <div class="empty-state">
-                <h2>推荐内容还在整理中</h2>
-                <p>可以先从博客列表或文档中心开始浏览。</p>
+                <h2>内容还在整理中</h2>
+                <p>可以先浏览博客或文档。</p>
             </div>
         }
         else
@@ -290,6 +201,7 @@
                 @foreach (var post in Model.Posts)
                 {
                     var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                    var postAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
                     <article class="resource-card">
                         <a href="@postUrl" class="resource-card__media">
                             @if (!string.IsNullOrWhiteSpace(post.Cover))
@@ -305,18 +217,15 @@
                         </a>
                         <div class="resource-card__body">
                             <h3 class="resource-card__title">
-                                <a href="@postUrl">@post.Title</a>
+                                <a href="@postUrl" title="@post.Title" aria-label="@post.Title">@post.Title</a>
                             </h3>
                             @if (!string.IsNullOrWhiteSpace(post.Description))
                             {
-                                <p class="resource-card__desc">@post.Description</p>
+                                <p class="resource-card__desc" title="@post.Description">@post.Description</p>
                             }
                             <div class="resource-card__meta">
                                 <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
-                                @if (!string.IsNullOrWhiteSpace(post.Author))
-                                {
-                                    <span><i class="far fa-user"></i>@post.Author</span>
-                                }
+                                <span><i class="far fa-user"></i>@postAuthor</span>
                             </div>
                             <a href="@postUrl" class="inline-link">
                                 阅读全文

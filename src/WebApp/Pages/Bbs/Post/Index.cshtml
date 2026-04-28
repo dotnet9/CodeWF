@@ -1,8 +1,11 @@
 @page "/Bbs/Post/{year:int}/{month:int}/{slug}"
+@using Microsoft.Extensions.Options
+@inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model WebApp.Pages.Bbs.Post.IndexModel
 @{
     ViewData["Title"] = Model.Post?.Title ?? "文章详情";
     ViewData["Description"] = Model.Post?.Description ?? "浏览码坊技术文章。";
+    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
 }
 
 @section Head {
@@ -20,6 +23,7 @@
         }
         else
         {
+            var authorName = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
             <div class="page-banner">
                 <div>
                     <span class="eyebrow">Article</span>
@@ -35,10 +39,7 @@
                     {
                         <span class="meta-chip"><i class="fas fa-rotate-right"></i>更新于 @Model.Post.Lastmod.Value.ToString("yyyy-MM-dd")</span>
                     }
-                    @if (!string.IsNullOrWhiteSpace(Model.Post.Author))
-                    {
-                        <span class="meta-chip"><i class="far fa-user"></i>@Model.Post.Author</span>
-                    }
+                    <span class="meta-chip"><i class="far fa-user"></i>@authorName</span>
                 </div>
             </div>
 
