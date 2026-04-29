@@ -4,7 +4,7 @@
     ViewData["Title"] = Model.IsDirectoryPage ? "分类" : $"{Model.CategoryName} - 博客分类";
     ViewData["Description"] = Model.IsDirectoryPage
         ? "浏览码坊全部文章分类。"
-        : $"查看 {Model.CategoryName} 分类下的技术文章。";
+        : (string.IsNullOrWhiteSpace(Model.CategoryMemo) ? $"查看 {Model.CategoryName} 分类下的技术文章。" : Model.CategoryMemo);
     var categorySlug = Model.CurrentSlug ?? string.Empty;
     var categories = Model.Categories
         .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
@@ -17,7 +17,7 @@
             <div>
                 <span class="eyebrow">Category</span>
                 <h1 class="page-title">@(Model.IsDirectoryPage ? "全部分类" : Model.CategoryName)</h1>
-                <p class="page-description">@(Model.IsDirectoryPage ? "按分类浏览站内文章内容。" : "聚焦同一技术主题下的文章，方便按方向连续阅读。")</p>
+                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.CategoryMemo) ? "按分类浏览站内文章内容。" : Model.CategoryMemo)</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {

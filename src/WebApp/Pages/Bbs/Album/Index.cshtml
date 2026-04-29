@@ -4,7 +4,7 @@
     ViewData["Title"] = Model.IsDirectoryPage ? "专题" : $"{Model.AlbumName} - 专题";
     ViewData["Description"] = Model.IsDirectoryPage
         ? "浏览码坊全部专题。"
-        : $"查看 {Model.AlbumName} 专题下的文章内容。";
+        : (string.IsNullOrWhiteSpace(Model.AlbumMemo) ? $"查看 {Model.AlbumName} 专题下的文章内容。" : Model.AlbumMemo);
     var albumSlug = Model.CurrentSlug ?? string.Empty;
     var albums = Model.Albums
         .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
@@ -17,7 +17,7 @@
             <div>
                 <span class="eyebrow">Album</span>
                 <h1 class="page-title">@(Model.IsDirectoryPage ? "全部专题" : Model.AlbumName)</h1>
-                <p class="page-description">@(Model.IsDirectoryPage ? "按专题浏览站内文章内容。" : "按系列化内容连续阅读，更适合跟着主题系统学习。")</p>
+                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.AlbumMemo) ? "按专题浏览站内文章内容。" : Model.AlbumMemo)</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {

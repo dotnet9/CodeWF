@@ -17,19 +17,44 @@ public class NavigationViewComponent : ViewComponent
     {
         var albums = await _appService.GetAllAlbumItemsAsync();
         var categories = await _appService.GetAllCategoryItemsAsync();
+        var posts = await _appService.GetAllBlogPostsAsync() ?? [];
 
         var model = new NavigationViewModel
         {
-            Albums = albums ?? new List<AlbumItem>(),
-            Categories = categories ?? new List<CategoryItem>()
+            Albums = (albums ?? [])
+                .Where(item =>
+                    !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)
+                    && !string.IsNullOrWhiteSpace(item.Name)
+                    && !string.IsNullOrWhiteSpace(item.Slug))
+                .OrderBy(item => item.Sort)
+                .Select(item => new NavigationBrowseItem(
+                    item.Name!,
+                    item.Slug!,
+                    item.Memo,
+                    posts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                .ToList(),
+            Categories = (categories ?? [])
+                .Where(item =>
+                    !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)
+                    && !string.IsNullOrWhiteSpace(item.Name)
+                    && !string.IsNullOrWhiteSpace(item.Slug))
+                .OrderBy(item => item.Sort)
+                .Select(item => new NavigationBrowseItem(
+                    item.Name!,
+                    item.Slug!,
+                    item.Memo,
+                    posts.Count(post => post.Categories?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                .ToList()
         };
 
         return View(model);
     }
 }
 
+public sealed record NavigationBrowseItem(string Name, string Slug, string? Memo, int PostCount);
+
 public class NavigationViewModel
 {
-    public List<AlbumItem> Albums { get; set; } = new();
-    public List<CategoryItem> Categories { get; set; } = new();
+    public List<NavigationBrowseItem> Albums { get; set; } = new();
+    public List<NavigationBrowseItem> Categories { get; set; } = new();
 }

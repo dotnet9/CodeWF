@@ -7,6 +7,10 @@ V1.1.1 (2026-04-29)
 - 🔨 [Changed] Refined the global typography stack with dedicated display, text, and code fonts for a more professional technical-blog reading experience.
 - 🔨 [Changed] Reworked the site visual language with a lighter technology-inspired grid background, sharper card styling, and more restrained shadows.
 - 🔨 [Changed] Compacted the header navigation and moved source-code and issue links to the footer to keep primary menu items horizontal on desktop.
+- 🔨 [Changed] Deferred non-critical Font Awesome and analytics loading, and only load jQuery on pages that need validation or legacy scripts to improve initial page performance.
+- 🔨 [Changed] Matched the homepage album/category curation panel and latest-articles panel heights for a more balanced first-screen layout.
+- 🔨 [Changed] Rebuilt the album and category header dropdowns as two-column browse menus with memo snippets, article counts, and more polished hover targets.
+- 🔨 [Changed] Updated album and category detail headers and meta descriptions to read from each item's `Memo` field with safe directory fallbacks.
 - 🔨 [Changed] Added the grid treatment to the footer for stronger visual continuity across the whole site.
 - 🔨 [Changed] Updated the homepage hero to present two featured articles with single-line title truncation, two-line summary truncation, and hover title details.
 

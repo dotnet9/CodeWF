@@ -12,6 +12,7 @@ public class IndexModel : PageModel
     private readonly IOptions<SiteOption> _siteOption;
 
     public string AlbumName { get; set; } = "所有专辑";
+    public string? AlbumMemo { get; set; }
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
     public List<BlogPost> Posts { get; set; } = [];
@@ -38,12 +39,14 @@ public class IndexModel : PageModel
         if (string.IsNullOrWhiteSpace(slug))
         {
             AlbumName = "全部专题";
+            AlbumMemo = "按专题浏览站内文章内容。";
             return;
         }
 
         if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
         {
             AlbumName = "所有专辑";
+            AlbumMemo = "按系列化内容连续阅读，更适合跟着主题系统学习。";
             var defaultPageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
             Posts = defaultPageData.Data;
             Total = defaultPageData.Total;
@@ -60,6 +63,7 @@ public class IndexModel : PageModel
         }
 
         AlbumName = album.Name ?? "所有专辑";
+        AlbumMemo = album.Memo;
         var pageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;

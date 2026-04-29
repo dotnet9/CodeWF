@@ -1,11 +1,7 @@
 @model WebApp.Components.NavigationViewModel
 @{
-    var albums = Model.Albums
-        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
-        .ToList();
-    var categories = Model.Categories
-        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
-        .ToList();
+    var albums = Model.Albums.ToList();
+    var categories = Model.Categories.ToList();
 }
 
 @if (albums.Any())
@@ -14,16 +10,34 @@
         <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">专题</button>
         <div class="dropdown-menu nav-mega-menu">
             <div class="nav-mega-menu__header">
-                <span class="nav-mega-menu__eyebrow">Albums</span>
-                <strong>按专题快速浏览文章</strong>
+                <div>
+                    <span class="nav-mega-menu__eyebrow">Albums</span>
+                    <strong>按系列阅读文章</strong>
+                </div>
+                <span class="nav-mega-menu__badge">@albums.Count 个专题</span>
             </div>
-            <div class="nav-chip-grid">
+            <div class="nav-menu-list">
                 @foreach (var album in albums)
                 {
-                    <a class="nav-chip" href="/bbs/album/@album.Slug">@album.Name</a>
+                    <a class="nav-menu-link" href="/bbs/album/@album.Slug">
+                        <span class="nav-menu-link__content">
+                            <strong>@album.Name</strong>
+                            @if (!string.IsNullOrWhiteSpace(album.Memo))
+                            {
+                                <small>@album.Memo</small>
+                            }
+                        </span>
+                        @if (album.PostCount > 0)
+                        {
+                            <span class="nav-menu-link__count">@album.PostCount</span>
+                        }
+                    </a>
                 }
             </div>
-            <a class="nav-mega-menu__more" href="/bbs">查看全部文章</a>
+            <div class="nav-mega-menu__actions">
+                <a href="/bbs/album">全部专题</a>
+                <a href="/bbs">最新文章</a>
+            </div>
         </div>
     </li>
 }
@@ -34,16 +48,34 @@
         <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">分类</button>
         <div class="dropdown-menu nav-mega-menu">
             <div class="nav-mega-menu__header">
-                <span class="nav-mega-menu__eyebrow">Categories</span>
-                <strong>按技术主题筛选内容</strong>
+                <div>
+                    <span class="nav-mega-menu__eyebrow">Categories</span>
+                    <strong>按技术主题筛选</strong>
+                </div>
+                <span class="nav-mega-menu__badge">@categories.Count 个分类</span>
             </div>
-            <div class="nav-chip-grid">
+            <div class="nav-menu-list">
                 @foreach (var category in categories)
                 {
-                    <a class="nav-chip" href="/Bbs/Category/@category.Slug">@category.Name</a>
+                    <a class="nav-menu-link" href="/Bbs/Category/@category.Slug">
+                        <span class="nav-menu-link__content">
+                            <strong>@category.Name</strong>
+                            @if (!string.IsNullOrWhiteSpace(category.Memo))
+                            {
+                                <small>@category.Memo</small>
+                            }
+                        </span>
+                        @if (category.PostCount > 0)
+                        {
+                            <span class="nav-menu-link__count">@category.PostCount</span>
+                        }
+                    </a>
                 }
             </div>
-            <a class="nav-mega-menu__more" href="/bbs">浏览最新文章</a>
+            <div class="nav-mega-menu__actions">
+                <a href="/Bbs/Category">全部分类</a>
+                <a href="/bbs">最新文章</a>
+            </div>
         </div>
     </li>
 }

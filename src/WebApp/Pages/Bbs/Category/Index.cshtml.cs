@@ -12,6 +12,7 @@ public class IndexModel : PageModel
     private readonly IOptions<SiteOption> _siteOption;
 
     public string CategoryName { get; set; } = "所有文章";
+    public string? CategoryMemo { get; set; }
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
     public List<BlogPost> Posts { get; set; } = [];
@@ -38,12 +39,14 @@ public class IndexModel : PageModel
         if (string.IsNullOrWhiteSpace(slug))
         {
             CategoryName = "全部分类";
+            CategoryMemo = "按分类浏览站内文章内容。";
             return;
         }
 
         if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
         {
             CategoryName = "所有分类";
+            CategoryMemo = "聚焦同一技术主题下的文章，方便按方向连续阅读。";
             var defaultPageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
             Posts = defaultPageData.Data;
             Total = defaultPageData.Total;
@@ -60,6 +63,7 @@ public class IndexModel : PageModel
         }
 
         CategoryName = category.Name ?? CategoryName;
+        CategoryMemo = category.Memo;
         var pageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;

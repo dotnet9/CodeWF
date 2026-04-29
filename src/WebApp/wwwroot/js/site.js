@@ -12,13 +12,17 @@ function initializeHeaderOffset() {
         return;
     }
 
+    const compactHeaderMedia = window.matchMedia("(max-width: 991.98px)");
+
     const updateOffset = () => {
         const height = Math.ceil(navbar.getBoundingClientRect().height);
-        root.style.setProperty("--site-header-offset", `${Math.max(height + 18, 96)}px`);
+        const minOffset = compactHeaderMedia.matches ? 68 : 72;
+        root.style.setProperty("--site-header-offset", `${Math.max(height + 12, minOffset)}px`);
     };
 
     updateOffset();
     window.addEventListener("resize", updateOffset);
+    compactHeaderMedia.addEventListener("change", updateOffset);
 
     navbar.addEventListener("shown.bs.collapse", updateOffset);
     navbar.addEventListener("hidden.bs.collapse", updateOffset);
