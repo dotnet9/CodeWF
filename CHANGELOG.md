@@ -2,6 +2,14 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.1 (2026-04-29)
+
+- 🔨 [Changed] Refined the global typography stack with dedicated display, text, and code fonts for a more professional technical-blog reading experience.
+- 🔨 [Changed] Reworked the site visual language with a lighter technology-inspired grid background, sharper card styling, and more restrained shadows.
+- 🔨 [Changed] Compacted the header navigation and moved source-code and issue links to the footer to keep primary menu items horizontal on desktop.
+- 🔨 [Changed] Added the grid treatment to the footer for stronger visual continuity across the whole site.
+- 🔨 [Changed] Updated the homepage hero to present two featured articles with single-line title truncation, two-line summary truncation, and hover title details.
+
 V1.1.0 (2026-04-29)
 
 - 😄 [Added] Added `/bbs/album` and `/Bbs/Category` directory pages for browsing all albums and categories.

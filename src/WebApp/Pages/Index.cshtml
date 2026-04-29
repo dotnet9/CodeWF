@@ -8,12 +8,25 @@
     ViewData["BodyClass"] = "home-page";
     var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
 
-    var spotlight = Model.SpotlightPost;
-    var latestPosts = Model.LatestPosts.Skip(1).Take(3).ToList();
+    var heroPosts = Model.LatestPosts.Take(2).ToList();
+    if (!heroPosts.Any())
+    {
+        heroPosts = Model.Posts.Take(2).ToList();
+    }
+
+    var heroPostSlugs = heroPosts
+        .Where(post => !string.IsNullOrWhiteSpace(post.Slug))
+        .Select(post => post.Slug!)
+        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+    var latestPosts = Model.LatestPosts
+        .Where(post => string.IsNullOrWhiteSpace(post.Slug) || !heroPostSlugs.Contains(post.Slug))
+        .Take(3)
+        .ToList();
     if (!latestPosts.Any())
     {
         latestPosts = Model.Posts
-            .Where(post => spotlight == null || !string.Equals(post.Slug, spotlight.Slug, StringComparison.OrdinalIgnoreCase))
+            .Where(post => string.IsNullOrWhiteSpace(post.Slug) || !heroPostSlugs.Contains(post.Slug))
             .Take(3)
             .ToList();
     }
@@ -30,7 +43,11 @@
     <div class="container">
         <div class="home-hero">
             <div class="home-hero__content">
-                <h1>持续更新的 .NET 文章、文档与工具</h1>
+                <span class="eyebrow">Tech Blog / Engineering Notes</span>
+                <h1>用工程视角记录 .NET 与现代开发</h1>
+                <p class="hero-copy">
+                    深入框架、源码实践、工具链与真实项目经验，沉淀可复用的技术判断。
+                </p>
 
                 <div class="hero-actions">
                     <a href="/bbs" class="btn btn-primary btn-lg">
@@ -52,21 +69,31 @@
             </div>
 
             <aside class="surface-panel hero-terminal hero-terminal--focus">
-                @if (spotlight != null)
+                <div class="hero-terminal__header">
+                    <span>Featured</span>
+                    <strong>推荐文章</strong>
+                </div>
+
+                @if (heroPosts.Any())
                 {
-                    var spotlightUrl = $"/Bbs/Post/{spotlight.Date?.Year}/{spotlight.Date?.Month}/{spotlight.Slug}";
-                    var spotlightAuthor = string.IsNullOrWhiteSpace(spotlight.Author) ? siteOwner : spotlight.Author;
-                    <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
-                        <h2>@spotlight.Title</h2>
-                        @if (!string.IsNullOrWhiteSpace(spotlight.Description))
+                    <div class="spotlight-list">
+                        @foreach (var post in heroPosts)
                         {
-                            <p>@spotlight.Description</p>
+                            var spotlightUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                            var spotlightAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
+                            <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
+                                <h2 title="@post.Title">@post.Title</h2>
+                                @if (!string.IsNullOrWhiteSpace(post.Description))
+                                {
+                                    <p title="@post.Description">@post.Description</p>
+                                }
+                                <div class="spotlight-story__meta">
+                                    <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    <span><i class="far fa-user"></i>@spotlightAuthor</span>
+                                </div>
+                            </a>
                         }
-                        <div class="spotlight-story__meta">
-                            <span><i class="far fa-calendar"></i>@spotlight.Date?.ToString("yyyy-MM-dd")</span>
-                            <span><i class="far fa-user"></i>@spotlightAuthor</span>
-                        </div>
-                    </a>
+                    </div>
                 }
                 else
                 {

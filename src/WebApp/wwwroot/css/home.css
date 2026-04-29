@@ -364,3 +364,180 @@
     line-height: 1.18;
   }
 }
+
+/* Home-specific technical blog polish */
+.home-page {
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #f8fafc 0%, #eef3f8 42%, #f8fafc 100%);
+  background-size: 32px 32px, 32px 32px, auto;
+}
+
+.home-page .site-main::before {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.28), transparent 54%);
+  opacity: 0.42;
+}
+
+.home-page .home-hero__content {
+  border-color: rgba(125, 211, 252, 0.24);
+  background:
+    linear-gradient(rgba(125, 211, 252, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(8, 13, 23, 0.98), rgba(15, 23, 42, 0.96));
+  background-size: 34px 34px, 34px 34px, auto;
+  color: #f8fafc;
+  box-shadow: 0 28px 58px rgba(8, 13, 23, 0.2);
+}
+
+.home-page .home-hero__content::after {
+  inset: 0;
+  border-radius: 8px;
+  border-color: rgba(94, 234, 212, 0.16);
+}
+
+.home-page .home-hero__content h1 {
+  color: #f8fafc;
+  font-size: 2.65rem;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.home-page .hero-actions .btn-outline-light {
+  border-color: rgba(125, 211, 252, 0.28);
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.home-page .hero-actions .btn-outline-light:hover,
+.home-page .hero-actions .btn-outline-light:focus {
+  color: #07111f;
+  background: #7dd3fc;
+  border-color: #7dd3fc;
+}
+
+.hero-trustline span {
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.64);
+  border-color: rgba(125, 211, 252, 0.22);
+  color: #cbd5e1;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.hero-terminal {
+  border-color: rgba(125, 211, 252, 0.18);
+  background:
+    linear-gradient(rgba(125, 211, 252, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.045) 1px, transparent 1px),
+    #0b1220;
+  background-size: 28px 28px, 28px 28px, auto;
+  color: #e2e8f0;
+}
+
+.spotlight-story {
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(125, 211, 252, 0.16);
+  color: #e2e8f0;
+}
+
+.spotlight-story:hover {
+  color: #ffffff;
+  border-color: rgba(94, 234, 212, 0.3);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+}
+
+.spotlight-story h2 {
+  color: #f8fafc;
+}
+
+.spotlight-story p,
+.spotlight-story__meta {
+  color: #cbd5e1 !important;
+}
+
+.home-index-card,
+.topic-list__item,
+.dispatch-item {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.topic-list__count,
+.dispatch-item__meta {
+  color: #006f5d;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 767.98px) {
+  .home-page .home-hero__content h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+}
+
+.home-page .home-hero {
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.72fr);
+  gap: 1.3rem;
+}
+
+.home-page .home-hero__content {
+  background:
+    linear-gradient(rgba(125, 211, 252, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.07) 1px, transparent 1px),
+    linear-gradient(135deg, #17345e, #1f4b72);
+  background-size: 34px 34px, 34px 34px, auto;
+}
+
+.hero-terminal {
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.94);
+  background-size: 28px 28px, 28px 28px, auto;
+  border-color: rgba(15, 23, 42, 0.14);
+  color: var(--text-1);
+}
+
+.spotlight-story {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: var(--text-1);
+}
+
+.spotlight-story:hover {
+  color: var(--text-1);
+  border-color: rgba(0, 168, 132, 0.28);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+}
+
+.spotlight-story h2 {
+  color: var(--text-1);
+  font-size: 1.02rem;
+  line-height: 1.42;
+}
+
+.spotlight-story p,
+.spotlight-story__meta {
+  color: var(--text-2) !important;
+}
+
+.spotlight-story__meta {
+  font-size: 0.8rem;
+}
+
+.spotlight-story--hero h2 {
+  font-size: 1.02rem;
+}
+
+@media (max-width: 1099.98px) {
+  .home-page .home-hero {
+    grid-template-columns: 1fr;
+  }
+}
