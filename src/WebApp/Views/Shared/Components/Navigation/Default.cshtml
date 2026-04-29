@@ -1,81 +1,117 @@
+@using WebApp.Extensions
 @model WebApp.Components.NavigationViewModel
 @{
-    var albums = Model.Albums.ToList();
-    var categories = Model.Categories.ToList();
+    var albums = Model.Albums.Take(8).ToList();
+    var categories = Model.Categories.Take(8).ToList();
+    var latestPost = Model.LatestPost;
 }
 
-@if (albums.Any())
-{
-    <li class="nav-item dropdown">
-        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">专题</button>
-        <div class="dropdown-menu nav-mega-menu">
-            <div class="nav-mega-menu__header">
-                <div>
-                    <span class="nav-mega-menu__eyebrow">Albums</span>
-                    <strong>按系列阅读文章</strong>
-                </div>
-                <span class="nav-mega-menu__badge">@albums.Count 个专题</span>
+<li class="nav-item dropdown">
+    <button class="nav-link dropdown-toggle site-menu-toggle @(Model.IsActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">博客</button>
+    <div class="dropdown-menu nav-mega-menu nav-mega-menu--blog">
+        <div class="nav-mega-menu__header">
+            <div>
+                <span class="nav-mega-menu__eyebrow">Blog</span>
+                <strong>先看文章，再按专题或分类继续浏览</strong>
             </div>
-            <div class="nav-menu-list">
-                @foreach (var album in albums)
-                {
-                    <a class="nav-menu-link" href="/bbs/album/@album.Slug">
-                        <span class="nav-menu-link__content">
-                            <strong>@album.Name</strong>
-                            @if (!string.IsNullOrWhiteSpace(album.Memo))
-                            {
-                                <small>@album.Memo</small>
-                            }
-                        </span>
-                        @if (album.PostCount > 0)
-                        {
-                            <span class="nav-menu-link__count">@album.PostCount</span>
-                        }
-                    </a>
-                }
-            </div>
-            <div class="nav-mega-menu__actions">
-                <a href="/bbs/album">全部专题</a>
-                <a href="/bbs">最新文章</a>
-            </div>
+            <span class="nav-mega-menu__badge">@((albums.Count + categories.Count).ToString()) 个入口</span>
         </div>
-    </li>
-}
 
-@if (categories.Any())
-{
-    <li class="nav-item dropdown">
-        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">分类</button>
-        <div class="dropdown-menu nav-mega-menu">
-            <div class="nav-mega-menu__header">
-                <div>
-                    <span class="nav-mega-menu__eyebrow">Categories</span>
-                    <strong>按技术主题筛选</strong>
-                </div>
-                <span class="nav-mega-menu__badge">@categories.Count 个分类</span>
-            </div>
-            <div class="nav-menu-list">
-                @foreach (var category in categories)
-                {
-                    <a class="nav-menu-link" href="/Bbs/Category/@category.Slug">
-                        <span class="nav-menu-link__content">
-                            <strong>@category.Name</strong>
-                            @if (!string.IsNullOrWhiteSpace(category.Memo))
-                            {
-                                <small>@category.Memo</small>
-                            }
-                        </span>
-                        @if (category.PostCount > 0)
-                        {
-                            <span class="nav-menu-link__count">@category.PostCount</span>
-                        }
-                    </a>
-                }
-            </div>
-            <div class="nav-mega-menu__actions">
-                <a href="/Bbs/Category">全部分类</a>
-                <a href="/bbs">最新文章</a>
-            </div>
+        <div class="nav-mega-menu__actions nav-mega-menu__actions--blog">
+            <a href="@ConstantUtil.GetBlogUrl()">全部文章</a>
+            <a href="@ConstantUtil.GetAlbumDirectoryUrl()">全部专题</a>
+            <a href="@ConstantUtil.GetCategoryDirectoryUrl()">全部分类</a>
         </div>
-    </li>
-}
+
+        @if (latestPost != null)
+        {
+            <a class="nav-feature-card" href="@latestPost.Url">
+                <div class="nav-feature-card__media">
+                    @if (!string.IsNullOrWhiteSpace(latestPost.Cover))
+                    {
+                        <img src="@latestPost.Cover" alt="@latestPost.Title" class="cover-media" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <div class="media-placeholder">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                    }
+                </div>
+                <div class="nav-feature-card__content">
+                    <span class="nav-mega-menu__eyebrow">Latest</span>
+                    <strong>@latestPost.Title</strong>
+                    @if (!string.IsNullOrWhiteSpace(latestPost.Description))
+                    {
+                        <p>@latestPost.Description</p>
+                    }
+                    <div class="nav-feature-card__meta">
+                        @if (latestPost.Date.HasValue)
+                        {
+                            <span><i class="far fa-calendar"></i>@latestPost.Date.Value.ToString("yyyy-MM-dd")</span>
+                        }
+                        <span>去看最新更新 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+        }
+
+        <div class="nav-browse-grid">
+            @if (albums.Any())
+            {
+                <section class="nav-browse-section">
+                    <div class="nav-browse-section__header">
+                        <span class="nav-mega-menu__eyebrow">Albums</span>
+                        <strong>按专题连续阅读</strong>
+                    </div>
+                    <div class="nav-menu-list nav-menu-list--stacked">
+                        @foreach (var album in albums)
+                        {
+                            <a class="nav-menu-link" href="@ConstantUtil.GetBbsAlbumUrl(album.Slug)">
+                                <span class="nav-menu-link__content">
+                                    <strong>@album.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(album.Memo))
+                                    {
+                                        <small>@album.Memo</small>
+                                    }
+                                </span>
+                                @if (album.PostCount > 0)
+                                {
+                                    <span class="nav-menu-link__count">@album.PostCount</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (categories.Any())
+            {
+                <section class="nav-browse-section">
+                    <div class="nav-browse-section__header">
+                        <span class="nav-mega-menu__eyebrow">Categories</span>
+                        <strong>按分类快速筛选</strong>
+                    </div>
+                    <div class="nav-menu-list nav-menu-list--stacked">
+                        @foreach (var category in categories)
+                        {
+                            <a class="nav-menu-link" href="@ConstantUtil.GetBbsCategoryUrl(category.Slug)">
+                                <span class="nav-menu-link__content">
+                                    <strong>@category.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(category.Memo))
+                                    {
+                                        <small>@category.Memo</small>
+                                    }
+                                </span>
+                                @if (category.PostCount > 0)
+                                {
+                                    <span class="nav-menu-link__count">@category.PostCount</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+    </div>
+</li>

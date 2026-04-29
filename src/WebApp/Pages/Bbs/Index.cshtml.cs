@@ -1,5 +1,6 @@
 using WebApp.Models;
 using WebApp.Services;
+using WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages.Bbs;
@@ -10,6 +11,10 @@ public class IndexModel : PageModel
 
     public List<BlogPost> Posts { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
+    public List<AlbumItem> Albums { get; private set; } = [];
+    public List<DiscoveryLinkCard> GettingStartedLinks { get; private set; } = [];
+    public List<DiscoveryLinkCard> SerialReadingLinks { get; private set; } = [];
+    public List<DiscoveryPostCard> RandomPosts { get; private set; } = [];
     public int PageIndex { get; private set; } = 1;
     public int PageSize { get; private set; } = 10;
     public int Total { get; private set; }
@@ -27,5 +32,131 @@ public class IndexModel : PageModel
         Posts = pageData.Data;
         Total = pageData.Total;
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
+        Albums = await _appService.GetAllAlbumItemsAsync() ?? [];
+
+        var allPosts = await _appService.GetAllBlogPostsAsync() ?? [];
+        GettingStartedLinks = BuildGettingStartedLinks(allPosts, Categories, Albums);
+        SerialReadingLinks = BuildSerialReadingLinks(allPosts, Albums);
+        RandomPosts = BuildDiscoveryPosts(
+            allPosts.Where(post =>
+                Posts.All(listed => !string.Equals(listed.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
+            .ToList(),
+            3);
+    }
+
+    private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
+        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<CategoryItem> categories,
+        IReadOnlyList<AlbumItem> albums)
+    {
+        var links = new List<DiscoveryLinkCard>();
+
+        if (allPosts.FirstOrDefault() is { } latestPost)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "先看更新",
+                "从最新文章进入",
+                latestPost.Title ?? "最近更新",
+                ConstantUtil.GetBbsPostUrl(latestPost)));
+        }
+
+        var topCategory = categories
+            .Where(item =>
+                !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(item.Name)
+                && !string.IsNullOrWhiteSpace(item.Slug))
+            .Select(item => new
+            {
+                Item = item,
+                Count = allPosts.Count(post => post.Categories?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+            })
+            .OrderByDescending(item => item.Count)
+            .FirstOrDefault();
+
+        if (topCategory != null)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "按主题看",
+                $"先逛 {topCategory.Item.Name}",
+                $"{topCategory.Count} 篇文章，适合按技术方向快速筛选",
+                ConstantUtil.GetBbsCategoryUrl(topCategory.Item.Slug!)));
+        }
+
+        var topAlbum = albums
+            .Where(item =>
+                !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(item.Name)
+                && !string.IsNullOrWhiteSpace(item.Slug))
+            .Select(item => new
+            {
+                Item = item,
+                Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+            })
+            .OrderByDescending(item => item.Count)
+            .FirstOrDefault();
+
+        if (topAlbum != null)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "连续阅读",
+                $"跟着专题读 {topAlbum.Item.Name}",
+                $"{topAlbum.Count} 篇文章，更适合系统连读",
+                ConstantUtil.GetBbsAlbumUrl(topAlbum.Item.Slug!)));
+        }
+
+        return links;
+    }
+
+    private static List<DiscoveryLinkCard> BuildSerialReadingLinks(
+        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<AlbumItem> albums)
+    {
+        return albums
+            .Where(item =>
+                !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)
+                && !string.IsNullOrWhiteSpace(item.Name)
+                && !string.IsNullOrWhiteSpace(item.Slug))
+            .Select(item => new
+            {
+                Item = item,
+                Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+            })
+            .Where(item => item.Count > 0)
+            .OrderByDescending(item => item.Count)
+            .Take(4)
+            .Select(item => new DiscoveryLinkCard(
+                "专题连读",
+                item.Item.Name!,
+                $"{item.Count} 篇文章，适合连续阅读",
+                ConstantUtil.GetBbsAlbumUrl(item.Item.Slug!)))
+            .ToList();
+    }
+
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPost> posts, int count)
+    {
+        if (posts.Count == 0)
+        {
+            return [];
+        }
+
+        var startIndex = DateTime.Now.DayOfYear % posts.Count;
+        var items = new List<DiscoveryPostCard>();
+
+        for (var index = 0; index < Math.Min(count, posts.Count); index++)
+        {
+            var post = posts[(startIndex + index) % posts.Count];
+            var label = post.Categories?.FirstOrDefault()
+                ?? post.Albums?.FirstOrDefault()
+                ?? "随机发现";
+
+            items.Add(new DiscoveryPostCard(
+                "随机发现",
+                post.Title ?? "未命名文章",
+                post.Description ?? "换个方向看看，也许正好碰到你感兴趣的主题。",
+                ConstantUtil.GetBbsPostUrl(post),
+                label));
+        }
+
+        return items;
     }
 }

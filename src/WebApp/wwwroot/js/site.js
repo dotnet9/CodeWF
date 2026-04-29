@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initializeHeaderOffset();
     initializeDesktopDropdowns();
     initializeReadingToc();
+    initializeReadingExperience();
 });
 
 function initializeHeaderOffset() {
@@ -151,7 +152,7 @@ function initializeReadingToc() {
     const headings = Array.from(readingBody.querySelectorAll("h2, h3, h4"));
     if (!headings.length) {
         if (tocRoot.dataset.tocHideEmpty === "true") {
-            tocRoot.closest(".article-aside, .content-sidebar")?.setAttribute("hidden", "hidden");
+            tocRoot.setAttribute("hidden", "hidden");
             return;
         }
 
@@ -208,4 +209,94 @@ function initializeReadingToc() {
     });
 
     headings.forEach((heading) => observer.observe(heading));
+}
+
+function initializeReadingExperience() {
+    initializeReadingProgress();
+    initializeCopyUrlButtons();
+}
+
+function initializeReadingProgress() {
+    const readingBody = document.querySelector("[data-reading-body]");
+    const progressBar = document.querySelector("[data-reading-progress-bar]");
+
+    if (!readingBody || !progressBar) {
+        return;
+    }
+
+    let ticking = false;
+
+    const updateProgress = () => {
+        const rect = readingBody.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+        const totalDistance = Math.max(readingBody.scrollHeight - viewportHeight * 0.55, 1);
+        const travelled = Math.min(Math.max(viewportHeight * 0.22 - rect.top, 0), totalDistance);
+        const progress = Math.min(Math.max(travelled / totalDistance, 0), 1);
+
+        progressBar.style.transform = `scaleX(${progress})`;
+        ticking = false;
+    };
+
+    const requestProgressUpdate = () => {
+        if (ticking) {
+            return;
+        }
+
+        ticking = true;
+        window.requestAnimationFrame(updateProgress);
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", requestProgressUpdate, { passive: true });
+    window.addEventListener("resize", requestProgressUpdate);
+}
+
+function initializeCopyUrlButtons() {
+    const copyButtons = Array.from(document.querySelectorAll("[data-copy-url]"));
+    if (!copyButtons.length) {
+        return;
+    }
+
+    const fallbackCopy = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "readonly");
+        textArea.style.position = "absolute";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+    };
+
+    copyButtons.forEach((button) => {
+        const label = button.querySelector("[data-copy-url-label]");
+        const defaultLabel = button.dataset.copyLabelDefault || "复制链接";
+        const successLabel = button.dataset.copyLabelSuccess || "已复制";
+        let resetTimer = 0;
+
+        button.addEventListener("click", async () => {
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(window.location.href);
+                } else {
+                    fallbackCopy(window.location.href);
+                }
+
+                if (!label) {
+                    return;
+                }
+
+                window.clearTimeout(resetTimer);
+                label.textContent = successLabel;
+                resetTimer = window.setTimeout(() => {
+                    label.textContent = defaultLabel;
+                }, 2200);
+            } catch (error) {
+                if (label) {
+                    label.textContent = defaultLabel;
+                }
+            }
+        });
+    });
 }

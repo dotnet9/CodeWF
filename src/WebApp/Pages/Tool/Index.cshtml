@@ -1,8 +1,9 @@
-@page
+@page "/tool"
+@using WebApp.Extensions
 @model WebApp.Pages.Tool.IndexModel
 @{
     ViewData["Title"] = "工具";
-    ViewData["Description"] = "查看码坊提供的在线开发工具，提高日常开发效率。";
+    ViewData["Description"] = "查看码墙提供的在线开发工具，提升日常开发效率。";
     var banner = new WebApp.Models.PageBannerViewModel
     {
         Eyebrow = "Toolbox",
@@ -42,16 +43,7 @@
                                 <div class="chip-cloud">
                                     @foreach (var child in tool.Children)
                                     {
-                                        var toolLink = child.Slug switch
-                                        {
-                                            "slugify-string" => "/SlugifyString",
-                                            "timestamp" => "/Timestamp",
-                                            "ico" => "/Icon",
-                                            "nuoche" => "/NuoChe",
-                                            "fuli" => "/FuLi",
-                                            _ => $"/Tool/{child.Slug}"
-                                        };
-
+                                        var toolLink = ConstantUtil.GetToolUrl(child.Slug);
                                         <a href="@toolLink" class="chip-link">@child.Name</a>
                                     }
                                 </div>

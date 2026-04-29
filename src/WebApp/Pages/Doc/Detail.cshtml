@@ -1,17 +1,17 @@
-@page "/doc/{slug}"
+@page "/project/{slug}"
 @model WebApp.Pages.Doc.DetailModel
 @using WebApp.Extensions
 @{
-    ViewData["Title"] = $"{Model.Doc?.Name ?? "文档"} - 文档中心";
-    ViewData["Description"] = Model.Doc?.Memo ?? "浏览码坊文档内容。";
+    ViewData["Title"] = $"{Model.Doc?.Name ?? "项目"} - 项目中心";
+    ViewData["Description"] = Model.Doc?.Memo ?? "浏览码坊的项目与使用说明。";
     var banner = Model.Doc == null
         ? null
         : new WebApp.Models.PageBannerViewModel
         {
-            Eyebrow = "Documentation",
-            Title = Model.Doc.Name ?? "文档",
+            Eyebrow = "Projects",
+            Title = Model.Doc.Name ?? "项目",
             Description = Model.Doc.Memo,
-            MetaItems = ["结构化文档"]
+            MetaItems = ["项目说明"]
         };
 }
 
@@ -24,8 +24,8 @@
         @if (Model.Doc == null)
         {
             <div class="empty-state">
-                <h2>文档不存在或已删除</h2>
-                <p>可以返回文档中心查看其他内容。</p>
+                <h2>项目不存在或已删除</h2>
+                <p>可以返回项目中心查看其他内容。</p>
             </div>
         }
         else
@@ -59,10 +59,10 @@
 
                     @if (Model.PreviousDoc != null || Model.NextDoc != null)
                     {
-                        <nav class="doc-pager" aria-label="文档阅读导航">
+                        <nav class="doc-pager" aria-label="项目阅读导航">
                             @if (Model.PreviousDoc != null)
                             {
-                                <a href="/doc/@Model.PreviousDoc.Slug" class="surface-panel doc-pager__item doc-pager__item--prev">
+                                <a href="@ConstantUtil.GetProjectUrl(Model.PreviousDoc.Slug)" class="surface-panel doc-pager__item doc-pager__item--prev">
                                     <span class="doc-pager__label">
                                         <i class="fas fa-arrow-left"></i>
                                         上一篇
@@ -81,7 +81,7 @@
 
                             @if (Model.NextDoc != null)
                             {
-                                <a href="/doc/@Model.NextDoc.Slug" class="surface-panel doc-pager__item doc-pager__item--next">
+                                <a href="@ConstantUtil.GetProjectUrl(Model.NextDoc.Slug)" class="surface-panel doc-pager__item doc-pager__item--next">
                                     <span class="doc-pager__label">
                                         下一篇
                                         <i class="fas fa-arrow-right"></i>

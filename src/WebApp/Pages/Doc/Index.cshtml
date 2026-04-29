@@ -1,14 +1,15 @@
-@page "/doc"
+@page "/project"
+@using WebApp.Extensions
 @model WebApp.Pages.Doc.IndexModel
 @{
-    ViewData["Title"] = "文档";
-    ViewData["Description"] = "浏览码坊文档中心，按主题和目录快速定位内容。";
+    ViewData["Title"] = "项目";
+    ViewData["Description"] = "浏览码坊的开源项目与 NuGet 包说明，按主题快速定位内容。";
     var banner = new WebApp.Models.PageBannerViewModel
     {
-        Eyebrow = "Documentation",
-        Title = "文档中心",
-        Description = "把常用知识点和项目说明沉淀成目录化文档，减少重复检索的时间成本。",
-        MetaItems = ["结构化内容", "按主题导航", "便于快速复用"]
+        Eyebrow = "Projects",
+        Title = "项目中心",
+        Description = "这里集中整理开源项目、NuGet 包以及对应的使用说明，方便快速查阅和持续维护。",
+        MetaItems = ["项目索引", "使用说明", "便于快速复用"]
     };
 }
 
@@ -19,7 +20,7 @@
         @if (Model.DocItems == null || !Model.DocItems.Any())
         {
             <div class="empty-state">
-                <h2>文档内容暂未就绪</h2>
+                <h2>项目内容暂未就绪</h2>
                 <p>可以稍后再来查看，或先浏览博客里的技术文章。</p>
             </div>
         }
@@ -30,7 +31,7 @@
                 {
                     <article class="resource-card">
                         <div class="resource-card__body">
-                            <span class="card-kicker">文档分组</span>
+                            <span class="card-kicker">项目分组</span>
                             <h2 class="resource-card__title">@doc.Name</h2>
                             @if (!string.IsNullOrWhiteSpace(doc.Memo))
                             {
@@ -42,7 +43,7 @@
                                 <div class="sidebar-link-list sidebar-link-list--compact">
                                     @foreach (var child in doc.Children)
                                     {
-                                        <a href="/doc/@child.Slug" class="sidebar-link">
+                                        <a href="@ConstantUtil.GetProjectUrl(child.Slug)" class="sidebar-link">
                                             <span>@child.Name</span>
                                             <i class="fas fa-arrow-right"></i>
                                         </a>

@@ -35,8 +35,8 @@ public class SearchModel : PageModel
 
         ViewData["Title"] = string.IsNullOrWhiteSpace(Query) ? "全局搜索" : $"搜索：{Query}";
         ViewData["Description"] = string.IsNullOrWhiteSpace(Query)
-            ? "搜索站内的工具、文档和技术文章。"
-            : $"查看与 {Query} 相关的工具、文档和技术文章搜索结果。";
+            ? "搜索站内的工具、项目和技术文章。"
+            : $"查看与 {Query} 相关的工具、项目和技术文章搜索结果。";
 
         if (string.IsNullOrWhiteSpace(Query))
         {

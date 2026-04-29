@@ -246,7 +246,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             results.Add(new SearchResultItem
             {
                 Kind = SearchResultKind.Doc,
-                Title = doc.Item.Name?.Trim() ?? "未命名文档",
+                Title = doc.Item.Name?.Trim() ?? "未命名项目",
                 Url = ConstantUtil.GetDocUrl(doc.Item.Slug),
                 Summary = summary,
                 MatchedSnippet = matchedSnippet,
@@ -1040,12 +1040,12 @@ public class AppService(IOptions<SiteOption> siteOption)
                 sb.Append("<item>");
                 sb.Append($"<title>{item.Title}</title>");
                 sb.Append(
-                    $"<link>{siteOption.Value.Domain}/bbs/post/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</link>");
+                    $"<link>{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(item)}</link>");
                 sb.Append($"<description>{item.Description}</description>");
                 sb.Append($"<author>({item.Author ?? siteOption.Value.Owner})</author>");
                 sb.Append($"<category>{string.Join(",", item.Categories ?? [])}</category>");
                 sb.Append(
-                    $"<guid>{siteOption.Value.Domain}/{item.Date?.ToString("yyyy/MM")}/{item.Slug}</guid>");
+                    $"<guid>{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(item)}</guid>");
                 sb.Append($"<pubDate>{item.Date:R}</pubDate>");
                 sb.Append($"<content:encoded><![CDATA[{item.Description}]]></content:encoded>");
                 sb.Append("</item>");
@@ -1075,7 +1075,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             {
                 LastModified = DateTimeOffset.UtcNow,
                 Priority = 0.8,
-                Url = $"{siteOption.Value.Domain}/bbs/cat/{x.Slug}",
+                Url = $"{siteOption.Value.Domain}{ConstantUtil.GetBbsCategoryUrl(x.Slug ?? ConstantUtil.DefaultCategory)}",
                 Frequency = SitemapFrequency.Monthly
             }));
         }
@@ -1090,8 +1090,7 @@ public class AppService(IOptions<SiteOption> siteOption)
                     {
                         LastModified = x.Lastmod ?? x.Date ?? DateTimeOffset.Now,
                         Priority = 0.9,
-                        Url =
-                            $"{siteOption.Value.Domain}/bbs/post/{x.Date:yyyy/MM}/{x.Slug}",
+                        Url = $"{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(x)}",
                         Frequency = SitemapFrequency.Daily
                     }));
         }

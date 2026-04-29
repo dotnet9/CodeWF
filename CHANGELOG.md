@@ -2,6 +2,17 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.2 (2026-04-29)
+
+- 😄 [Added] Added "Start Here" and "Unexpected Finds" homepage modules to help first-time visitors enter the content flow and continue reading more naturally.
+- 😄 [Added] Added the `/project` project hub and project detail pages for open-source projects, NuGet packages, and their usage guides.
+- 🔨 [Changed] Unified the site URL scheme around shorter routes: blog index is now `/post`, search is `/s`, categories use `/cat/{slug}`, albums use `/album/{slug}`, and article details use `/{yyyy}/{MM}/{slug}`.
+- 🔨 [Changed] Removed legacy `/Bbs/...` route compatibility and the old `/doc` entry, and standardized the public-facing section name to "Projects".
+- 🔨 [Changed] Rebuilt the article header into a media-rich hero card that combines the cover image, minute-level publish/update timestamps, and compact category/album/tag summaries.
+- 🔨 [Changed] Removed the article "reading guide" card and restored a simpler sticky table-of-contents sidebar for reading.
+- 🔨 [Changed] Reorganized the header navigation by folding Albums and Categories into the Blog dropdown, with direct links to all articles, albums, categories, and the latest update.
+- 🐛 [Fixed] Fixed garbled Chinese text and broken interaction copy on the NuoChe move-car QR generator page.
+
 V1.1.1 (2026-04-29)
 
 - 🔨 [Changed] Refined the global typography stack with dedicated display, text, and code fonts for a more professional technical-blog reading experience.

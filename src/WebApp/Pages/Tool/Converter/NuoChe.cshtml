@@ -1,5 +1,9 @@
-@page "/NuoChe"
+@page "/nuoche"
 @model WebApp.Pages.Tool.Converter.NuoCheModel
+@{
+    ViewData["Title"] = "挪车码生成器";
+    ViewData["Description"] = "快速生成可扫码联系车主的挪车码。";
+}
 
 <style>
 .nuoche-container {
@@ -339,80 +343,80 @@
 </style>
 
 <section class="page-shell">
-<div class="nuoche-container">
-    @if (string.IsNullOrWhiteSpace(Model.P))
-    {
-        <div class="generator-container">
-        <h1 class="generator-title">挪车码生成器</h1>
-        <div class="generator-layout">
-            <div class="config-section">
-                <div class="input-group">
-                    <label for="phoneNumber">手机号码</label>
-                    <input type="tel" id="phoneNumber" placeholder="请输入手机号码" value="18600000000" />
-                    <div class="privacy-notice">
-                        <i class="fas fa-info-circle"></i> 您的手机号码将被用于生成挪车码，扫码者可以通过此号码联系您。
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="title">标题</label>
-                    <input type="text" id="title" placeholder="请输入标题" value="扫码挪车" />
-                </div>
-                <div class="input-group">
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="enableSubtitle" />
-                        <label for="enableSubtitle">添加副标题</label>
-                    </div>
-                    <input type="text" id="subtitle" placeholder="请输入副标题" value="扫码联系车主或拨打电话: 18600000000" disabled />
-                </div>
+    <div class="nuoche-container">
+        @if (string.IsNullOrWhiteSpace(Model.P))
+        {
+            <div class="generator-container">
+                <h1 class="generator-title">挪车码生成器</h1>
+                <div class="generator-layout">
+                    <div class="config-section">
+                        <div class="input-group">
+                            <label for="phoneNumber">手机号</label>
+                            <input type="tel" id="phoneNumber" placeholder="请输入手机号" value="18600000000" />
+                            <div class="privacy-notice">
+                                <i class="fas fa-info-circle"></i> 您的手机号仅用于生成挪车码，扫码者可以通过该号码联系您。
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="title">标题</label>
+                            <input type="text" id="title" placeholder="请输入标题" value="扫码挪车" />
+                        </div>
+                        <div class="input-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="enableSubtitle" />
+                                <label for="enableSubtitle">添加副标题</label>
+                            </div>
+                            <input type="text" id="subtitle" placeholder="请输入副标题" value="扫码联系车主或拨打电话 18600000000" disabled />
+                        </div>
 
-                <div class="privacy-consent">
-                    <div class="checkbox-container">
-                        <input type="checkbox" id="privacyConsent" />
-                        <label for="privacyConsent">我已了解并同意：我的手机号码将被收集并用于生成挪车码，扫码者可以通过此号码联系我。</label>
-                    </div>
-                </div>
+                        <div class="privacy-consent">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="privacyConsent" />
+                                <label for="privacyConsent">我已了解并同意：我的手机号将被用于生成挪车码，扫码者可以通过该号码联系我。</label>
+                            </div>
+                        </div>
 
-                <div class="button-group">
-                    <button class="primary-button" onclick="generateQrCode()">
-                        <i class="fas fa-qrcode"></i> 生成二维码
-                    </button>
+                        <div class="button-group">
+                            <button class="primary-button" onclick="generateQrCode()">
+                                <i class="fas fa-qrcode"></i> 生成二维码
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="qr-code-container" style="display: none">
+                        <img alt="挪车码" />
+                        <div class="action-buttons">
+                            <a target="_blank" class="preview-link">
+                                <i class="fas fa-external-link-alt"></i> 预览
+                            </a>
+                            <a class="download-link">
+                                <i class="fas fa-download"></i> 下载
+                            </a>
+                        </div>
+                        <div class="alert alert-warning mt-2">
+                            <i class="fas fa-clock"></i> 注意：生成的图片有效期为 2 分钟，请及时下载。
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="qr-code-container" style="display: none">
-                <img alt="挪车码" />
-                <div class="action-buttons">
-                    <a target="_blank" class="preview-link">
-                        <i class="fas fa-external-link-alt"></i> 预览
-                    </a>
-                    <a class="download-link">
-                        <i class="fas fa-download"></i> 下载
-                    </a>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-car"></i>
+                    <h1 class="title">临时停靠，请多关照</h1>
                 </div>
-                <div class="alert alert-warning mt-2">
-                    <i class="fas fa-clock"></i> 注意：生成的图片有效期为2分钟，请及时下载。
+                <div class="card-body">
+                    <p class="description">如果我的车辆影响了您的通行，请点击下方按钮联系我。给您带来不便，敬请谅解。</p>
+                    <a class="phone-button" href="tel:@Model.DecodePhone">
+                        <i class="fas fa-phone-alt"></i> 联系车主
+                    </a>
+                    <a class="generate-link" href="/nuoche">去生成一个挪车码</a>
                 </div>
             </div>
-        </div>
+        }
     </div>
-    }
-    else
-    {
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-car"></i>
-                <h1 class="title">临时停靠，请多关照</h1>
-            </div>
-            <div class="card-body">
-                <p class="description">如果我的车阻碍了您的车辆通行，点击下方按钮通知我，给您带来不便敬请谅解。</p>
-                <a class="phone-button" href="tel:@Model.DecodePhone">
-                    <i class="fas fa-phone-alt"></i> 联系车主
-                </a>
-                <a class="generate-link" href="/Tool/NuoChe">去生成一个挪车码</a>
-            </div>
-        </div>
-    }
-</div>
 </section>
 
 @section Scripts {
@@ -427,18 +431,18 @@
         if (enableSubtitle) {
             subtitle = document.getElementById('subtitle').value.trim();
             if (!subtitle) {
-                subtitle = `扫码联系车主或拨打电话: ${phoneNumber || "18600000000"}`;
+                subtitle = `扫码联系车主或拨打电话 ${phoneNumber || "18600000000"}`;
                 document.getElementById('subtitle').value = subtitle;
             }
         }
 
         if (!title || !phoneNumber) {
-            alert('请输入标题和手机号码');
+            alert('请输入标题和手机号');
             return;
         }
 
         if (!privacyConsent) {
-            alert('请确认您已了解并同意隐私声明');
+            alert('请确认您已了解并同意隐私说明');
             return;
         }
 
@@ -494,8 +498,8 @@
                 throw new Error(data.message);
             }
         } catch (error) {
-            console.error('生成二维码失败:', error);
-            alert('生成二维码失败，请稍后再试');
+            console.error('生成二维码失败', error);
+            alert('生成二维码失败，请稍后再试。');
         }
     }
 
@@ -537,16 +541,16 @@
                 if (this.checked) {
                     if (!subtitleInput.value.trim()) {
                         const phoneNumber = phoneInput.value.trim() || "18600000000";
-                        subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
+                        subtitleInput.value = `扫码联系车主或拨打电话 ${phoneNumber}`;
                     }
                     subtitleInput.focus();
                 }
             });
 
             phoneInput.addEventListener('input', function() {
-                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('扫码联系车主或拨打电话:')) {
+                if (enableSubtitleCheckbox.checked && subtitleInput.value.startsWith('扫码联系车主或拨打电话')) {
                     const phoneNumber = this.value.trim() || "18600000000";
-                    subtitleInput.value = `扫码联系车主或拨打电话: ${phoneNumber}`;
+                    subtitleInput.value = `扫码联系车主或拨打电话 ${phoneNumber}`;
                 }
             });
         }

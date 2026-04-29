@@ -1,5 +1,6 @@
-@page "/Bbs/Post/{year:int}/{month:int}/{slug}"
+@page "/{year:int}/{month:int}/{slug}"
 @using Microsoft.Extensions.Options
+@using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model WebApp.Pages.Bbs.Post.IndexModel
 @{
@@ -24,66 +25,142 @@
         else
         {
             var authorName = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
-            <div class="page-banner">
-                <div>
-                    <span class="eyebrow">Article</span>
-                    <h1 class="page-title">@Model.Post.Title</h1>
-                    @if (!string.IsNullOrWhiteSpace(Model.Post.Description))
+            var publishedAt = Model.Post.Date?.ToString("yyyy-MM-dd HH:mm");
+            var updatedAt = Model.Post.Lastmod?.ToString("yyyy-MM-dd HH:mm");
+            var categorySummary = string.Join(" / ", Model.CategoryLinks.Select(item => item.Label));
+            var albumSummary = string.Join(" / ", Model.AlbumLinks.Select(item => item.Label));
+            var tagSummary = string.Join(" / ", Model.TagLinks.Select(item => item.Label));
+            <div class="reading-progress-shell" aria-hidden="true">
+                <span class="reading-progress-bar" data-reading-progress-bar></span>
+            </div>
+
+            <div class="page-banner article-banner">
+                <div class="article-banner__cover">
+                    @if (!string.IsNullOrWhiteSpace(Model.Post.Cover))
                     {
-                        <p class="page-description">@Model.Post.Description</p>
+                        <img src="@Model.Post.Cover" alt="@Model.Post.Title" class="cover-media article-banner__cover-media" decoding="async" fetchpriority="high" />
+                    }
+                    else
+                    {
+                        <div class="article-banner__cover-placeholder">
+                            <i class="fas fa-file-lines"></i>
+                        </div>
                     }
                 </div>
-                <div class="page-banner__meta">
-                    <span class="meta-chip"><i class="far fa-calendar"></i>发布于 @Model.Post.Date?.ToString("yyyy-MM-dd")</span>
-                    @if (Model.Post.Lastmod.HasValue)
-                    {
-                        <span class="meta-chip"><i class="fas fa-rotate-right"></i>更新于 @Model.Post.Lastmod.Value.ToString("yyyy-MM-dd")</span>
-                    }
-                    <span class="meta-chip"><i class="far fa-user"></i>@authorName</span>
+                <div class="article-banner__content">
+                    <div>
+                        <span class="eyebrow">Article</span>
+                        <h1 class="page-title">@Model.Post.Title</h1>
+                        @if (!string.IsNullOrWhiteSpace(Model.Post.Description))
+                        {
+                            <p class="page-description">@Model.Post.Description</p>
+                        }
+                    </div>
+
+                    <div class="article-banner__meta-grid">
+                        @if (!string.IsNullOrWhiteSpace(publishedAt))
+                        {
+                            <div class="meta-chip article-banner__meta-card">
+                                <i class="far fa-calendar"></i>
+                                <span>发布于 @publishedAt</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(updatedAt))
+                        {
+                            <div class="meta-chip article-banner__meta-card">
+                                <i class="fas fa-rotate-right"></i>
+                                <span>更新于 @updatedAt</span>
+                            </div>
+                        }
+                        <div class="meta-chip article-banner__meta-card">
+                            <i class="far fa-user"></i>
+                            <span>@authorName</span>
+                        </div>
+                        <div class="meta-chip article-banner__meta-card">
+                            <i class="far fa-clock"></i>
+                            <span>预计阅读 @Model.EstimatedReadingMinutes 分钟</span>
+                        </div>
+                    </div>
+
+                    <div class="article-topic-summary-list">
+                        @if (!string.IsNullOrWhiteSpace(categorySummary))
+                        {
+                            <div class="article-topic-summary">
+                                <span class="article-topic-summary__label">分类</span>
+                                <span class="article-topic-summary__value" title="@categorySummary">@categorySummary</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(albumSummary))
+                        {
+                            <div class="article-topic-summary">
+                                <span class="article-topic-summary__label">专题</span>
+                                <span class="article-topic-summary__value" title="@albumSummary">@albumSummary</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(tagSummary))
+                        {
+                            <div class="article-topic-summary">
+                                <span class="article-topic-summary__label">标签</span>
+                                <span class="article-topic-summary__value" title="@tagSummary">@tagSummary</span>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
 
             <div class="article-layout">
                 <div class="article-main">
-                    @if (!string.IsNullOrWhiteSpace(Model.Post.Cover))
-                    {
-                        <div class="surface-panel article-cover">
-                            <img src="@Model.Post.Cover" alt="@Model.Post.Title" class="cover-media cover-media--hero" decoding="async" fetchpriority="high" />
-                        </div>
-                    }
-
                     <article class="surface-panel article-panel">
-                        @if (Model.Post.Categories?.Any() == true)
-                        {
-                            <div class="chip-row">
-                                @foreach (var category in Model.Post.Categories)
-                                {
-                                    <span class="tag-chip"><i class="fas fa-folder-open"></i>@category</span>
-                                }
-                            </div>
-                        }
-
-                        @if (Model.Post.Tags?.Any() == true)
-                        {
-                            <div class="chip-row chip-row--secondary">
-                                @foreach (var tag in Model.Post.Tags)
-                                {
-                                    <span class="tag-chip tag-chip--muted"><i class="fas fa-hashtag"></i>@tag</span>
-                                }
-                            </div>
-                        }
-
                         <div class="prose article-content" data-reading-body>
                             @Html.Raw(Model.Post.HtmlContent)
                         </div>
                     </article>
+
+                    @if (Model.RelatedPosts.Any())
+                    {
+                        <section class="surface-panel article-related-panel">
+                            <div class="surface-panel__header">
+                                <div>
+                                    <span class="eyebrow">Keep Exploring</span>
+                                    <h2 class="surface-title">延伸阅读</h2>
+                                </div>
+                                <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">更多文章</a>
+                            </div>
+
+                            <div class="article-related-grid">
+                                @foreach (var relatedPost in Model.RelatedPosts)
+                                {
+                                    <article class="article-related-card">
+                                        <div class="article-related-card__meta">
+                                            <span class="article-related-card__badge">@relatedPost.ContextLabel</span>
+                                            @if (relatedPost.UpdatedAt.HasValue)
+                                            {
+                                                <span>@relatedPost.UpdatedAt.Value.ToString("yyyy-MM-dd")</span>
+                                            }
+                                        </div>
+                                        <h3>
+                                            <a href="@relatedPost.Url">@relatedPost.Title</a>
+                                        </h3>
+                                        @if (!string.IsNullOrWhiteSpace(relatedPost.Description))
+                                        {
+                                            <p>@relatedPost.Description</p>
+                                        }
+                                        <a href="@relatedPost.Url" class="inline-link">
+                                            继续阅读
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </article>
+                                }
+                            </div>
+                        </section>
+                    }
 
                     @if (Model.PreviousPost != null || Model.NextPost != null)
                     {
                         <nav class="doc-pager" aria-label="文章阅读导航">
                             @if (Model.PreviousPost != null)
                             {
-                                var previousUrl = $"/Bbs/Post/{Model.PreviousPost.Date?.Year}/{Model.PreviousPost.Date?.Month}/{Model.PreviousPost.Slug}";
+                                var previousUrl = ConstantUtil.GetBbsPostUrl(Model.PreviousPost);
                                 <a href="@previousUrl" class="surface-panel doc-pager__item doc-pager__item--prev">
                                     <span class="doc-pager__label">
                                         <i class="fas fa-arrow-left"></i>
@@ -103,7 +180,7 @@
 
                             @if (Model.NextPost != null)
                             {
-                                var nextUrl = $"/Bbs/Post/{Model.NextPost.Date?.Year}/{Model.NextPost.Date?.Month}/{Model.NextPost.Slug}";
+                                var nextUrl = ConstantUtil.GetBbsPostUrl(Model.NextPost);
                                 <a href="@nextUrl" class="surface-panel doc-pager__item doc-pager__item--next">
                                     <span class="doc-pager__label">
                                         下一篇
@@ -125,7 +202,7 @@
                 </div>
 
                 <aside class="article-aside sticky-panel">
-                    <div id="toc" class="surface-panel toc-panel" data-reading-toc>
+                    <div id="toc" class="surface-panel toc-panel" data-reading-toc data-toc-hide-empty="true">
                         <h2 class="sidebar-title">目录</h2>
                         <div class="toc-nav"></div>
                     </div>
@@ -134,7 +211,3 @@
         }
     </div>
 </section>
-
-@section Scripts {
-    <partial name="_CodeHighlightScripts" />
-}

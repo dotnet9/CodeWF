@@ -1,9 +1,10 @@
-@page "/Bbs/Category/{slug?}"
+@page "/cat/{slug?}"
+@using WebApp.Extensions
 @model WebApp.Pages.Bbs.Category.IndexModel
 @{
     ViewData["Title"] = Model.IsDirectoryPage ? "分类" : $"{Model.CategoryName} - 博客分类";
     ViewData["Description"] = Model.IsDirectoryPage
-        ? "浏览码坊全部文章分类。"
+        ? "浏览码墙全部文章分类。"
         : (string.IsNullOrWhiteSpace(Model.CategoryMemo) ? $"查看 {Model.CategoryName} 分类下的技术文章。" : Model.CategoryMemo);
     var categorySlug = Model.CurrentSlug ?? string.Empty;
     var categories = Model.Categories
@@ -49,7 +50,7 @@
                     <div class="directory-grid">
                         @foreach (var category in categories)
                         {
-                            <a href="/Bbs/Category/@category.Slug" class="directory-card">
+                            <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug!)" class="directory-card">
                                 <strong>@category.Name</strong>
                                 @if (!string.IsNullOrWhiteSpace(category.Memo))
                                 {
@@ -81,7 +82,7 @@
                         <div class="post-list">
                             @foreach (var post in Model.Posts)
                             {
-                                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                                var postUrl = ConstantUtil.GetBbsPostUrl(post);
                                 var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
                                 <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
                                     @if (hasCover)
@@ -116,7 +117,7 @@
                             <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                    <a class="page-link" href="/Bbs/Category/@categorySlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@(Model.PageIndex - 1)">上一页</a>
                                 </li>
                                 @{
                                     var startPage = Math.Max(1, Model.PageIndex - 2);
@@ -136,7 +137,7 @@
                                 @if (startPage > 1)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" href="/Bbs/Category/@categorySlug?pageIndex=1">1</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=1">1</a>
                                     </li>
                                     @if (startPage > 2)
                                     {
@@ -148,7 +149,7 @@
                                 @for (var i = startPage; i <= endPage; i++)
                                 {
                                     <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                                        <a class="page-link" href="/Bbs/Category/@categorySlug?pageIndex=@i">@i</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@i">@i</a>
                                     </li>
                                 }
                                 @if (endPage < Model.TotalPages)
@@ -160,11 +161,11 @@
                                         </li>
                                     }
                                     <li class="page-item">
-                                        <a class="page-link" href="/Bbs/Category/@categorySlug?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
                                     </li>
                                 }
                                 <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="/Bbs/Category/@categorySlug?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@(Model.PageIndex + 1)">下一页</a>
                                 </li>
                             </ul>
                         </nav>
@@ -177,7 +178,7 @@
                         <div class="sidebar-link-list">
                             @foreach (var category in categories)
                             {
-                                <a href="/Bbs/Category/@category.Slug" class="sidebar-link @(category.Slug == categorySlug ? "is-current" : string.Empty)">
+                                <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug!)" class="sidebar-link @(category.Slug == categorySlug ? "is-current" : string.Empty)">
                                     <span>@category.Name</span>
                                     <i class="fas fa-angle-right"></i>
                                 </a>

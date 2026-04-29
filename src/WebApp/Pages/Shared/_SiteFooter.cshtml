@@ -1,9 +1,10 @@
 @using Microsoft.Extensions.Options
+@using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @{
     var site = SiteOptions.Value;
     var appTitle = site.AppTitle ?? "码坊";
-    var defaultSiteDescription = "技术文章、文档与在线工具";
+    var defaultSiteDescription = "技术文章、项目说明与在线工具";
 }
 
 <section class="site-links-shell">
@@ -24,8 +25,8 @@
                 <div>
                     <h2 class="footer-title">导航</h2>
                     <ul class="footer-list">
-                        <li><a href="/bbs">博客</a></li>
-                        <li><a href="/doc">文档</a></li>
+                        <li><a href="@ConstantUtil.GetBlogUrl()">博客</a></li>
+                        <li><a href="@ConstantUtil.GetProjectDirectoryUrl()">项目</a></li>
                         <li><a href="/tool">工具</a></li>
                         <li><a href="/timeline">时间线</a></li>
                     </ul>
@@ -37,7 +38,7 @@
                         <li><a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a></li>
                         <li><a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a></li>
                         <li><a href="https://github.com/dotnet9" target="_blank" rel="noreferrer">GitHub</a></li>
-                        <li><a href="https://irihi.tech/" target="_blank" rel="noreferrer">铱泓科技</a></li>
+                        <li><a href="https://irihi.tech/" target="_blank" rel="noreferrer">银沫科技</a></li>
                     </ul>
                 </div>
 

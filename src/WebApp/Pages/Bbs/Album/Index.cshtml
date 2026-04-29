@@ -1,9 +1,10 @@
-@page "/bbs/album/{slug?}"
+@page "/album/{slug?}"
+@using WebApp.Extensions
 @model WebApp.Pages.Bbs.Album.IndexModel
 @{
     ViewData["Title"] = Model.IsDirectoryPage ? "专题" : $"{Model.AlbumName} - 专题";
     ViewData["Description"] = Model.IsDirectoryPage
-        ? "浏览码坊全部专题。"
+        ? "浏览码墙全部专题。"
         : (string.IsNullOrWhiteSpace(Model.AlbumMemo) ? $"查看 {Model.AlbumName} 专题下的文章内容。" : Model.AlbumMemo);
     var albumSlug = Model.CurrentSlug ?? string.Empty;
     var albums = Model.Albums
@@ -49,7 +50,7 @@
                     <div class="directory-grid">
                         @foreach (var album in albums)
                         {
-                            <a href="/bbs/album/@album.Slug" class="directory-card">
+                            <a href="@ConstantUtil.GetBbsAlbumUrl(album.Slug!)" class="directory-card">
                                 <strong>@album.Name</strong>
                                 @if (!string.IsNullOrWhiteSpace(album.Memo))
                                 {
@@ -81,7 +82,7 @@
                         <div class="post-list">
                             @foreach (var post in Model.Posts)
                             {
-                                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                                var postUrl = ConstantUtil.GetBbsPostUrl(post);
                                 var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
                                 <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
                                     @if (hasCover)
@@ -112,11 +113,11 @@
 
                     @if (Model.TotalPages > 1)
                     {
-                        <nav class="pagination-shell" aria-label="专辑分页">
+                        <nav class="pagination-shell" aria-label="专题分页">
                             <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetBbsAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex - 1)">上一页</a>
                                 </li>
                                 @{
                                     var startPage = Math.Max(1, Model.PageIndex - 2);
@@ -136,7 +137,7 @@
                                 @if (startPage > 1)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=1">1</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsAlbumUrl(albumSlug)?pageIndex=1">1</a>
                                     </li>
                                     @if (startPage > 2)
                                     {
@@ -148,7 +149,7 @@
                                 @for (var i = startPage; i <= endPage; i++)
                                 {
                                     <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@i">@i</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsAlbumUrl(albumSlug)?pageIndex=@i">@i</a>
                                     </li>
                                 }
                                 @if (endPage < Model.TotalPages)
@@ -160,11 +161,11 @@
                                         </li>
                                     }
                                     <li class="page-item">
-                                        <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                                        <a class="page-link" href="@ConstantUtil.GetBbsAlbumUrl(albumSlug)?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
                                     </li>
                                 }
                                 <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="/bbs/album/@albumSlug?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetBbsAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex + 1)">下一页</a>
                                 </li>
                             </ul>
                         </nav>
@@ -177,7 +178,7 @@
                         <div class="sidebar-link-list">
                             @foreach (var album in albums)
                             {
-                                <a href="/bbs/album/@album.Slug" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
+                                <a href="@ConstantUtil.GetBbsAlbumUrl(album.Slug!)" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
                                     <span>@album.Name</span>
                                     <i class="fas fa-angle-right"></i>
                                 </a>

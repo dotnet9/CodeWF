@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Options
+@using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @{
     var site = SiteOptions.Value;
@@ -10,19 +11,30 @@
         currentPath = "/";
     }
 
-    string NavClass(string href)
+    var articleDetailActive = System.Text.RegularExpressions.Regex.IsMatch(
+        currentPath,
+        @"^/\d{4}/\d{1,2}/[^/]+$",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+    string NavClass(params string[] hrefs)
     {
-        if (href == "/")
+        if (hrefs.Length == 1 && hrefs[0] == "/")
         {
             return currentPath == "/" ? "nav-link is-active" : "nav-link";
         }
 
-        return currentPath.StartsWith(href, StringComparison.OrdinalIgnoreCase)
+        return hrefs.Any(href => currentPath.StartsWith(href, StringComparison.OrdinalIgnoreCase))
             ? "nav-link is-active"
             : "nav-link";
     }
 
+    var blogActive = currentPath.StartsWith("/post", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/cat", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/album", StringComparison.OrdinalIgnoreCase)
+        || articleDetailActive;
+
     var moreActive = currentPath.StartsWith("/about", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/privacy", StringComparison.OrdinalIgnoreCase)
         || currentPath.StartsWith("/timeline", StringComparison.OrdinalIgnoreCase)
         || currentPath.StartsWith("/donation", StringComparison.OrdinalIgnoreCase)
         || currentPath.StartsWith("/rss", StringComparison.OrdinalIgnoreCase)
@@ -46,16 +58,13 @@
                     <li class="nav-item">
                         <a class="@(NavClass("/"))" href="/">首页</a>
                     </li>
+                    @await Component.InvokeAsync("Navigation", new { isActive = blogActive })
                     <li class="nav-item">
-                        <a class="@(NavClass("/bbs"))" href="/bbs">博客</a>
+                        <a class="@(NavClass("/project"))" href="@ConstantUtil.GetProjectDirectoryUrl()">项目</a>
                     </li>
                     <li class="nav-item">
-                        <a class="@(NavClass("/doc"))" href="/doc">文档</a>
+                        <a class="@(NavClass("/tool", "/timestamp", "/icon", "/nuoche", "/fuli", "/slugify-string"))" href="/tool">工具</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="@(NavClass("/tool"))" href="/tool">工具</a>
-                    </li>
-                    @await Component.InvokeAsync("Navigation")
                     <li class="nav-item dropdown">
                         <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
                         <div class="dropdown-menu site-dropdown">
@@ -72,8 +81,8 @@
                 </ul>
 
                 <div class="site-utility-bar">
-                    <form class="site-search-form" method="get" action="/search" role="search">
-                        <label class="visually-hidden" for="global-search-query">全局搜索</label>
+                    <form class="site-search-form" method="get" action="@ConstantUtil.GetSearchUrl()" role="search">
+                        <label class="visually-hidden" for="global-search-query">全站搜索</label>
                         <span class="site-search-form__icon" aria-hidden="true">
                             <i class="fas fa-magnifying-glass"></i>
                         </span>
@@ -83,10 +92,9 @@
                             type="search"
                             name="q"
                             value="@searchQuery"
-                            placeholder="搜索文档、工具、文章" />
+                            placeholder="搜索项目、工具、文章" />
                         <button type="submit" class="site-search-submit">搜索</button>
                     </form>
-
                 </div>
             </div>
         </div>

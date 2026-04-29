@@ -22,7 +22,7 @@ public class SearchResultItem
     public string KindLabel => Kind switch
     {
         SearchResultKind.Tool => "工具",
-        SearchResultKind.Doc => "文档",
+        SearchResultKind.Doc => "项目",
         SearchResultKind.Post => "文章",
         _ => "结果"
     };

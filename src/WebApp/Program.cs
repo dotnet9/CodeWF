@@ -88,7 +88,6 @@ app.UseStaticFiles(new StaticFileOptions
         context.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=604800";
     }
 });
-
 app.UseRouting();
 
 app.UseAuthorization();

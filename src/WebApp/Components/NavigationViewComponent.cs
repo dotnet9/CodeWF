@@ -1,5 +1,6 @@
 using WebApp.Models;
 using WebApp.Services;
+using WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Components;
@@ -13,7 +14,7 @@ public class NavigationViewComponent : ViewComponent
         _appService = appService;
     }
 
-    public async Task<IViewComponentResult> InvokeAsync()
+    public async Task<IViewComponentResult> InvokeAsync(bool isActive = false)
     {
         var albums = await _appService.GetAllAlbumItemsAsync();
         var categories = await _appService.GetAllCategoryItemsAsync();
@@ -21,6 +22,17 @@ public class NavigationViewComponent : ViewComponent
 
         var model = new NavigationViewModel
         {
+            IsActive = isActive,
+            LatestPost = posts
+                .Where(post => !string.IsNullOrWhiteSpace(post.Slug) && !string.IsNullOrWhiteSpace(post.Title))
+                .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+                .Select(post => new NavigationFeaturedPost(
+                    post.Title!,
+                    ConstantUtil.GetBbsPostUrl(post),
+                    post.Description,
+                    post.Date,
+                    post.Cover))
+                .FirstOrDefault(),
             Albums = (albums ?? [])
                 .Where(item =>
                     !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)
@@ -52,9 +64,12 @@ public class NavigationViewComponent : ViewComponent
 }
 
 public sealed record NavigationBrowseItem(string Name, string Slug, string? Memo, int PostCount);
+public sealed record NavigationFeaturedPost(string Title, string Url, string? Description, DateTime? Date, string? Cover);
 
 public class NavigationViewModel
 {
+    public bool IsActive { get; set; }
+    public NavigationFeaturedPost? LatestPost { get; set; }
     public List<NavigationBrowseItem> Albums { get; set; } = new();
     public List<NavigationBrowseItem> Categories { get; set; } = new();
 }

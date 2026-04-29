@@ -1,5 +1,6 @@
 using WebApp.Models;
 using WebApp.Services;
+using WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace WebApp.Pages;
@@ -18,6 +19,8 @@ public class IndexModel : PageModel
     public List<CategoryItem> Categories { get; private set; } = [];
     public List<HomeBrowseItem> FeaturedAlbums { get; private set; } = [];
     public List<HomeBrowseItem> FeaturedCategories { get; private set; } = [];
+    public List<DiscoveryLinkCard> GettingStartedLinks { get; private set; } = [];
+    public List<DiscoveryPostCard> DiscoveryPosts { get; private set; } = [];
     public int TotalPosts { get; private set; }
     public int TotalDocNodes { get; private set; }
     public int TotalToolEntries { get; private set; }
@@ -72,10 +75,84 @@ public class IndexModel : PageModel
             .Take(FeaturedCategoryLimit)
             .ToList();
 
+        GettingStartedLinks = BuildGettingStartedLinks(allPosts, FeaturedCategories, FeaturedAlbums);
+        DiscoveryPosts = BuildDiscoveryPosts(
+            allPosts.Where(post =>
+                Posts.All(featured => !string.Equals(featured.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
+            .ToList(),
+            3);
+
         var docItems = await _appService.GetAllDocItemsAsync() ?? [];
         TotalDocNodes = docItems.Count + docItems.Sum(item => item.Children?.Count ?? 0);
 
         var toolItems = await _appService.GetAllToolItemsAsync() ?? [];
         TotalToolEntries = toolItems.Sum(item => Math.Max(1, item.Children?.Count ?? 0));
+    }
+
+    private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
+        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<HomeBrowseItem> categories,
+        IReadOnlyList<HomeBrowseItem> albums)
+    {
+        var links = new List<DiscoveryLinkCard>();
+
+        if (allPosts.FirstOrDefault() is { } latestPost)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "从这里开始",
+                "先看最新更新",
+                latestPost.Title ?? "最近更新",
+                ConstantUtil.GetBbsPostUrl(latestPost)));
+        }
+
+        if (categories.FirstOrDefault() is { } category)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "内容地图",
+                $"先逛 {category.Name}",
+                $"{category.PostCount} 篇文章，适合快速熟悉站内内容结构",
+                ConstantUtil.GetBbsCategoryUrl(category.Slug)));
+        }
+
+        if (albums.FirstOrDefault() is { } album)
+        {
+            links.Add(new DiscoveryLinkCard(
+                "连续阅读",
+                $"跟着专题读 {album.Name}",
+                $"{album.PostCount} 篇文章，适合按主题连续阅读",
+                ConstantUtil.GetBbsAlbumUrl(album.Slug)));
+        }
+
+        links.Add(new DiscoveryLinkCard(
+            "项目索引",
+            "看看开源项目",
+            "这里整理了开源项目、NuGet 包和对应的使用说明。",
+            ConstantUtil.GetProjectDirectoryUrl()));
+
+        return links.Take(4).ToList();
+    }
+
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPost> posts, int count)
+    {
+        if (posts.Count == 0)
+        {
+            return [];
+        }
+
+        var startIndex = DateTime.Now.DayOfYear % posts.Count;
+        var items = new List<DiscoveryPostCard>();
+
+        for (var index = 0; index < Math.Min(count, posts.Count); index++)
+        {
+            var post = posts[(startIndex + index) % posts.Count];
+            items.Add(new DiscoveryPostCard(
+                "随机发现",
+                post.Title ?? "未命名文章",
+                post.Description ?? "换一篇看看，也许会撞上正想看的主题。",
+                ConstantUtil.GetBbsPostUrl(post),
+                post.Date?.ToString("yyyy-MM-dd") ?? "文章"));
+        }
+
+        return items;
     }
 }

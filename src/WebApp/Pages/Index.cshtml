@@ -1,10 +1,11 @@
 @page "/"
 @using Microsoft.Extensions.Options
+@using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model IndexModel
 @{
     ViewData["Title"] = "首页";
-    ViewData["Description"] = "码坊聚合 .NET 文章、文档与在线工具。";
+    ViewData["Description"] = "码坊聚合 .NET 文章、项目与在线工具。";
     ViewData["BodyClass"] = "home-page";
     var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
 
@@ -50,20 +51,20 @@
                 </p>
 
                 <div class="hero-actions">
-                    <a href="/bbs" class="btn btn-primary btn-lg">
+                    <a href="@ConstantUtil.GetBlogUrl()" class="btn btn-primary btn-lg">
                         <i class="fas fa-book-open me-2"></i>浏览文章
                     </a>
-                    <a href="/doc" class="btn btn-ghost btn-lg">
-                        <i class="fas fa-compass me-2"></i>进入文档
+                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="btn btn-ghost btn-lg">
+                        <i class="fas fa-compass me-2"></i>进入项目
                     </a>
-                    <a href="/search?q=dotnet" class="btn btn-outline-light btn-lg">
+                    <a href="@ConstantUtil.GetSearchUrl("dotnet")" class="btn btn-outline-light btn-lg">
                         <i class="fas fa-magnifying-glass me-2"></i>全站搜索
                     </a>
                 </div>
 
                 <div class="hero-trustline">
                     <span>@Model.TotalPosts 篇文章</span>
-                    <span>@Model.TotalDocNodes 个文档节点</span>
+                    <span>@Model.TotalDocNodes 个项目条目</span>
                     <span>@Model.TotalToolEntries 个工具入口</span>
                 </div>
             </div>
@@ -79,7 +80,7 @@
                     <div class="spotlight-list">
                         @foreach (var post in heroPosts)
                         {
-                            var spotlightUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                            var spotlightUrl = ConstantUtil.GetBbsPostUrl(post);
                             var spotlightAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
                             <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
                                 <h2 title="@post.Title">@post.Title</h2>
@@ -106,6 +107,64 @@
     </div>
 </section>
 
+<section class="page-shell page-shell--tight">
+    <div class="container">
+        <div class="discovery-grid discovery-grid--home">
+            <section class="surface-panel discovery-panel">
+                <div class="surface-panel__header">
+                    <div>
+                        <span class="eyebrow">Start Here</span>
+                        <h2 class="surface-title">新用户起步路线</h2>
+                    </div>
+                </div>
+                <div class="discovery-link-list">
+                    @foreach (var link in Model.GettingStartedLinks)
+                    {
+                        <a href="@link.Url" class="discovery-link-card">
+                            <span class="card-kicker">@link.Eyebrow</span>
+                            <strong>@link.Title</strong>
+                            <p>@link.Description</p>
+                            <span class="inline-link">现在开始 <i class="fas fa-arrow-right"></i></span>
+                        </a>
+                    }
+                </div>
+            </section>
+
+            <section class="surface-panel discovery-panel">
+                <div class="surface-panel__header">
+                    <div>
+                        <span class="eyebrow">Unexpected Finds</span>
+                        <h2 class="surface-title">随机发现</h2>
+                    </div>
+                </div>
+
+                @if (!Model.DiscoveryPosts.Any())
+                {
+                    <div class="empty-state empty-state--compact">
+                        <p>内容整理中，稍后会补上更多随机发现入口。</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="discovery-post-list">
+                        @foreach (var post in Model.DiscoveryPosts)
+                        {
+                            <article class="discovery-post-card">
+                                <span class="card-kicker">@post.Eyebrow</span>
+                                <h3><a href="@post.Url">@post.Title</a></h3>
+                                <p>@post.Description</p>
+                                <div class="resource-card__meta">
+                                    <span><i class="far fa-calendar"></i>@post.MetaLabel</span>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+</section>
+
 <section class="page-shell page-shell--home-grid">
     <div class="container">
         <div class="home-layout-grid">
@@ -114,7 +173,7 @@
                     <article class="home-index-card">
                         <div class="home-index-card__header">
                             <h2 class="surface-title home-index-card__title">专题</h2>
-                            <a href="/bbs/album" class="surface-link">查看更多</a>
+                            <a href="@ConstantUtil.GetAlbumDirectoryUrl()" class="surface-link">查看更多</a>
                         </div>
 
                         @if (!albums.Any())
@@ -128,7 +187,7 @@
                             <div class="topic-list">
                                 @foreach (var album in albums)
                                 {
-                                    <a href="/bbs/album/@album.Slug" class="topic-list__item">
+                                    <a href="@ConstantUtil.GetBbsAlbumUrl(album.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
                                             <strong>@album.Name</strong>
                                             @if (!string.IsNullOrWhiteSpace(album.Memo))
@@ -146,7 +205,7 @@
                     <article class="home-index-card">
                         <div class="home-index-card__header">
                             <h2 class="surface-title home-index-card__title">分类</h2>
-                            <a href="/Bbs/Category" class="surface-link">查看更多</a>
+                            <a href="@ConstantUtil.GetCategoryDirectoryUrl()" class="surface-link">查看更多</a>
                         </div>
 
                         @if (!categories.Any())
@@ -160,7 +219,7 @@
                             <div class="topic-list">
                                 @foreach (var category in categories)
                                 {
-                                    <a href="/Bbs/Category/@category.Slug" class="topic-list__item">
+                                    <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
                                             <strong>@category.Name</strong>
                                             @if (!string.IsNullOrWhiteSpace(category.Memo))
@@ -181,7 +240,7 @@
                 <div class="surface-panel dispatch-panel">
                     <div class="dispatch-panel__header">
                         <h2 class="surface-title dispatch-panel__title">最新文章</h2>
-                        <a href="/bbs" class="surface-link">更多</a>
+                        <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">更多</a>
                     </div>
 
                     @if (!latestPosts.Any())
@@ -195,7 +254,7 @@
                         <div class="dispatch-list">
                             @foreach (var post in latestPosts)
                             {
-                                var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                                var postUrl = ConstantUtil.GetBbsPostUrl(post);
                                 <a href="@postUrl" class="dispatch-item">
                                     <span class="dispatch-item__meta">@post.Date?.ToString("yyyy-MM-dd")</span>
                                     <strong>@post.Title</strong>
@@ -219,7 +278,7 @@
         {
             <div class="empty-state">
                 <h2>内容还在整理中</h2>
-                <p>可以先浏览博客或文档。</p>
+                <p>可以先浏览文章或项目。</p>
             </div>
         }
         else
@@ -227,7 +286,7 @@
             <div class="post-grid feature-grid">
                 @foreach (var post in Model.Posts)
                 {
-                    var postUrl = $"/Bbs/Post/{post.Date?.Year}/{post.Date?.Month}/{post.Slug}";
+                    var postUrl = ConstantUtil.GetBbsPostUrl(post);
                     var postAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
                     <article class="resource-card">
                         <a href="@postUrl" class="resource-card__media">
