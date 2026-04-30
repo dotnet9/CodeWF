@@ -110,7 +110,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _docItems;
         }
 
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", "doc.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", "navigation.json");
         if (!File.Exists(filePath))
         {
             return _docItems;
@@ -123,7 +123,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to deserialize doc.json: {ex.Message}");
+            Console.WriteLine($"Failed to deserialize doc/navigation.json: {ex.Message}");
         }
         return _docItems;
     }
@@ -993,7 +993,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _albumItems;
         }
 
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "album.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "albums.json");
         if (!File.Exists(filePath))
         {
             return _albumItems;
@@ -1006,7 +1006,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to deserialize album.json: {ex.Message}");
+            Console.WriteLine($"Failed to deserialize albums.json: {ex.Message}");
         }
         
         if (_albumItems == null)
@@ -1030,7 +1030,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _categoryItems;
         }
 
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "category.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "categories.json");
         if (!File.Exists(filePath))
         {
             return _categoryItems;
@@ -1043,7 +1043,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to deserialize category.json: {ex.Message}");
+            Console.WriteLine($"Failed to deserialize categories.json: {ex.Message}");
         }
         
         if (_categoryItems == null)
@@ -1396,7 +1396,8 @@ public class AppService(IOptions<SiteOption> siteOption)
 
     public async Task<BlogPost?> GetPostBySlug(string slug)
     {
-        var post = _blogPosts?.FirstOrDefault(cat => cat.Slug == slug);
+        var post = _blogPosts?.FirstOrDefault(post =>
+            string.Equals(post.Slug, slug, StringComparison.OrdinalIgnoreCase));
         return post;
     }
 
@@ -1455,7 +1456,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _friendLinkItems;
         }
 
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "FriendLink.json");
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "friend-links.json");
         if (!File.Exists(filePath))
         {
             return _friendLinkItems;
@@ -1468,7 +1469,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to deserialize FriendLink.json: {ex.Message}");
+            Console.WriteLine($"Failed to deserialize friend-links.json: {ex.Message}");
         }
         return _friendLinkItems;
     }
