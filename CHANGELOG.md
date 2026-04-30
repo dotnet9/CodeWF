@@ -6,8 +6,9 @@ V1.1.3 (2026-04-30)
 
 - 😄 [Added] Added the `/tag` tag directory and `/tag/{tag}` tag aggregation pages, with safe encoding and decoding for Chinese tags, `C#`, and other special tag names.
 - 😄 [Added] Added search suggestion dropdowns backed by recent high-frequency search terms and matching site content.
+- 😄 [Added] Added persisted search keyword popularity in the resource repository at `site/search-keywords.json`, so hot-search suggestions survive service restarts.
 - 🔨 [Changed] Added a static search index plus a bounded 20-key in-memory search-result cache for faster repeated searches.
-- 🔨 [Changed] Added server-side filtering for inappropriate search terms with a friendly search-page fallback.
+- 🔨 [Changed] Added resource-backed server-side filtering for inappropriate search terms, with Chinese and English keyword configuration plus a friendly search-page fallback.
 - 🔨 [Changed] Modernized internal blog page namespaces and URL helper names to align with the current site language.
 - 🔨 [Changed] Improved SEO metadata with canonical URLs, Open Graph/Twitter tags, RSS discovery, article structured data, robots.txt, and broader sitemap coverage.
 - 🔨 [Changed] Completed missing article tags and cover metadata in the resource repository so tag pages and article previews have cleaner source data.

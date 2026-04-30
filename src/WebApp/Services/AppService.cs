@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using WebApp.Extensions;
@@ -16,6 +17,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 {
     private const int SearchCacheLimit = 20;
     private const int SearchQueryStatsLimit = 50;
+    private const string SearchKeywordsFileName = "search-keywords.json";
     private const string BlockedSearchNotice = "这个搜索词不适合展示，请换一个技术关键词。";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -25,37 +27,18 @@ public class AppService(IOptions<SiteOption> siteOption)
         ReadCommentHandling = JsonCommentHandling.Skip
     };
 
-    private static readonly string[] BlockedSearchKeywords =
-    [
-        "赌博",
-        "博彩",
-        "色情",
-        "成人视频",
-        "约炮",
-        "毒品",
-        "冰毒",
-        "枪支",
-        "炸药",
-        "爆炸物",
-        "恐怖主义",
-        "暴恐",
-        "诈骗",
-        "钓鱼",
-        "洗钱",
-        "代开发票",
-        "黑产",
-        "木马",
-        "免杀",
-        "盗号",
-        "撞库",
-        "外挂",
-        "破解软件"
-    ];
+    private static readonly JsonSerializerOptions WriteJsonOptions = new(JsonOptions)
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
 
     private List<DocItem>? _docItems;
     private List<ToolItem>? _toolItems;
     private List<AlbumItem>? _albumItems;
     private List<CategoryItem>? _categoryItems;
+    private List<SearchBlockedKeywordGroup>? _searchBlockedKeywordGroups;
+    private IReadOnlyList<string>? _searchBlockedKeywords;
     private List<BlogPost>? _blogPosts;
     private List<FriendLinkItem>? _friendLinkItems;
     private List<TimeLineItem>? _timeLineItems;
@@ -92,13 +75,17 @@ public class AppService(IOptions<SiteOption> siteOption)
     private sealed record SearchQueryStats(string Query, int Count, DateTimeOffset LastSearchedAt);
 
     private readonly SemaphoreSlim _searchIndexLock = new(1, 1);
+    private readonly SemaphoreSlim _searchQueryStatsFileLock = new(1, 1);
     private readonly ConcurrentDictionary<string, SearchCacheEntry> _searchCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, SearchQueryStats> _searchQueryStats = new(StringComparer.OrdinalIgnoreCase);
+    private bool _searchQueryStatsLoaded;
 
     public async Task SeedAsync()
     {
         await GetAllAlbumItemsAsync();
         await GetAllCategoryItemsAsync();
+        await GetSearchBlockedKeywordGroupsAsync();
+        await LoadSearchQueryStatsAsync();
         await GetAllBlogPostsAsync();
         await GetAllFriendLinkItemsAsync();
         await GetTimeLineItemsAsync();
@@ -236,7 +223,7 @@ public class AppService(IOptions<SiteOption> siteOption)
             return new SearchResultPageData(safePageIndex, safePageSize, 0, [], 0, 0, 0);
         }
 
-        if (IsBlockedSearchQuery(normalizedQuery))
+        if (await IsBlockedSearchQueryAsync(normalizedQuery))
         {
             return new SearchResultPageData(
                 safePageIndex,
@@ -250,7 +237,7 @@ public class AppService(IOptions<SiteOption> siteOption)
                 BlockedSearchNotice);
         }
 
-        TrackSearchQuery(normalizedQuery);
+        await TrackSearchQueryAsync(normalizedQuery);
 
         if (_searchCache.TryGetValue(normalizedQuery, out var cacheEntry))
         {
@@ -270,7 +257,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         var normalizedQuery = NormalizeSearchQuery(query);
         var safeSize = Math.Clamp(size, 1, 20);
 
-        if (IsBlockedSearchQuery(normalizedQuery))
+        if (await IsBlockedSearchQueryAsync(normalizedQuery))
         {
             return [];
         }
@@ -278,6 +265,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         var suggestions = new List<SearchSuggestionItem>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        await LoadSearchQueryStatsAsync();
         foreach (var item in _searchQueryStats.Values
                      .Where(item => string.IsNullOrWhiteSpace(normalizedQuery)
                          || item.Query.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase))
@@ -504,12 +492,44 @@ public class AppService(IOptions<SiteOption> siteOption)
     private static string NormalizeSearchQuery(string? query) =>
         Regex.Replace(query?.Trim() ?? string.Empty, @"\s+", " ");
 
-    private static bool IsBlockedSearchQuery(string query) =>
-        !string.IsNullOrWhiteSpace(query)
-        && BlockedSearchKeywords.Any(keyword => query.Contains(keyword, StringComparison.OrdinalIgnoreCase));
-
-    private void TrackSearchQuery(string normalizedQuery)
+    private async Task<bool> IsBlockedSearchQueryAsync(string query)
     {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return false;
+        }
+
+        var keywords = await GetSearchBlockedKeywordsAsync();
+        return ContainsBlockedSearchKeyword(query, keywords);
+    }
+
+    private static bool ContainsBlockedSearchKeyword(string query, IReadOnlyList<string> keywords) =>
+        keywords.Any(keyword => query.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+    private async Task<IReadOnlyList<string>> GetSearchBlockedKeywordsAsync()
+    {
+        if (_searchBlockedKeywords is not null)
+        {
+            return _searchBlockedKeywords;
+        }
+
+        var groups = await GetSearchBlockedKeywordGroupsAsync();
+        _searchBlockedKeywords = groups
+            .SelectMany(static group => group.Keywords ?? [])
+            .Select(NormalizeSearchQuery)
+            .Where(static keyword => !string.IsNullOrWhiteSpace(keyword))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(static keyword => keyword.Length)
+            .ThenBy(static keyword => keyword, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        return _searchBlockedKeywords;
+    }
+
+    private async Task TrackSearchQueryAsync(string normalizedQuery)
+    {
+        await LoadSearchQueryStatsAsync();
+
         var now = DateTimeOffset.UtcNow;
         _searchQueryStats.AddOrUpdate(
             normalizedQuery,
@@ -521,6 +541,134 @@ public class AppService(IOptions<SiteOption> siteOption)
             });
 
         TrimSearchQueryStats();
+        await SaveSearchQueryStatsAsync();
+    }
+
+    private async Task LoadSearchQueryStatsAsync()
+    {
+        if (_searchQueryStatsLoaded)
+        {
+            return;
+        }
+
+        var filePath = GetSearchKeywordsFilePath();
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            _searchQueryStatsLoaded = true;
+            return;
+        }
+
+        var blockedKeywords = await GetSearchBlockedKeywordsAsync();
+
+        await _searchQueryStatsFileLock.WaitAsync();
+        try
+        {
+            if (_searchQueryStatsLoaded)
+            {
+                return;
+            }
+
+            if (!File.Exists(filePath))
+            {
+                _searchQueryStatsLoaded = true;
+                return;
+            }
+
+            var fileContent = await File.ReadAllTextAsync(filePath);
+            if (string.IsNullOrWhiteSpace(fileContent))
+            {
+                _searchQueryStatsLoaded = true;
+                return;
+            }
+
+            List<SearchQueryStats>? savedStats;
+            try
+            {
+                savedStats = JsonSerializer.Deserialize<List<SearchQueryStats>>(fileContent, JsonOptions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to deserialize {SearchKeywordsFileName}: {ex.Message}");
+                _searchQueryStatsLoaded = true;
+                return;
+            }
+
+            foreach (var item in savedStats ?? [])
+            {
+                var query = NormalizeSearchQuery(item.Query);
+                if (string.IsNullOrWhiteSpace(query) || ContainsBlockedSearchKeyword(query, blockedKeywords))
+                {
+                    continue;
+                }
+
+                var count = Math.Max(1, item.Count);
+                var lastSearchedAt = item.LastSearchedAt == default ? DateTimeOffset.UtcNow : item.LastSearchedAt;
+                _searchQueryStats.AddOrUpdate(
+                    query,
+                    new SearchQueryStats(query, count, lastSearchedAt),
+                    (_, current) => current.Count > count
+                                    || (current.Count == count && current.LastSearchedAt >= lastSearchedAt)
+                        ? current
+                        : new SearchQueryStats(query, count, lastSearchedAt));
+            }
+
+            TrimSearchQueryStats();
+            _searchQueryStatsLoaded = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load {SearchKeywordsFileName}: {ex.Message}");
+            _searchQueryStatsLoaded = true;
+        }
+        finally
+        {
+            _searchQueryStatsFileLock.Release();
+        }
+    }
+
+    private async Task SaveSearchQueryStatsAsync()
+    {
+        var filePath = GetSearchKeywordsFilePath();
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return;
+        }
+
+        await _searchQueryStatsFileLock.WaitAsync();
+        try
+        {
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var data = _searchQueryStats.Values
+                .OrderByDescending(static item => item.Count)
+                .ThenByDescending(static item => item.LastSearchedAt)
+                .Take(SearchQueryStatsLimit)
+                .ToList();
+            var json = JsonSerializer.Serialize(data, WriteJsonOptions);
+            await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to write {SearchKeywordsFileName}: {ex.Message}");
+        }
+        finally
+        {
+            _searchQueryStatsFileLock.Release();
+        }
+    }
+
+    private string? GetSearchKeywordsFilePath()
+    {
+        if (string.IsNullOrWhiteSpace(siteOption.Value.LocalAssetsDir))
+        {
+            return null;
+        }
+
+        return Path.Combine(siteOption.Value.LocalAssetsDir, "site", SearchKeywordsFileName);
     }
 
     private void TouchSearchCacheEntry(string normalizedQuery, SearchCacheEntry cacheEntry)
@@ -905,6 +1053,55 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         _categoryItems.Insert(0, new CategoryItem() { Slug = ConstantUtil.DefaultCategory, Name = "所有" });
         return _categoryItems;
+    }
+
+    public async Task<List<SearchBlockedKeywordGroup>> GetSearchBlockedKeywordGroupsAsync()
+    {
+        if (_searchBlockedKeywordGroups is not null)
+        {
+            return _searchBlockedKeywordGroups;
+        }
+
+        _searchBlockedKeywordGroups = [];
+        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
+        {
+            return _searchBlockedKeywordGroups;
+        }
+
+        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "blocked-search-keywords.json");
+        if (!File.Exists(filePath))
+        {
+            return _searchBlockedKeywordGroups;
+        }
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+        try
+        {
+            _searchBlockedKeywordGroups = JsonSerializer.Deserialize<List<SearchBlockedKeywordGroup>>(fileContent, JsonOptions) ?? [];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to deserialize blocked-search-keywords.json: {ex.Message}");
+            _searchBlockedKeywordGroups = [];
+        }
+
+        foreach (var group in _searchBlockedKeywordGroups)
+        {
+            group.Keywords = group.Keywords?
+                .Select(NormalizeSearchQuery)
+                .Where(static keyword => !string.IsNullOrWhiteSpace(keyword))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList()
+                ?? [];
+        }
+
+        _searchBlockedKeywordGroups = _searchBlockedKeywordGroups
+            .Where(static group => group.Keywords is { Count: > 0 })
+            .OrderBy(static group => group.Sort)
+            .ThenBy(static group => group.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        return _searchBlockedKeywordGroups;
     }
 
 
