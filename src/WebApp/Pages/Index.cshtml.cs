@@ -13,9 +13,9 @@ public class IndexModel : PageModel
     private const int FeaturedAlbumLimit = 4;
     private const int FeaturedCategoryLimit = 4;
 
-    public List<BlogPost> Posts { get; private set; } = [];
-    public List<BlogPost> HeroPosts { get; private set; } = [];
-    public List<BlogPost> LatestPosts { get; private set; } = [];
+    public List<BlogPostBrief> Posts { get; private set; } = [];
+    public List<BlogPostBrief> HeroPosts { get; private set; } = [];
+    public List<BlogPostBrief> LatestPosts { get; private set; } = [];
     public List<AlbumItem> Albums { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
     public List<HomeBrowseItem> FeaturedAlbums { get; private set; } = [];
@@ -25,7 +25,7 @@ public class IndexModel : PageModel
     public int TotalPosts { get; private set; }
     public int TotalDocNodes { get; private set; }
     public int TotalToolEntries { get; private set; }
-    public BlogPost? SpotlightPost => LatestPosts.FirstOrDefault() ?? Posts.FirstOrDefault();
+    public BlogPostBrief? SpotlightPost => LatestPosts.FirstOrDefault() ?? Posts.FirstOrDefault();
 
     public IndexModel(AppService appService)
     {
@@ -34,7 +34,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var allPosts = await _appService.GetAllBlogPostsAsync() ?? [];
+        var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
         LatestPosts = allPosts.Take(4).ToList();
         HeroPosts = TakeRandom(allPosts, 2);
         Posts = (await _appService.GetBannerPostAsync())?.Take(6).ToList() ?? [];
@@ -92,7 +92,7 @@ public class IndexModel : PageModel
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
-        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<BlogPostBrief> allPosts,
         IReadOnlyList<HomeBrowseItem> categories,
         IReadOnlyList<HomeBrowseItem> albums)
     {
@@ -134,7 +134,7 @@ public class IndexModel : PageModel
         return links.Take(4).ToList();
     }
 
-    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPost> posts, int count)
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts, int count)
     {
         if (posts.Count == 0)
         {

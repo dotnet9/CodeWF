@@ -18,7 +18,7 @@ public class NavigationViewComponent : ViewComponent
     {
         var albums = await _appService.GetAllAlbumItemsAsync();
         var categories = await _appService.GetAllCategoryItemsAsync();
-        var posts = await _appService.GetAllBlogPostsAsync() ?? [];
+        var posts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
 
         var model = new NavigationViewModel
         {

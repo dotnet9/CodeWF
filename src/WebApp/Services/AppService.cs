@@ -1164,7 +1164,13 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         return _blogPosts;
     }
 
-    public Task<PageData<BlogPost>> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
+    public async Task<List<BlogPostBrief>?> GetAllBlogPostBriefsAsync()
+    {
+        var posts = await GetAllBlogPostsAsync();
+        return posts?.Select(ToBlogPostBrief).ToList();
+    }
+
+    public Task<PageData<BlogPostBrief>> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
         string? key)
     {
         AlbumItem? album = null;
@@ -1200,11 +1206,12 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var postDatas = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .Select(ToBlogPostBrief)
             .ToList();
-        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, postDatas));
+        return Task.FromResult(new PageData<BlogPostBrief>(pageIndex, pageSize, total, postDatas));
     }
 
-    public Task<PageData<BlogPost>> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
+    public Task<PageData<BlogPostBrief>> GetPostByCategory(int pageIndex, int pageSize, string categorySlug,
         string? key)
     {
         CategoryItem? cat = null;
@@ -1240,8 +1247,9 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var postDatas = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .Select(ToBlogPostBrief)
             .ToList();
-        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, postDatas));
+        return Task.FromResult(new PageData<BlogPostBrief>(pageIndex, pageSize, total, postDatas));
     }
 
     public async Task<List<TagItem>> GetAllTagItemsAsync()
@@ -1264,7 +1272,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             .ToList();
     }
 
-    public async Task<PageData<BlogPost>> GetPostByTag(int pageIndex, int pageSize, string tag, string? key = null)
+    public async Task<PageData<BlogPostBrief>> GetPostByTag(int pageIndex, int pageSize, string tag, string? key = null)
     {
         await GetAllBlogPostsAsync();
 
@@ -1298,21 +1306,24 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var data = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .Select(ToBlogPostBrief)
             .ToList();
 
-        return new PageData<BlogPost>(pageIndex, pageSize, total, data);
+        return new PageData<BlogPostBrief>(pageIndex, pageSize, total, data);
     }
 
-    public Task<List<BlogPost>?> GetBannerPostAsync()
+    public async Task<List<BlogPostBrief>?> GetBannerPostAsync()
     {
-        var posts = _blogPosts
+        var posts = await GetAllBlogPostsAsync();
+        var bannerPosts = posts
             ?.Where(post => post.Banner)
             .OrderByDescending(post => post.Date)
+            .Select(ToBlogPostBrief)
             .ToList();
-        return Task.FromResult(posts);
+        return bannerPosts;
     }
 
-    public Task<PageData<BlogPost>> GetPagedBlogPostsAsync(int pageIndex, int pageSize, string? key = null)
+    public Task<PageData<BlogPostBrief>> GetPagedBlogPostsAsync(int pageIndex, int pageSize, string? key = null)
     {
         var source = _blogPosts?.AsEnumerable() ?? [];
 
@@ -1334,10 +1345,31 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var data = ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .Select(ToBlogPostBrief)
             .ToList();
 
-        return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, data));
+        return Task.FromResult(new PageData<BlogPostBrief>(pageIndex, pageSize, total, data));
     }
+
+    private static BlogPostBrief ToBlogPostBrief(BlogPost post) => new()
+    {
+        Title = post.Title,
+        Slug = post.Slug,
+        Description = post.Description,
+        Date = post.Date,
+        Lastmod = post.Lastmod,
+        Copyright = post.Copyright,
+        Banner = post.Banner,
+        Author = post.Author,
+        LastModifyUser = post.LastModifyUser,
+        OriginalTitle = post.OriginalTitle,
+        OriginalLink = post.OriginalLink,
+        Draft = post.Draft,
+        Cover = post.Cover,
+        Albums = post.Albums?.ToList(),
+        Categories = post.Categories?.ToList(),
+        Tags = post.Tags?.ToList()
+    };
 
     public Task<Dictionary<string, string>> GetWebSiteCountAsync()
     {

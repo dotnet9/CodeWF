@@ -15,7 +15,7 @@ public class IndexModel : PageModel
     public string TagName { get; set; } = "全部标签";
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
-    public List<BlogPost> Posts { get; set; } = [];
+    public List<BlogPostBrief> Posts { get; set; } = [];
     public List<TagItem> Tags { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
 

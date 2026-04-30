@@ -4729,6 +4729,20 @@ p,
   }
 }
 
+@media (min-width: 992px) {
+  .site-navbar .navbar-nav {
+    gap: 0.45rem;
+  }
+
+  .site-navbar .nav-link {
+    padding-inline: 0.92rem !important;
+  }
+
+  .site-navbar .nav-item.dropdown .nav-link {
+    padding-right: 0.92rem !important;
+  }
+}
+
 @media (max-width: 767.98px) {
   .surface-panel {
     padding: 1rem;

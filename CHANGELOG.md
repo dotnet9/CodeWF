@@ -14,6 +14,8 @@ V1.1.3 (2026-04-30)
 - 🔨 [Changed] Completed missing article tags and cover metadata in the resource repository so tag pages and article previews have cleaner source data.
 - 🔨 [Changed] Turned article detail categories, albums, and tags into internal links for easier same-category, same-album, and same-tag exploration.
 - 🔨 [Changed] Turned homepage hero statistics into internal links to `/post`, `/project`, and `/tool`.
+- 🔨 [Changed] Increased desktop header navigation spacing for a more comfortable top-menu rhythm.
+- 🔨 [Changed] Changed article list, homepage, tag, category, album, and navigation data flows to use `BlogPostBrief` instead of carrying full post content.
 - 🔨 [Changed] Refined the overall visual clarity by reducing card title size and weight, softening overly dark text, and tuning cards, shadows, and grid backgrounds.
 - 🔨 [Changed] Improved Markdown code block readability with Prism highlighting on article pages, language headers, copy buttons, a dark grid background, and smaller readable code typography.
 - 🐛 [Fixed] Fixed mobile horizontal overflow in article list pagination.

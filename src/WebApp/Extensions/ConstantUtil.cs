@@ -40,7 +40,7 @@ public static class ConstantUtil
             return NormalizeTagName(trimmed);
         }
     }
-    public static string GetPostUrl(BlogPost post) => $"/{post.Date?.Year:D4}/{post.Date?.Month:D2}/{post.Slug}";
+    public static string GetPostUrl(BlogPostBrief post) => $"/{post.Date?.Year:D4}/{post.Date?.Month:D2}/{post.Slug}";
     public static string GetProjectDirectoryUrl() => "/project";
     public static string GetProjectUrl(string? slug) => $"/project/{slug}";
     public static string GetSearchUrl(string? query = null, int? pageIndex = null)

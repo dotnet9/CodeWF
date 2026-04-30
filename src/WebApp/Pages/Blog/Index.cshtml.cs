@@ -9,7 +9,7 @@ public class IndexModel : PageModel
 {
     private readonly AppService _appService;
 
-    public List<BlogPost> Posts { get; private set; } = [];
+    public List<BlogPostBrief> Posts { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
     public List<AlbumItem> Albums { get; private set; } = [];
     public List<DiscoveryLinkCard> GettingStartedLinks { get; private set; } = [];
@@ -34,7 +34,7 @@ public class IndexModel : PageModel
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
         Albums = await _appService.GetAllAlbumItemsAsync() ?? [];
 
-        var allPosts = await _appService.GetAllBlogPostsAsync() ?? [];
+        var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
         GettingStartedLinks = BuildGettingStartedLinks(allPosts, Categories, Albums);
         SerialReadingLinks = BuildSerialReadingLinks(allPosts, Albums);
         RandomPosts = BuildDiscoveryPosts(
@@ -45,7 +45,7 @@ public class IndexModel : PageModel
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
-        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<BlogPostBrief> allPosts,
         IReadOnlyList<CategoryItem> categories,
         IReadOnlyList<AlbumItem> albums)
     {
@@ -109,7 +109,7 @@ public class IndexModel : PageModel
     }
 
     private static List<DiscoveryLinkCard> BuildSerialReadingLinks(
-        IReadOnlyList<BlogPost> allPosts,
+        IReadOnlyList<BlogPostBrief> allPosts,
         IReadOnlyList<AlbumItem> albums)
     {
         var candidates = albums
@@ -134,7 +134,7 @@ public class IndexModel : PageModel
             .ToList();
     }
 
-    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPost> posts, int count)
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts, int count)
     {
         if (posts.Count == 0)
         {
