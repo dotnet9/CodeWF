@@ -823,3 +823,25 @@
     font-size: 0.92rem;
   }
 }
+
+.hero-trustline__item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.42rem 0.62rem;
+  border-radius: 6px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  background: rgba(8, 21, 38, 0.46);
+  color: #c5d4e7;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.hero-trustline__item:hover,
+.hero-trustline__item:focus {
+  color: #ffffff;
+  border-color: rgba(118, 228, 208, 0.34);
+  background: rgba(8, 21, 38, 0.62);
+  transform: translateY(-1px);
+}

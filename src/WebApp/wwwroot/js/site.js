@@ -212,8 +212,100 @@ function initializeReadingToc() {
 }
 
 function initializeReadingExperience() {
+    initializeMarkdownCodeBlocks();
     initializeReadingProgress();
     initializeCopyUrlButtons();
+}
+
+function initializeMarkdownCodeBlocks() {
+    const codeBlocks = Array.from(document.querySelectorAll(".prose pre, .article-content pre, .doc-content pre"));
+    if (!codeBlocks.length) {
+        return;
+    }
+
+    const fallbackCopy = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.setAttribute("readonly", "readonly");
+        textArea.style.position = "absolute";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+    };
+
+    const getLanguage = (pre) => {
+        const code = pre.querySelector("code");
+        const className = code?.className || pre.className || "";
+        const match = className.match(/language-([a-z0-9#+.-]+)/i);
+        if (!match) {
+            return "text";
+        }
+
+        const aliases = {
+            csharp: "C#",
+            cs: "C#",
+            javascript: "JS",
+            typescript: "TS",
+            markup: "HTML/XML",
+            bash: "Shell",
+            powershell: "PowerShell",
+            text: "Text"
+        };
+
+        return aliases[match[1].toLowerCase()] || match[1].toUpperCase();
+    };
+
+    codeBlocks.forEach((pre) => {
+        if (pre.dataset.codeEnhanced === "true" || pre.closest(".code-block-shell")) {
+            return;
+        }
+
+        const code = pre.querySelector("code");
+        const rawText = code?.textContent || pre.textContent || "";
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block-shell";
+
+        const header = document.createElement("div");
+        header.className = "code-block-header";
+
+        const language = document.createElement("span");
+        language.className = "code-block-language";
+        language.textContent = getLanguage(pre);
+
+        const copyButton = document.createElement("button");
+        copyButton.type = "button";
+        copyButton.className = "code-copy-button";
+        copyButton.textContent = "复制";
+
+        let resetTimer = 0;
+        copyButton.addEventListener("click", async () => {
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(rawText);
+                } else {
+                    fallbackCopy(rawText);
+                }
+
+                window.clearTimeout(resetTimer);
+                copyButton.textContent = "已复制";
+                copyButton.classList.add("is-copied");
+                resetTimer = window.setTimeout(() => {
+                    copyButton.textContent = "复制";
+                    copyButton.classList.remove("is-copied");
+                }, 1800);
+            } catch (error) {
+                copyButton.textContent = "复制";
+                copyButton.classList.remove("is-copied");
+            }
+        });
+
+        header.append(language, copyButton);
+        pre.dataset.codeEnhanced = "true";
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.append(header, pre);
+    });
 }
 
 function initializeReadingProgress() {

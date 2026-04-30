@@ -1,4 +1,5 @@
 using WebApp.Models;
+using System.Text;
 
 namespace WebApp.Extensions;
 
@@ -13,6 +14,32 @@ public static class ConstantUtil
     public static string GetBbsCategoryUrl(string slug) => $"/cat/{slug}";
     public static string GetAlbumDirectoryUrl() => "/album";
     public static string GetBbsAlbumUrl(string slug) => $"/album/{slug}";
+    public static string GetTagDirectoryUrl() => "/tag";
+    public static string GetBbsTagUrl(string tag) =>
+        string.IsNullOrWhiteSpace(NormalizeTagName(tag))
+            ? GetTagDirectoryUrl()
+            : $"/tag/{Uri.EscapeDataString(NormalizeTagName(tag))}";
+    public static string NormalizeTagName(string? tag) =>
+        string.IsNullOrWhiteSpace(tag)
+            ? string.Empty
+            : tag.Trim().Normalize(NormalizationForm.FormC);
+    public static string DecodeTagSlug(string? slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            return string.Empty;
+        }
+
+        var trimmed = slug.Trim();
+        try
+        {
+            return NormalizeTagName(Uri.UnescapeDataString(trimmed));
+        }
+        catch (UriFormatException)
+        {
+            return NormalizeTagName(trimmed);
+        }
+    }
     public static string GetBbsPostUrl(BlogPost post) => $"/{post.Date?.Year:D4}/{post.Date?.Month:D2}/{post.Slug}";
     public static string GetProjectDirectoryUrl() => "/project";
     public static string GetProjectUrl(string? slug) => $"/project/{slug}";

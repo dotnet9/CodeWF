@@ -63,9 +63,9 @@
                 </div>
 
                 <div class="hero-trustline">
-                    <span>@Model.TotalPosts 篇文章</span>
-                    <span>@Model.TotalDocNodes 个项目条目</span>
-                    <span>@Model.TotalToolEntries 个工具入口</span>
+                    <a href="@ConstantUtil.GetBlogUrl()" class="hero-trustline__item">@Model.TotalPosts 篇文章</a>
+                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="hero-trustline__item">@Model.TotalDocNodes 个项目条目</a>
+                    <a href="/tool" class="hero-trustline__item">@Model.TotalToolEntries 个工具入口</a>
                 </div>
             </div>
 

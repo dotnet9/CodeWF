@@ -2,6 +2,15 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.3 (2026-04-30)
+
+- 😄 [Added] Added the `/tag` tag directory and `/tag/{tag}` tag aggregation pages, with safe encoding and decoding for Chinese tags, `C#`, and other special tag names.
+- 🔨 [Changed] Turned article detail categories, albums, and tags into internal links for easier same-category, same-album, and same-tag exploration.
+- 🔨 [Changed] Turned homepage hero statistics into internal links to `/post`, `/project`, and `/tool`.
+- 🔨 [Changed] Refined the overall visual clarity by reducing card title size and weight, softening overly dark text, and tuning cards, shadows, and grid backgrounds.
+- 🔨 [Changed] Improved Markdown code block readability with Prism highlighting on article pages, language headers, copy buttons, a dark grid background, and smaller readable code typography.
+- 🐛 [Fixed] Fixed mobile horizontal overflow in article list pagination.
+
 V1.1.2 (2026-04-29)
 
 - 😄 [Added] Added "Start Here" and "Unexpected Finds" homepage modules to help first-time visitors enter the content flow and continue reading more naturally.

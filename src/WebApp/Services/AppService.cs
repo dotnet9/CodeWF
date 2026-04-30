@@ -799,6 +799,65 @@ public class AppService(IOptions<SiteOption> siteOption)
         return Task.FromResult(new PageData<BlogPost>(pageIndex, pageSize, total, postDatas));
     }
 
+    public async Task<List<TagItem>> GetAllTagItemsAsync()
+    {
+        await GetAllBlogPostsAsync();
+
+        return (_blogPosts ?? [])
+            .SelectMany(static post => post.Tags ?? [])
+            .Where(static tag => !string.IsNullOrWhiteSpace(tag))
+            .Select(ConstantUtil.NormalizeTagName)
+            .Where(static tag => !string.IsNullOrWhiteSpace(tag))
+            .GroupBy(static tag => tag, StringComparer.OrdinalIgnoreCase)
+            .Select(static group => new TagItem
+            {
+                Name = group.First(),
+                PostCount = group.Count()
+            })
+            .OrderByDescending(static tag => tag.PostCount)
+            .ThenBy(static tag => tag.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+    }
+
+    public async Task<PageData<BlogPost>> GetPostByTag(int pageIndex, int pageSize, string tag, string? key = null)
+    {
+        await GetAllBlogPostsAsync();
+
+        var normalizedTag = ConstantUtil.NormalizeTagName(tag);
+        IEnumerable<BlogPost> posts;
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            posts = (_blogPosts ?? [])
+                .Where(p => p.Title?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Description?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Slug?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Author?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Content?.Contains(key, StringComparison.OrdinalIgnoreCase) == true
+                            || p.Tags?.Any(tagItem => tagItem.Contains(key, StringComparison.OrdinalIgnoreCase)) == true);
+        }
+        else
+        {
+            posts = (_blogPosts ?? [])
+                .Where(post => post.Tags?.Any(postTag =>
+                    string.Equals(
+                        ConstantUtil.NormalizeTagName(postTag),
+                        normalizedTag,
+                        StringComparison.OrdinalIgnoreCase)) == true);
+        }
+
+        var ordered = posts
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ThenByDescending(post => post.Date ?? DateTime.MinValue);
+
+        var total = ordered.Count();
+        var data = ordered
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PageData<BlogPost>(pageIndex, pageSize, total, data);
+    }
+
     public Task<List<BlogPost>?> GetBannerPostAsync()
     {
         var posts = _blogPosts

@@ -106,7 +106,7 @@ public class IndexModel : PageModel
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Select(static item => item.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Select(tag => new ArticleTopicLink(tag, ConstantUtil.GetSearchUrl(tag), "fas fa-hashtag"))
+            .Select(tag => new ArticleTopicLink(tag, ConstantUtil.GetBbsTagUrl(tag), "fas fa-hashtag"))
             .ToList();
     }
 
@@ -129,7 +129,7 @@ public class IndexModel : PageModel
 
         if (tags.FirstOrDefault() is { } primaryTag)
         {
-            links.Add(new ArticleExploreLink("搜索相关标签", primaryTag.Url, primaryTag.IconClass, primaryTag.Label));
+            links.Add(new ArticleExploreLink("继续看同标签", primaryTag.Url, primaryTag.IconClass, primaryTag.Label));
         }
 
         links.Add(new ArticleExploreLink("顺手逛工具库", "/tool", "fas fa-screwdriver-wrench", "从文章跳到实用工具"));
