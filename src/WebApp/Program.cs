@@ -77,7 +77,8 @@ app.UseStaticFiles(new StaticFileOptions
             ".ico",
             ".woff",
             ".woff2",
-            ".json"
+            ".json",
+            ".txt"
         };
 
         if (!cacheableExtensions.Contains(extension))

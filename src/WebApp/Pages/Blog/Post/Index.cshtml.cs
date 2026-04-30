@@ -5,7 +5,7 @@ using WebApp.Models;
 using WebApp.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace WebApp.Pages.Bbs.Post;
+namespace WebApp.Pages.Blog.Post;
 
 public sealed record ArticleTopicLink(string Label, string Url, string IconClass);
 public sealed record ArticleExploreLink(string Title, string Url, string IconClass, string Description);
@@ -66,8 +66,8 @@ public class IndexModel : PageModel
             .GroupBy(item => item.Name!, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(group => group.Key, group => group.First().Slug!, StringComparer.OrdinalIgnoreCase);
 
-        CategoryLinks = BuildTopicLinks(Post.Categories, categoryLookup, ConstantUtil.GetBbsCategoryUrl, "fas fa-folder-open");
-        AlbumLinks = BuildTopicLinks(Post.Albums, albumLookup, ConstantUtil.GetBbsAlbumUrl, "fas fa-layer-group");
+        CategoryLinks = BuildTopicLinks(Post.Categories, categoryLookup, ConstantUtil.GetCategoryUrl, "fas fa-folder-open");
+        AlbumLinks = BuildTopicLinks(Post.Albums, albumLookup, ConstantUtil.GetAlbumUrl, "fas fa-layer-group");
         TagLinks = BuildTagLinks(Post.Tags);
         ExploreLinks = BuildExploreLinks(CategoryLinks, AlbumLinks, TagLinks);
         RelatedPosts = BuildRelatedPosts(Post, posts, RelatedPostLimit);
@@ -106,7 +106,7 @@ public class IndexModel : PageModel
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Select(static item => item.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Select(tag => new ArticleTopicLink(tag, ConstantUtil.GetBbsTagUrl(tag), "fas fa-hashtag"))
+            .Select(tag => new ArticleTopicLink(tag, ConstantUtil.GetTagUrl(tag), "fas fa-hashtag"))
             .ToList();
     }
 
@@ -192,7 +192,7 @@ public class IndexModel : PageModel
             .Take(limit)
             .Select(item => new RelatedPostCard(
                 item.Post.Title!,
-                ConstantUtil.GetBbsPostUrl(item.Post),
+                ConstantUtil.GetPostUrl(item.Post),
                 item.Post.Description,
                 item.ContextLabel,
                 item.Post.Lastmod ?? item.Post.Date))
@@ -214,7 +214,7 @@ public class IndexModel : PageModel
                          && !string.IsNullOrWhiteSpace(post.Title))
                      .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue))
         {
-            var url = ConstantUtil.GetBbsPostUrl(post);
+            var url = ConstantUtil.GetPostUrl(post);
             if (!existingUrls.Add(url))
             {
                 continue;

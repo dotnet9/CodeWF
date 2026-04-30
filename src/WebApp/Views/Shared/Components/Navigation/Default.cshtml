@@ -68,7 +68,7 @@
                     <div class="nav-menu-list nav-menu-list--stacked">
                         @foreach (var album in albums)
                         {
-                            <a class="nav-menu-link" href="@ConstantUtil.GetBbsAlbumUrl(album.Slug)">
+                            <a class="nav-menu-link" href="@ConstantUtil.GetAlbumUrl(album.Slug)">
                                 <span class="nav-menu-link__content">
                                     <strong>@album.Name</strong>
                                     @if (!string.IsNullOrWhiteSpace(album.Memo))
@@ -96,7 +96,7 @@
                     <div class="nav-menu-list nav-menu-list--stacked">
                         @foreach (var category in categories)
                         {
-                            <a class="nav-menu-link" href="@ConstantUtil.GetBbsCategoryUrl(category.Slug)">
+                            <a class="nav-menu-link" href="@ConstantUtil.GetCategoryUrl(category.Slug)">
                                 <span class="nav-menu-link__content">
                                     <strong>@category.Name</strong>
                                     @if (!string.IsNullOrWhiteSpace(category.Memo))

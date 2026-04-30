@@ -3,7 +3,7 @@ using WebApp.Services;
 using WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace WebApp.Pages.Bbs;
+namespace WebApp.Pages.Blog;
 
 public class IndexModel : PageModel
 {
@@ -57,7 +57,7 @@ public class IndexModel : PageModel
                 "先看更新",
                 "从最新文章进入",
                 latestPost.Title ?? "最近更新",
-                ConstantUtil.GetBbsPostUrl(latestPost)));
+                ConstantUtil.GetPostUrl(latestPost)));
         }
 
         var topCategory = categories
@@ -79,7 +79,7 @@ public class IndexModel : PageModel
                 "按主题看",
                 $"先逛 {topCategory.Item.Name}",
                 $"{topCategory.Count} 篇文章，适合按技术方向快速筛选",
-                ConstantUtil.GetBbsCategoryUrl(topCategory.Item.Slug!)));
+                ConstantUtil.GetCategoryUrl(topCategory.Item.Slug!)));
         }
 
         var topAlbum = albums
@@ -101,7 +101,7 @@ public class IndexModel : PageModel
                 "连续阅读",
                 $"跟着专题读 {topAlbum.Item.Name}",
                 $"{topAlbum.Count} 篇文章，更适合系统连读",
-                ConstantUtil.GetBbsAlbumUrl(topAlbum.Item.Slug!)));
+                ConstantUtil.GetAlbumUrl(topAlbum.Item.Slug!)));
         }
 
         return links;
@@ -128,7 +128,7 @@ public class IndexModel : PageModel
                 "专题连读",
                 item.Item.Name!,
                 $"{item.Count} 篇文章，适合连续阅读",
-                ConstantUtil.GetBbsAlbumUrl(item.Item.Slug!)))
+                ConstantUtil.GetAlbumUrl(item.Item.Slug!)))
             .ToList();
     }
 
@@ -153,7 +153,7 @@ public class IndexModel : PageModel
                 "随机发现",
                 post.Title ?? "未命名文章",
                 post.Description ?? "换个方向看看，也许正好碰到你感兴趣的主题。",
-                ConstantUtil.GetBbsPostUrl(post),
+                ConstantUtil.GetPostUrl(post),
                 label));
         }
 

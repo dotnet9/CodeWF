@@ -5,6 +5,12 @@ Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 V1.1.3 (2026-04-30)
 
 - 😄 [Added] Added the `/tag` tag directory and `/tag/{tag}` tag aggregation pages, with safe encoding and decoding for Chinese tags, `C#`, and other special tag names.
+- 😄 [Added] Added search suggestion dropdowns backed by recent high-frequency search terms and matching site content.
+- 🔨 [Changed] Added a static search index plus a bounded 20-key in-memory search-result cache for faster repeated searches.
+- 🔨 [Changed] Added server-side filtering for inappropriate search terms with a friendly search-page fallback.
+- 🔨 [Changed] Modernized internal blog page namespaces and URL helper names to align with the current site language.
+- 🔨 [Changed] Improved SEO metadata with canonical URLs, Open Graph/Twitter tags, RSS discovery, article structured data, robots.txt, and broader sitemap coverage.
+- 🔨 [Changed] Completed missing article tags and cover metadata in the resource repository so tag pages and article previews have cleaner source data.
 - 🔨 [Changed] Turned article detail categories, albums, and tags into internal links for easier same-category, same-album, and same-tag exploration.
 - 🔨 [Changed] Turned homepage hero statistics into internal links to `/post`, `/project`, and `/tool`.
 - 🔨 [Changed] Refined the overall visual clarity by reducing card title size and weight, softening overly dark text, and tuning cards, shadows, and grid backgrounds.
@@ -16,7 +22,7 @@ V1.1.2 (2026-04-29)
 - 😄 [Added] Added "Start Here" and "Unexpected Finds" homepage modules to help first-time visitors enter the content flow and continue reading more naturally.
 - 😄 [Added] Added the `/project` project hub and project detail pages for open-source projects, NuGet packages, and their usage guides.
 - 🔨 [Changed] Unified the site URL scheme around shorter routes: blog index is now `/post`, search is `/s`, categories use `/cat/{slug}`, albums use `/album/{slug}`, and article details use `/{yyyy}/{MM}/{slug}`.
-- 🔨 [Changed] Removed legacy `/Bbs/...` route compatibility and the old `/doc` entry, and standardized the public-facing section name to "Projects".
+- 🔨 [Changed] Removed legacy `/...` route compatibility and the old `/doc` entry, and standardized the public-facing section name to "Projects".
 - 🔨 [Changed] Rebuilt the article header into a media-rich hero card that combines the cover image, minute-level publish/update timestamps, and compact category/album/tag summaries.
 - 🔨 [Changed] Removed the article "reading guide" card and restored a simpler sticky table-of-contents sidebar for reading.
 - 🔨 [Changed] Reorganized the header navigation by folding Albums and Categories into the Blog dropdown, with direct links to all articles, albums, categories, and the latest update.
@@ -36,7 +42,7 @@ V1.1.1 (2026-04-29)
 
 V1.1.0 (2026-04-29)
 
-- 😄 [Added] Added `/bbs/album` and `/Bbs/Category` directory pages for browsing all albums and categories.
+- 😄 [Added] Added `/album` and `/Category` directory pages for browsing all albums and categories.
 - 🔨 [Changed] Simplified the homepage into a cleaner visitor-facing layout with less duplicated copy, stats, and navigation.
 - 🔨 [Changed] Refined the homepage album and category sections to use curated items with unified "View more" entry points.
 - 🔨 [Changed] Updated homepage article cards to clamp titles and summaries while keeping full text available on hover.

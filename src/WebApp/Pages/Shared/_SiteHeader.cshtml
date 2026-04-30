@@ -31,6 +31,7 @@
     var blogActive = currentPath.StartsWith("/post", StringComparison.OrdinalIgnoreCase)
         || currentPath.StartsWith("/cat", StringComparison.OrdinalIgnoreCase)
         || currentPath.StartsWith("/album", StringComparison.OrdinalIgnoreCase)
+        || currentPath.StartsWith("/tag", StringComparison.OrdinalIgnoreCase)
         || articleDetailActive;
 
     var moreActive = currentPath.StartsWith("/about", StringComparison.OrdinalIgnoreCase)
@@ -81,7 +82,7 @@
                 </ul>
 
                 <div class="site-utility-bar">
-                    <form class="site-search-form" method="get" action="@ConstantUtil.GetSearchUrl()" role="search">
+                    <form class="site-search-form search-suggest" method="get" action="@ConstantUtil.GetSearchUrl()" role="search" data-search-suggestions-url="@($"{ConstantUtil.GetSearchUrl()}?handler=Suggest")">
                         <label class="visually-hidden" for="global-search-query">全站搜索</label>
                         <span class="site-search-form__icon" aria-hidden="true">
                             <i class="fas fa-magnifying-glass"></i>
@@ -92,8 +93,13 @@
                             type="search"
                             name="q"
                             value="@searchQuery"
-                            placeholder="搜索项目、工具、文章" />
+                            placeholder="搜索项目、工具、文章"
+                            autocomplete="off"
+                            aria-autocomplete="list"
+                            aria-controls="global-search-suggestions"
+                            data-search-suggest-input />
                         <button type="submit" class="site-search-submit">搜索</button>
+                        <div id="global-search-suggestions" class="search-suggest-panel" data-search-suggest-panel hidden></div>
                     </form>
                 </div>
             </div>

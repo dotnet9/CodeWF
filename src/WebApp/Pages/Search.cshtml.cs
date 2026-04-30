@@ -20,6 +20,8 @@ public class SearchModel : PageModel
     public int ToolCount { get; private set; }
     public int DocCount { get; private set; }
     public int PostCount { get; private set; }
+    public bool IsBlocked { get; private set; }
+    public string? Notice { get; private set; }
     public List<SearchResultItem> Results { get; private set; } = [];
     public int TotalPages => Total <= 0 ? 0 : (int)Math.Ceiling(Total / (double)PageSize);
 
@@ -50,5 +52,13 @@ public class SearchModel : PageModel
         ToolCount = pageData.ToolCount;
         DocCount = pageData.DocCount;
         PostCount = pageData.PostCount;
+        IsBlocked = pageData.IsBlocked;
+        Notice = pageData.Notice;
+    }
+
+    public async Task<JsonResult> OnGetSuggestAsync(string? q)
+    {
+        var suggestions = await _appService.GetSearchSuggestionsAsync(q, 10);
+        return new JsonResult(new { suggestions });
     }
 }

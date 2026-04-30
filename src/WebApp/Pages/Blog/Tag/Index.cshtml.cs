@@ -5,7 +5,7 @@ using WebApp.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
-namespace WebApp.Pages.Bbs.Tag;
+namespace WebApp.Pages.Blog.Tag;
 
 public class IndexModel : PageModel
 {
@@ -60,5 +60,5 @@ public class IndexModel : PageModel
         Total = pageData.Total;
     }
 
-    public string GetTagUrl(string tag) => ConstantUtil.GetBbsTagUrl(tag);
+    public string GetTagUrl(string tag) => ConstantUtil.GetTagUrl(tag);
 }

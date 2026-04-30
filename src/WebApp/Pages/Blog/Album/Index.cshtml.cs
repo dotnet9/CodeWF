@@ -4,19 +4,19 @@ using WebApp.Options;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 
-namespace WebApp.Pages.Bbs.Category;
+namespace WebApp.Pages.Blog.Album;
 
 public class IndexModel : PageModel
 {
     private readonly AppService _appService;
     private readonly IOptions<SiteOption> _siteOption;
 
-    public string CategoryName { get; set; } = "所有文章";
-    public string? CategoryMemo { get; set; }
+    public string AlbumName { get; set; } = "所有专辑";
+    public string? AlbumMemo { get; set; }
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
     public List<BlogPost> Posts { get; set; } = [];
-    public List<CategoryItem> Categories { get; set; } = [];
+    public List<AlbumItem> Albums { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
 
     public int PageIndex { get; set; } = 1;
@@ -35,36 +35,36 @@ public class IndexModel : PageModel
         CurrentSlug = slug;
         PageIndex = pageIndex > 0 ? pageIndex : 1;
 
-        Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
+        Albums = await _appService.GetAllAlbumItemsAsync() ?? [];
         if (string.IsNullOrWhiteSpace(slug))
         {
-            CategoryName = "全部分类";
-            CategoryMemo = "按分类浏览站内文章内容。";
+            AlbumName = "全部专题";
+            AlbumMemo = "按专题浏览站内文章内容。";
             return;
         }
 
         if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
         {
-            CategoryName = "所有分类";
-            CategoryMemo = "聚焦同一技术主题下的文章，方便按方向连续阅读。";
-            var defaultPageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
+            AlbumName = "所有专辑";
+            AlbumMemo = "按系列化内容连续阅读，更适合跟着主题系统学习。";
+            var defaultPageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
             Posts = defaultPageData.Data;
             Total = defaultPageData.Total;
             return;
         }
 
-        var category = Categories.FirstOrDefault(c => c.Slug == slug);
-        if (category == null)
+        var album = Albums.FirstOrDefault(c => c.Slug == slug);
+        if (album == null)
         {
-            CategoryName = "分类不存在";
+            AlbumName = "专题不存在";
             Posts = [];
             Total = 0;
             return;
         }
 
-        CategoryName = category.Name ?? CategoryName;
-        CategoryMemo = category.Memo;
-        var pageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
+        AlbumName = album.Name ?? "所有专辑";
+        AlbumMemo = album.Memo;
+        var pageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;
     }

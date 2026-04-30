@@ -28,7 +28,7 @@ public class NavigationViewComponent : ViewComponent
                 .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
                 .Select(post => new NavigationFeaturedPost(
                     post.Title!,
-                    ConstantUtil.GetBbsPostUrl(post),
+                    ConstantUtil.GetPostUrl(post),
                     post.Description,
                     post.Date,
                     post.Cover))

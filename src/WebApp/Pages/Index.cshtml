@@ -80,7 +80,7 @@
                     <div class="spotlight-list">
                         @foreach (var post in heroPosts)
                         {
-                            var spotlightUrl = ConstantUtil.GetBbsPostUrl(post);
+                            var spotlightUrl = ConstantUtil.GetPostUrl(post);
                             var spotlightAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
                             <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
                                 <h2 title="@post.Title">@post.Title</h2>
@@ -187,7 +187,7 @@
                             <div class="topic-list">
                                 @foreach (var album in albums)
                                 {
-                                    <a href="@ConstantUtil.GetBbsAlbumUrl(album.Slug)" class="topic-list__item">
+                                    <a href="@ConstantUtil.GetAlbumUrl(album.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
                                             <strong>@album.Name</strong>
                                             @if (!string.IsNullOrWhiteSpace(album.Memo))
@@ -219,7 +219,7 @@
                             <div class="topic-list">
                                 @foreach (var category in categories)
                                 {
-                                    <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug)" class="topic-list__item">
+                                    <a href="@ConstantUtil.GetCategoryUrl(category.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
                                             <strong>@category.Name</strong>
                                             @if (!string.IsNullOrWhiteSpace(category.Memo))
@@ -254,7 +254,7 @@
                         <div class="dispatch-list">
                             @foreach (var post in latestPosts)
                             {
-                                var postUrl = ConstantUtil.GetBbsPostUrl(post);
+                                var postUrl = ConstantUtil.GetPostUrl(post);
                                 <a href="@postUrl" class="dispatch-item">
                                     <span class="dispatch-item__meta">@post.Date?.ToString("yyyy-MM-dd")</span>
                                     <strong>@post.Title</strong>
@@ -286,7 +286,7 @@
             <div class="post-grid feature-grid">
                 @foreach (var post in Model.Posts)
                 {
-                    var postUrl = ConstantUtil.GetBbsPostUrl(post);
+                    var postUrl = ConstantUtil.GetPostUrl(post);
                     var postAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
                     <article class="resource-card">
                         <a href="@postUrl" class="resource-card__media">

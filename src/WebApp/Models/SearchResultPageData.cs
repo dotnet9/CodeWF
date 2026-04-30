@@ -7,4 +7,6 @@ public record SearchResultPageData(
     List<SearchResultItem> Data,
     int ToolCount,
     int DocCount,
-    int PostCount);
+    int PostCount,
+    bool IsBlocked = false,
+    string? Notice = null);

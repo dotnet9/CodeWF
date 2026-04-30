@@ -1,16 +1,100 @@
 @page "/{year:int}/{month:int}/{slug}"
+@using System.Text.Encodings.Web
+@using System.Text.Json
 @using Microsoft.Extensions.Options
 @using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
-@model WebApp.Pages.Bbs.Post.IndexModel
+@model WebApp.Pages.Blog.Post.IndexModel
 @{
+    var site = SiteOptions.Value;
     ViewData["Title"] = Model.Post?.Title ?? "文章详情";
     ViewData["Description"] = Model.Post?.Description ?? "浏览码坊技术文章。";
-    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
+    var siteOwner = site.Owner ?? site.AppTitle ?? "码坊";
+    var articleJson = string.Empty;
+
+    if (Model.Post != null)
+    {
+        var siteDomain = (site.Domain ?? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}").TrimEnd('/');
+        string AbsoluteUrl(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return $"{siteDomain}/";
+            }
+
+            return Uri.TryCreate(url, UriKind.Absolute, out _)
+                ? url
+                : $"{siteDomain}/{url.TrimStart('/')}";
+        }
+
+        var articleUrl = $"{siteDomain}{ConstantUtil.GetPostUrl(Model.Post)}";
+        var articleImage = string.IsNullOrWhiteSpace(Model.Post.Cover)
+            ? AbsoluteUrl(site.Favicon ?? "/favicon.png")
+            : AbsoluteUrl(Model.Post.Cover);
+        var keywords = (Model.Post.Tags ?? [])
+            .Concat(Model.Post.Categories ?? [])
+            .Concat(Model.Post.Albums ?? [])
+            .Where(static item => !string.IsNullOrWhiteSpace(item))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        ViewData["CanonicalPath"] = ConstantUtil.GetPostUrl(Model.Post);
+        ViewData["OgType"] = "article";
+        ViewData["OgImage"] = articleImage;
+        ViewData["Keywords"] = keywords.Any()
+            ? string.Join(",", keywords)
+            : ".NET,C#,技术文章,码坊";
+        ViewData["ArticlePublishedTime"] = Model.Post.Date?.ToString("O");
+        ViewData["ArticleModifiedTime"] = (Model.Post.Lastmod ?? Model.Post.Date)?.ToString("O");
+        ViewData["ArticleAuthor"] = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
+
+        var articleSchema = new Dictionary<string, object?>
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "Article",
+            ["headline"] = Model.Post.Title,
+            ["description"] = Model.Post.Description,
+            ["image"] = new[] { articleImage },
+            ["datePublished"] = Model.Post.Date?.ToString("O"),
+            ["dateModified"] = (Model.Post.Lastmod ?? Model.Post.Date)?.ToString("O"),
+            ["mainEntityOfPage"] = new Dictionary<string, string>
+            {
+                ["@type"] = "WebPage",
+                ["@id"] = articleUrl
+            },
+            ["author"] = new Dictionary<string, string>
+            {
+                ["@type"] = "Person",
+                ["name"] = ViewData["ArticleAuthor"]?.ToString() ?? siteOwner
+            },
+            ["publisher"] = new Dictionary<string, object?>
+            {
+                ["@type"] = "Organization",
+                ["name"] = site.AppTitle ?? "码坊",
+                ["logo"] = new Dictionary<string, string>
+                {
+                    ["@type"] = "ImageObject",
+                    ["url"] = AbsoluteUrl(site.Favicon ?? "/favicon.png")
+                }
+            },
+            ["keywords"] = keywords
+        };
+
+        articleJson = JsonSerializer.Serialize(articleSchema, new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        });
+    }
 }
 
 @section Head {
     <partial name="_CodeHighlightHead" />
+    @if (!string.IsNullOrWhiteSpace(articleJson))
+    {
+        <script type="application/ld+json">
+            @Html.Raw(articleJson)
+        </script>
+    }
 }
 
 <section class="page-shell">
@@ -184,7 +268,7 @@
                         <nav class="doc-pager" aria-label="文章阅读导航">
                             @if (Model.PreviousPost != null)
                             {
-                                var previousUrl = ConstantUtil.GetBbsPostUrl(Model.PreviousPost);
+                                var previousUrl = ConstantUtil.GetPostUrl(Model.PreviousPost);
                                 <a href="@previousUrl" class="surface-panel doc-pager__item doc-pager__item--prev">
                                     <span class="doc-pager__label">
                                         <i class="fas fa-arrow-left"></i>
@@ -204,7 +288,7 @@
 
                             @if (Model.NextPost != null)
                             {
-                                var nextUrl = ConstantUtil.GetBbsPostUrl(Model.NextPost);
+                                var nextUrl = ConstantUtil.GetPostUrl(Model.NextPost);
                                 <a href="@nextUrl" class="surface-panel doc-pager__item doc-pager__item--next">
                                     <span class="doc-pager__label">
                                         下一篇

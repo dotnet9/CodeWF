@@ -1,24 +1,21 @@
-@page "/cat/{slug?}"
+@page "/tag/{slug?}"
 @using WebApp.Extensions
-@model WebApp.Pages.Bbs.Category.IndexModel
+@model WebApp.Pages.Blog.Tag.IndexModel
 @{
-    ViewData["Title"] = Model.IsDirectoryPage ? "分类" : $"{Model.CategoryName} - 博客分类";
+    ViewData["Title"] = Model.IsDirectoryPage ? "标签" : $"{Model.TagName} - 标签";
     ViewData["Description"] = Model.IsDirectoryPage
-        ? "浏览码墙全部文章分类。"
-        : (string.IsNullOrWhiteSpace(Model.CategoryMemo) ? $"查看 {Model.CategoryName} 分类下的技术文章。" : Model.CategoryMemo);
-    var categorySlug = Model.CurrentSlug ?? string.Empty;
-    var categories = Model.Categories
-        .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
-        .ToList();
+        ? "浏览码坊全部文章标签。"
+        : $"查看 {Model.TagName} 标签下的技术文章。";
+    var tagSlug = Model.CurrentSlug ?? string.Empty;
 }
 
 <section class="page-shell">
     <div class="container">
         <div class="page-banner">
             <div>
-                <span class="eyebrow">Category</span>
-                <h1 class="page-title">@(Model.IsDirectoryPage ? "全部分类" : Model.CategoryName)</h1>
-                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.CategoryMemo) ? "按分类浏览站内文章内容。" : Model.CategoryMemo)</p>
+                <span class="eyebrow">Tag</span>
+                <h1 class="page-title">@(Model.IsDirectoryPage ? "全部标签" : Model.TagName)</h1>
+                <p class="page-description">@(Model.IsDirectoryPage ? "按标签快速聚合站内文章。" : $"正在浏览与 {Model.TagName} 相关的文章。")</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {
@@ -38,26 +35,23 @@
         @if (Model.IsDirectoryPage)
         {
             <div class="surface-panel directory-panel">
-                @if (!categories.Any())
+                @if (!Model.Tags.Any())
                 {
                     <div class="empty-state">
-                        <h2>暂未配置分类</h2>
-                        <p>后续会在这里展示全部文章分类。</p>
+                        <h2>暂未整理标签</h2>
+                        <p>后续会在这里展示文章标签。</p>
                     </div>
                 }
                 else
                 {
                     <div class="directory-grid">
-                        @foreach (var category in categories)
+                        @foreach (var tag in Model.Tags)
                         {
-                            <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug!)" class="directory-card">
-                                <strong>@category.Name</strong>
-                                @if (!string.IsNullOrWhiteSpace(category.Memo))
-                                {
-                                    <p>@category.Memo</p>
-                                }
+                            <a href="@Model.GetTagUrl(tag.Name)" class="directory-card">
+                                <strong>@tag.Name</strong>
+                                <p>@tag.PostCount 篇文章使用了这个标签。</p>
                                 <span class="directory-card__action">
-                                    查看分类
+                                    查看标签
                                     <i class="fas fa-arrow-right"></i>
                                 </span>
                             </a>
@@ -73,8 +67,8 @@
                     @if (!Model.Posts.Any())
                     {
                         <div class="empty-state">
-                            <h2>这个分类下还没有文章</h2>
-                            <p>可以先去首页或博客列表看看其他内容。</p>
+                            <h2>这个标签下还没有文章</h2>
+                            <p>可以返回标签列表或博客首页继续浏览。</p>
                         </div>
                     }
                     else
@@ -82,7 +76,7 @@
                         <div class="post-list">
                             @foreach (var post in Model.Posts)
                             {
-                                var postUrl = ConstantUtil.GetBbsPostUrl(post);
+                                var postUrl = ConstantUtil.GetPostUrl(post);
                                 var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
                                 <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
                                     @if (hasCover)
@@ -113,11 +107,11 @@
 
                     @if (Model.TotalPages > 1)
                     {
-                        <nav class="pagination-shell" aria-label="分类分页">
+                        <nav class="pagination-shell" aria-label="标签分页">
                             <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                                    <a class="page-link" href="@Model.GetTagUrl(tagSlug)?pageIndex=@(Model.PageIndex - 1)">上一页</a>
                                 </li>
                                 @{
                                     var startPage = Math.Max(1, Model.PageIndex - 2);
@@ -137,7 +131,7 @@
                                 @if (startPage > 1)
                                 {
                                     <li class="page-item">
-                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=1">1</a>
+                                        <a class="page-link" href="@Model.GetTagUrl(tagSlug)?pageIndex=1">1</a>
                                     </li>
                                     @if (startPage > 2)
                                     {
@@ -149,7 +143,7 @@
                                 @for (var i = startPage; i <= endPage; i++)
                                 {
                                     <li class="page-item @(Model.PageIndex == i ? "active" : "")">
-                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@i">@i</a>
+                                        <a class="page-link" href="@Model.GetTagUrl(tagSlug)?pageIndex=@i">@i</a>
                                     </li>
                                 }
                                 @if (endPage < Model.TotalPages)
@@ -161,11 +155,11 @@
                                         </li>
                                     }
                                     <li class="page-item">
-                                        <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
+                                        <a class="page-link" href="@Model.GetTagUrl(tagSlug)?pageIndex=@Model.TotalPages">@Model.TotalPages</a>
                                     </li>
                                 }
                                 <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@ConstantUtil.GetBbsCategoryUrl(categorySlug)?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                                    <a class="page-link" href="@Model.GetTagUrl(tagSlug)?pageIndex=@(Model.PageIndex + 1)">下一页</a>
                                 </li>
                             </ul>
                         </nav>
@@ -174,12 +168,12 @@
 
                 <aside class="content-sidebar">
                     <div class="surface-panel sidebar-panel sticky-panel">
-                        <h2 class="sidebar-title">全部分类</h2>
+                        <h2 class="sidebar-title">全部标签</h2>
                         <div class="sidebar-link-list">
-                            @foreach (var category in categories)
+                            @foreach (var tag in Model.Tags)
                             {
-                                <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug!)" class="sidebar-link @(category.Slug == categorySlug ? "is-current" : string.Empty)">
-                                    <span>@category.Name</span>
+                                <a href="@Model.GetTagUrl(tag.Name)" class="sidebar-link @(string.Equals(tag.Name, Model.TagName, StringComparison.OrdinalIgnoreCase) ? "is-current" : string.Empty)">
+                                    <span>@tag.Name</span>
                                     <i class="fas fa-angle-right"></i>
                                 </a>
                             }

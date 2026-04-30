@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -12,12 +14,43 @@ namespace WebApp.Services;
 
 public class AppService(IOptions<SiteOption> siteOption)
 {
+    private const int SearchCacheLimit = 20;
+    private const int SearchQueryStatsLimit = 50;
+    private const string BlockedSearchNotice = "这个搜索词不适合展示，请换一个技术关键词。";
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         AllowTrailingCommas = true,
         ReadCommentHandling = JsonCommentHandling.Skip
     };
+
+    private static readonly string[] BlockedSearchKeywords =
+    [
+        "赌博",
+        "博彩",
+        "色情",
+        "成人视频",
+        "约炮",
+        "毒品",
+        "冰毒",
+        "枪支",
+        "炸药",
+        "爆炸物",
+        "恐怖主义",
+        "暴恐",
+        "诈骗",
+        "钓鱼",
+        "洗钱",
+        "代开发票",
+        "黑产",
+        "木马",
+        "免杀",
+        "盗号",
+        "撞库",
+        "外挂",
+        "破解软件"
+    ];
 
     private List<DocItem>? _docItems;
     private List<ToolItem>? _toolItems;
@@ -33,10 +66,34 @@ public class AppService(IOptions<SiteOption> siteOption)
     private string? _aboutHtmlContent;
     private string? _rss;
     private string? _siteMap;
+    private List<SearchableEntry>? _searchIndex;
 
     private sealed record SearchField(string? Text, int ExactScore, int PrefixScore, int ContainsScore);
     private sealed record SearchableToolNode(ToolItem Item, string? GroupName);
     private sealed record SearchableDocNode(DocItem Item, string? ContextLabel, string? RelativeDir);
+    private sealed record SearchableEntry(
+        SearchResultKind Kind,
+        string Title,
+        string Url,
+        string? Context,
+        string? Slug,
+        DateTime? UpdatedAt,
+        IReadOnlyList<SearchField> Fields,
+        IReadOnlyList<string?> SummaryCandidates,
+        IReadOnlyList<string?> SnippetCandidates);
+
+    private sealed record SearchSnapshot(
+        List<SearchResultItem> OrderedResults,
+        int ToolCount,
+        int DocCount,
+        int PostCount);
+
+    private sealed record SearchCacheEntry(SearchSnapshot Snapshot, int HitCount, DateTimeOffset LastUsedAt);
+    private sealed record SearchQueryStats(string Query, int Count, DateTimeOffset LastSearchedAt);
+
+    private readonly SemaphoreSlim _searchIndexLock = new(1, 1);
+    private readonly ConcurrentDictionary<string, SearchCacheEntry> _searchCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, SearchQueryStats> _searchQueryStats = new(StringComparer.OrdinalIgnoreCase);
 
     public async Task SeedAsync()
     {
@@ -170,7 +227,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
     public async Task<SearchResultPageData> SearchAsync(string? query, int pageIndex, int pageSize, SearchResultKind? kind = null)
     {
-        var normalizedQuery = query?.Trim() ?? string.Empty;
+        var normalizedQuery = NormalizeSearchQuery(query);
         var safePageIndex = Math.Max(1, pageIndex);
         var safePageSize = pageSize <= 0 ? 10 : pageSize;
 
@@ -179,124 +236,121 @@ public class AppService(IOptions<SiteOption> siteOption)
             return new SearchResultPageData(safePageIndex, safePageSize, 0, [], 0, 0, 0);
         }
 
-        await GetAllBlogPostsAsync();
-        await GetAllDocItemsAsync();
-        await GetAllToolItemsAsync();
+        if (IsBlockedSearchQuery(normalizedQuery))
+        {
+            return new SearchResultPageData(
+                safePageIndex,
+                safePageSize,
+                0,
+                [],
+                0,
+                0,
+                0,
+                true,
+                BlockedSearchNotice);
+        }
 
+        TrackSearchQuery(normalizedQuery);
+
+        if (_searchCache.TryGetValue(normalizedQuery, out var cacheEntry))
+        {
+            TouchSearchCacheEntry(normalizedQuery, cacheEntry);
+            return CreateSearchPageData(cacheEntry.Snapshot, safePageIndex, safePageSize, kind);
+        }
+
+        var snapshot = await BuildSearchSnapshotAsync(normalizedQuery);
+        _searchCache[normalizedQuery] = new SearchCacheEntry(snapshot, 1, DateTimeOffset.UtcNow);
+        TrimSearchCache();
+
+        return CreateSearchPageData(snapshot, safePageIndex, safePageSize, kind);
+    }
+
+    public async Task<List<SearchSuggestionItem>> GetSearchSuggestionsAsync(string? query, int size = 10)
+    {
+        var normalizedQuery = NormalizeSearchQuery(query);
+        var safeSize = Math.Clamp(size, 1, 20);
+
+        if (IsBlockedSearchQuery(normalizedQuery))
+        {
+            return [];
+        }
+
+        var suggestions = new List<SearchSuggestionItem>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var item in _searchQueryStats.Values
+                     .Where(item => string.IsNullOrWhiteSpace(normalizedQuery)
+                         || item.Query.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase))
+                     .OrderByDescending(item => item.Count)
+                     .ThenByDescending(item => item.LastSearchedAt)
+                     .Take(safeSize))
+        {
+            if (seen.Add(item.Query))
+            {
+                suggestions.Add(new SearchSuggestionItem(item.Query, "热搜", item.Count));
+            }
+        }
+
+        if (suggestions.Count >= safeSize || normalizedQuery.Length < 1)
+        {
+            return suggestions;
+        }
+
+        var index = await GetSearchIndexAsync();
+        foreach (var entry in index
+                     .Where(entry => entry.Title.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase)
+                         || (!string.IsNullOrWhiteSpace(entry.Slug)
+                             && entry.Slug.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase)))
+                     .OrderBy(entry => entry.Kind)
+                     .ThenBy(entry => entry.Title, StringComparer.CurrentCultureIgnoreCase))
+        {
+            if (!seen.Add(entry.Title))
+            {
+                continue;
+            }
+
+            suggestions.Add(new SearchSuggestionItem(entry.Title, GetSuggestionLabel(entry.Kind), 0));
+            if (suggestions.Count >= safeSize)
+            {
+                break;
+            }
+        }
+
+        return suggestions;
+    }
+
+    private async Task<SearchSnapshot> BuildSearchSnapshotAsync(string normalizedQuery)
+    {
         var tokens = SplitSearchTokens(normalizedQuery);
         if (tokens.Count == 0)
         {
-            return new SearchResultPageData(safePageIndex, safePageSize, 0, [], 0, 0, 0);
+            return new SearchSnapshot([], 0, 0, 0);
         }
 
         var results = new List<SearchResultItem>();
+        var index = await GetSearchIndexAsync();
 
-        foreach (var tool in GetSearchableToolNodes())
+        foreach (var entry in index)
         {
-            var score = CalculateSearchScore(
-                normalizedQuery,
-                tokens,
-                new SearchField(tool.Item.Name, 220, 170, 130),
-                new SearchField(tool.Item.Slug, 180, 140, 100),
-                new SearchField(tool.Item.Memo, 90, 60, 36),
-                new SearchField(tool.GroupName, 70, 45, 24));
-
+            var score = CalculateSearchScore(normalizedQuery, tokens, entry.Fields);
             if (score <= 0)
             {
                 continue;
             }
 
-            var summary = SelectSummary(normalizedQuery, tool.Item.Memo, tool.GroupName);
-            var matchedSnippet = SelectSnippet(normalizedQuery, tool.Item.Memo, tool.GroupName);
+            var summary = SelectSummary(normalizedQuery, entry.SummaryCandidates);
+            var matchedSnippet = SelectSnippet(normalizedQuery, entry.SnippetCandidates);
 
             results.Add(new SearchResultItem
             {
-                Kind = SearchResultKind.Tool,
-                Title = tool.Item.Name?.Trim() ?? "未命名工具",
-                Url = ConstantUtil.GetToolUrl(tool.Item.Slug),
+                Kind = entry.Kind,
+                Title = entry.Title,
+                Url = entry.Url,
                 Summary = summary,
                 MatchedSnippet = matchedSnippet,
-                Context = tool.GroupName,
-                Slug = tool.Item.Slug,
-                Score = score
-            });
-        }
-
-        var searchableDocs = await GetSearchableDocNodesAsync();
-        foreach (var doc in searchableDocs)
-        {
-            var plainContent = CleanSearchText(doc.Item.Content);
-            var score = CalculateSearchScore(
-                normalizedQuery,
-                tokens,
-                new SearchField(doc.Item.Name, 220, 170, 130),
-                new SearchField(doc.Item.Slug, 180, 140, 100),
-                new SearchField(doc.Item.Memo, 90, 60, 36),
-                new SearchField(doc.ContextLabel, 70, 45, 24),
-                new SearchField(plainContent, 26, 18, 12));
-
-            if (score <= 0)
-            {
-                continue;
-            }
-
-            var summary = SelectSummary(normalizedQuery, doc.Item.Memo, plainContent);
-            var matchedSnippet = SelectSnippet(normalizedQuery, doc.Item.Memo, plainContent);
-
-            results.Add(new SearchResultItem
-            {
-                Kind = SearchResultKind.Doc,
-                Title = doc.Item.Name?.Trim() ?? "未命名项目",
-                Url = ConstantUtil.GetDocUrl(doc.Item.Slug),
-                Summary = summary,
-                MatchedSnippet = matchedSnippet,
-                Context = doc.ContextLabel,
-                Slug = doc.Item.Slug,
-                Score = score
-            });
-        }
-
-        foreach (var post in _blogPosts ?? [])
-        {
-            var plainContent = CleanSearchText(post.Content);
-            var categoryText = string.Join(" / ", post.Categories?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
-            var albumText = string.Join(" / ", post.Albums?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
-            var tagText = string.Join(" / ", post.Tags?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
-            var score = CalculateSearchScore(
-                normalizedQuery,
-                tokens,
-                new SearchField(post.Title, 230, 180, 135),
-                new SearchField(post.Slug, 185, 145, 105),
-                new SearchField(post.Description, 95, 65, 40),
-                new SearchField(categoryText, 75, 48, 28),
-                new SearchField(albumText, 60, 42, 24),
-                new SearchField(tagText, 60, 42, 24),
-                new SearchField(post.Author, 48, 36, 22),
-                new SearchField(plainContent, 28, 20, 14));
-
-            if (score <= 0)
-            {
-                continue;
-            }
-
-            var summary = SelectSummary(normalizedQuery, post.Description, plainContent);
-            var matchedSnippet = SelectSnippet(normalizedQuery, post.Description, plainContent);
-            var context = !string.IsNullOrWhiteSpace(categoryText)
-                ? categoryText
-                : !string.IsNullOrWhiteSpace(albumText)
-                    ? albumText
-                    : null;
-
-            results.Add(new SearchResultItem
-            {
-                Kind = SearchResultKind.Post,
-                Title = post.Title?.Trim() ?? "未命名文章",
-                Url = ConstantUtil.GetBbsPostUrl(post),
-                Summary = summary,
-                MatchedSnippet = matchedSnippet,
-                Context = context,
-                Slug = post.Slug,
-                UpdatedAt = post.Lastmod ?? post.Date,
+                Context = entry.Context,
+                Slug = entry.Slug,
+                UpdatedAt = entry.UpdatedAt,
                 Score = score
             });
         }
@@ -308,30 +362,215 @@ public class AppService(IOptions<SiteOption> siteOption)
             .ThenBy(result => result.Title, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
 
-        var filtered = kind.HasValue
-            ? ordered.Where(result => result.Kind == kind.Value).ToList()
-            : ordered;
-
-        var totalCount = filtered.Count;
-        var totalPages = totalCount <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)safePageSize);
-        var currentPageIndex = totalPages <= 0
-            ? 1
-            : Math.Min(safePageIndex, totalPages);
-
-        var data = filtered
-            .Skip((currentPageIndex - 1) * safePageSize)
-            .Take(safePageSize)
-            .ToList();
-
-        return new SearchResultPageData(
-            currentPageIndex,
-            safePageSize,
-            totalCount,
-            data,
+        return new SearchSnapshot(
+            ordered,
             ordered.Count(result => result.Kind == SearchResultKind.Tool),
             ordered.Count(result => result.Kind == SearchResultKind.Doc),
             ordered.Count(result => result.Kind == SearchResultKind.Post));
     }
+
+    private async Task<List<SearchableEntry>> GetSearchIndexAsync()
+    {
+        if (_searchIndex is not null)
+        {
+            return _searchIndex;
+        }
+
+        await _searchIndexLock.WaitAsync();
+        try
+        {
+            if (_searchIndex is not null)
+            {
+                return _searchIndex;
+            }
+
+            await GetAllBlogPostsAsync();
+            await GetAllDocItemsAsync();
+            await GetAllToolItemsAsync();
+
+            var index = new List<SearchableEntry>();
+            foreach (var tool in GetSearchableToolNodes())
+            {
+                index.Add(new SearchableEntry(
+                    SearchResultKind.Tool,
+                    tool.Item.Name?.Trim() ?? "未命名工具",
+                    ConstantUtil.GetToolUrl(tool.Item.Slug),
+                    tool.GroupName,
+                    tool.Item.Slug,
+                    null,
+                    [
+                        new SearchField(tool.Item.Name, 220, 170, 130),
+                        new SearchField(tool.Item.Slug, 180, 140, 100),
+                        new SearchField(tool.Item.Memo, 90, 60, 36),
+                        new SearchField(tool.GroupName, 70, 45, 24)
+                    ],
+                    [tool.Item.Memo, tool.GroupName],
+                    [tool.Item.Memo, tool.GroupName]));
+            }
+
+            var searchableDocs = await GetSearchableDocNodesAsync();
+            foreach (var doc in searchableDocs)
+            {
+                var plainContent = CleanSearchText(doc.Item.Content);
+                index.Add(new SearchableEntry(
+                    SearchResultKind.Doc,
+                    doc.Item.Name?.Trim() ?? "未命名项目",
+                    ConstantUtil.GetDocUrl(doc.Item.Slug),
+                    doc.ContextLabel,
+                    doc.Item.Slug,
+                    null,
+                    [
+                        new SearchField(doc.Item.Name, 220, 170, 130),
+                        new SearchField(doc.Item.Slug, 180, 140, 100),
+                        new SearchField(doc.Item.Memo, 90, 60, 36),
+                        new SearchField(doc.ContextLabel, 70, 45, 24),
+                        new SearchField(plainContent, 26, 18, 12)
+                    ],
+                    [doc.Item.Memo, plainContent],
+                    [doc.Item.Memo, plainContent]));
+            }
+
+            foreach (var post in _blogPosts ?? [])
+            {
+                var plainContent = CleanSearchText(post.Content);
+                var categoryText = string.Join(" / ", post.Categories?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+                var albumText = string.Join(" / ", post.Albums?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+                var tagText = string.Join(" / ", post.Tags?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+                var context = !string.IsNullOrWhiteSpace(categoryText)
+                    ? categoryText
+                    : !string.IsNullOrWhiteSpace(albumText)
+                        ? albumText
+                        : null;
+
+                index.Add(new SearchableEntry(
+                    SearchResultKind.Post,
+                    post.Title?.Trim() ?? "未命名文章",
+                    ConstantUtil.GetPostUrl(post),
+                    context,
+                    post.Slug,
+                    post.Lastmod ?? post.Date,
+                    [
+                        new SearchField(post.Title, 230, 180, 135),
+                        new SearchField(post.Slug, 185, 145, 105),
+                        new SearchField(post.Description, 95, 65, 40),
+                        new SearchField(categoryText, 75, 48, 28),
+                        new SearchField(albumText, 60, 42, 24),
+                        new SearchField(tagText, 60, 42, 24),
+                        new SearchField(post.Author, 48, 36, 22),
+                        new SearchField(plainContent, 28, 20, 14)
+                    ],
+                    [post.Description, plainContent],
+                    [post.Description, plainContent]));
+            }
+
+            _searchIndex = index;
+            return _searchIndex;
+        }
+        finally
+        {
+            _searchIndexLock.Release();
+        }
+    }
+
+    private static SearchResultPageData CreateSearchPageData(
+        SearchSnapshot snapshot,
+        int pageIndex,
+        int pageSize,
+        SearchResultKind? kind)
+    {
+        var filtered = kind.HasValue
+            ? snapshot.OrderedResults.Where(result => result.Kind == kind.Value).ToList()
+            : snapshot.OrderedResults;
+        var totalCount = filtered.Count;
+        var totalPages = totalCount <= 0 ? 0 : (int)Math.Ceiling(totalCount / (double)pageSize);
+        var currentPageIndex = totalPages <= 0
+            ? 1
+            : Math.Min(pageIndex, totalPages);
+        var data = filtered
+            .Skip((currentPageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new SearchResultPageData(
+            currentPageIndex,
+            pageSize,
+            totalCount,
+            data,
+            snapshot.ToolCount,
+            snapshot.DocCount,
+            snapshot.PostCount);
+    }
+
+    private static string NormalizeSearchQuery(string? query) =>
+        Regex.Replace(query?.Trim() ?? string.Empty, @"\s+", " ");
+
+    private static bool IsBlockedSearchQuery(string query) =>
+        !string.IsNullOrWhiteSpace(query)
+        && BlockedSearchKeywords.Any(keyword => query.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+    private void TrackSearchQuery(string normalizedQuery)
+    {
+        var now = DateTimeOffset.UtcNow;
+        _searchQueryStats.AddOrUpdate(
+            normalizedQuery,
+            new SearchQueryStats(normalizedQuery, 1, now),
+            (_, current) => current with
+            {
+                Count = current.Count + 1,
+                LastSearchedAt = now
+            });
+
+        TrimSearchQueryStats();
+    }
+
+    private void TouchSearchCacheEntry(string normalizedQuery, SearchCacheEntry cacheEntry)
+    {
+        _searchCache[normalizedQuery] = cacheEntry with
+        {
+            HitCount = cacheEntry.HitCount + 1,
+            LastUsedAt = DateTimeOffset.UtcNow
+        };
+    }
+
+    private void TrimSearchCache()
+    {
+        if (_searchCache.Count <= SearchCacheLimit)
+        {
+            return;
+        }
+
+        foreach (var item in _searchCache
+                     .OrderBy(item => item.Value.HitCount)
+                     .ThenBy(item => item.Value.LastUsedAt)
+                     .Take(_searchCache.Count - SearchCacheLimit))
+        {
+            _searchCache.TryRemove(item.Key, out _);
+        }
+    }
+
+    private void TrimSearchQueryStats()
+    {
+        if (_searchQueryStats.Count <= SearchQueryStatsLimit)
+        {
+            return;
+        }
+
+        foreach (var item in _searchQueryStats
+                     .OrderBy(item => item.Value.Count)
+                     .ThenBy(item => item.Value.LastSearchedAt)
+                     .Take(_searchQueryStats.Count - SearchQueryStatsLimit))
+        {
+            _searchQueryStats.TryRemove(item.Key, out _);
+        }
+    }
+
+    private static string GetSuggestionLabel(SearchResultKind kind) => kind switch
+    {
+        SearchResultKind.Tool => "工具",
+        SearchResultKind.Doc => "项目",
+        SearchResultKind.Post => "文章",
+        _ => "内容"
+    };
 
     private async Task LoadDocContentAsync(DocItem item, string? parentDir = default)
     {
@@ -420,9 +659,9 @@ public class AppService(IOptions<SiteOption> siteOption)
         return nodes;
     }
 
-    private static int CalculateSearchScore(string query, IReadOnlyCollection<string> tokens, params SearchField[] fields)
+    private static int CalculateSearchScore(string query, IReadOnlyCollection<string> tokens, IReadOnlyCollection<SearchField> fields)
     {
-        if (tokens.Count == 0 || fields.Length == 0)
+        if (tokens.Count == 0 || fields.Count == 0)
         {
             return 0;
         }
@@ -502,7 +741,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         .Distinct(StringComparer.OrdinalIgnoreCase)
         .ToList();
 
-    private static string? SelectSummary(string query, params string?[] candidates)
+    private static string? SelectSummary(string query, IEnumerable<string?> candidates)
     {
         foreach (var candidate in candidates)
         {
@@ -516,7 +755,7 @@ public class AppService(IOptions<SiteOption> siteOption)
         return null;
     }
 
-    private static string? SelectSnippet(string query, params string?[] candidates)
+    private static string? SelectSnippet(string query, IEnumerable<string?> candidates)
     {
         foreach (var candidate in candidates)
         {
@@ -1086,27 +1325,27 @@ public class AppService(IOptions<SiteOption> siteOption)
             "<rss xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" version=\"2.0\">");
         sb.Append("<channel>");
         sb.Append(
-            $"<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"{siteOption.Value.Domain}/rss\"/>");
-        sb.Append($"<title>{siteOption.Value.AppTitle}_{siteOption.Value.Memo}</title>");
-        sb.Append($"<link>{siteOption.Value.Domain}/rss</link>");
-        sb.Append($"<description>{siteOption.Value.Memo}</description>");
-        sb.Append($"<copyright>{siteOption.Value.AppTitle}_{siteOption.Value.Memo}</copyright>");
+            $"<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"{XmlEncode($"{siteOption.Value.Domain}/rss")}\"/>");
+        sb.Append($"<title>{XmlEncode($"{siteOption.Value.AppTitle}_{siteOption.Value.Memo}")}</title>");
+        sb.Append($"<link>{XmlEncode($"{siteOption.Value.Domain}/rss")}</link>");
+        sb.Append($"<description>{XmlEncode(siteOption.Value.Memo)}</description>");
+        sb.Append($"<copyright>{XmlEncode($"{siteOption.Value.AppTitle}_{siteOption.Value.Memo}")}</copyright>");
         sb.Append("<language>zh-cn</language>");
         if (data is { Count: > 0 })
         {
             foreach (var item in data)
             {
                 sb.Append("<item>");
-                sb.Append($"<title>{item.Title}</title>");
+                sb.Append($"<title>{XmlEncode(item.Title)}</title>");
                 sb.Append(
-                    $"<link>{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(item)}</link>");
-                sb.Append($"<description>{item.Description}</description>");
-                sb.Append($"<author>({item.Author ?? siteOption.Value.Owner})</author>");
-                sb.Append($"<category>{string.Join(",", item.Categories ?? [])}</category>");
+                    $"<link>{XmlEncode($"{siteOption.Value.Domain}{ConstantUtil.GetPostUrl(item)}")}</link>");
+                sb.Append($"<description>{XmlEncode(item.Description)}</description>");
+                sb.Append($"<author>{XmlEncode(item.Author ?? siteOption.Value.Owner)}</author>");
+                sb.Append($"<category>{XmlEncode(string.Join(",", item.Categories ?? []))}</category>");
                 sb.Append(
-                    $"<guid>{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(item)}</guid>");
+                    $"<guid>{XmlEncode($"{siteOption.Value.Domain}{ConstantUtil.GetPostUrl(item)}")}</guid>");
                 sb.Append($"<pubDate>{item.Date:R}</pubDate>");
-                sb.Append($"<content:encoded><![CDATA[{item.Description}]]></content:encoded>");
+                sb.Append($"<content:encoded><![CDATA[{ToCData(item.Description)}]]></content:encoded>");
                 sb.Append("</item>");
             }
         }
@@ -1127,31 +1366,89 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
 
         List<SitemapNode> siteMapNodes = new();
+        var domain = (siteOption.Value.Domain ?? string.Empty).TrimEnd('/');
+        var now = DateTimeOffset.UtcNow;
+        var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void AddNode(string path, double priority, SitemapFrequency frequency, DateTimeOffset? lastModified = null)
+        {
+            if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(domain))
+            {
+                return;
+            }
+
+            var normalizedPath = path.StartsWith('/') ? path : $"/{path}";
+            var url = $"{domain}{normalizedPath}";
+            if (!seenUrls.Add(url))
+            {
+                return;
+            }
+
+            siteMapNodes.Add(new SitemapNode
+            {
+                LastModified = lastModified ?? now,
+                Priority = priority,
+                Url = url,
+                Frequency = frequency
+            });
+        }
+
+        AddNode("/", 1.0, SitemapFrequency.Daily);
+        AddNode(ConstantUtil.GetBlogUrl(), 0.9, SitemapFrequency.Daily);
+        AddNode(ConstantUtil.GetProjectDirectoryUrl(), 0.8, SitemapFrequency.Weekly);
+        AddNode("/tool", 0.8, SitemapFrequency.Weekly);
+        AddNode(ConstantUtil.GetCategoryDirectoryUrl(), 0.7, SitemapFrequency.Weekly);
+        AddNode(ConstantUtil.GetAlbumDirectoryUrl(), 0.7, SitemapFrequency.Weekly);
+        AddNode(ConstantUtil.GetTagDirectoryUrl(), 0.7, SitemapFrequency.Weekly);
+        AddNode("/about", 0.5, SitemapFrequency.Monthly);
+        AddNode("/timeline", 0.5, SitemapFrequency.Monthly);
+        AddNode("/donation", 0.4, SitemapFrequency.Monthly);
 
         if (_categoryItems?.Any() == true)
         {
-            siteMapNodes.AddRange(_categoryItems.Select(x => new SitemapNode
+            foreach (var item in _categoryItems.Where(static item =>
+                         !string.IsNullOrWhiteSpace(item.Slug)
+                         && !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)))
             {
-                LastModified = DateTimeOffset.UtcNow,
-                Priority = 0.8,
-                Url = $"{siteOption.Value.Domain}{ConstantUtil.GetBbsCategoryUrl(x.Slug ?? ConstantUtil.DefaultCategory)}",
-                Frequency = SitemapFrequency.Monthly
-            }));
+                AddNode(ConstantUtil.GetCategoryUrl(item.Slug!), 0.8, SitemapFrequency.Monthly);
+            }
+        }
+
+        if (_albumItems?.Any() == true)
+        {
+            foreach (var item in _albumItems.Where(static item =>
+                         !string.IsNullOrWhiteSpace(item.Slug)
+                         && !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)))
+            {
+                AddNode(ConstantUtil.GetAlbumUrl(item.Slug!), 0.8, SitemapFrequency.Monthly);
+            }
+        }
+
+        var tags = await GetAllTagItemsAsync();
+        foreach (var tag in tags.Where(static item => !string.IsNullOrWhiteSpace(item.Name)))
+        {
+            AddNode(ConstantUtil.GetTagUrl(tag.Name), 0.7, SitemapFrequency.Weekly);
+        }
+
+        foreach (var doc in FlattenDocItems(_docItems).Where(static item => !string.IsNullOrWhiteSpace(item.Slug)))
+        {
+            AddNode(ConstantUtil.GetDocUrl(doc.Slug), 0.7, SitemapFrequency.Monthly);
+        }
+
+        foreach (var tool in FlattenToolItems(_toolItems).Where(static item => !string.IsNullOrWhiteSpace(item.Slug)))
+        {
+            AddNode(ConstantUtil.GetToolUrl(tool.Slug), 0.7, SitemapFrequency.Monthly);
         }
 
         if (_blogPosts?.Any() == true)
         {
-            siteMapNodes.AddRange(_blogPosts
-                .OrderByDescending(p => p.Lastmod)
-                .ThenByDescending(p => p.Date)
-                .Select(x =>
-                    new SitemapNode
-                    {
-                        LastModified = x.Lastmod ?? x.Date ?? DateTimeOffset.Now,
-                        Priority = 0.9,
-                        Url = $"{siteOption.Value.Domain}{ConstantUtil.GetBbsPostUrl(x)}",
-                        Frequency = SitemapFrequency.Daily
-                    }));
+            foreach (var item in _blogPosts
+                         .Where(static post => !string.IsNullOrWhiteSpace(post.Slug))
+                         .OrderByDescending(post => post.Lastmod)
+                         .ThenByDescending(post => post.Date))
+            {
+                AddNode(ConstantUtil.GetPostUrl(item), 0.9, SitemapFrequency.Daily, item.Lastmod ?? item.Date ?? now);
+            }
         }
 
         StringBuilder sb = new();
@@ -1165,9 +1462,9 @@ public class AppService(IOptions<SiteOption> siteOption)
         {
             sb.AppendLine("    <url>");
 
-            sb.AppendLine($"        <loc>{m.Url}</loc>");
+            sb.AppendLine($"        <loc>{XmlEncode(m.Url)}</loc>");
             sb.AppendLine($"        <lastmod>{m.LastModified.ToString("yyyy-MM-dd")}</lastmod>");
-            sb.AppendLine($"        <changefreq>{m.Frequency}</changefreq>");
+            sb.AppendLine($"        <changefreq>{m.Frequency.ToString().ToLowerInvariant()}</changefreq>");
             sb.AppendLine($"        <priority>{m.Priority}</priority>");
 
             sb.AppendLine("    </url>");
@@ -1179,4 +1476,49 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         return _siteMap;
     }
+
+    private static IEnumerable<DocItem> FlattenDocItems(IEnumerable<DocItem>? items)
+    {
+        if (items == null)
+        {
+            yield break;
+        }
+
+        foreach (var item in items)
+        {
+            if (item.Children?.Any() == true)
+            {
+                foreach (var child in FlattenDocItems(item.Children))
+                {
+                    yield return child;
+                }
+
+                continue;
+            }
+
+            yield return item;
+        }
+    }
+
+    private static IEnumerable<ToolItem> FlattenToolItems(IEnumerable<ToolItem>? items)
+    {
+        if (items == null)
+        {
+            yield break;
+        }
+
+        foreach (var item in items)
+        {
+            yield return item;
+
+            foreach (var child in FlattenToolItems(item.Children))
+            {
+                yield return child;
+            }
+        }
+    }
+
+    private static string XmlEncode(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
+
+    private static string ToCData(string? value) => (value ?? string.Empty).Replace("]]>", "]]]]><![CDATA[>");
 }

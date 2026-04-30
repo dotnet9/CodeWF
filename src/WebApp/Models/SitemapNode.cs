@@ -11,5 +11,6 @@ public class SitemapNode
 public enum SitemapFrequency
 {
     Monthly,
+    Weekly,
     Daily
 }

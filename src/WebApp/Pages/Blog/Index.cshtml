@@ -2,7 +2,7 @@
 @using Microsoft.Extensions.Options
 @using WebApp.Extensions
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
-@model WebApp.Pages.Bbs.IndexModel
+@model WebApp.Pages.Blog.IndexModel
 @{
     ViewData["Title"] = "博客";
     ViewData["Description"] = "浏览码坊博客内容，按时间查看最新技术文章。";
@@ -111,7 +111,7 @@
                     <div class="post-list">
                         @foreach (var post in Model.Posts)
                         {
-                            var postUrl = ConstantUtil.GetBbsPostUrl(post);
+                            var postUrl = ConstantUtil.GetPostUrl(post);
                             var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
                             var authorName = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
 
@@ -202,7 +202,7 @@
                     <div class="sidebar-link-list">
                         @foreach (var category in Model.Categories)
                         {
-                            <a href="@ConstantUtil.GetBbsCategoryUrl(category.Slug ?? ConstantUtil.DefaultCategory)" class="sidebar-link">
+                            <a href="@ConstantUtil.GetCategoryUrl(category.Slug ?? ConstantUtil.DefaultCategory)" class="sidebar-link">
                                 <span>@category.Name</span>
                                 <i class="fas fa-angle-right"></i>
                             </a>

@@ -102,7 +102,7 @@ public class IndexModel : PageModel
                 "从这里开始",
                 "先看最新更新",
                 latestPost.Title ?? "最近更新",
-                ConstantUtil.GetBbsPostUrl(latestPost)));
+                ConstantUtil.GetPostUrl(latestPost)));
         }
 
         if (categories.FirstOrDefault() is { } category)
@@ -111,7 +111,7 @@ public class IndexModel : PageModel
                 "内容地图",
                 $"先逛 {category.Name}",
                 $"{category.PostCount} 篇文章，适合快速熟悉站内内容结构",
-                ConstantUtil.GetBbsCategoryUrl(category.Slug)));
+                ConstantUtil.GetCategoryUrl(category.Slug)));
         }
 
         if (albums.FirstOrDefault() is { } album)
@@ -120,7 +120,7 @@ public class IndexModel : PageModel
                 "连续阅读",
                 $"跟着专题读 {album.Name}",
                 $"{album.PostCount} 篇文章，适合按主题连续阅读",
-                ConstantUtil.GetBbsAlbumUrl(album.Slug)));
+                ConstantUtil.GetAlbumUrl(album.Slug)));
         }
 
         links.Add(new DiscoveryLinkCard(
@@ -149,7 +149,7 @@ public class IndexModel : PageModel
                 "随机发现",
                 post.Title ?? "未命名文章",
                 post.Description ?? "换一篇看看，也许会撞上正想看的主题。",
-                ConstantUtil.GetBbsPostUrl(post),
+                ConstantUtil.GetPostUrl(post),
                 post.Date?.ToString("yyyy-MM-dd") ?? "文章"));
         }
 

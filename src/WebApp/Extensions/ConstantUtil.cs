@@ -11,11 +11,11 @@ public static class ConstantUtil
             ? $"/post?pageIndex={pageIndex.Value}"
             : "/post";
     public static string GetCategoryDirectoryUrl() => "/cat";
-    public static string GetBbsCategoryUrl(string slug) => $"/cat/{slug}";
+    public static string GetCategoryUrl(string slug) => $"/cat/{slug}";
     public static string GetAlbumDirectoryUrl() => "/album";
-    public static string GetBbsAlbumUrl(string slug) => $"/album/{slug}";
+    public static string GetAlbumUrl(string slug) => $"/album/{slug}";
     public static string GetTagDirectoryUrl() => "/tag";
-    public static string GetBbsTagUrl(string tag) =>
+    public static string GetTagUrl(string tag) =>
         string.IsNullOrWhiteSpace(NormalizeTagName(tag))
             ? GetTagDirectoryUrl()
             : $"/tag/{Uri.EscapeDataString(NormalizeTagName(tag))}";
@@ -40,7 +40,7 @@ public static class ConstantUtil
             return NormalizeTagName(trimmed);
         }
     }
-    public static string GetBbsPostUrl(BlogPost post) => $"/{post.Date?.Year:D4}/{post.Date?.Month:D2}/{post.Slug}";
+    public static string GetPostUrl(BlogPost post) => $"/{post.Date?.Year:D4}/{post.Date?.Month:D2}/{post.Slug}";
     public static string GetProjectDirectoryUrl() => "/project";
     public static string GetProjectUrl(string? slug) => $"/project/{slug}";
     public static string GetSearchUrl(string? query = null, int? pageIndex = null)

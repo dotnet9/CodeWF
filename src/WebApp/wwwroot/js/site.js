@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     initializeHeaderOffset();
     initializeDesktopDropdowns();
+    initializeSearchSuggestions();
     initializeReadingToc();
     initializeReadingExperience();
 });
@@ -134,6 +135,189 @@ function initializeDesktopDropdowns() {
     });
 
     desktopMedia.addEventListener("change", hideAllDropdowns);
+}
+
+function initializeSearchSuggestions() {
+    const forms = Array.from(document.querySelectorAll("[data-search-suggestions-url]"));
+    if (!forms.length || !window.fetch) {
+        return;
+    }
+
+    forms.forEach((form, index) => {
+        const input = form.querySelector("[data-search-suggest-input]");
+        const panel = form.querySelector("[data-search-suggest-panel]");
+        if (!input || !panel) {
+            return;
+        }
+
+        if (!panel.id) {
+            panel.id = `search-suggestions-${index + 1}`;
+        }
+
+        input.setAttribute("aria-controls", panel.id);
+
+        let suggestions = [];
+        let activeIndex = -1;
+        let debounceTimer = 0;
+        let requestController = null;
+
+        const hidePanel = () => {
+            panel.hidden = true;
+            panel.innerHTML = "";
+            input.removeAttribute("aria-activedescendant");
+            activeIndex = -1;
+        };
+
+        const setActiveOption = (nextIndex) => {
+            const options = Array.from(panel.querySelectorAll(".search-suggest-option"));
+            if (!options.length) {
+                activeIndex = -1;
+                input.removeAttribute("aria-activedescendant");
+                return;
+            }
+
+            activeIndex = (nextIndex + options.length) % options.length;
+            options.forEach((option, optionIndex) => {
+                const isActive = optionIndex === activeIndex;
+                option.classList.toggle("is-active", isActive);
+                option.setAttribute("aria-selected", isActive ? "true" : "false");
+            });
+
+            input.setAttribute("aria-activedescendant", options[activeIndex].id);
+        };
+
+        const submitSuggestion = (suggestion) => {
+            if (!suggestion?.query) {
+                return;
+            }
+
+            input.value = suggestion.query;
+            hidePanel();
+            form.requestSubmit ? form.requestSubmit() : form.submit();
+        };
+
+        const renderSuggestions = () => {
+            panel.innerHTML = "";
+            activeIndex = -1;
+            input.removeAttribute("aria-activedescendant");
+
+            if (!suggestions.length) {
+                hidePanel();
+                return;
+            }
+
+            const list = document.createElement("div");
+            list.className = "search-suggest-list";
+            list.setAttribute("role", "listbox");
+
+            suggestions.forEach((suggestion, suggestionIndex) => {
+                const option = document.createElement("button");
+                option.type = "button";
+                option.className = "search-suggest-option";
+                option.id = `${panel.id}-option-${suggestionIndex}`;
+                option.setAttribute("role", "option");
+                option.setAttribute("aria-selected", "false");
+
+                const text = document.createElement("span");
+                text.className = "search-suggest-option__text";
+                text.textContent = suggestion.query;
+
+                const meta = document.createElement("span");
+                meta.className = "search-suggest-option__meta";
+                meta.textContent = suggestion.count > 0
+                    ? `${suggestion.label} ${suggestion.count}`
+                    : suggestion.label;
+
+                option.append(text, meta);
+                option.addEventListener("click", () => submitSuggestion(suggestion));
+                list.appendChild(option);
+            });
+
+            panel.appendChild(list);
+            panel.hidden = false;
+        };
+
+        const loadSuggestions = async () => {
+            const query = input.value.trim();
+            if (query.length > 60) {
+                hidePanel();
+                return;
+            }
+
+            if (requestController) {
+                requestController.abort();
+            }
+
+            requestController = new AbortController();
+            const url = new URL(form.dataset.searchSuggestionsUrl, window.location.origin);
+            url.searchParams.set("q", query);
+
+            try {
+                const response = await fetch(url, {
+                    headers: { "Accept": "application/json" },
+                    signal: requestController.signal
+                });
+
+                if (!response.ok) {
+                    hidePanel();
+                    return;
+                }
+
+                const payload = await response.json();
+                suggestions = (payload.suggestions || []).map((item) => ({
+                    query: item.query ?? item.Query,
+                    label: item.label ?? item.Label ?? "建议",
+                    count: item.count ?? item.Count ?? 0
+                })).filter((item) => item.query);
+                renderSuggestions();
+            } catch (error) {
+                if (error?.name !== "AbortError") {
+                    hidePanel();
+                }
+            }
+        };
+
+        const scheduleLoad = () => {
+            window.clearTimeout(debounceTimer);
+            debounceTimer = window.setTimeout(loadSuggestions, 160);
+        };
+
+        input.addEventListener("focus", scheduleLoad);
+        input.addEventListener("input", scheduleLoad);
+        input.addEventListener("keydown", (event) => {
+            if (panel.hidden) {
+                return;
+            }
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                setActiveOption(activeIndex + 1);
+                return;
+            }
+
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                setActiveOption(activeIndex - 1);
+                return;
+            }
+
+            if (event.key === "Enter" && activeIndex >= 0) {
+                event.preventDefault();
+                submitSuggestion(suggestions[activeIndex]);
+                return;
+            }
+
+            if (event.key === "Escape") {
+                hidePanel();
+            }
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!form.contains(event.target)) {
+                hidePanel();
+            }
+        });
+    });
 }
 
 function initializeReadingToc() {
