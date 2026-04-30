@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Hosting;
 using WebApp.Extensions;
 using WebApp.Models;
 using WebApp.Options;
@@ -13,7 +14,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace WebApp.Services;
 
-public class AppService(IOptions<SiteOption> siteOption)
+public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment environment)
 {
     private const int SearchCacheLimit = 20;
     private const int SearchQueryStatsLimit = 50;
@@ -80,6 +81,37 @@ public class AppService(IOptions<SiteOption> siteOption)
     private readonly ConcurrentDictionary<string, SearchQueryStats> _searchQueryStats = new(StringComparer.OrdinalIgnoreCase);
     private bool _searchQueryStatsLoaded;
 
+    private string? GetLocalAssetsDir()
+    {
+        var localAssetsDir = siteOption.Value.LocalAssetsDir;
+        if (string.IsNullOrWhiteSpace(localAssetsDir))
+        {
+            return null;
+        }
+
+        var expandedPath = System.Environment.ExpandEnvironmentVariables(localAssetsDir.Trim());
+        var path = Path.IsPathRooted(expandedPath)
+            ? expandedPath
+            : Path.Combine(environment.ContentRootPath, expandedPath);
+
+        return Path.GetFullPath(path);
+    }
+
+    private string? GetAssetPath(params string[] paths)
+    {
+        var localAssetsDir = GetLocalAssetsDir();
+        if (localAssetsDir is null)
+        {
+            return null;
+        }
+
+        var segments = new string[paths.Length + 1];
+        segments[0] = localAssetsDir;
+        Array.Copy(paths, 0, segments, 1, paths.Length);
+
+        return Path.Combine(segments);
+    }
+
     public async Task SeedAsync()
     {
         await GetAllAlbumItemsAsync();
@@ -105,13 +137,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _docItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _docItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", "navigation.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "doc", "navigation.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _docItems;
         }
@@ -135,13 +162,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _toolItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _toolItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "tools", "tools.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "tools", "tools.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _toolItems;
         }
@@ -663,12 +685,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
     private string? GetSearchKeywordsFilePath()
     {
-        if (string.IsNullOrWhiteSpace(siteOption.Value.LocalAssetsDir))
-        {
-            return null;
-        }
-
-        return Path.Combine(siteOption.Value.LocalAssetsDir, "site", SearchKeywordsFileName);
+        return GetAssetPath("site", SearchKeywordsFileName);
     }
 
     private void TouchSearchCacheEntry(string normalizedQuery, SearchCacheEntry cacheEntry)
@@ -727,14 +744,20 @@ public class AppService(IOptions<SiteOption> siteOption)
             return;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir) || string.IsNullOrWhiteSpace(item.Slug))
+        if (string.IsNullOrWhiteSpace(item.Slug))
+        {
+            return;
+        }
+
+        var localAssetsDir = GetLocalAssetsDir();
+        if (localAssetsDir is null)
         {
             return;
         }
 
         var contentPath = string.IsNullOrWhiteSpace(parentDir)
-            ? Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", $"{item.Slug}.md")
-            : Path.Combine(siteOption.Value.LocalAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
+            ? Path.Combine(localAssetsDir, "site", "doc", $"{item.Slug}.md")
+            : Path.Combine(localAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
 
         if (!File.Exists(contentPath))
         {
@@ -988,13 +1011,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _albumItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _albumItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "albums.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "albums.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _albumItems;
         }
@@ -1025,13 +1043,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _categoryItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _categoryItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "categories.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "categories.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _categoryItems;
         }
@@ -1063,13 +1076,8 @@ public class AppService(IOptions<SiteOption> siteOption)
         }
 
         _searchBlockedKeywordGroups = [];
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _searchBlockedKeywordGroups;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "blocked-search-keywords.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "blocked-search-keywords.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _searchBlockedKeywordGroups;
         }
@@ -1112,7 +1120,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _blogPosts;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
+        var localAssetsDir = GetLocalAssetsDir();
+        if (localAssetsDir is null)
         {
             _blogPosts = new List<BlogPost>();
             return _blogPosts;
@@ -1123,7 +1132,7 @@ public class AppService(IOptions<SiteOption> siteOption)
 
         for (var start = siteOption.Value.StartYear; start <= endYear; start++)
         {
-            var postDir = Path.Combine(siteOption.Value.LocalAssetsDir, start.ToString());
+            var postDir = Path.Combine(localAssetsDir, start.ToString());
             if (!Directory.Exists(postDir))
             {
                 continue;
@@ -1355,13 +1364,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return (_aboutMarkdown, _aboutHtmlContent);
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return ("## 关于", "关于");
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "about.md");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "about.md");
+        if (filePath is null || !File.Exists(filePath))
         {
             return ("## 关于", "关于");
         }
@@ -1378,13 +1382,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return (_donationMarkdown, _donationHtmlContent);
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return ("## 赞助", "赞助");
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "pays", "Donation.md");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "pays", "Donation.md");
+        if (filePath is null || !File.Exists(filePath))
         {
             return ("## 赞助", "赞助");
         }
@@ -1451,13 +1450,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _friendLinkItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _friendLinkItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "friend-links.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "friend-links.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _friendLinkItems;
         }
@@ -1481,13 +1475,8 @@ public class AppService(IOptions<SiteOption> siteOption)
             return _timeLineItems;
         }
 
-        if (string.IsNullOrEmpty(siteOption.Value.LocalAssetsDir))
-        {
-            return _timeLineItems;
-        }
-
-        var filePath = Path.Combine(siteOption.Value.LocalAssetsDir, "site", "timelines.json");
-        if (!File.Exists(filePath))
+        var filePath = GetAssetPath("site", "timelines.json");
+        if (filePath is null || !File.Exists(filePath))
         {
             return _timeLineItems;
         }

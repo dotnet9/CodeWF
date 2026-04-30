@@ -397,6 +397,7 @@ function initializeReadingToc() {
 
 function initializeReadingExperience() {
     initializeMarkdownCodeBlocks();
+    initializeArticleImageViewer();
     initializeReadingProgress();
     initializeCopyUrlButtons();
 }
@@ -525,6 +526,232 @@ function initializeReadingProgress() {
     updateProgress();
     window.addEventListener("scroll", requestProgressUpdate, { passive: true });
     window.addEventListener("resize", requestProgressUpdate);
+}
+
+function initializeArticleImageViewer() {
+    const readingBody = document.querySelector("[data-reading-body]");
+    if (!readingBody) {
+        return;
+    }
+
+    const images = Array.from(readingBody.querySelectorAll("img"));
+    if (!images.length) {
+        return;
+    }
+
+    const imageUrlPattern = /\.(avif|bmp|gif|jpe?g|png|svg|webp)(\?.*)?$/i;
+    let viewer = null;
+    let viewerImage = null;
+    let scale = 1;
+    let rotation = 0;
+    let activeImage = null;
+
+    const isPreviewableImage = (image) => {
+        const src = image.currentSrc || image.getAttribute("src") || "";
+        if (!src) {
+            return false;
+        }
+
+        const link = image.closest("a");
+        if (!link) {
+            return true;
+        }
+
+        const href = link.getAttribute("href") || "";
+        if (!href || href.startsWith("#")) {
+            return true;
+        }
+
+        return imageUrlPattern.test(href) || href === src;
+    };
+
+    const getPreviewSource = (image) => {
+        const link = image.closest("a");
+        const href = link?.getAttribute("href") || "";
+        if (href && imageUrlPattern.test(href)) {
+            return link.href;
+        }
+
+        return image.currentSrc || image.src;
+    };
+
+    const updateTransform = () => {
+        if (!viewerImage) {
+            return;
+        }
+
+        viewerImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+    };
+
+    const clampScale = (nextScale) => Math.min(Math.max(nextScale, 0.45), 3);
+
+    const closeViewer = () => {
+        if (!viewer) {
+            return;
+        }
+
+        viewer.hidden = true;
+        viewer.classList.remove("is-open");
+        document.body.classList.remove("article-image-viewer-open");
+        activeImage?.focus?.();
+        activeImage = null;
+    };
+
+    const ensureViewer = () => {
+        if (viewer) {
+            return viewer;
+        }
+
+        viewer = document.createElement("div");
+        viewer.className = "article-image-viewer";
+        viewer.hidden = true;
+        viewer.setAttribute("role", "dialog");
+        viewer.setAttribute("aria-modal", "true");
+        viewer.setAttribute("aria-label", "文章图片预览");
+
+        const toolbar = document.createElement("div");
+        toolbar.className = "article-image-viewer__toolbar";
+
+        const makeButton = (label, iconClass, action) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "article-image-viewer__button";
+            button.setAttribute("aria-label", label);
+            button.title = label;
+            button.innerHTML = `<i class="${iconClass}" aria-hidden="true"></i>`;
+            button.addEventListener("click", action);
+            return button;
+        };
+
+        toolbar.append(
+            makeButton("缩小", "fas fa-magnifying-glass-minus", () => {
+                scale = clampScale(scale - 0.2);
+                updateTransform();
+            }),
+            makeButton("放大", "fas fa-magnifying-glass-plus", () => {
+                scale = clampScale(scale + 0.2);
+                updateTransform();
+            }),
+            makeButton("向左旋转", "fas fa-rotate-left", () => {
+                rotation -= 90;
+                updateTransform();
+            }),
+            makeButton("向右旋转", "fas fa-rotate-right", () => {
+                rotation += 90;
+                updateTransform();
+            }),
+            makeButton("重置", "fas fa-arrows-rotate", () => {
+                scale = 1;
+                rotation = 0;
+                updateTransform();
+            }),
+            makeButton("关闭", "fas fa-xmark", closeViewer)
+        );
+
+        const stage = document.createElement("div");
+        stage.className = "article-image-viewer__stage";
+
+        viewerImage = document.createElement("img");
+        viewerImage.className = "article-image-viewer__image";
+        viewerImage.alt = "";
+        stage.appendChild(viewerImage);
+
+        viewer.append(toolbar, stage);
+        viewer.addEventListener("click", (event) => {
+            if (event.target === viewer || event.target === stage) {
+                closeViewer();
+            }
+        });
+
+        document.body.appendChild(viewer);
+        return viewer;
+    };
+
+    const openViewer = (image) => {
+        ensureViewer();
+        activeImage = image;
+        scale = 1;
+        rotation = 0;
+        viewerImage.src = getPreviewSource(image);
+        viewerImage.alt = image.alt || "文章图片";
+        updateTransform();
+        viewer.hidden = false;
+        viewer.classList.add("is-open");
+        document.body.classList.add("article-image-viewer-open");
+        viewer.querySelector("button")?.focus();
+    };
+
+    images.forEach((image) => {
+        if (!isPreviewableImage(image)) {
+            return;
+        }
+
+        image.classList.add("article-image-previewable");
+        image.tabIndex = 0;
+        image.setAttribute("role", "button");
+        image.setAttribute("aria-label", image.alt ? `查看大图：${image.alt}` : "查看文章图片大图");
+
+        image.addEventListener("click", (event) => {
+            event.preventDefault();
+            openViewer(image);
+        });
+
+        image.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") {
+                return;
+            }
+
+            event.preventDefault();
+            openViewer(image);
+        });
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (!viewer || viewer.hidden) {
+            return;
+        }
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeViewer();
+            return;
+        }
+
+        if (event.key === "+" || event.key === "=") {
+            event.preventDefault();
+            scale = clampScale(scale + 0.2);
+            updateTransform();
+            return;
+        }
+
+        if (event.key === "-") {
+            event.preventDefault();
+            scale = clampScale(scale - 0.2);
+            updateTransform();
+            return;
+        }
+
+        if (event.key === "0") {
+            event.preventDefault();
+            scale = 1;
+            rotation = 0;
+            updateTransform();
+            return;
+        }
+
+        if (event.key.toLowerCase() === "r" || event.key === "ArrowRight") {
+            event.preventDefault();
+            rotation += 90;
+            updateTransform();
+            return;
+        }
+
+        if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            rotation -= 90;
+            updateTransform();
+        }
+    });
 }
 
 function initializeCopyUrlButtons() {

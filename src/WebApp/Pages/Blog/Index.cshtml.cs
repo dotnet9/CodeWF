@@ -82,7 +82,7 @@ public class IndexModel : PageModel
                 ConstantUtil.GetCategoryUrl(topCategory.Item.Slug!)));
         }
 
-        var topAlbum = albums
+        var topAlbum = TakeRandom(albums
             .Where(item =>
                 !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)
                 && !string.IsNullOrWhiteSpace(item.Name)
@@ -92,7 +92,8 @@ public class IndexModel : PageModel
                 Item = item,
                 Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
             })
-            .OrderByDescending(item => item.Count)
+            .Where(static item => item.Count > 0)
+            .ToList(), 1)
             .FirstOrDefault();
 
         if (topAlbum != null)
@@ -111,7 +112,7 @@ public class IndexModel : PageModel
         IReadOnlyList<BlogPost> allPosts,
         IReadOnlyList<AlbumItem> albums)
     {
-        return albums
+        var candidates = albums
             .Where(item =>
                 !string.Equals(item.Slug, ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase)
                 && !string.IsNullOrWhiteSpace(item.Name)
@@ -122,8 +123,9 @@ public class IndexModel : PageModel
                 Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
             })
             .Where(item => item.Count > 0)
-            .OrderByDescending(item => item.Count)
-            .Take(4)
+            .ToList();
+
+        return TakeRandom(candidates, 4)
             .Select(item => new DiscoveryLinkCard(
                 "专题连读",
                 item.Item.Name!,
@@ -139,12 +141,10 @@ public class IndexModel : PageModel
             return [];
         }
 
-        var startIndex = DateTime.Now.DayOfYear % posts.Count;
         var items = new List<DiscoveryPostCard>();
 
-        for (var index = 0; index < Math.Min(count, posts.Count); index++)
+        foreach (var post in TakeRandom(posts, count))
         {
-            var post = posts[(startIndex + index) % posts.Count];
             var label = post.Categories?.FirstOrDefault()
                 ?? post.Albums?.FirstOrDefault()
                 ?? "随机发现";
@@ -158,5 +158,24 @@ public class IndexModel : PageModel
         }
 
         return items;
+    }
+
+    private static List<T> TakeRandom<T>(IReadOnlyList<T> source, int count)
+    {
+        if (source.Count == 0 || count <= 0)
+        {
+            return [];
+        }
+
+        var items = source.ToList();
+        var take = Math.Min(count, items.Count);
+
+        for (var index = 0; index < take; index++)
+        {
+            var swapIndex = Random.Shared.Next(index, items.Count);
+            (items[index], items[swapIndex]) = (items[swapIndex], items[index]);
+        }
+
+        return items.Take(take).ToList();
     }
 }

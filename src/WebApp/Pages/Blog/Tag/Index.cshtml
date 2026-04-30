@@ -7,6 +7,8 @@
         ? "浏览码坊全部文章标签。"
         : $"查看 {Model.TagName} 标签下的技术文章。";
     var tagSlug = Model.CurrentSlug ?? string.Empty;
+    var maxTagCount = Math.Max(1, Model.Tags.Any() ? Model.Tags.Max(item => item.PostCount) : 1);
+    var tagIndex = 0;
 }
 
 <section class="page-shell">
@@ -44,16 +46,13 @@
                 }
                 else
                 {
-                    <div class="directory-grid">
+                    <div class="tag-cloud" aria-label="全部标签">
                         @foreach (var tag in Model.Tags)
                         {
-                            <a href="@Model.GetTagUrl(tag.Name)" class="directory-card">
-                                <strong>@tag.Name</strong>
-                                <p>@tag.PostCount 篇文章使用了这个标签。</p>
-                                <span class="directory-card__action">
-                                    查看标签
-                                    <i class="fas fa-arrow-right"></i>
-                                </span>
+                            var weight = Math.Clamp(0.82 + tag.PostCount / (double)maxTagCount * 0.48, 0.82, 1.3);
+                            var delay = (tagIndex++ % 12) * -0.18;
+                            <a href="@Model.GetTagUrl(tag.Name)" class="tag-cloud__item" style="--tag-weight:@weight.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture); --tag-delay:@delay.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)s">
+                                <span>@tag.Name</span><strong>(@tag.PostCount)</strong>
                             </a>
                         }
                     </div>
@@ -93,12 +92,8 @@
                                         }
                                         <div class="meta-line">
                                             <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
-                                            <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd HH:mm")</span>
+                                            <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd HH:mm"))</span>
                                         </div>
-                                        <a href="@postUrl" class="inline-link">
-                                            阅读全文
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
                                     </div>
                                 </article>
                             }

@@ -1,0 +1,15 @@
+[
+  {
+    "sort": 10,
+    "name": "Illegal",
+    "memo": "示例过滤配置，可在真实资源仓库中扩展。",
+    "keywords": [
+      "terrorism",
+      "drug trafficking",
+      "hack bank",
+      "非法交易",
+      "涉恐",
+      "毒品"
+    ]
+  }
+]

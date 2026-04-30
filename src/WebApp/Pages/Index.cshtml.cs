@@ -14,6 +14,7 @@ public class IndexModel : PageModel
     private const int FeaturedCategoryLimit = 4;
 
     public List<BlogPost> Posts { get; private set; } = [];
+    public List<BlogPost> HeroPosts { get; private set; } = [];
     public List<BlogPost> LatestPosts { get; private set; } = [];
     public List<AlbumItem> Albums { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
@@ -35,6 +36,7 @@ public class IndexModel : PageModel
     {
         var allPosts = await _appService.GetAllBlogPostsAsync() ?? [];
         LatestPosts = allPosts.Take(4).ToList();
+        HeroPosts = TakeRandom(allPosts, 2);
         Posts = (await _appService.GetBannerPostAsync())?.Take(6).ToList() ?? [];
         if (Posts.Count == 0)
         {
@@ -114,7 +116,7 @@ public class IndexModel : PageModel
                 ConstantUtil.GetCategoryUrl(category.Slug)));
         }
 
-        if (albums.FirstOrDefault() is { } album)
+        if (PickRandom(albums.Where(static item => item.PostCount > 0).ToList()) is { } album)
         {
             links.Add(new DiscoveryLinkCard(
                 "连续阅读",
@@ -139,20 +141,44 @@ public class IndexModel : PageModel
             return [];
         }
 
-        var startIndex = DateTime.Now.DayOfYear % posts.Count;
         var items = new List<DiscoveryPostCard>();
 
-        for (var index = 0; index < Math.Min(count, posts.Count); index++)
+        foreach (var post in TakeRandom(posts, count))
         {
-            var post = posts[(startIndex + index) % posts.Count];
             items.Add(new DiscoveryPostCard(
                 "随机发现",
                 post.Title ?? "未命名文章",
                 post.Description ?? "换一篇看看，也许会撞上正想看的主题。",
                 ConstantUtil.GetPostUrl(post),
-                post.Date?.ToString("yyyy-MM-dd") ?? "文章"));
+                (post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd") ?? "文章"));
         }
 
         return items;
+    }
+
+    private static T? PickRandom<T>(IReadOnlyList<T> items)
+    {
+        return items.Count == 0
+            ? default
+            : items[Random.Shared.Next(items.Count)];
+    }
+
+    private static List<T> TakeRandom<T>(IReadOnlyList<T> source, int count)
+    {
+        if (source.Count == 0 || count <= 0)
+        {
+            return [];
+        }
+
+        var items = source.ToList();
+        var take = Math.Min(count, items.Count);
+
+        for (var index = 0; index < take; index++)
+        {
+            var swapIndex = Random.Shared.Next(index, items.Count);
+            (items[index], items[swapIndex]) = (items[swapIndex], items[index]);
+        }
+
+        return items.Take(take).ToList();
     }
 }

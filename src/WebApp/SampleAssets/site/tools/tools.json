@@ -1,0 +1,31 @@
+[
+  {
+    "name": "文本工具",
+    "memo": "常用文本和链接处理工具。",
+    "slug": "text",
+    "children": [
+      {
+        "name": "Slug 生成器",
+        "memo": "把标题转换为适合 URL 的 slug。",
+        "slug": "slugify-string"
+      },
+      {
+        "name": "时间戳转换",
+        "memo": "在时间戳和日期时间之间转换。",
+        "slug": "timestamp"
+      }
+    ]
+  },
+  {
+    "name": "图片工具",
+    "memo": "图标、二维码等轻量图片工具。",
+    "slug": "image",
+    "children": [
+      {
+        "name": "ICO 图标生成",
+        "memo": "从图片生成多尺寸 ico 图标。",
+        "slug": "ico"
+      }
+    ]
+  }
+]

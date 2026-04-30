@@ -33,14 +33,14 @@
                 </p>
             </div>
             <div class="page-banner__stats">
-                <div class="stat-chip">
+                <a href="@ConstantUtil.GetBlogUrl()" class="stat-chip stat-chip--link">
                     <strong>@Model.Total</strong>
                     <span>篇文章</span>
-                </div>
-                <div class="stat-chip">
+                </a>
+                <a href="@ConstantUtil.GetCategoryDirectoryUrl()" class="stat-chip stat-chip--link">
                     <strong>@Math.Max(0, Model.Categories.Count - 1)</strong>
                     <span>个分类</span>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -132,17 +132,13 @@
                                         <p class="post-list-card__excerpt">@post.Description</p>
                                     }
                                     <div class="meta-line">
-                                        <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                        <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
                                         <span><i class="far fa-user"></i>@authorName</span>
                                         @if (post.Categories?.Any() == true)
                                         {
                                             <span><i class="far fa-folder-open"></i>@string.Join(" / ", post.Categories.Take(2))</span>
                                         }
                                     </div>
-                                    <a href="@postUrl" class="inline-link">
-                                        阅读全文
-                                        <i class="fas fa-arrow-right"></i>
-                                    </a>
                                 </div>
                             </article>
                         }

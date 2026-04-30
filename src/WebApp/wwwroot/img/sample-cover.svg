@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">CodeWF sample cover</title>
+  <desc id="desc">A clean technology themed cover for sample articles.</desc>
+  <rect width="1200" height="675" fill="#f6fbff"/>
+  <path d="M0 520 C180 430 300 590 500 500 C680 420 760 260 980 300 C1080 318 1150 370 1200 410 L1200 675 L0 675 Z" fill="#dff5ef"/>
+  <path d="M0 0 H1200 V675 H0 Z" fill="none" stroke="#d7e5f0" stroke-width="2"/>
+  <g transform="translate(120 112)">
+    <rect x="0" y="0" width="500" height="338" rx="22" fill="#10243a"/>
+    <rect x="34" y="44" width="432" height="34" rx="8" fill="#203a57"/>
+    <rect x="34" y="112" width="250" height="24" rx="7" fill="#76e4d0"/>
+    <rect x="34" y="158" width="370" height="18" rx="6" fill="#8de3ff"/>
+    <rect x="34" y="198" width="330" height="18" rx="6" fill="#5fa8ff"/>
+    <rect x="34" y="238" width="400" height="18" rx="6" fill="#8de3ff"/>
+  </g>
+  <g transform="translate(690 150)">
+    <circle cx="140" cy="140" r="118" fill="#0b72e7" opacity="0.12"/>
+    <circle cx="140" cy="140" r="72" fill="#00a884" opacity="0.15"/>
+    <path d="M86 154 L128 196 L204 86" fill="none" stroke="#00a884" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="120" y="548" fill="#1d2b42" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="700">CodeWF Sample Assets</text>
+  <text x="122" y="604" fill="#4d5d73" font-family="Segoe UI, Arial, sans-serif" font-size="30">Razor Pages, content metadata, search and project docs</text>
+</svg>

@@ -1,0 +1,20 @@
+[
+  {
+    "sort": 10,
+    "name": ".NET",
+    "memo": ".NET 平台、运行时、框架与工程实践。",
+    "slug": "dotnet"
+  },
+  {
+    "sort": 20,
+    "name": "Razor Pages",
+    "memo": "适合内容站、工具站与轻量应用的 Razor Pages 实践。",
+    "slug": "razor-pages"
+  },
+  {
+    "sort": 30,
+    "name": "性能优化",
+    "memo": "缓存、静态资源、渲染链路与可观测性优化。",
+    "slug": "performance"
+  }
+]

@@ -56,10 +56,6 @@
                                 {
                                     <p>@category.Memo</p>
                                 }
-                                <span class="directory-card__action">
-                                    查看分类
-                                    <i class="fas fa-arrow-right"></i>
-                                </span>
                             </a>
                         }
                     </div>
@@ -99,12 +95,8 @@
                                         }
                                         <div class="meta-line">
                                             <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
-                                            <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd HH:mm")</span>
+                                            <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd HH:mm"))</span>
                                         </div>
-                                        <a href="@postUrl" class="inline-link">
-                                            阅读全文
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
                                     </div>
                                 </article>
                             }

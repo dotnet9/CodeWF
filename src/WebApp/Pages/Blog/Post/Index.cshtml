@@ -109,8 +109,7 @@
         else
         {
             var authorName = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
-            var publishedAt = Model.Post.Date?.ToString("yyyy-MM-dd HH:mm");
-            var updatedAt = Model.Post.Lastmod?.ToString("yyyy-MM-dd HH:mm");
+            var updatedAt = (Model.Post.Lastmod ?? Model.Post.Date)?.ToString("yyyy-MM-dd HH:mm");
             var categorySummary = string.Join(" / ", Model.CategoryLinks.Select(item => item.Label));
             var albumSummary = string.Join(" / ", Model.AlbumLinks.Select(item => item.Label));
             var tagSummary = string.Join(" / ", Model.TagLinks.Select(item => item.Label));
@@ -133,7 +132,6 @@
                 </div>
                 <div class="article-banner__content">
                     <div>
-                        <span class="eyebrow">Article</span>
                         <h1 class="page-title">@Model.Post.Title</h1>
                         @if (!string.IsNullOrWhiteSpace(Model.Post.Description))
                         {
@@ -142,18 +140,11 @@
                     </div>
 
                     <div class="article-banner__meta-grid">
-                        @if (!string.IsNullOrWhiteSpace(publishedAt))
-                        {
-                            <div class="meta-chip article-banner__meta-card">
-                                <i class="far fa-calendar"></i>
-                                <span>发布于 @publishedAt</span>
-                            </div>
-                        }
                         @if (!string.IsNullOrWhiteSpace(updatedAt))
                         {
                             <div class="meta-chip article-banner__meta-card">
                                 <i class="fas fa-rotate-right"></i>
-                                <span>更新于 @updatedAt</span>
+                                <span>最后更新 @updatedAt</span>
                             </div>
                         }
                         <div class="meta-chip article-banner__meta-card">

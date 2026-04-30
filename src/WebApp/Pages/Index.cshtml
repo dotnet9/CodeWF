@@ -9,7 +9,7 @@
     ViewData["BodyClass"] = "home-page";
     var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
 
-    var heroPosts = Model.LatestPosts.Take(2).ToList();
+    var heroPosts = Model.HeroPosts.Take(2).ToList();
     if (!heroPosts.Any())
     {
         heroPosts = Model.Posts.Take(2).ToList();
@@ -89,7 +89,7 @@
                                     <p title="@post.Description">@post.Description</p>
                                 }
                                 <div class="spotlight-story__meta">
-                                    <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
                                     <span><i class="far fa-user"></i>@spotlightAuthor</span>
                                 </div>
                             </a>
@@ -256,7 +256,7 @@
                             {
                                 var postUrl = ConstantUtil.GetPostUrl(post);
                                 <a href="@postUrl" class="dispatch-item">
-                                    <span class="dispatch-item__meta">@post.Date?.ToString("yyyy-MM-dd")</span>
+                                    <span class="dispatch-item__meta">@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
                                     <strong>@post.Title</strong>
                                     @if (!string.IsNullOrWhiteSpace(post.Description))
                                     {
@@ -310,13 +310,9 @@
                                 <p class="resource-card__desc" title="@post.Description">@post.Description</p>
                             }
                             <div class="resource-card__meta">
-                                <span><i class="far fa-calendar"></i>@post.Date?.ToString("yyyy-MM-dd")</span>
+                                <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
                                 <span><i class="far fa-user"></i>@postAuthor</span>
                             </div>
-                            <a href="@postUrl" class="inline-link">
-                                阅读全文
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
                         </div>
                     </article>
                 }
