@@ -10,6 +10,7 @@ public static class MarkdownExtension
         if (string.IsNullOrWhiteSpace(markdown))
             return default;
 
+        // 统一在这里配置 Markdown 管线，保证文章页、文档页和 about/donation 的渲染行为一致。
         var pipelineBuilder = new MarkdownPipelineBuilder()
             .UsePipeTables()
             .UseBootstrap();
@@ -41,6 +42,7 @@ public static class MarkdownExtension
 
     private static string DetermineLanguageClass(string codeContent, string existingClass)
     {
+        // 历史文章里并不是每个代码块都补了语言标签，这里用启发式规则兜底高亮体验。
         if (!string.IsNullOrEmpty(existingClass) && !existingClass.Contains("language-"))
         {
             return $"language-{existingClass}";
@@ -104,6 +106,7 @@ public static class MarkdownExtension
 
     private static string AddImagePerformanceAttributes(string html)
     {
+        // 站内大部分 Markdown 图片都不是首屏关键资源，默认补齐懒加载和异步解码。
         var imagePattern = new Regex(@"<img\b(?![^>]*\bloading=)(?![^>]*\bdecoding=)([^>]*?)\s*/?>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
         return imagePattern.Replace(html, match =>

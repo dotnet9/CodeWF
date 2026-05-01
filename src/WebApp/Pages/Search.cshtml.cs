@@ -42,6 +42,7 @@ public class SearchModel : PageModel
 
         if (string.IsNullOrWhiteSpace(Query))
         {
+            // 空查询保留搜索页壳子，方便用户直接进入页面再输入关键词。
             return;
         }
 
@@ -58,6 +59,7 @@ public class SearchModel : PageModel
 
     public async Task<JsonResult> OnGetSuggestAsync(string? q)
     {
+        // 输入建议同时服务于首屏导航搜索框和独立搜索页。
         var suggestions = await _appService.GetSearchSuggestionsAsync(q, 10);
         return new JsonResult(new { suggestions });
     }

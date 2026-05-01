@@ -11,6 +11,7 @@
         currentPath = "/";
     }
 
+    // 文章详情页是 /yyyy/MM/slug 形式，单靠前缀判断无法让“博客”导航高亮。
     var articleDetailActive = System.Text.RegularExpressions.Regex.IsMatch(
         currentPath,
         @"^/\d{4}/\d{1,2}/[^/]+$",
@@ -82,6 +83,7 @@
                 </ul>
 
                 <div class="site-utility-bar">
+                    @* 搜索建议通过 handler 异步获取，表单本身仍然保留正常 GET 行为，兼顾无脚本场景。 *@
                     <form class="site-search-form search-suggest" method="get" action="@ConstantUtil.GetSearchUrl()" role="search" data-search-suggestions-url="@($"{ConstantUtil.GetSearchUrl()}?handler=Suggest")">
                         <label class="visually-hidden" for="global-search-query">全站搜索</label>
                         <span class="site-search-form__icon" aria-hidden="true">

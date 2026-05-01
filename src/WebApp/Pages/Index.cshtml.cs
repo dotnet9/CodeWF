@@ -36,6 +36,7 @@ public class IndexModel : PageModel
     {
         var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
         LatestPosts = allPosts.Take(4).ToList();
+        // Hero 区域使用随机文章，避免首页长期只被同一组内容占据。
         HeroPosts = TakeRandom(allPosts, 2);
         Posts = (await _appService.GetBannerPostAsync())?.Take(6).ToList() ?? [];
         if (Posts.Count == 0)
@@ -173,6 +174,7 @@ public class IndexModel : PageModel
         var items = source.ToList();
         var take = Math.Min(count, items.Count);
 
+        // 只洗牌前 count 个位置，足够拿到无重复随机项，成本也比完整乱序更低。
         for (var index = 0; index < take; index++)
         {
             var swapIndex = Random.Shared.Next(index, items.Count);

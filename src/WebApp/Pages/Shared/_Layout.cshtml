@@ -28,6 +28,7 @@
         canonicalPath = $"/{canonicalPath}";
     }
 
+    // 统一把站内相对路径提升为绝对地址，供 canonical、OG 和 Twitter Card 共用。
     string ToAbsoluteUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -43,6 +44,7 @@
     var canonicalUrl = ToAbsoluteUrl(ViewData["CanonicalUrl"] as string ?? canonicalPath);
     var ogImage = ToAbsoluteUrl(ViewData["OgImage"] as string ?? site.Favicon ?? "/favicon.png");
     var ogType = ViewData["OgType"] as string ?? "website";
+    // 搜索结果页不参与索引，但允许爬虫继续跟随结果链接抓正文。
     var robots = ViewData["Robots"] as string
         ?? (requestPath.Equals("/s", StringComparison.OrdinalIgnoreCase)
             ? "noindex,follow"
@@ -89,6 +91,7 @@
 
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    @* 非关键图标样式改为异步生效，避免它阻塞首屏正文渲染。 *@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
     <noscript>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -100,6 +103,7 @@
     {
         <script>
             window.addEventListener("load", () => {
+                // 统计脚本延后到页面主内容稳定后再加载，避免影响首屏可交互时间。
                 const loadAnalytics = () => {
                     const analytics = document.createElement("script");
                     analytics.async = true;

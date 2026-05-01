@@ -2,6 +2,15 @@
 
 English version: [CHANGELOG.md](./CHANGELOG.md)
 
+V1.1.4（2026-05-01）
+
+- 😄[新增]-为外部资源仓库中的 Markdown、JSON 和常见图片资源增加开发环境热更新，借助 `FileSystemWatcher` 在本地修改内容后自动失效站点缓存
+- 😄[新增]-增加最小 xUnit 回归测试项目，并接入解决方案，用于覆盖 Front Matter 解析、Markdown 渲染和非法搜索词拦截等基础场景
+- 😄[新增]-增加 GitHub Actions 构建工作流，覆盖 `develop`、`main` 和 `master` 分支
+- 🔤[优化]-补充中英文 README，完善路由约定、资源仓库、热更新、测试和 CI 的使用说明
+- 🔤[优化]-为整站关键源码补充必要中文注释，覆盖启动入口、缓存、搜索、SEO 元数据、Markdown 渲染和文章导航等核心逻辑
+- 🔤[优化]-更新 `.gitignore`，避免测试项目的构建产物进入版本控制
+
 V1.1.3（2026-04-30）
 
 - 😄[新增]-新增 `/tag` 标签目录与 `/tag/{tag}` 标签聚合页，支持中文、`C#` 等特殊标签的安全编码与解码

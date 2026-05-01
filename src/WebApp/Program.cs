@@ -15,22 +15,31 @@ builder.Services.AddResponseCompression(options =>
     options.EnableForHttps = true;
     options.Providers.Add<BrotliCompressionProvider>();
     options.Providers.Add<GzipCompressionProvider>();
+    // SVG 属于文本资源，压缩后通常能明显降低文章封面和图标的传输体积。
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(["image/svg+xml"]);
 });
 builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
 builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Fastest);
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    // 保留更直觉的短路由，兼顾历史链接、用户记忆和爬虫抓取入口。
+    options.Conventions.AddPageRoute("/Blog/Index", "/blog");
+    options.Conventions.AddPageRoute("/Search", "/search");
+    options.Conventions.AddPageRoute("/Doc/Index", "/doc");
+    options.Conventions.AddPageRoute("/SiteMap", "/sitemap.xml");
+});
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<AppService>();
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
+// 站点正文和配置里包含大量中文，统一放开编码范围，避免输出时被过度转义。
 builder.Services.Configure<WebEncoderOptions>(options =>
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
 builder.Services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 
 var app = builder.Build();
 
-// Seed data
+// 启动时预热内容缓存，避免第一批请求承担 Markdown/JSON 的解析成本。
 using (var serviceScope = app.Services.CreateScope())
 {
     var service = serviceScope.ServiceProvider.GetRequiredService<AppService>();
@@ -86,6 +95,7 @@ app.UseStaticFiles(new StaticFileOptions
             return;
         }
 
+        // 版本化静态资源允许较长缓存时间，能显著改善二次访问体验。
         context.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=604800";
     }
 });

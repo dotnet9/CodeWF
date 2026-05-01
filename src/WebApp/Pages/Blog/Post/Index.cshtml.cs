@@ -41,6 +41,7 @@ public class IndexModel : PageModel
         }
 
         var posts = await _appService.GetAllBlogPostsAsync() ?? [];
+        // 文章列表已按发布时间倒序排列，这里直接复用当前位置计算上一篇/下一篇。
         var currentIndex = posts.FindIndex(item =>
             string.Equals(item.Slug, Post.Slug, StringComparison.OrdinalIgnoreCase));
 
@@ -55,6 +56,7 @@ public class IndexModel : PageModel
         }
 
         var categories = await _appService.GetAllCategoryItemsAsync() ?? [];
+        // 分类/专题名称来自 Front Matter，先转成名称 -> slug 的索引，后面生成跳转链接更稳定。
         var categoryLookup = categories
             .Where(item => !string.IsNullOrWhiteSpace(item.Name) && !string.IsNullOrWhiteSpace(item.Slug))
             .GroupBy(item => item.Name!, StringComparer.OrdinalIgnoreCase)
@@ -115,6 +117,7 @@ public class IndexModel : PageModel
         IReadOnlyList<ArticleTopicLink> albums,
         IReadOnlyList<ArticleTopicLink> tags)
     {
+        // 优先给当前文章补一条“继续阅读”路径，再兜底站内工具和项目入口，避免侧栏完全空掉。
         var links = new List<ArticleExploreLink>();
 
         if (categories.FirstOrDefault() is { } primaryCategory)
@@ -148,6 +151,7 @@ public class IndexModel : PageModel
         var currentAlbums = ToHashSet(currentPost.Albums);
         var currentTags = ToHashSet(currentPost.Tags);
 
+        // 分类权重最高，其次专题、标签；分数不足时再用最近更新文章补齐卡片数量。
         var related = posts
             .Where(post =>
                 !string.IsNullOrWhiteSpace(post.Slug)
@@ -272,6 +276,7 @@ public class IndexModel : PageModel
             return 1;
         }
 
+        // 中文按字数、英文按词数估算阅读量，混排文章会比单纯按空格切词更接近真实体感。
         var plainText = Regex.Replace(content, "<[^>]+>", " ");
         plainText = WebUtility.HtmlDecode(plainText);
 

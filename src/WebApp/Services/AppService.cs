@@ -14,7 +14,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace WebApp.Services;
 
-public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment environment)
+public class AppService : IDisposable
 {
     private const int SearchCacheLimit = 20;
     private const int SearchQueryStatsLimit = 50;
@@ -79,7 +79,21 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
     private readonly SemaphoreSlim _searchQueryStatsFileLock = new(1, 1);
     private readonly ConcurrentDictionary<string, SearchCacheEntry> _searchCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, SearchQueryStats> _searchQueryStats = new(StringComparer.OrdinalIgnoreCase);
+    private readonly IOptions<SiteOption> siteOption;
+    private readonly IWebHostEnvironment environment;
+    private readonly object _assetWatcherGate = new();
+    private FileSystemWatcher? _assetWatcher;
+    private Timer? _assetWatcherDebounceTimer;
     private bool _searchQueryStatsLoaded;
+
+    public AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment environment)
+    {
+        this.siteOption = siteOption;
+        this.environment = environment;
+
+        // 仅在开发环境监听资源仓库，便于改 Markdown/JSON 后即时刷新站点内容。
+        InitializeAssetWatcher();
+    }
 
     private string? GetLocalAssetsDir()
     {
@@ -95,6 +109,106 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             : Path.Combine(environment.ContentRootPath, expandedPath);
 
         return Path.GetFullPath(path);
+    }
+
+    private void InitializeAssetWatcher()
+    {
+        if (!environment.IsDevelopment())
+        {
+            return;
+        }
+
+        var localAssetsDir = GetLocalAssetsDir();
+        if (string.IsNullOrWhiteSpace(localAssetsDir) || !Directory.Exists(localAssetsDir))
+        {
+            return;
+        }
+
+        _assetWatcher = new FileSystemWatcher(localAssetsDir)
+        {
+            IncludeSubdirectories = true,
+            NotifyFilter = NotifyFilters.FileName
+                           | NotifyFilters.DirectoryName
+                           | NotifyFilters.LastWrite
+                           | NotifyFilters.CreationTime
+                           | NotifyFilters.Size,
+            EnableRaisingEvents = true
+        };
+
+        _assetWatcher.Changed += OnAssetChanged;
+        _assetWatcher.Created += OnAssetChanged;
+        _assetWatcher.Deleted += OnAssetChanged;
+        _assetWatcher.Renamed += OnAssetChanged;
+    }
+
+    private void OnAssetChanged(object sender, FileSystemEventArgs args)
+    {
+        if (!ShouldInvalidateContentCaches(args.FullPath))
+        {
+            return;
+        }
+
+        lock (_assetWatcherGate)
+        {
+            // 文件保存时往往会触发多次事件，这里做一次轻量去抖，避免反复清空缓存。
+            _assetWatcherDebounceTimer ??= new Timer(_ => InvalidateContentCaches(), null, Timeout.Infinite, Timeout.Infinite);
+            _assetWatcherDebounceTimer.Change(300, Timeout.Infinite);
+        }
+    }
+
+    private bool ShouldInvalidateContentCaches(string? fullPath)
+    {
+        if (string.IsNullOrWhiteSpace(fullPath))
+        {
+            return false;
+        }
+
+        var extension = Path.GetExtension(fullPath);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            return false;
+        }
+
+        var interestingExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".md",
+            ".json",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".svg"
+        };
+
+        if (!interestingExtensions.Contains(extension))
+        {
+            return false;
+        }
+
+        // 搜索热词文件会在正常搜索时持续更新，不应该因此把整站内容缓存全部打掉。
+        return !string.Equals(Path.GetFileName(fullPath), SearchKeywordsFileName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void InvalidateContentCaches()
+    {
+        _docItems = null;
+        _toolItems = null;
+        _albumItems = null;
+        _categoryItems = null;
+        _searchBlockedKeywordGroups = null;
+        _searchBlockedKeywords = null;
+        _blogPosts = null;
+        _friendLinkItems = null;
+        _timeLineItems = null;
+        _webSiteCountInfos = null;
+        _donationMarkdown = null;
+        _donationHtmlContent = null;
+        _aboutMarkdown = null;
+        _aboutHtmlContent = null;
+        _rss = null;
+        _siteMap = null;
+        _searchIndex = null;
+        _searchCache.Clear();
     }
 
     private string? GetAssetPath(params string[] paths)
@@ -114,6 +228,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
 
     public async Task SeedAsync()
     {
+        // 统一在启动阶段把高频数据源读入内存，后续页面请求尽量只做拼装。
         await GetAllAlbumItemsAsync();
         await GetAllCategoryItemsAsync();
         await GetSearchBlockedKeywordGroupsAsync();
@@ -263,6 +378,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
 
         if (_searchCache.TryGetValue(normalizedQuery, out var cacheEntry))
         {
+            // 站内搜索的查询模式很容易重复，命中缓存时直接复用排序后的快照。
             TouchSearchCacheEntry(normalizedQuery, cacheEntry);
             return CreateSearchPageData(cacheEntry.Snapshot, safePageIndex, safePageSize, kind);
         }
@@ -287,6 +403,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var suggestions = new List<SearchSuggestionItem>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        // 优先返回用户真实搜索过的热词，建议列表会比纯标题匹配更贴近日常使用。
         await LoadSearchQueryStatsAsync();
         foreach (var item in _searchQueryStats.Values
                      .Where(item => string.IsNullOrWhiteSpace(normalizedQuery)
@@ -306,6 +423,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             return suggestions;
         }
 
+        // 热词不足时再从内存索引补齐，避免输入建议完全依赖历史查询数据。
         var index = await GetSearchIndexAsync();
         foreach (var entry in index
                      .Where(entry => entry.Title.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase)
@@ -340,6 +458,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
         var results = new List<SearchResultItem>();
         var index = await GetSearchIndexAsync();
 
+        // 搜索结果先统一打分，再在同一种实体内按相关度和更新时间排序。
         foreach (var entry in index)
         {
             var score = CalculateSearchScore(normalizedQuery, tokens, entry.Fields);
@@ -398,6 +517,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             await GetAllDocItemsAsync();
             await GetAllToolItemsAsync();
 
+            // 把文章、文档、工具统一拉平成一套可搜索条目，后续搜索只面对内存索引。
             var index = new List<SearchableEntry>();
             foreach (var tool in GetSearchableToolNodes())
             {
@@ -1435,6 +1555,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
     public static async Task<BlogPost> ReadBlogPostAsync(string markdownFilePath)
     {
         var markdown = await File.ReadAllTextAsync(markdownFilePath);
+        // 约定 Front Matter 必须放在文件开头，先切出 YAML，再把剩余正文交给 Markdown 渲染。
         var endOfFrontMatter = markdown.IndexOf("---", 3, StringComparison.Ordinal);
         if (endOfFrontMatter == -1)
         {
@@ -1537,6 +1658,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             .ThenByDescending(p => p.Date)
             .Take(10)
             .ToList();
+        // RSS 只保留最近几篇，兼顾订阅时效性和输出体积。
 
         var sb = new StringBuilder();
         sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
@@ -1600,6 +1722,7 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
             var url = $"{domain}{normalizedPath}";
             if (!seenUrls.Add(url))
             {
+                // 文章、分类、工具会从不同来源汇总进来，提前去重避免 sitemap 里重复输出。
                 return;
             }
 
@@ -1740,4 +1863,21 @@ public class AppService(IOptions<SiteOption> siteOption, IWebHostEnvironment env
     private static string XmlEncode(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
 
     private static string ToCData(string? value) => (value ?? string.Empty).Replace("]]>", "]]]]><![CDATA[>");
+
+    public void Dispose()
+    {
+        if (_assetWatcher is not null)
+        {
+            _assetWatcher.EnableRaisingEvents = false;
+            _assetWatcher.Changed -= OnAssetChanged;
+            _assetWatcher.Created -= OnAssetChanged;
+            _assetWatcher.Deleted -= OnAssetChanged;
+            _assetWatcher.Renamed -= OnAssetChanged;
+            _assetWatcher.Dispose();
+        }
+
+        _assetWatcherDebounceTimer?.Dispose();
+        _searchIndexLock.Dispose();
+        _searchQueryStatsFileLock.Dispose();
+    }
 }

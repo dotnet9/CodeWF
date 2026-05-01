@@ -1,0 +1,29 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  webapp:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 11 preview
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+
+      - name: Restore
+        run: dotnet restore src/WebApp/WebApp.csproj
+
+      - name: Build
+        run: dotnet build src/WebApp/WebApp.csproj --configuration Release --no-restore

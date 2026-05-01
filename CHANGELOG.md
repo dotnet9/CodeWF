@@ -2,6 +2,15 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.4 (2026-05-01)
+
+- 😄 [Added] Added development-time asset hot reload for markdown, JSON, and common image assets in the external content repository via `FileSystemWatcher`.
+- 😄 [Added] Added a minimal xUnit regression test project and wired it into the solution for front matter parsing, markdown rendering, and blocked-search behavior checks.
+- 😄 [Added] Added a GitHub Actions build workflow for the `develop`, `main`, and `master` branches.
+- 🔤 [Changed] Expanded both README files with route, content-repository, hot-reload, test, and CI guidance.
+- 🔤 [Changed] Added focused Chinese source comments across key site layers, including startup, caching, search, SEO metadata, markdown rendering, and article navigation logic.
+- 🔤 [Changed] Updated `.gitignore` so test build outputs stay out of the repository.
+
 V1.1.3 (2026-04-30)
 
 - 😄 [Added] Added the `/tag` tag directory and `/tag/{tag}` tag aggregation pages, with safe encoding and decoding for Chinese tags, `C#`, and other special tag names.

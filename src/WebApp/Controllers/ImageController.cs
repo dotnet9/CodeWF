@@ -38,6 +38,7 @@ public class ImageController : ControllerBase
             var sourcePath = Path.Combine(folderPath, $"{Guid.NewGuid():N}.png");
             var icoFullPath = Path.Combine(folderPath, $"{Guid.NewGuid():N}.ico");
 
+            // 上传文件先落地到临时路径，方便后续复用现有图像工具链。
             await using (var fs = new FileStream(sourcePath, FileMode.Create))
             {
                 await sourceImage.CopyToAsync(fs);
@@ -89,6 +90,7 @@ public class ImageController : ControllerBase
             if (System.IO.File.Exists(zipFilePath))
                 System.IO.File.Delete(zipFilePath);
 
+            // 分尺寸导出的中间目录最终只作为打包源，压缩后即可删除，避免长期堆积临时文件。
             await ZipFile.CreateFromDirectoryAsync(iconFolderPath, zipFilePath);
             Directory.Delete(iconFolderPath, true);
 
@@ -116,6 +118,7 @@ public class ImageController : ControllerBase
             if (!long.TryParse(request.PhoneNumber, out _))
                 return BadRequest(new { success = false, message = "无效的手机号码" });
 
+            // 对手机号做可逆短编码，既能生成短链，也避免在二维码地址中直接暴露原始号码。
             var encodedPhone = new Hashids("codewf").EncodeLong(long.Parse(request.PhoneNumber));
             var domain = env.IsDevelopment()
                 ? $"{Request.Scheme}://{Request.Host}"

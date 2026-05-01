@@ -37,6 +37,7 @@ public class IndexModel : PageModel
         var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
         GettingStartedLinks = BuildGettingStartedLinks(allPosts, Categories, Albums);
         SerialReadingLinks = BuildSerialReadingLinks(allPosts, Albums);
+        // “随机发现”刻意排除当前列表页已展示的文章，降低同屏重复感。
         RandomPosts = BuildDiscoveryPosts(
             allPosts.Where(post =>
                 Posts.All(listed => !string.Equals(listed.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
@@ -170,6 +171,7 @@ public class IndexModel : PageModel
         var items = source.ToList();
         var take = Math.Min(count, items.Count);
 
+        // 使用局部洗牌而不是 OrderBy(Random)，可读性和性能都更可控。
         for (var index = 0; index < take; index++)
         {
             var swapIndex = Random.Shared.Next(index, items.Count);

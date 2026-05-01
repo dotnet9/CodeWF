@@ -19,6 +19,7 @@ public static class ConstantUtil
         string.IsNullOrWhiteSpace(NormalizeTagName(tag))
             ? GetTagDirectoryUrl()
             : $"/tag/{Uri.EscapeDataString(NormalizeTagName(tag))}";
+    // 标签名在 URL、文件和页面展示之间来回转换，统一做 Trim + FormC 归一化能减少同义重复。
     public static string NormalizeTagName(string? tag) =>
         string.IsNullOrWhiteSpace(tag)
             ? string.Empty
@@ -45,6 +46,7 @@ public static class ConstantUtil
     public static string GetProjectUrl(string? slug) => $"/project/{slug}";
     public static string GetSearchUrl(string? query = null, int? pageIndex = null)
     {
+        // 搜索页统一收敛到 /s，既能保持链接简短，也方便在布局层做 robots 特殊处理。
         var parameters = new List<string>();
 
         if (!string.IsNullOrWhiteSpace(query))

@@ -30,8 +30,11 @@ src/WebApp/
   Controllers/       MVC controllers
   Models/            Content and page models
   Pages/             Razor Pages
-  Services/          Content loading and search logic
+  Services/          Content loading, search, and site services
   wwwroot/           Static assets for the app itself
+
+tests/WebApp.Tests/
+  AppServiceTests.cs Minimal regression tests
 ```
 
 ## How Content Is Loaded
@@ -40,15 +43,28 @@ src/WebApp/
 
 Main inputs:
 
-- `site/album.json`
-- `site/category.json`
-- `site/FriendLink.json`
+- `site/albums.json`
+- `site/categories.json`
+- `site/friend-links.json`
 - `site/timelines.json`
-- `site/doc/doc.json`
+- `site/doc/navigation.json`
 - `site/tools/tools.json`
+- `site/search-keywords.json`
+- `site/blocked-search-keywords.json`
 - `site/about.md`
 - `site/pays/Donation.md`
 - `2019/` to current year article markdown trees
+
+Common public routes:
+
+- `/post` all posts
+- `/project` project/doc center
+- `/tool` tool directory
+- `/s` search
+- `/blog` legacy blog route
+- `/search` legacy search route
+- `/doc` legacy doc route
+- `/sitemap` and `/sitemap.xml` sitemap
 
 ## Local Development
 
@@ -59,6 +75,37 @@ Main inputs:
 ```powershell
 cd D:\github\owner\CodeWF\src\WebApp
 dotnet run
+```
+
+## Developer Workflow
+
+In development, `AppService` uses `FileSystemWatcher` to monitor markdown, JSON, and common image assets under the content repository and automatically invalidates in-memory caches.
+
+That means you can:
+
+- edit articles without restarting the app
+- tweak categories, docs, or navigation and refresh immediately
+- update content images and verify page output quickly
+
+Note: `site/search-keywords.json` is updated by live searches and intentionally does not invalidate all site caches.
+
+## Tests and CI
+
+The repository now includes a minimal safety net:
+
+- GitHub Actions build check: `.github/workflows/build.yml`
+- xUnit regression tests: `tests/WebApp.Tests`
+
+Current tests cover:
+
+- front matter parsing
+- markdown-to-HTML conversion
+- blocked search keyword handling
+
+Run locally:
+
+```powershell
+dotnet test D:\github\owner\CodeWF\CodeWF.slnx
 ```
 
 ## Configuration

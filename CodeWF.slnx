@@ -7,4 +7,5 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="src\WebApp\WebApp.csproj" />
+  <Project Path="tests\WebApp.Tests\WebApp.Tests.csproj" />
 </Solution>

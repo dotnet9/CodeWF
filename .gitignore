@@ -6,6 +6,8 @@
 /.vs
 /src/CodeWF/bin
 /src/WebApp/wwwroot/UploadIcons
+/tests/**/bin
+/tests/**/obj
 src/WebApp/WebApp.csproj.user
 src/WebApp/appsettings.Development.json
 src/WebApp/appsettings.Production.json
