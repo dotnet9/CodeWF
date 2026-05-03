@@ -65,16 +65,29 @@ public static class ConstantUtil
     }
 
     public static string GetDocUrl(string? slug) => GetProjectUrl(slug);
-    public static string GetToolUrl(string? slug) => slug switch
+    public static string GetToolUrl(string? slug)
     {
-        "slugify-string" => "/slugify-string",
-        "timestamp" => "/timestamp",
-        "ico" => "/icon",
-        "nuoche" => "/nuoche",
-        "fuli" => "/fuli",
-        null or "" => "/tool",
-        _ => $"/tool/{slug}"
-    };
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            return "/tool";
+        }
+
+        var normalizedSlug = slug.Trim();
+        if (normalizedSlug.StartsWith('/'))
+        {
+            return normalizedSlug;
+        }
+
+        return normalizedSlug.ToLowerInvariant() switch
+        {
+            "nuoche" => "/nuoche",
+            "ico" or "icon" or "icon-converter" => "/icon",
+            "timestamp" => "/timestamp",
+            "fuli" or "compound-interest-calculator" => "/fuli",
+            "slugify-string-translator" => "/slugify-string",
+            _ => $"/tool/{normalizedSlug}"
+        };
+    }
 
     public static string GetPostGithubPath(string? githubRepository, BlogPost? post) =>
         $"{githubRepository}/blob/main/{post?.Date?.Year:D4}/{post?.Date?.Month:D2}/{post?.Slug}.md";

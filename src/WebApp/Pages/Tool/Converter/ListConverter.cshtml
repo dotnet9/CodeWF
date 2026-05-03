@@ -1,0 +1,119 @@
+@page "/tool/list-converter"
+@{
+    ViewData["Title"] = "列表转换器";
+    ViewData["Description"] = "对多行列表执行排序、反转、去重、大小写转换和 CSV 行转换等操作。";
+    ViewData["CanonicalPath"] = "/tool/list-converter";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "转换器",
+        Title = "列表转换器",
+        Description = "对多行列表执行排序、反转、去重、大小写转换和 CSV 行转换等操作。",
+        MetaItems = ["Razor Pages", "原生工具", "list-converter"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">列表转换器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+
+                <label class="native-field">
+                    <span>模式</span>
+                    <select class="form-select" id="mode">
+                        <option value="sort">排序</option>
+                        <option value="reverse">反转</option>
+                        <option value="unique">去重</option>
+                        <option value="trim">修剪空白行</option>
+                        <option value="lower">小写</option>
+                        <option value="upper">大写</option>
+                        <option value="csv">多行转 CSV 行</option>
+                    </select>
+                </label>
+                <label class="native-field native-field--full">
+                    <span>输入</span>
+                    <textarea class="form-control native-textarea" id="input" rows="8">香蕉
+苹果
+橙子</textarea>
+                </label>
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                    <button type="button" class="btn btn-ghost" onclick="clearTool()">清空</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>输出</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="8" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+
+async function transform(value, mode) {
+
+    let lines = value.split(/\r?\n/);
+    if (mode === 'sort') lines = [...lines].sort((a, b) => a.localeCompare(b));
+    if (mode === 'reverse') lines = [...lines].reverse();
+    if (mode === 'unique') lines = [...new Set(lines)];
+    if (mode === 'trim') lines = lines.map(line => line.trim()).filter(Boolean);
+    if (mode === 'lower') lines = lines.map(line => line.toLowerCase());
+    if (mode === 'upper') lines = lines.map(line => line.toUpperCase());
+    if (mode === 'csv') return lines.map(line => '"' + line.replaceAll('"', '""') + '"').join(',');
+    return lines.join('\n');
+}
+async function runTool() {
+    try { setOutput('处理中...'); setOutput(await transform($('input').value, $('mode')?.value ?? 'default')); }
+    catch (error) { showError(error); }
+}
+function clearTool() { $('input').value = ''; setOutput(''); $('input').focus(); }
+document.addEventListener('DOMContentLoaded', () => {
+    $('input').addEventListener('input', () => { runTool(); });
+    $('mode')?.addEventListener('change', runTool);
+    runTool();
+});
+</script>
+}

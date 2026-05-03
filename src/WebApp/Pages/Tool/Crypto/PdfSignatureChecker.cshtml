@@ -1,0 +1,96 @@
+@page "/tool/pdf-signature-checker"
+@{
+    ViewData["Title"] = "PDF 签名检查器";
+    ViewData["Description"] = "检查 PDF 文件中是否存在签名相关结构标记，辅助判断文件是否可能带签名。";
+    ViewData["CanonicalPath"] = "/tool/pdf-signature-checker";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "加密与安全",
+        Title = "PDF 签名检查器",
+        Description = "检查 PDF 文件中是否存在签名相关结构标记，辅助判断文件是否可能带签名。",
+        MetaItems = ["Razor Pages", "原生工具", "pdf-signature-checker"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">PDF 签名检查器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+                <label class="native-field native-field--full">
+                    <span>PDF 文件</span>
+                    <input class="form-control" id="file" type="file" accept="application/pdf,.pdf" />
+                </label>
+
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>输出</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="10" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+function clearTool() { if ($('input')) $('input').value = ''; setOutput(''); $('input')?.focus(); }
+async function runTool(){try{const f=$('file').files?.[0]; if(!f) throw new Error('请选择 PDF 文件。'); const text=new TextDecoder('latin1').decode(await f.arrayBuffer()); const marks=['/ByteRange','/Contents','/Type /Sig','/SubFilter','/AcroForm'].filter(m=>text.includes(m)); setOutput(['文件：'+f.name,'大小：'+f.size+' bytes','发现签名相关标记：'+(marks.join(', ')||'无'),'判断：'+(marks.includes('/ByteRange')||marks.includes('/Type /Sig')?'可能包含数字签名':'未发现明显签名结构')].join('\n'));}catch(error){showError(error);}}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+
+});
+</script>
+}

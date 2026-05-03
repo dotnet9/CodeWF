@@ -1,0 +1,101 @@
+@page "/tool/phone-parser-and-formatter"
+@{
+    ViewData["Title"] = "电话号码解析与格式化";
+    ViewData["Description"] = "提取电话号码中的数字，并生成近似 E.164 和分组显示形式。";
+    ViewData["CanonicalPath"] = "/tool/phone-parser-and-formatter";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "数据工具",
+        Title = "电话号码解析与格式化",
+        Description = "提取电话号码中的数字，并生成近似 E.164 和分组显示形式。",
+        MetaItems = ["Razor Pages", "原生工具", "phone-parser-and-formatter"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">电话号码解析与格式化</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+                <label class="native-field">
+                    <span>默认国家</span>
+                    <input class="form-control" id="country" type="text" value="US" />
+                </label>
+                <label class="native-field native-field--full">
+                    <span>电话号码</span>
+                    <textarea class="form-control native-textarea" id="input" rows="8">+1 202-555-0104</textarea>
+                </label>
+
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                    <button type="button" class="btn btn-ghost" onclick="clearTool()">清空</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>输出</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="10" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+function clearTool() { if ($('input')) $('input').value = ''; setOutput(''); $('input')?.focus(); }
+async function runTool(){try{const mod=await loadModule('https://cdn.jsdelivr.net/npm/libphonenumber-js@1.10.28/+esm'); const p=mod.parsePhoneNumberFromString($('input').value,$('country').value||undefined); if(!p) throw new Error('无法解析电话号码。'); setOutput(['有效：'+p.isValid(),'国家：'+(p.country??''),'E.164：'+p.format('E.164'),'国际格式：'+p.formatInternational(),'国家格式：'+p.formatNational()].join('\n'));}catch(error){showError(error);}}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+
+});
+</script>
+}

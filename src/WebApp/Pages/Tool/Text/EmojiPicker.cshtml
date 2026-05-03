@@ -1,0 +1,82 @@
+@page "/tool/emoji-picker"
+@{
+    ViewData["Title"] = "Emoji 选择器";
+    ViewData["Description"] = "快速选择并复制常用 Emoji 表情。";
+    ViewData["CanonicalPath"] = "/tool/emoji-picker";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "文本工具",
+        Title = "Emoji 选择器",
+        Description = "快速选择并复制常用 Emoji 表情。",
+        MetaItems = ["Razor Pages", "原生工具", "emoji-picker"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">Emoji 选择器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-emoji-grid" id="emojiGrid"></div><label class="native-field native-field--full"><span>当前选择</span><input class="form-control" id="output" readonly /></label>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+const emojis='😀 😃 😄 😁 😆 😅 😂 🙂 🙃 😉 😊 😎 🤔 😍 🤩 🥳 😭 👍 👎 👏 🙌 💪 🙏 🚀 ✅ ❌ ⚠️ 🔥 💡 ❤️ ⭐ 🎉 🛠️ 📌 📎 🔍 🔐'.split(' '); function runTool(){}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+    const grid=$('emojiGrid'); emojis.forEach(e=>{const b=document.createElement('button'); b.type='button'; b.className='native-emoji'; b.textContent=e; b.onclick=async()=>{setOutput(e); try{await navigator.clipboard.writeText(e);}catch{}}; grid.appendChild(b);});
+});
+</script>
+}

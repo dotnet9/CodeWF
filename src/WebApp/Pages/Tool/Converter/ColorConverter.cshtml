@@ -1,0 +1,100 @@
+@page "/tool/color-converter"
+@{
+    ViewData["Title"] = "颜色格式转换器";
+    ViewData["Description"] = "在 Hex、RGB 和 HSL 等常见颜色格式之间转换。";
+    ViewData["CanonicalPath"] = "/tool/color-converter";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "转换器",
+        Title = "颜色格式转换器",
+        Description = "在 Hex、RGB 和 HSL 等常见颜色格式之间转换。",
+        MetaItems = ["Razor Pages", "原生工具", "color-converter"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">颜色格式转换器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+
+                <label class="native-field native-field--full">
+                    <span>颜色（Hex/RGB）</span>
+                    <textarea class="form-control native-textarea" id="input" rows="3">#1d6fff</textarea>
+                </label>
+                <div class="native-preview native-field--full" id="preview"></div>
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                    <button type="button" class="btn btn-ghost" onclick="clearTool()">清空</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>转换结果</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="10" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+function clearTool() { if ($('input')) $('input').value = ''; setOutput(''); $('input')?.focus(); }
+function parseRgb(v){v=String(v).trim(); if(/^#?[0-9a-f]{3}$/i.test(v)){return v.replace('#','').split('').map(c=>parseInt(c+c,16));} if(/^#?[0-9a-f]{6}$/i.test(v)){v=v.replace('#','');return [parseInt(v.slice(0,2),16),parseInt(v.slice(2,4),16),parseInt(v.slice(4,6),16)];} const m=v.match(/rgba?(([^)]+))/i); if(m) return m[1].split(',').slice(0,3).map(Number); throw new Error('请输入 Hex 或 RGB 颜色。');}
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h=0,s=0,l=(max+min)/2;if(max!==min){const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);h=max===r?(g-b)/d+(g<b?6:0):max===g?(b-r)/d+2:(r-g)/d+4;h/=6;}return [Math.round(h*360),Math.round(s*100),Math.round(l*100)];}
+function runTool(){try{const [r,g,b]=parseRgb($('input').value); const [h,s,l]=rgbToHsl(r,g,b); const hex='#'+[r,g,b].map(n=>n.toString(16).padStart(2,'0')).join(''); $('preview').innerHTML='<div class="it-tool-color-swatch" style="background:'+hex+'"></div>'; setOutput(['HEX: '+hex,'RGB: rgb('+r+', '+g+', '+b+')','HSL: hsl('+h+', '+s+'%, '+l+'%)'].join('\n'));}catch(error){showError(error);}}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+    runTool();
+});
+</script>
+}

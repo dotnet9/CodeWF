@@ -22,3 +22,5 @@ src/WebApp/Properties/PublishProfiles/FolderProfile.pubxml.user
 .codex-webapp-verify2.log
 .codex-webapp.err
 .codex-webapp.log
+**/.codex-webapp-*.log
+.codex-*.png

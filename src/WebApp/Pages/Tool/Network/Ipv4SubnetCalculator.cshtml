@@ -1,0 +1,98 @@
+@page "/tool/ipv4-subnet-calculator"
+@{
+    ViewData["Title"] = "IPv4 子网计算器";
+    ViewData["Description"] = "根据 IPv4/CIDR 计算子网掩码、网络地址、广播地址和主机范围。";
+    ViewData["CanonicalPath"] = "/tool/ipv4-subnet-calculator";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "网络工具",
+        Title = "IPv4 子网计算器",
+        Description = "根据 IPv4/CIDR 计算子网掩码、网络地址、广播地址和主机范围。",
+        MetaItems = ["Razor Pages", "原生工具", "ipv4-subnet-calculator"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">IPv4 子网计算器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+
+                <label class="native-field native-field--full">
+                    <span>IPv4/CIDR</span>
+                    <textarea class="form-control native-textarea" id="input" rows="8">192.168.1.10/24</textarea>
+                </label>
+
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                    <button type="button" class="btn btn-ghost" onclick="clearTool()">清空</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>输出</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="10" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+function clearTool() { if ($('input')) $('input').value = ''; setOutput(''); $('input')?.focus(); }
+function ipToInt(ip){const p=String(ip).trim().split('.').map(Number); if(p.length!==4||p.some(x=>!Number.isInteger(x)||x<0||x>255)) throw new Error('IPv4 地址格式不正确。'); return p.reduce((a,x)=>((a<<8)+x)>>>0,0);} function intToIp(n){n=Number(n)>>>0; return [24,16,8,0].map(s=>(n>>>s)&255).join('.');} function mask(p){p=Number(p); if(p<0||p>32) throw new Error('CIDR 前缀必须在 0 到 32 之间。'); return p===0?0:(0xffffffff<<(32-p))>>>0;} function runTool(){try{const [ip,p='24']=$('input').value.trim().split('/'); const pre=Number(p), addr=ipToInt(ip), m=mask(pre), net=addr&m, broad=net|(~m>>>0); setOutput(['CIDR：'+intToIp(addr)+'/'+pre,'子网掩码：'+intToIp(m),'网络地址：'+intToIp(net),'广播地址：'+intToIp(broad),'主机范围：'+intToIp(net+1)+' - '+intToIp(broad-1),'可用主机数：'+(pre>=31?0:Math.max(0,broad-net-1))].join('\n'));}catch(error){showError(error);}}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+    runTool();
+});
+</script>
+}

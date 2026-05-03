@@ -1,0 +1,131 @@
+@page "/tool/wifi-qrcode-generator"
+@{
+    ViewData["Title"] = "WiFi 二维码生成器";
+    ViewData["Description"] = "根据 WiFi 名称、密码和加密方式生成快速连接二维码。";
+    ViewData["CanonicalPath"] = "/tool/wifi-qrcode-generator";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "图像与视频",
+        Title = "WiFi 二维码生成器",
+        Description = "根据 WiFi 名称、密码和加密方式生成快速连接二维码。",
+        MetaItems = ["Razor Pages", "原生工具", "wifi-qrcode-generator"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">WiFi 二维码生成器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid"><label class="native-field"><span>WiFi 名称</span><input class="form-control" id="ssid" value="CodeWF WiFi" /></label><label class="native-field"><span>密码</span><input class="form-control" id="password" /></label><label class="native-field"><span>加密方式</span><select class="form-select" id="security"><option>WPA</option><option>WEP</option><option value="nopass">无</option></select></label><label class="native-field"><span>前景色</span><input class="form-control" type="color" value="#111827" id="dark" /></label><label class="native-field"><span>背景色</span><input class="form-control" type="color" value="#ffffff" id="light" /></label><div class="native-tool-actions native-field--full"><button type="button" class="btn btn-primary" onclick="runTool()">生成二维码</button></div><div class="native-qr native-field--full"><canvas id="canvas"></canvas></div><textarea class="form-control native-textarea native-field--full" id="output" rows="4" readonly></textarea></div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+let qrCodeLoader;
+let qrRunSequence = 0;
+function getQrCodeLibrary() {
+    qrCodeLoader ??= loadModule('https://cdn.jsdelivr.net/npm/qrcode@@1.5.3/+esm')
+        .then(module => {
+            const lib = module.default ?? module;
+            if (!lib?.toCanvas) throw new Error('二维码组件加载失败');
+            return lib;
+        });
+    return qrCodeLoader;
+}
+function escapeWifiValue(value) {
+    return String(value ?? '').replace(/([\\;,":])/g, '\\$1');
+}
+function buildWifiPayload() {
+    const ssid = $('ssid').value.trim();
+    if (!ssid) throw new Error('请输入 WiFi 名称');
+
+    const security = $('security').value || 'WPA';
+    const password = $('password').value;
+    const passwordPart = security === 'nopass' ? '' : `;P:${escapeWifiValue(password)}`;
+    return `WIFI:T:${security};S:${escapeWifiValue(ssid)}${passwordPart};;`;
+}
+function clearCanvas() {
+    const canvas = $('canvas');
+    const context = canvas?.getContext?.('2d');
+    if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
+}
+async function runTool() {
+    const runId = ++qrRunSequence;
+    try {
+        const text = buildWifiPayload();
+        const qrCode = await getQrCodeLibrary();
+        if (runId !== qrRunSequence) return;
+        await qrCode.toCanvas($('canvas'), text, {
+            width: 280,
+            margin: 2,
+            errorCorrectionLevel: 'M',
+            color: {
+                dark: $('dark').value || '#111827',
+                light: $('light').value || '#ffffff'
+            }
+        });
+        if (runId !== qrRunSequence) return;
+        setOutput(text);
+    } catch (error) {
+        if (runId !== qrRunSequence) return;
+        clearCanvas();
+        showError(error);
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', runTool);
+        el.addEventListener('change', runTool);
+    });
+    runTool();
+});
+</script>
+}

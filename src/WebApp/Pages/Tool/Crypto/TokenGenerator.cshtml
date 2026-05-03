@@ -1,0 +1,69 @@
+@page "/tool/token-generator"
+@{
+    ViewData["Title"] = "随机 Token 生成器";
+    ViewData["Description"] = "按指定长度和字符集生成随机字符串，可用于临时令牌、测试密码和标识符。";
+    ViewData["CanonicalPath"] = "/tool/token-generator";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "加密与安全",
+        Title = "随机 Token 生成器",
+        Description = "按指定长度和字符集生成随机字符串，可用于临时令牌、测试密码和标识符。",
+        MetaItems = ["Razor Pages", "原生工具", "token-generator"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">随机 Token 生成器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid"><label class="native-field"><span>长度</span><input class="form-control" id="length" type="number" min="1" max="4096" value="32" /></label><label class="native-check"><input type="checkbox" id="upper" checked /> 大写字母</label><label class="native-check"><input type="checkbox" id="lower" checked /> 小写字母</label><label class="native-check"><input type="checkbox" id="number" checked /> 数字</label><label class="native-check"><input type="checkbox" id="symbol" /> 符号</label><div class="native-tool-actions native-field--full"><button type="button" class="btn btn-primary" onclick="runTool()">生成</button></div><textarea class="form-control native-textarea native-field--full" id="output" rows="4" readonly></textarea></div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+function runTool(){let chars=''; if($('upper').checked) chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ'; if($('lower').checked) chars+='abcdefghijklmnopqrstuvwxyz'; if($('number').checked) chars+='0123456789'; if($('symbol').checked) chars+='!#$%&()*+,-./:;<=>?[]^_{|}~'; if(!chars) return setOutput('请至少选择一种字符类型。'); const length=Math.min(4096,Math.max(1,parseInt($('length').value,10)||32)); const bytes=new Uint32Array(length); crypto.getRandomValues(bytes); setOutput([...bytes].map(v=>chars[v%chars.length]).join(''));} document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('input').forEach(el=>el.addEventListener('input',runTool));runTool();});
+</script>
+}

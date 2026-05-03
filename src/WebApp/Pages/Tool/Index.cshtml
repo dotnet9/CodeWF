@@ -26,32 +26,174 @@
         }
         else
         {
-            <div class="post-grid">
-                @foreach (var tool in Model.Tools)
-                {
-                    <article class="resource-card">
-                        <div class="resource-card__body">
-                            <span class="card-kicker">工具分组</span>
-                            <h2 class="resource-card__title">@tool.Name</h2>
-                            @if (!string.IsNullOrWhiteSpace(tool.Memo))
-                            {
-                                <p class="resource-card__desc">@tool.Memo</p>
-                            }
+            var totalToolCount = Model.Tools.Sum(static tool => tool.Children?.Count ?? 0);
+            var groupIcons = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["crypto"] = "fa-solid fa-shield-halved",
+                ["converter"] = "fa-solid fa-right-left",
+                ["web"] = "fa-solid fa-globe",
+                ["images-and-videos"] = "fa-regular fa-image",
+                ["development"] = "fa-solid fa-code",
+                ["network"] = "fa-solid fa-network-wired",
+                ["math"] = "fa-solid fa-square-root-variable",
+                ["measurement"] = "fa-solid fa-gauge-high",
+                ["text"] = "fa-solid fa-font",
+                ["data"] = "fa-solid fa-database"
+            };
+
+            <div class="tool-directory">
+                <div class="tool-list-search" role="search" aria-label="工具列表搜索">
+                    <label class="tool-list-search__field" for="tool-list-search">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input id="tool-list-search"
+                               type="search"
+                               autocomplete="off"
+                               placeholder="搜索当前工具列表"
+                               aria-describedby="tool-list-search-summary" />
+                    </label>
+                    <button class="btn btn-ghost btn-sm" type="button" id="tool-list-search-clear">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                        清空
+                    </button>
+                    <span class="tool-list-search__summary" id="tool-list-search-summary">共 @totalToolCount 个工具</span>
+                </div>
+
+                <nav class="tool-directory__nav" aria-label="工具分类">
+                    <div class="tool-category-nav">
+                        @foreach (var tool in Model.Tools)
+                        {
+                            var groupId = $"tool-group-{tool.Slug}";
+                            var iconClass = groupIcons.GetValueOrDefault(tool.Slug ?? string.Empty, "fa-solid fa-toolbox");
+                            var childCount = tool.Children?.Count ?? 0;
+
+                            <a class="tool-category-nav__item" href="#@groupId" data-tool-category-link data-tool-target="@groupId">
+                                <i class="@iconClass" aria-hidden="true"></i>
+                                <span>@tool.Name</span>
+                                <strong>@childCount</strong>
+                            </a>
+                        }
+                    </div>
+                </nav>
+
+                <div class="tool-directory__content" id="tool-list-grid">
+                    @foreach (var tool in Model.Tools)
+                    {
+                        var groupId = $"tool-group-{tool.Slug}";
+                        var iconClass = groupIcons.GetValueOrDefault(tool.Slug ?? string.Empty, "fa-solid fa-toolbox");
+                        var childCount = tool.Children?.Count ?? 0;
+                        var groupSearchText = string.Join(" ", tool.Name, tool.Slug);
+
+                        <section class="tool-category-section" id="@groupId" data-tool-group data-tool-search="@groupSearchText">
+                            <header class="tool-category-section__head">
+                                <span class="tool-category-section__icon">
+                                    <i class="@iconClass" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span class="tool-category-section__meta">@childCount 个工具</span>
+                                    <h2>@tool.Name</h2>
+                                    @if (!string.IsNullOrWhiteSpace(tool.Memo))
+                                    {
+                                        <p>@tool.Memo</p>
+                                    }
+                                </div>
+                            </header>
 
                             @if (tool.Children != null && tool.Children.Any())
                             {
-                                <div class="chip-cloud">
+                                <div class="tool-card-grid">
                                     @foreach (var child in tool.Children)
                                     {
                                         var toolLink = ConstantUtil.GetToolUrl(child.Slug);
-                                        <a href="@toolLink" class="chip-link">@child.Name</a>
+                                        var childSearchText = string.Join(" ", child.Name, child.Memo, child.Slug, tool.Name);
+
+                                        <a href="@toolLink" class="tool-card-link" data-tool-chip data-tool-search="@childSearchText">
+                                            <span class="tool-card-link__main">
+                                                <strong>@child.Name</strong>
+                                                @if (!string.IsNullOrWhiteSpace(child.Memo))
+                                                {
+                                                    <span>@child.Memo</span>
+                                                }
+                                            </span>
+                                            <span class="tool-card-link__meta">
+                                                <code>@child.Slug</code>
+                                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                            </span>
+                                        </a>
                                     }
                                 </div>
                             }
-                        </div>
-                    </article>
-                }
+                        </section>
+                    }
+                </div>
+
+                <div class="empty-state tool-list-search__empty" id="tool-list-search-empty" hidden>
+                    <h2>没有匹配的工具</h2>
+                    <p>换一个工具名称、分组或 slug 试试。</p>
+                </div>
             </div>
         }
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const input = document.getElementById('tool-list-search');
+            const clear = document.getElementById('tool-list-search-clear');
+            const summary = document.getElementById('tool-list-search-summary');
+            const empty = document.getElementById('tool-list-search-empty');
+            const groups = Array.from(document.querySelectorAll('[data-tool-group]'));
+            const categoryLinks = Array.from(document.querySelectorAll('[data-tool-category-link]'));
+
+            if (!input || !summary || groups.length === 0) {
+                return;
+            }
+
+            const normalize = value => String(value || '').trim().toLocaleLowerCase();
+            const matches = (value, tokens) => tokens.every(token => normalize(value).includes(token));
+
+            function applyToolFilter() {
+                const tokens = normalize(input.value).split(/\s+/).filter(Boolean);
+                let visibleGroups = 0;
+                let visibleTools = 0;
+
+                for (const group of groups) {
+                    const groupMatches = tokens.length === 0 || matches(group.dataset.toolSearch, tokens);
+                    let groupVisibleTools = 0;
+
+                    for (const chip of group.querySelectorAll('[data-tool-chip]')) {
+                        const visible = tokens.length === 0 || groupMatches || matches(chip.dataset.toolSearch, tokens);
+                        chip.hidden = !visible;
+                        if (visible) {
+                            groupVisibleTools += 1;
+                        }
+                    }
+
+                    group.hidden = groupVisibleTools === 0;
+                    const categoryLink = categoryLinks.find(link => link.dataset.toolTarget === group.id);
+                    if (categoryLink) {
+                        categoryLink.hidden = group.hidden;
+                    }
+
+                    if (!group.hidden) {
+                        visibleGroups += 1;
+                        visibleTools += groupVisibleTools;
+                    }
+                }
+
+                empty.hidden = visibleTools !== 0;
+                summary.textContent = tokens.length === 0
+                    ? `共 ${visibleTools} 个工具`
+                    : `匹配 ${visibleTools} 个工具，分布在 ${visibleGroups} 个分组`;
+            }
+
+            input.addEventListener('input', applyToolFilter);
+            clear?.addEventListener('click', () => {
+                input.value = '';
+                input.focus();
+                applyToolFilter();
+            });
+            applyToolFilter();
+        })();
+    </script>
+}

@@ -1,0 +1,101 @@
+@page "/tool/eta-calculator"
+@{
+    ViewData["Title"] = "ETA 预计完成时间计算器";
+    ViewData["Description"] = "根据已完成量、总量和已耗时估算剩余时间与完成时刻。";
+    ViewData["CanonicalPath"] = "/tool/eta-calculator";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "数学工具",
+        Title = "ETA 预计完成时间计算器",
+        Description = "根据已完成量、总量和已耗时估算剩余时间与完成时刻。",
+        MetaItems = ["Razor Pages", "原生工具", "eta-calculator"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">ETA 预计完成时间计算器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid">
+                <label class="native-field">
+                    <span>已完成</span>
+                    <input class="form-control" id="done" type="number" value="35" min="0"/>
+                </label>                <label class="native-field">
+                    <span>总量</span>
+                    <input class="form-control" id="total" type="number" value="100" min="1"/>
+                </label>                <label class="native-field">
+                    <span>已用分钟</span>
+                    <input class="form-control" id="elapsed" type="number" value="42" min="0"/>
+                </label>
+
+                <div class="native-tool-actions native-field--full">
+                    <button type="button" class="btn btn-primary" onclick="runTool()">执行</button>
+                </div>
+                <label class="native-field native-field--full">
+                    <span>输出</span>
+                    <textarea class="form-control native-textarea native-textarea--output" id="output" rows="10" readonly></textarea>
+                </label>
+            </div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; else if (output) output.textContent = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const moduleCache = new Map();
+function loadModule(src) {
+    if (!moduleCache.has(src)) moduleCache.set(src, import(src));
+    return moduleCache.get(src);
+}
+
+function human(sec){if(!isFinite(sec))return '不可估算'; if(sec<1)return '不到 1 秒'; const u=[['年',31536000],['天',86400],['小时',3600],['分钟',60],['秒',1]]; let r=sec,p=[]; for(const [n,s] of u){const c=Math.floor(r/s); if(c){p.push(c+n); r%=s;} if(p.length>=2)break;} return p.join(' ');} function runTool(){const done=Number($('done').value), total=Number($('total').value), elapsed=Number($('elapsed').value); const rate=done/elapsed; const remain=(total-done)/rate; const finish=new Date(Date.now()+remain*60000); setOutput(['进度：'+(done/total*100).toFixed(2)+'%','速度：'+rate.toFixed(2)+' / 分钟','剩余：'+human(remain*60),'预计完成：'+finish.toLocaleString()].join('\n'));}
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => runTool?.());
+        el.addEventListener('change', () => runTool?.());
+    });
+    runTool();
+});
+</script>
+}

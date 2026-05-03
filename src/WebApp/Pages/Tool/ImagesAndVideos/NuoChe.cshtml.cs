@@ -4,7 +4,7 @@ using HashidsNet;
 using WebApp.Options;
 using Microsoft.Extensions.Options;
 
-namespace WebApp.Pages.Tool.Converter;
+namespace WebApp.Pages.Tool.ImagesAndVideos;
 
 [IgnoreAntiforgeryToken]
 public class NuoCheModel : PageModel

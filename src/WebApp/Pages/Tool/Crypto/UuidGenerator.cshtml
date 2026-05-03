@@ -1,0 +1,69 @@
+@page "/tool/uuid-generator"
+@{
+    ViewData["Title"] = "UUID 生成器";
+    ViewData["Description"] = "生成 UUID v4 或 Nil UUID，适合测试数据、临时标识和分布式唯一 ID。";
+    ViewData["CanonicalPath"] = "/tool/uuid-generator";
+    var banner = new WebApp.Models.PageBannerViewModel
+    {
+        Eyebrow = "加密与安全",
+        Title = "UUID 生成器",
+        Description = "生成 UUID v4 或 Nil UUID，适合测试数据、临时标识和分布式唯一 ID。",
+        MetaItems = ["Razor Pages", "原生工具", "uuid-generator"]
+    };
+}
+
+<section class="page-shell">
+    <div class="container">
+        <partial name="_PageBanner" model="banner" />
+
+        <div class="tool-detail-nav">
+            <a class="inline-link" href="/tool">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                返回工具箱
+            </a>
+        </div>
+
+        <article class="surface-panel native-tool-host">
+            <div class="native-tool-panel__head">
+                <div>
+                    <span class="card-kicker">Razor Pages 原生工具</span>
+                    <h2 class="surface-title">UUID 生成器</h2>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="copyOutput()">
+                    <i class="fa-regular fa-copy" aria-hidden="true"></i> 复制结果
+                </button>
+            </div>
+            <div class="native-tool-grid"><label class="native-field"><span>数量</span><input class="form-control" id="count" type="number" min="1" max="100" value="5" /></label><div class="native-tool-actions"><button type="button" class="btn btn-primary" onclick="runTool()">生成</button></div><textarea class="form-control native-textarea native-field--full" id="output" rows="8" readonly></textarea></div>
+        </article>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+
+function $(id) { return document.getElementById(id); }
+function setOutput(value) { const output = $('output'); if (output) output.value = value ?? ''; }
+function showError(error) { setOutput(error?.message ?? String(error)); }
+async function copyOutput() {
+    const output = $('output');
+    if (!output) return;
+    try { await navigator.clipboard.writeText(output.value || output.textContent || ''); }
+    catch { output.select?.(); document.execCommand('copy'); }
+}
+function escapeHtml(value) {
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve(window[globalName]);
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.onload = () => resolve(globalName ? window[globalName] : true);
+        script.onerror = () => reject(new Error('资源加载失败：' + src));
+        document.head.appendChild(script);
+    });
+}
+const crockford='0123456789ABCDEFGHJKMNPQRSTVWXYZ'; function encodeTime(time){let out='';for(let i=9;i>=0;i--){out=crockford[time%32]+out;time=Math.floor(time/32);}return out;} function ulid(){const random=new Uint8Array(16);crypto.getRandomValues(random);return encodeTime(Date.now())+[...random].map(b=>crockford[b%32]).join('');} function runTool(){const count=Math.min(100,Math.max(1,parseInt($('count').value,10)||5));setOutput(Array.from({length:count},()=> 'uuid-generator'==='uuid-generator'?crypto.randomUUID():ulid()).join('\n'));} document.addEventListener('DOMContentLoaded',()=>{$('count').addEventListener('input',runTool);runTool();});
+</script>
+}
