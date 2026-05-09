@@ -1,16 +1,17 @@
 @model WebApp.Components.FriendLinkViewModel
+@inject WebApp.Services.I18nService I18n
 
 <div class="friend-links">
     @if (Model.Links?.Any() != true)
     {
         <div class="empty-state">
-            <h2>友情链接暂未配置</h2>
-            <p>后续可在这里补充站点链接。</p>
+            <h2>@I18n.T("friendLinks.emptyTitle", "友情链接暂未配置")</h2>
+            <p>@I18n.T("friendLinks.emptyDescription", "后续可在这里补充站点链接。")</p>
         </div>
     }
     else
     {
-        <div class="friend-links__label">友情链接</div>
+        <div class="friend-links__label">@I18n.T("friendLinks.title", "友情链接")</div>
         <div class="friend-links__grid">
             @foreach (var link in Model.Links.OrderBy(item => item.Index))
             {

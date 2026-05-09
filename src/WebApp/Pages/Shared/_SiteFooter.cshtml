@@ -1,10 +1,12 @@
 @using Microsoft.Extensions.Options
 @using WebApp.Extensions
+@using WebApp.Services
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
+@inject WebApp.Services.I18nService I18n
 @{
     var site = SiteOptions.Value;
-    var appTitle = site.AppTitle ?? "码坊";
-    var defaultSiteDescription = "技术文章、项目说明与在线工具";
+    var appTitle = I18n.T("site.name", site.AppTitle ?? "码坊");
+    var defaultSiteDescription = I18n.T("footer.tagline", "技术文章、项目说明与在线工具");
 }
 
 <section class="site-links-shell">
@@ -23,18 +25,18 @@
                 </div>
 
                 <div>
-                    <h2 class="footer-title">导航</h2>
+                    <h2 class="footer-title">@I18n.T("footer.navigation", "导航")</h2>
                     <ul class="footer-list">
-                        <li><a href="@ConstantUtil.GetBlogUrl()">博客</a></li>
-                        <li><a href="@ConstantUtil.GetProjectDirectoryUrl()">项目</a></li>
-                        <li><a href="/tool">工具</a></li>
-                        <li><a href="@ConstantUtil.GetTagDirectoryUrl()">标签</a></li>
-                        <li><a href="/timeline">时间线</a></li>
+                        <li><a href="@ConstantUtil.GetBlogUrl()">@I18n.T("nav.blog", "博客")</a></li>
+                        <li><a href="@ConstantUtil.GetProjectDirectoryUrl()">@I18n.T("nav.projects", "项目")</a></li>
+                        <li><a href="/tool">@I18n.T("nav.tools", "工具")</a></li>
+                        <li><a href="@ConstantUtil.GetTagDirectoryUrl()">@I18n.T("nav.tags", "标签")</a></li>
+                        <li><a href="/timeline">@I18n.T("nav.timeline", "时间线")</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h2 class="footer-title">社区</h2>
+                    <h2 class="footer-title">@I18n.T("footer.community", "社区")</h2>
                     <ul class="footer-list">
                         <li><a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a></li>
                         <li><a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a></li>
@@ -44,20 +46,35 @@
                 </div>
 
                 <div>
-                    <h2 class="footer-title">入口</h2>
+                    <h2 class="footer-title">@I18n.T("footer.entries", "入口")</h2>
                     <ul class="footer-list">
-                        <li><a href="/about">关于站点</a></li>
-                        <li><a href="/donation">支持作者</a></li>
-                        <li><a href="https://github.com/dotnet9/CodeWF" target="_blank" rel="noreferrer">查看源码</a></li>
-                        <li><a href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">反馈问题</a></li>
-                        <li><a href="/rss" target="_blank" rel="noreferrer">RSS 订阅</a></li>
-                        <li><a href="/sitemap" target="_blank" rel="noreferrer">站点地图</a></li>
+                        <li><a href="/about">@I18n.T("footer.aboutSite", "关于站点")</a></li>
+                        <li><a href="/donation">@I18n.T("footer.supportAuthor", "支持作者")</a></li>
+                        <li><a href="https://github.com/dotnet9/CodeWF" target="_blank" rel="noreferrer">@I18n.T("footer.source", "查看源码")</a></li>
+                        <li><a href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">@I18n.T("footer.feedback", "反馈问题")</a></li>
+                        <li><a href="/rss" target="_blank" rel="noreferrer">@I18n.T("footer.rss", "RSS 订阅")</a></li>
+                        <li><a href="/sitemap" target="_blank" rel="noreferrer">@I18n.T("nav.sitemap", "站点地图")</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="footer-title">@I18n.T("language.title", "语言")</h2>
+                    <ul class="footer-list footer-language-list">
+                        @foreach (var language in I18n.Languages)
+                        {
+                            var active = string.Equals(language.Code, I18n.CurrentLanguage, StringComparison.OrdinalIgnoreCase);
+                            <li>
+                                <a class="@(active ? "is-current" : string.Empty)" href="@I18n.SwitchUrl(language.Code)" lang="@language.HtmlLang" aria-current="@(active ? "true" : null)">
+                                    @language.NativeName
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
 
                 <div class="footer-qr">
-                    <img src="@(site.WeChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg")" alt="@($"{site.WeChatName ?? appTitle} 微信公众号")" loading="lazy" decoding="async" />
-                    <p>关注公众号<br />@(site.WeChatName ?? appTitle)</p>
+                    <img src="@(site.WeChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg")" alt="@I18n.Format("footer.wechatAlt", $"{site.WeChatName ?? appTitle} 微信公众号", site.WeChatName ?? appTitle)" loading="lazy" decoding="async" />
+                    <p>@I18n.T("footer.followWechat", "关注公众号")<br />@(site.WeChatName ?? appTitle)</p>
                 </div>
             </div>
 

@@ -1,9 +1,11 @@
 @using Microsoft.Extensions.Options
 @using WebApp.Extensions
+@using WebApp.Services
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
+@inject WebApp.Services.I18nService I18n
 @{
     var site = SiteOptions.Value;
-    var appTitle = site.AppTitle ?? "码坊";
+    var appTitle = I18n.T("site.name", site.AppTitle ?? "码坊");
     var searchQuery = Context.Request.Query["q"].ToString();
     var currentPath = (Context.Request.Path.Value ?? "/").TrimEnd('/');
     if (string.IsNullOrEmpty(currentPath))
@@ -48,36 +50,52 @@
         <div class="container">
             <a class="navbar-brand site-brand" href="/">
                 <span class="site-brand__mark">@appTitle</span>
-                <span class="site-brand__meta">Tech Blog / .NET Lab</span>
+                <span class="site-brand__meta">@I18n.T("site.brandMeta", "Tech Blog / .NET Lab")</span>
             </a>
 
-            <button class="navbar-toggler site-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="切换导航">
+            <button class="navbar-toggler site-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="@I18n.T("nav.toggle", "切换导航")">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="mainNavigation">
                 <ul class="navbar-nav me-auto align-items-xl-center">
                     <li class="nav-item">
-                        <a class="@(NavClass("/"))" href="/">首页</a>
+                        <a class="@(NavClass("/"))" href="/">@I18n.T("nav.home", "首页")</a>
                     </li>
                     @await Component.InvokeAsync("Navigation", new { isActive = blogActive })
                     <li class="nav-item">
-                        <a class="@(NavClass("/project"))" href="@ConstantUtil.GetProjectDirectoryUrl()">项目</a>
+                        <a class="@(NavClass("/project"))" href="@ConstantUtil.GetProjectDirectoryUrl()">@I18n.T("nav.projects", "项目")</a>
                     </li>
                     <li class="nav-item">
-                        <a class="@(NavClass("/tool", "/timestamp", "/icon", "/nuoche", "/fuli", "/slugify-string"))" href="/tool">工具</a>
+                        <a class="@(NavClass("/tool", "/timestamp", "/icon", "/nuoche", "/fuli", "/slugify-string"))" href="/tool">@I18n.T("nav.tools", "工具")</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
+                        <button class="nav-link dropdown-toggle site-menu-toggle @(moreActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">@I18n.T("nav.more", "更多")</button>
                         <div class="dropdown-menu site-dropdown">
-                            <a class="dropdown-item" href="/about">关于</a>
-                            <a class="dropdown-item" href="/timeline">时间线</a>
-                            <a class="dropdown-item" href="/donation">赞助</a>
+                            <a class="dropdown-item" href="/about">@I18n.T("nav.about", "关于")</a>
+                            <a class="dropdown-item" href="/timeline">@I18n.T("nav.timeline", "时间线")</a>
+                            <a class="dropdown-item" href="/donation">@I18n.T("nav.donation", "赞助")</a>
                             <a class="dropdown-item" href="/rss" target="_blank" rel="noreferrer">RSS</a>
-                            <a class="dropdown-item" href="/sitemap" target="_blank" rel="noreferrer">站点地图</a>
+                            <a class="dropdown-item" href="/sitemap" target="_blank" rel="noreferrer">@I18n.T("nav.sitemap", "站点地图")</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a>
                             <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown site-language-menu">
+                        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@I18n.T("language.switch", "切换语言")">
+                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                            <span>@I18n.CurrentLanguageInfo.NativeName</span>
+                        </button>
+                        <div class="dropdown-menu site-dropdown site-language-dropdown">
+                            @foreach (var language in I18n.Languages)
+                            {
+                                var active = string.Equals(language.Code, I18n.CurrentLanguage, StringComparison.OrdinalIgnoreCase);
+                                <a class="dropdown-item @(active ? "active" : string.Empty)" href="@I18n.SwitchUrl(language.Code)" lang="@language.HtmlLang" aria-current="@(active ? "true" : null)">
+                                    <span>@language.NativeName</span>
+                                    <small>@language.EnglishName</small>
+                                </a>
+                            }
                         </div>
                     </li>
                 </ul>
@@ -85,7 +103,7 @@
                 <div class="site-utility-bar">
                     @* 搜索建议通过 handler 异步获取，表单本身仍然保留正常 GET 行为，兼顾无脚本场景。 *@
                     <form class="site-search-form search-suggest" method="get" action="@ConstantUtil.GetSearchUrl()" role="search" data-search-suggestions-url="@($"{ConstantUtil.GetSearchUrl()}?handler=Suggest")">
-                        <label class="visually-hidden" for="global-search-query">全站搜索</label>
+                        <label class="visually-hidden" for="global-search-query">@I18n.T("search.global", "全站搜索")</label>
                         <span class="site-search-form__icon" aria-hidden="true">
                             <i class="fas fa-magnifying-glass"></i>
                         </span>
@@ -95,12 +113,12 @@
                             type="search"
                             name="q"
                             value="@searchQuery"
-                            placeholder="搜索项目、工具、文章"
+                            placeholder="@I18n.T("search.placeholder", "搜索项目、工具、文章")"
                             autocomplete="off"
                             aria-autocomplete="list"
                             aria-controls="global-search-suggestions"
                             data-search-suggest-input />
-                        <button type="submit" class="site-search-submit">搜索</button>
+                        <button type="submit" class="site-search-submit">@I18n.T("search.submit", "搜索")</button>
                         <div id="global-search-suggestions" class="search-suggest-panel" data-search-suggest-panel hidden></div>
                     </form>
                 </div>

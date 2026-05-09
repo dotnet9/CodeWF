@@ -1,5 +1,7 @@
 @using WebApp.Extensions
+@using WebApp.Services
 @model WebApp.Components.NavigationViewModel
+@inject WebApp.Services.I18nService I18n
 @{
     var albums = Model.Albums.Take(8).ToList();
     var categories = Model.Categories.Take(8).ToList();
@@ -7,21 +9,21 @@
 }
 
 <li class="nav-item dropdown">
-    <button class="nav-link dropdown-toggle site-menu-toggle @(Model.IsActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">博客</button>
+    <button class="nav-link dropdown-toggle site-menu-toggle @(Model.IsActive ? "is-active" : string.Empty)" type="button" data-bs-toggle="dropdown" aria-expanded="false">@I18n.T("nav.blog", "博客")</button>
     <div class="dropdown-menu nav-mega-menu nav-mega-menu--blog">
         <div class="nav-mega-menu__header">
             <div>
                 <span class="nav-mega-menu__eyebrow">Blog</span>
-                <strong>先看文章，再按专题或分类继续浏览</strong>
+                <strong>@I18n.T("nav.blogLead", "先看文章，再按专题或分类继续浏览")</strong>
             </div>
-            <span class="nav-mega-menu__badge">@((albums.Count + categories.Count).ToString()) 个入口</span>
+            <span class="nav-mega-menu__badge">@I18n.Format("nav.entryCount", "{0} 个入口", albums.Count + categories.Count)</span>
         </div>
 
         <div class="nav-mega-menu__actions nav-mega-menu__actions--blog">
-            <a href="@ConstantUtil.GetBlogUrl()">全部文章</a>
-            <a href="@ConstantUtil.GetAlbumDirectoryUrl()">全部专题</a>
-            <a href="@ConstantUtil.GetCategoryDirectoryUrl()">全部分类</a>
-            <a href="@ConstantUtil.GetTagDirectoryUrl()">全部标签</a>
+            <a href="@ConstantUtil.GetBlogUrl()">@I18n.T("nav.allPosts", "全部文章")</a>
+            <a href="@ConstantUtil.GetAlbumDirectoryUrl()">@I18n.T("nav.allAlbums", "全部专题")</a>
+            <a href="@ConstantUtil.GetCategoryDirectoryUrl()">@I18n.T("nav.allCategories", "全部分类")</a>
+            <a href="@ConstantUtil.GetTagDirectoryUrl()">@I18n.T("nav.allTags", "全部标签")</a>
         </div>
 
         @if (latestPost != null)
@@ -51,7 +53,7 @@
                         {
                             <span><i class="far fa-calendar"></i>@latestPost.Date.Value.ToString("yyyy-MM-dd")</span>
                         }
-                        <span>去看最新更新 <i class="fas fa-arrow-right"></i></span>
+                        <span>@I18n.T("nav.latestPostLink", "去看最新更新") <i class="fas fa-arrow-right"></i></span>
                     </div>
                 </div>
             </a>
@@ -63,7 +65,7 @@
                 <section class="nav-browse-section">
                     <div class="nav-browse-section__header">
                         <span class="nav-mega-menu__eyebrow">Albums</span>
-                        <strong>按专题连续阅读</strong>
+                        <strong>@I18n.T("nav.readByAlbum", "按专题连续阅读")</strong>
                     </div>
                     <div class="nav-menu-list nav-menu-list--stacked">
                         @foreach (var album in albums)
@@ -91,7 +93,7 @@
                 <section class="nav-browse-section">
                     <div class="nav-browse-section__header">
                         <span class="nav-mega-menu__eyebrow">Categories</span>
-                        <strong>按分类快速筛选</strong>
+                        <strong>@I18n.T("nav.readByCategory", "按分类快速筛选")</strong>
                     </div>
                     <div class="nav-menu-list nav-menu-list--stacked">
                         @foreach (var category in categories)

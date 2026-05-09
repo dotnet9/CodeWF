@@ -1,10 +1,81 @@
 document.addEventListener("DOMContentLoaded", () => {
+    initializeI18nText();
     initializeHeaderOffset();
     initializeDesktopDropdowns();
     initializeSearchSuggestions();
     initializeReadingToc();
     initializeReadingExperience();
 });
+
+function codewfTranslate(value) {
+    const text = String(value ?? "");
+    const resource = window.CodeWFI18n;
+    if (!resource) {
+        return text;
+    }
+
+    return resource.textMap?.[text] ?? resource.strings?.[text] ?? text;
+}
+
+function initializeI18nText() {
+    const resource = window.CodeWFI18n;
+    if (!resource || resource.language === "zh-cn") {
+        return;
+    }
+
+    const translateText = (value) => {
+        const text = String(value ?? "");
+        const trimmed = text.trim();
+        if (!trimmed) {
+            return text;
+        }
+
+        if (resource.textMap?.[trimmed]) {
+            return text.replace(trimmed, resource.textMap[trimmed]);
+        }
+
+        for (const item of resource.patterns || []) {
+            try {
+                const regex = new RegExp(item.pattern);
+                if (regex.test(trimmed)) {
+                    return text.replace(trimmed, trimmed.replace(regex, item.replacement));
+                }
+            } catch {
+                continue;
+            }
+        }
+
+        return text;
+    };
+
+    const shouldSkipNode = (node) => {
+        const parent = node.parentElement;
+        return !parent
+            || parent.closest("script, style, code, pre, textarea, input, select, [contenteditable='true'], .article-content, [data-no-i18n]");
+    };
+
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+    while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (!shouldSkipNode(node)) {
+            textNodes.push(node);
+        }
+    }
+
+    textNodes.forEach((node) => {
+        node.nodeValue = translateText(node.nodeValue);
+    });
+
+    document.querySelectorAll("[placeholder], [aria-label], [title], [alt]").forEach((element) => {
+        ["placeholder", "aria-label", "title", "alt"].forEach((attributeName) => {
+            const value = element.getAttribute(attributeName);
+            if (value) {
+                element.setAttribute(attributeName, translateText(value));
+            }
+        });
+    });
+}
 
 function initializeHeaderOffset() {
     const root = document.documentElement;
@@ -227,6 +298,7 @@ function initializeSearchSuggestions() {
                 meta.textContent = suggestion.count > 0
                     ? `${suggestion.label} ${suggestion.count}`
                     : suggestion.label;
+                meta.textContent = codewfTranslate(meta.textContent);
 
                 option.append(text, meta);
                 option.addEventListener("click", () => submitSuggestion(suggestion));
@@ -266,7 +338,7 @@ function initializeSearchSuggestions() {
                 const payload = await response.json();
                 suggestions = (payload.suggestions || []).map((item) => ({
                     query: item.query ?? item.Query,
-                    label: item.label ?? item.Label ?? "建议",
+                label: codewfTranslate(item.label ?? item.Label ?? "建议"),
                     count: item.count ?? item.Count ?? 0
                 })).filter((item) => item.query);
                 renderSuggestions();
@@ -340,7 +412,7 @@ function initializeReadingToc() {
             return;
         }
 
-        tocContainer.innerHTML = '<p class="toc-empty">当前页面没有可生成的目录。</p>';
+        tocContainer.innerHTML = `<p class="toc-empty">${codewfTranslate("当前页面没有可生成的目录。")}</p>`;
         return;
     }
 
@@ -360,7 +432,7 @@ function initializeReadingToc() {
 
         const link = document.createElement("a");
         link.href = `#${heading.id}`;
-        link.textContent = heading.textContent?.trim() || `章节 ${index + 1}`;
+        link.textContent = heading.textContent?.trim() || codewfTranslate(`章节 ${index + 1}`);
         link.className = `toc-link toc-link--${heading.tagName.toLowerCase()}`;
         link.dataset.targetId = heading.id;
         fragment.appendChild(link);
@@ -462,7 +534,7 @@ function initializeMarkdownCodeBlocks() {
         const copyButton = document.createElement("button");
         copyButton.type = "button";
         copyButton.className = "code-copy-button";
-        copyButton.textContent = "复制";
+        copyButton.textContent = codewfTranslate("复制");
 
         let resetTimer = 0;
         copyButton.addEventListener("click", async () => {
@@ -474,14 +546,14 @@ function initializeMarkdownCodeBlocks() {
                 }
 
                 window.clearTimeout(resetTimer);
-                copyButton.textContent = "已复制";
+                copyButton.textContent = codewfTranslate("已复制");
                 copyButton.classList.add("is-copied");
                 resetTimer = window.setTimeout(() => {
-                    copyButton.textContent = "复制";
+                    copyButton.textContent = codewfTranslate("复制");
                     copyButton.classList.remove("is-copied");
                 }, 1800);
             } catch (error) {
-                copyButton.textContent = "复制";
+                copyButton.textContent = codewfTranslate("复制");
                 copyButton.classList.remove("is-copied");
             }
         });
@@ -607,7 +679,7 @@ function initializeArticleImageViewer() {
         viewer.hidden = true;
         viewer.setAttribute("role", "dialog");
         viewer.setAttribute("aria-modal", "true");
-        viewer.setAttribute("aria-label", "文章图片预览");
+        viewer.setAttribute("aria-label", codewfTranslate("文章图片预览"));
 
         const toolbar = document.createElement("div");
         toolbar.className = "article-image-viewer__toolbar";
@@ -624,28 +696,28 @@ function initializeArticleImageViewer() {
         };
 
         toolbar.append(
-            makeButton("缩小", "fas fa-magnifying-glass-minus", () => {
+            makeButton(codewfTranslate("缩小"), "fas fa-magnifying-glass-minus", () => {
                 scale = clampScale(scale - 0.2);
                 updateTransform();
             }),
-            makeButton("放大", "fas fa-magnifying-glass-plus", () => {
+            makeButton(codewfTranslate("放大"), "fas fa-magnifying-glass-plus", () => {
                 scale = clampScale(scale + 0.2);
                 updateTransform();
             }),
-            makeButton("向左旋转", "fas fa-rotate-left", () => {
+            makeButton(codewfTranslate("向左旋转"), "fas fa-rotate-left", () => {
                 rotation -= 90;
                 updateTransform();
             }),
-            makeButton("向右旋转", "fas fa-rotate-right", () => {
+            makeButton(codewfTranslate("向右旋转"), "fas fa-rotate-right", () => {
                 rotation += 90;
                 updateTransform();
             }),
-            makeButton("重置", "fas fa-arrows-rotate", () => {
+            makeButton(codewfTranslate("重置"), "fas fa-arrows-rotate", () => {
                 scale = 1;
                 rotation = 0;
                 updateTransform();
             }),
-            makeButton("关闭", "fas fa-xmark", closeViewer)
+            makeButton(codewfTranslate("关闭"), "fas fa-xmark", closeViewer)
         );
 
         const stage = document.createElement("div");
@@ -673,7 +745,7 @@ function initializeArticleImageViewer() {
         scale = 1;
         rotation = 0;
         viewerImage.src = getPreviewSource(image);
-        viewerImage.alt = image.alt || "文章图片";
+        viewerImage.alt = image.alt || codewfTranslate("文章图片");
         updateTransform();
         viewer.hidden = false;
         viewer.classList.add("is-open");
@@ -689,7 +761,7 @@ function initializeArticleImageViewer() {
         image.classList.add("article-image-previewable");
         image.tabIndex = 0;
         image.setAttribute("role", "button");
-        image.setAttribute("aria-label", image.alt ? `查看大图：${image.alt}` : "查看文章图片大图");
+        image.setAttribute("aria-label", image.alt ? `${codewfTranslate("查看大图")}：${image.alt}` : codewfTranslate("查看文章图片大图"));
 
         image.addEventListener("click", (event) => {
             event.preventDefault();
@@ -774,8 +846,8 @@ function initializeCopyUrlButtons() {
 
     copyButtons.forEach((button) => {
         const label = button.querySelector("[data-copy-url-label]");
-        const defaultLabel = button.dataset.copyLabelDefault || "复制链接";
-        const successLabel = button.dataset.copyLabelSuccess || "已复制";
+        const defaultLabel = button.dataset.copyLabelDefault || codewfTranslate("复制链接");
+        const successLabel = button.dataset.copyLabelSuccess || codewfTranslate("已复制");
         let resetTimer = 0;
 
         button.addEventListener("click", async () => {

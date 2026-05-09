@@ -30,7 +30,9 @@ builder.Services.AddRazorPages(options =>
 });
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<AppService>();
+builder.Services.AddSingleton<I18nService>();
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 // 站点正文和配置里包含大量中文，统一放开编码范围，避免输出时被过度转义。
 builder.Services.Configure<WebEncoderOptions>(options =>
@@ -58,6 +60,7 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+app.UseMiddleware<RequestLanguageMiddleware>();
 app.UseResponseCompression();
 app.UseStaticFiles(new StaticFileOptions
 {

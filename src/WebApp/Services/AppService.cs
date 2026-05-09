@@ -36,6 +36,10 @@ public class AppService : IDisposable
 
     private List<DocItem>? _docItems;
     private List<ToolItem>? _toolItems;
+    private readonly ConcurrentDictionary<string, List<DocItem>> _docItemsByLanguage = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, List<ToolItem>> _toolItemsByLanguage = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (string? Markdown, string? HtmlContent)> _aboutByLanguage = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (string? Markdown, string? HtmlContent)> _donationByLanguage = new(StringComparer.OrdinalIgnoreCase);
     private List<AlbumItem>? _albumItems;
     private List<CategoryItem>? _categoryItems;
     private List<SearchBlockedKeywordGroup>? _searchBlockedKeywordGroups;
@@ -51,6 +55,7 @@ public class AppService : IDisposable
     private string? _rss;
     private string? _siteMap;
     private List<SearchableEntry>? _searchIndex;
+    private readonly ConcurrentDictionary<string, List<SearchableEntry>> _searchIndexByLanguage = new(StringComparer.OrdinalIgnoreCase);
 
     private sealed record SearchField(string? Text, int ExactScore, int PrefixScore, int ContainsScore);
     private sealed record SearchableToolNode(ToolItem Item, string? GroupName);
@@ -193,6 +198,10 @@ public class AppService : IDisposable
     {
         _docItems = null;
         _toolItems = null;
+        _docItemsByLanguage.Clear();
+        _toolItemsByLanguage.Clear();
+        _aboutByLanguage.Clear();
+        _donationByLanguage.Clear();
         _albumItems = null;
         _categoryItems = null;
         _searchBlockedKeywordGroups = null;
@@ -208,6 +217,7 @@ public class AppService : IDisposable
         _rss = null;
         _siteMap = null;
         _searchIndex = null;
+        _searchIndexByLanguage.Clear();
         _searchCache.Clear();
     }
 
@@ -224,6 +234,86 @@ public class AppService : IDisposable
         Array.Copy(paths, 0, segments, 1, paths.Length);
 
         return Path.Combine(segments);
+    }
+
+    private string? GetLocalizedDocAssetPath(string language, params string[] paths)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var localizedSegments = new string[paths.Length + 3];
+        localizedSegments[0] = "site";
+        localizedSegments[1] = "doc";
+        localizedSegments[2] = normalizedLanguage;
+        Array.Copy(paths, 0, localizedSegments, 3, paths.Length);
+
+        var localizedPath = GetAssetPath(localizedSegments);
+        if (!string.IsNullOrWhiteSpace(localizedPath) && File.Exists(localizedPath))
+        {
+            return localizedPath;
+        }
+
+        var fallbackSegments = new string[paths.Length + 2];
+        fallbackSegments[0] = "site";
+        fallbackSegments[1] = "doc";
+        Array.Copy(paths, 0, fallbackSegments, 2, paths.Length);
+
+        var fallbackPath = GetAssetPath(fallbackSegments);
+        return !string.IsNullOrWhiteSpace(fallbackPath) && File.Exists(fallbackPath)
+            ? fallbackPath
+            : null;
+    }
+
+    private string? GetLocalizedSiteAssetPath(string language, params string[] paths)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var localizedSegments = new string[paths.Length + 2];
+        localizedSegments[0] = "site";
+        localizedSegments[1] = normalizedLanguage;
+        Array.Copy(paths, 0, localizedSegments, 2, paths.Length);
+
+        var localizedPath = GetAssetPath(localizedSegments);
+        if (!string.IsNullOrWhiteSpace(localizedPath) && File.Exists(localizedPath))
+        {
+            return localizedPath;
+        }
+
+        var fallbackSegments = new string[paths.Length + 1];
+        fallbackSegments[0] = "site";
+        Array.Copy(paths, 0, fallbackSegments, 1, paths.Length);
+
+        var fallbackPath = GetAssetPath(fallbackSegments);
+        return !string.IsNullOrWhiteSpace(fallbackPath) && File.Exists(fallbackPath)
+            ? fallbackPath
+            : null;
+    }
+
+    private string? GetLocalizedPayAssetPath(string language, string fileName)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var localizedPath = GetAssetPath("site", "pays", normalizedLanguage, fileName);
+        if (!string.IsNullOrWhiteSpace(localizedPath) && File.Exists(localizedPath))
+        {
+            return localizedPath;
+        }
+
+        var fallbackPath = GetAssetPath("site", "pays", fileName);
+        return !string.IsNullOrWhiteSpace(fallbackPath) && File.Exists(fallbackPath)
+            ? fallbackPath
+            : null;
+    }
+
+    private string? GetLocalizedToolAssetPath(string language)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var localizedPath = GetAssetPath("site", "tools", normalizedLanguage, "tools.json");
+        if (!string.IsNullOrWhiteSpace(localizedPath) && File.Exists(localizedPath))
+        {
+            return localizedPath;
+        }
+
+        var fallbackPath = GetAssetPath("site", "tools", "tools.json");
+        return !string.IsNullOrWhiteSpace(fallbackPath) && File.Exists(fallbackPath)
+            ? fallbackPath
+            : null;
     }
 
     public async Task SeedAsync()
@@ -247,62 +337,97 @@ public class AppService : IDisposable
 
     public async Task<List<DocItem>?> GetAllDocItemsAsync()
     {
-        if (_docItems?.Any() == true)
+        var language = RequestLanguage.CurrentLanguage;
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            && _docItems?.Any() == true)
         {
             return _docItems;
         }
 
-        var filePath = GetAssetPath("site", "doc", "navigation.json");
+        if (_docItemsByLanguage.TryGetValue(language, out var localizedItems) && localizedItems.Any())
+        {
+            return localizedItems;
+        }
+
+        var filePath = GetLocalizedDocAssetPath(language, "navigation.json");
         if (filePath is null || !File.Exists(filePath))
         {
-            return _docItems;
+            return string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+                ? _docItems
+                : localizedItems;
         }
 
         var fileContent = await File.ReadAllTextAsync(filePath);
         try
         {
-            _docItems = JsonSerializer.Deserialize<List<DocItem>>(fileContent, JsonOptions);
+            var items = JsonSerializer.Deserialize<List<DocItem>>(fileContent, JsonOptions) ?? [];
+            if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            {
+                _docItems = items;
+            }
+
+            _docItemsByLanguage[language] = items;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to deserialize doc/navigation.json: {ex.Message}");
+            Console.WriteLine($"Failed to deserialize localized doc/navigation.json: {ex.Message}");
         }
-        return _docItems;
+        return string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            ? _docItems
+            : _docItemsByLanguage.GetValueOrDefault(language);
     }
 
     public async Task<List<ToolItem>?> GetAllToolItemsAsync()
     {
-        if (_toolItems?.Any() == true)
+        var language = RequestLanguage.CurrentLanguage;
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            && _toolItems?.Any() == true)
         {
             return _toolItems;
         }
 
-        var filePath = GetAssetPath("site", "tools", "tools.json");
+        if (_toolItemsByLanguage.TryGetValue(language, out var localizedItems) && localizedItems.Any())
+        {
+            return localizedItems;
+        }
+
+        var filePath = GetLocalizedToolAssetPath(language);
         if (filePath is null || !File.Exists(filePath))
         {
-            return _toolItems;
+            return string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+                ? _toolItems
+                : localizedItems;
         }
 
         var fileContent = await File.ReadAllTextAsync(filePath);
         try
         {
-            _toolItems = JsonSerializer.Deserialize<List<ToolItem>>(fileContent, JsonOptions);
+            var items = JsonSerializer.Deserialize<List<ToolItem>>(fileContent, JsonOptions) ?? [];
+            if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            {
+                _toolItems = items;
+            }
+
+            _toolItemsByLanguage[language] = items;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to deserialize tools.json: {ex.Message}");
         }
-        return _toolItems;
+        return string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            ? _toolItems
+            : _toolItemsByLanguage.GetValueOrDefault(language);
     }
 
     public async Task<DocItem?> GetDocItemAsync(string slug)
     {
-        if (_docItems?.Any() != true)
+        var docItems = await GetAllDocItemsAsync();
+        if (docItems?.Any() != true)
         {
             return default;
         }
 
-        foreach (var item in _docItems)
+        foreach (var item in docItems)
         {
             if (!string.IsNullOrWhiteSpace(item.Slug) && item.Slug == slug)
             {
@@ -319,7 +444,7 @@ public class AppService : IDisposable
             }
         }
 
-        var first = _docItems.FirstOrDefault()?.Children?.FirstOrDefault();
+        var first = docItems.FirstOrDefault()?.Children?.FirstOrDefault();
         if (first != null)
         {
             await LoadDocContentAsync(first);
@@ -376,15 +501,16 @@ public class AppService : IDisposable
 
         await TrackSearchQueryAsync(normalizedQuery);
 
-        if (_searchCache.TryGetValue(normalizedQuery, out var cacheEntry))
+        var cacheKey = $"{RequestLanguage.CurrentLanguage}:{normalizedQuery}";
+        if (_searchCache.TryGetValue(cacheKey, out var cacheEntry))
         {
             // 站内搜索的查询模式很容易重复，命中缓存时直接复用排序后的快照。
-            TouchSearchCacheEntry(normalizedQuery, cacheEntry);
+            TouchSearchCacheEntry(cacheKey, cacheEntry);
             return CreateSearchPageData(cacheEntry.Snapshot, safePageIndex, safePageSize, kind);
         }
 
         var snapshot = await BuildSearchSnapshotAsync(normalizedQuery);
-        _searchCache[normalizedQuery] = new SearchCacheEntry(snapshot, 1, DateTimeOffset.UtcNow);
+        _searchCache[cacheKey] = new SearchCacheEntry(snapshot, 1, DateTimeOffset.UtcNow);
         TrimSearchCache();
 
         return CreateSearchPageData(snapshot, safePageIndex, safePageSize, kind);
@@ -410,11 +536,11 @@ public class AppService : IDisposable
                          || item.Query.Contains(normalizedQuery, StringComparison.OrdinalIgnoreCase))
                      .OrderByDescending(item => item.Count)
                      .ThenByDescending(item => item.LastSearchedAt)
-                     .Take(safeSize))
+            .Take(safeSize))
         {
             if (seen.Add(item.Query))
             {
-                suggestions.Add(new SearchSuggestionItem(item.Query, "热搜", item.Count));
+                suggestions.Add(new SearchSuggestionItem(item.Query, GetHotSearchLabel(), item.Count));
             }
         }
 
@@ -500,26 +626,27 @@ public class AppService : IDisposable
 
     private async Task<List<SearchableEntry>> GetSearchIndexAsync()
     {
-        if (_searchIndex is not null)
+        var language = RequestLanguage.CurrentLanguage;
+        if (_searchIndexByLanguage.TryGetValue(language, out var localizedIndex))
         {
-            return _searchIndex;
+            return localizedIndex;
         }
 
         await _searchIndexLock.WaitAsync();
         try
         {
-            if (_searchIndex is not null)
+            if (_searchIndexByLanguage.TryGetValue(language, out localizedIndex))
             {
-                return _searchIndex;
+                return localizedIndex;
             }
 
             await GetAllBlogPostsAsync();
-            await GetAllDocItemsAsync();
-            await GetAllToolItemsAsync();
+            var docItems = await GetAllDocItemsAsync();
+            var toolItems = await GetAllToolItemsAsync();
 
             // 把文章、文档、工具统一拉平成一套可搜索条目，后续搜索只面对内存索引。
             var index = new List<SearchableEntry>();
-            foreach (var tool in GetSearchableToolNodes())
+            foreach (var tool in GetSearchableToolNodes(toolItems))
             {
                 index.Add(new SearchableEntry(
                     SearchResultKind.Tool,
@@ -538,7 +665,7 @@ public class AppService : IDisposable
                     [tool.Item.Memo, tool.GroupName]));
             }
 
-            var searchableDocs = await GetSearchableDocNodesAsync();
+            var searchableDocs = await GetSearchableDocNodesAsync(docItems);
             foreach (var doc in searchableDocs)
             {
                 var plainContent = CleanSearchText(doc.Item.Content);
@@ -593,8 +720,13 @@ public class AppService : IDisposable
                     [post.Description, plainContent]));
             }
 
-            _searchIndex = index;
-            return _searchIndex;
+            _searchIndexByLanguage[language] = index;
+            if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            {
+                _searchIndex = index;
+            }
+
+            return index;
         }
         finally
         {
@@ -849,12 +981,48 @@ public class AppService : IDisposable
         }
     }
 
-    private static string GetSuggestionLabel(SearchResultKind kind) => kind switch
+    private static string GetSuggestionLabel(SearchResultKind kind)
     {
-        SearchResultKind.Tool => "工具",
-        SearchResultKind.Doc => "项目",
-        SearchResultKind.Post => "文章",
-        _ => "内容"
+        var language = RequestLanguage.CurrentLanguage;
+        return language switch
+        {
+            "en" => kind switch
+            {
+                SearchResultKind.Tool => "Tool",
+                SearchResultKind.Doc => "Project",
+                SearchResultKind.Post => "Post",
+                _ => "Content"
+            },
+            "ja" => kind switch
+            {
+                SearchResultKind.Tool => "ツール",
+                SearchResultKind.Doc => "プロジェクト",
+                SearchResultKind.Post => "記事",
+                _ => "コンテンツ"
+            },
+            "zh-tw" => kind switch
+            {
+                SearchResultKind.Tool => "工具",
+                SearchResultKind.Doc => "專案",
+                SearchResultKind.Post => "文章",
+                _ => "內容"
+            },
+            _ => kind switch
+            {
+                SearchResultKind.Tool => "工具",
+                SearchResultKind.Doc => "项目",
+                SearchResultKind.Post => "文章",
+                _ => "内容"
+            }
+        };
+    }
+
+    private static string GetHotSearchLabel() => RequestLanguage.CurrentLanguage switch
+    {
+        "en" => "Hot",
+        "ja" => "人気検索",
+        "zh-tw" => "熱門",
+        _ => "热搜"
     };
 
     private async Task LoadDocContentAsync(DocItem item, string? parentDir = default)
@@ -869,17 +1037,12 @@ public class AppService : IDisposable
             return;
         }
 
-        var localAssetsDir = GetLocalAssetsDir();
-        if (localAssetsDir is null)
-        {
-            return;
-        }
-
+        var language = RequestLanguage.CurrentLanguage;
         var contentPath = string.IsNullOrWhiteSpace(parentDir)
-            ? Path.Combine(localAssetsDir, "site", "doc", $"{item.Slug}.md")
-            : Path.Combine(localAssetsDir, "site", "doc", parentDir, $"{item.Slug}.md");
+            ? GetLocalizedDocAssetPath(language, $"{item.Slug}.md")
+            : GetLocalizedDocAssetPath(language, parentDir, $"{item.Slug}.md");
 
-        if (!File.Exists(contentPath))
+        if (string.IsNullOrWhiteSpace(contentPath) || !File.Exists(contentPath))
         {
             return;
         }
@@ -888,14 +1051,15 @@ public class AppService : IDisposable
         item.HtmlContent = item.Content.ToHtml();
     }
 
-    private IEnumerable<SearchableToolNode> GetSearchableToolNodes()
+    private IEnumerable<SearchableToolNode> GetSearchableToolNodes(IEnumerable<ToolItem>? toolItems = null)
     {
-        if (_toolItems?.Any() != true)
+        var source = toolItems ?? _toolItems;
+        if (source?.Any() != true)
         {
             yield break;
         }
 
-        foreach (var item in _toolItems)
+        foreach (var item in source)
         {
             if (item.Children?.Any() == true)
             {
@@ -915,10 +1079,11 @@ public class AppService : IDisposable
         }
     }
 
-    private async Task<List<SearchableDocNode>> GetSearchableDocNodesAsync()
+    private async Task<List<SearchableDocNode>> GetSearchableDocNodesAsync(IEnumerable<DocItem>? docItems = null)
     {
         var nodes = new List<SearchableDocNode>();
-        if (_docItems?.Any() != true)
+        var source = docItems ?? _docItems;
+        if (source?.Any() != true)
         {
             return nodes;
         }
@@ -946,7 +1111,7 @@ public class AppService : IDisposable
             }
         }
 
-        await TraverseAsync(_docItems);
+        await TraverseAsync(source);
         return nodes;
     }
 
@@ -1511,38 +1676,68 @@ public class AppService : IDisposable
 
     public async Task<(string? Markdown, string? HtmlContent)> ReadAboutAsync()
     {
-        if (!string.IsNullOrWhiteSpace(_aboutMarkdown))
+        var language = RequestLanguage.CurrentLanguage;
+        if (_aboutByLanguage.TryGetValue(language, out var localizedAbout)
+            && !string.IsNullOrWhiteSpace(localizedAbout.Markdown))
+        {
+            return localizedAbout;
+        }
+
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(_aboutMarkdown))
         {
             return (_aboutMarkdown, _aboutHtmlContent);
         }
 
-        var filePath = GetAssetPath("site", "about.md");
+        var filePath = GetLocalizedSiteAssetPath(language, "about.md");
         if (filePath is null || !File.Exists(filePath))
         {
             return ("## 关于", "关于");
         }
 
-        _aboutMarkdown = await File.ReadAllTextAsync(filePath);
-        _aboutHtmlContent = _aboutMarkdown.ToHtml();
-        return (_aboutMarkdown, _aboutHtmlContent);
+        var markdown = await File.ReadAllTextAsync(filePath);
+        var htmlContent = markdown.ToHtml();
+        _aboutByLanguage[language] = (markdown, htmlContent);
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            _aboutMarkdown = markdown;
+            _aboutHtmlContent = htmlContent;
+        }
+
+        return (markdown, htmlContent);
     }
 
     public async Task<(string? Markdown, string? HtmlContent)> ReadDonationAsync()
     {
-        if (!string.IsNullOrWhiteSpace(_donationMarkdown))
+        var language = RequestLanguage.CurrentLanguage;
+        if (_donationByLanguage.TryGetValue(language, out var localizedDonation)
+            && !string.IsNullOrWhiteSpace(localizedDonation.Markdown))
+        {
+            return localizedDonation;
+        }
+
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(_donationMarkdown))
         {
             return (_donationMarkdown, _donationHtmlContent);
         }
 
-        var filePath = GetAssetPath("site", "pays", "Donation.md");
+        var filePath = GetLocalizedPayAssetPath(language, "Donation.md");
         if (filePath is null || !File.Exists(filePath))
         {
             return ("## 赞助", "赞助");
         }
 
-        _donationMarkdown = await File.ReadAllTextAsync(filePath);
-        _donationHtmlContent = _donationMarkdown.ToHtml();
-        return (_donationMarkdown, _donationHtmlContent);
+        var markdown = await File.ReadAllTextAsync(filePath);
+        var htmlContent = markdown.ToHtml();
+        _donationByLanguage[language] = (markdown, htmlContent);
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            _donationMarkdown = markdown;
+            _donationHtmlContent = htmlContent;
+        }
+
+        return (markdown, htmlContent);
     }
 
     public async Task<BlogPost?> GetPostBySlug(string slug)
@@ -1665,10 +1860,11 @@ public class AppService : IDisposable
         sb.AppendLine(
             "<rss xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" version=\"2.0\">");
         sb.Append("<channel>");
+        var rssPath = RequestLanguage.LocalizePath("/rss", RequestLanguage.DefaultLanguage);
         sb.Append(
-            $"<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"{XmlEncode($"{siteOption.Value.Domain}/rss")}\"/>");
+            $"<atom:link rel=\"self\" type=\"application/rss+xml\" href=\"{XmlEncode($"{siteOption.Value.Domain}{rssPath}")}\"/>");
         sb.Append($"<title>{XmlEncode($"{siteOption.Value.AppTitle}_{siteOption.Value.Memo}")}</title>");
-        sb.Append($"<link>{XmlEncode($"{siteOption.Value.Domain}/rss")}</link>");
+        sb.Append($"<link>{XmlEncode($"{siteOption.Value.Domain}{rssPath}")}</link>");
         sb.Append($"<description>{XmlEncode(siteOption.Value.Memo)}</description>");
         sb.Append($"<copyright>{XmlEncode($"{siteOption.Value.AppTitle}_{siteOption.Value.Memo}")}</copyright>");
         sb.Append("<language>zh-cn</language>");
@@ -1718,7 +1914,7 @@ public class AppService : IDisposable
                 return;
             }
 
-            var normalizedPath = path.StartsWith('/') ? path : $"/{path}";
+            var normalizedPath = RequestLanguage.LocalizePath(path.StartsWith('/') ? path : $"/{path}", RequestLanguage.DefaultLanguage);
             var url = $"{domain}{normalizedPath}";
             if (!seenUrls.Add(url))
             {

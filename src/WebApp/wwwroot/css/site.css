@@ -3013,7 +3013,7 @@ button.site-menu-toggle {
 
 @media (min-width: 992px) {
   .footer-grid {
-    grid-template-columns: 1.45fr repeat(3, minmax(140px, 1fr)) 180px;
+    grid-template-columns: 1.45fr repeat(4, minmax(120px, 1fr)) 180px;
   }
 }
 
@@ -3056,6 +3056,31 @@ button.site-menu-toggle {
 .footer-list a:hover {
   color: var(--primary-dark);
   transform: none;
+}
+
+.footer-language-list a.is-current,
+.site-language-dropdown .dropdown-item.active {
+  color: var(--primary-dark);
+  background: rgba(29, 111, 255, 0.08);
+}
+
+.site-language-menu .nav-link {
+  gap: 0.42rem;
+}
+
+.site-language-dropdown {
+  min-width: 190px;
+}
+
+.site-language-dropdown .dropdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.site-language-dropdown .dropdown-item small {
+  color: var(--text-3);
+  font-size: 0.75rem;
 }
 
 .footer-qr {

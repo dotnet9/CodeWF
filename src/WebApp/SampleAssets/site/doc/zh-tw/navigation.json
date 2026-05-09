@@ -1,0 +1,94 @@
+[
+  {
+    "Name": "欢迎",
+    "Children": [
+      {
+        "Name": "介绍",
+        "Memo": "重点開源項目索引",
+        "Slug": "readme",
+        "Repository": "https://github.com/dotnet9"
+      }
+    ]
+  },
+  {
+    "Name": "网站",
+    "Memo": "网站源碼與資源內容倉庫",
+    "Slug": "website",
+    "Children": [
+      {
+        "Name": "CodeWF",
+        "Memo": "dotnet9.com / codewf.com 的网站源碼倉庫",
+        "Slug": "codewf",
+        "Repository": "https://github.com/dotnet9/CodeWF"
+      },
+      {
+        "Name": "Assets.Dotnet9",
+        "Memo": "网站文章、文档、圖片與站点配置的資源倉庫",
+        "Slug": "assets-dotnet9",
+        "Repository": "https://github.com/dotnet9/Assets.Dotnet9"
+      }
+    ]
+  },
+  {
+    "Name": "C# 通用",
+    "Memo": "事件通信、网络协议與基础類庫",
+    "Slug": "csharp",
+    "Children": [
+      {
+        "Name": "CodeWF.EventBus.Socket",
+        "Memo": "基於 TCP Socket 的轻量级进程間事件总線",
+        "Slug": "codewf-eventbus-socket",
+        "Repository": "https://github.com/dotnet9/CodeWF.EventBus.Socket"
+      },
+      {
+        "Name": "CodeWF.EventBus",
+        "Memo": "进程內事件总線，支持 Command、Query 和多种 IOC 場景",
+        "Slug": "codewf-eventbus",
+        "Repository": "https://github.com/dotnet9/CodeWF.EventBus"
+      },
+      {
+        "Name": "CodeWF.NetWeaver",
+        "Memo": "网络數據包序列化核心庫與 TCP/UDP 封装基础",
+        "Slug": "codewf-netweaver",
+        "Repository": "https://github.com/dotnet9/CodeWF.NetWeaver"
+      }
+    ]
+  },
+  {
+    "Name": "Avalonia",
+    "Memo": "Avalonia 控件、工具、日志、Markdown 和多語言生态",
+    "Slug": "avalonia",
+    "Children": [
+      {
+        "Name": "CodeWF.AvaloniaControls",
+        "Memo": "面向 Avalonia 12 的通用控件與主題包",
+        "Slug": "codewf-avalonia-controls",
+        "Repository": "https://github.com/dotnet9/CodeWF.AvaloniaControls"
+      },
+      {
+        "Name": "CodeWF.LogViewer",
+        "Memo": "轻量日志庫與 Avalonia 日志查看控件",
+        "Slug": "codewf-logviewer",
+        "Repository": "https://github.com/dotnet9/CodeWF.LogViewer"
+      },
+      {
+        "Name": "Lang.Avalonia",
+        "Memo": "Avalonia UI 插件化多語言庫",
+        "Slug": "lang-avalonia",
+        "Repository": "https://github.com/dotnet9/Lang.Avalonia"
+      },
+      {
+        "Name": "CodeWF.Markdown",
+        "Memo": "Avalonia Markdown 渲染控件與排版主題",
+        "Slug": "codewf-markdown",
+        "Repository": "https://github.com/dotnet9/CodeWF.Markdown"
+      },
+      {
+        "Name": "CodeWF.Toolbox",
+        "Memo": "基於 Avalonia + Prism 的模块化跨平台桌面工具箱",
+        "Slug": "codewf-toolbox",
+        "Repository": "https://github.com/dotnet9/CodeWF.Toolbox"
+      }
+    ]
+  }
+]

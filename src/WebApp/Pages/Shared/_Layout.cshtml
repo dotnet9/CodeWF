@@ -1,26 +1,40 @@
 @using Microsoft.Extensions.Options
 @using WebApp.Options
+@using WebApp.Services
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 @inject IOptions<SiteOption> SiteOptions
+@inject WebApp.Services.I18nService I18n
 @{
     var site = SiteOptions.Value;
-    var appTitle = site.AppTitle ?? "码坊";
-    var pageTitle = ViewData["Title"] as string;
+    var appTitle = I18n.T("site.name", site.AppTitle ?? "码坊");
+    var rawPageTitle = ViewData["Title"] as string;
+    var pageTitle = I18n.Text(rawPageTitle);
     var bodyClass = ViewData["BodyClass"] as string;
-    var siteDescription = ViewData["Description"] as string
-        ?? site.Memo
-        ?? "面向 .NET 开发者的技术内容、项目说明与在线工具站点。";
-    var siteKeywords = ViewData["Keywords"] as string
-        ?? ".NET,C#,ASP.NET Core,Razor Pages,开发工具,技术文章,开源项目,码坊";
-    var pageTitleText = string.IsNullOrWhiteSpace(pageTitle) || pageTitle == "首页"
+    var siteDescription = I18n.Text(ViewData["Description"] as string)
+        ?? I18n.T("site.description", site.Memo ?? "面向 .NET 开发者的技术内容、项目说明与在线工具站点。");
+    if (string.IsNullOrWhiteSpace(siteDescription))
+    {
+        siteDescription = I18n.T("site.description", site.Memo ?? "面向 .NET 开发者的技术内容、项目说明与在线工具站点。");
+    }
+
+    var siteKeywords = I18n.Text(ViewData["Keywords"] as string)
+        ?? I18n.T("site.keywords", ".NET,C#,ASP.NET Core,Razor Pages,开发工具,技术文章,开源项目,码坊");
+    if (string.IsNullOrWhiteSpace(siteKeywords))
+    {
+        siteKeywords = I18n.T("site.keywords", ".NET,C#,ASP.NET Core,Razor Pages,开发工具,技术文章,开源项目,码坊");
+    }
+
+    var isHomeTitle = string.IsNullOrWhiteSpace(rawPageTitle)
+        || string.Equals(rawPageTitle, "首页", StringComparison.OrdinalIgnoreCase);
+    var pageTitleText = isHomeTitle || string.IsNullOrWhiteSpace(pageTitle)
         ? appTitle
         : $"{pageTitle} - {appTitle}";
     var siteDomain = (site.Domain ?? $"{Context.Request.Scheme}://{Context.Request.Host}").TrimEnd('/');
     var requestPath = Context.Request.Path.ToUriComponent();
-    var canonicalPath = ViewData["CanonicalPath"] as string ?? requestPath;
+    var canonicalPath = RequestLanguage.LocalizePath(ViewData["CanonicalPath"] as string ?? requestPath);
     if (string.IsNullOrWhiteSpace(canonicalPath))
     {
-        canonicalPath = "/";
+        canonicalPath = RequestLanguage.LocalizePath("/");
     }
 
     if (!canonicalPath.StartsWith('/'))
@@ -52,9 +66,11 @@
     var articlePublishedTime = ViewData["ArticlePublishedTime"] as string;
     var articleModifiedTime = ViewData["ArticleModifiedTime"] as string;
     var articleAuthor = ViewData["ArticleAuthor"] as string;
+    var language = I18n.CurrentLanguageInfo;
+    var rssUrl = ToAbsoluteUrl(RequestLanguage.LocalizePath("/rss"));
 }
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="@language.HtmlLang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -63,8 +79,12 @@
     <meta name="description" content="@siteDescription" />
     <meta name="theme-color" content="#0f172a" />
     <link rel="canonical" href="@canonicalUrl" />
-    <link rel="alternate" type="application/rss+xml" title="@($"{appTitle} RSS")" href="@($"{siteDomain}/rss")" />
-    <meta property="og:locale" content="zh_CN" />
+    @foreach (var item in I18n.Languages)
+    {
+        <link rel="alternate" hreflang="@item.Code" href="@ToAbsoluteUrl(I18n.SwitchPath(item.Code))" />
+    }
+    <link rel="alternate" type="application/rss+xml" title="@($"{appTitle} RSS")" href="@rssUrl" />
+    <meta property="og:locale" content="@language.OgLocale" />
     <meta property="og:site_name" content="@appTitle" />
     <meta property="og:type" content="@ogType" />
     <meta property="og:title" content="@pageTitleText" />
@@ -131,6 +151,9 @@
     <partial name="_SiteFooter" />
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script>
+        window.CodeWFI18n = @Html.Raw(I18n.GetClientResourceJson());
+    </script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

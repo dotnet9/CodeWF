@@ -1,0 +1,618 @@
+[
+  {
+    "Name": "加密與安全",
+    "Memo": "加密、安全和随機標识類在線工具。",
+    "Slug": "crypto",
+    "Children": [
+      {
+        "Name": "随機 Token 生成器",
+        "Memo": "按指定长度和字符集生成随機字符串，可用於临时令牌、测试密碼和標识符。",
+        "Slug": "token-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/TokenGenerator.cshtml"
+      },
+      {
+        "Name": "文本哈希計算",
+        "Memo": "对文本計算 MD5、SHA1、SHA256、SHA384、SHA512、SHA3 和 RIPEMD160 等哈希值。",
+        "Slug": "hash-text",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/HashText.cshtml"
+      },
+      {
+        "Name": "Bcrypt 哈希",
+        "Memo": "使用 bcrypt 对文本进行哈希，并可與已有 bcrypt 哈希值进行校验。",
+        "Slug": "bcrypt",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/Bcrypt.cshtml"
+      },
+      {
+        "Name": "UUID 生成器",
+        "Memo": "生成 UUID v4 或 Nil UUID，适合测试數據、临时標识和分布式唯一 ID。",
+        "Slug": "uuid-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/UuidGenerator.cshtml"
+      },
+      {
+        "Name": "ULID 生成器",
+        "Memo": "生成可按时間排序的 ULID，适合日志、事件和數據庫標识符。",
+        "Slug": "ulid-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/UlidGenerator.cshtml"
+      },
+      {
+        "Name": "文本加密/解密",
+        "Memo": "使用 AES、TripleDES、RC4 或 Rabbit 等算法对文本进行加密和解密。",
+        "Slug": "encryption",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/Encryption.cshtml"
+      },
+      {
+        "Name": "BIP39 助记詞生成器",
+        "Memo": "生成 BIP39 助记詞短語，便於学习和测试助记詞相關流程。",
+        "Slug": "bip39-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/Bip39Generator.cshtml"
+      },
+      {
+        "Name": "HMAC 生成器",
+        "Memo": "使用密钥和指定哈希算法生成 HMAC 消息认证碼。",
+        "Slug": "hmac-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/HmacGenerator.cshtml"
+      },
+      {
+        "Name": "RSA 密钥对生成器",
+        "Memo": "在浏覽器中生成 RSA 私钥和公钥，并以 PEM 格式輸出。",
+        "Slug": "rsa-key-pair-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/RsaKeyPairGenerator.cshtml"
+      },
+      {
+        "Name": "密碼强度分析器",
+        "Memo": "估算密碼长度、字符類别、熵值和离線暴力破解所需时間。",
+        "Slug": "password-strength-analyser",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/PasswordStrengthAnalyser.cshtml"
+      },
+      {
+        "Name": "PDF 簽名檢查器",
+        "Memo": "檢查 PDF 文件中是否存在簽名相關結构標记，辅助判断文件是否可能带簽名。",
+        "Slug": "pdf-signature-checker",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Crypto/PdfSignatureChecker.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "轉換器",
+    "Memo": "格式、文本、日期和數值轉換工具。",
+    "Slug": "converter",
+    "Children": [
+      {
+        "Name": "日期时間轉換器",
+        "Memo": "在时間戳、本地时間、ISO 时間和 UTC 时間之間快速轉換。",
+        "Slug": "date-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/DateConverter.cshtml"
+      },
+      {
+        "Name": "整數进制轉換器",
+        "Memo": "在二进制、八进制、十进制、十六进制和 36 进制之間轉換整數。",
+        "Slug": "base-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/BaseConverter.cshtml"
+      },
+      {
+        "Name": "罗马數字轉換器",
+        "Memo": "將阿拉伯數字轉換為罗马數字，或將罗马數字解析為普通數字。",
+        "Slug": "roman-numeral-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/RomanNumeralConverter.cshtml"
+      },
+      {
+        "Name": "Base64 字符串编解碼",
+        "Memo": "將普通文本编碼為 Base64，或將 Base64 解碼回文本。",
+        "Slug": "base64-string-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/Base64StringConverter.cshtml"
+      },
+      {
+        "Name": "Base64 文件轉換器",
+        "Memo": "將上传的文件轉換為 Base64 Data URL，便於嵌入或调试。",
+        "Slug": "base64-file-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/Base64FileConverter.cshtml"
+      },
+      {
+        "Name": "颜色格式轉換器",
+        "Memo": "在 Hex、RGB 和 HSL 等常见颜色格式之間轉換。",
+        "Slug": "color-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/ColorConverter.cshtml"
+      },
+      {
+        "Name": "命名格式轉換器",
+        "Memo": "將文本轉換為 camelCase、PascalCase、snake_case、kebab-case 等格式。",
+        "Slug": "case-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/CaseConverter.cshtml"
+      },
+      {
+        "Name": "文本轉北约音標字母",
+        "Memo": "把文本轉換為北约音標字母表，适合口头拼讀和信息确认。",
+        "Slug": "text-to-nato-alphabet",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/TextToNatoAlphabet.cshtml"
+      },
+      {
+        "Name": "文本與 ASCII 二进制互轉",
+        "Memo": "將文本轉換為 ASCII 二进制表示，或把二进制內容解碼為文本。",
+        "Slug": "text-to-binary",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/TextToBinary.cshtml"
+      },
+      {
+        "Name": "文本與 Unicode 互轉",
+        "Memo": "將文本轉換為 Unicode 轉义形式，或把 Unicode 轉义解析回文本。",
+        "Slug": "text-to-unicode",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/TextToUnicode.cshtml"
+      },
+      {
+        "Name": "YAML 轉 JSON",
+        "Memo": "將 YAML 內容解析并轉換為格式化 JSON。",
+        "Slug": "yaml-to-json-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/YamlToJsonConverter.cshtml"
+      },
+      {
+        "Name": "YAML 轉 TOML",
+        "Memo": "將 YAML 配置轉換為 TOML 格式。",
+        "Slug": "yaml-to-toml",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/YamlToToml.cshtml"
+      },
+      {
+        "Name": "JSON 轉 YAML",
+        "Memo": "將 JSON 內容解析并轉換為 YAML。",
+        "Slug": "json-to-yaml-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/JsonToYamlConverter.cshtml"
+      },
+      {
+        "Name": "JSON 轉 TOML",
+        "Memo": "將 JSON 对象轉換為 TOML 配置格式。",
+        "Slug": "json-to-toml",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/JsonToToml.cshtml"
+      },
+      {
+        "Name": "列表轉換器",
+        "Memo": "对多行列表执行排序、反轉、去重、大小写轉換和 CSV 行轉換等操作。",
+        "Slug": "list-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/ListConverter.cshtml"
+      },
+      {
+        "Name": "TOML 轉 JSON",
+        "Memo": "解析 TOML 內容并轉換為格式化 JSON。",
+        "Slug": "toml-to-json",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/TomlToJson.cshtml"
+      },
+      {
+        "Name": "TOML 轉 YAML",
+        "Memo": "解析 TOML 內容并轉換為 YAML。",
+        "Slug": "toml-to-yaml",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/TomlToYaml.cshtml"
+      },
+      {
+        "Name": "XML 轉 JSON",
+        "Memo": "解析 XML 內容并轉換為 JSON 結构。",
+        "Slug": "xml-to-json",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/XmlToJson.cshtml"
+      },
+      {
+        "Name": "JSON 轉 XML",
+        "Memo": "將 JSON 对象轉換為 XML 字符串。",
+        "Slug": "json-to-xml",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/JsonToXml.cshtml"
+      },
+      {
+        "Name": "Markdown 轉 HTML",
+        "Memo": "將 Markdown 文本轉換為 HTML，并提供即时预覽。",
+        "Slug": "markdown-to-html",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/MarkdownToHtml.cshtml"
+      },
+      {
+        "Name": "时間戳轉換工具",
+        "Memo": "在时間戳和常见日期格式之間互轉，支持秒、毫秒和格式化顯示。",
+        "Slug": "timestamp",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Converter/Timestamp.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "网頁工具",
+    "Memo": "Web 開發、URL、頁面元信息和调试工具。",
+    "Slug": "web",
+    "Children": [
+      {
+        "Name": "URL 编碼/解碼",
+        "Memo": "对 URL 或 URL 组件进行百分号编碼和解碼。",
+        "Slug": "url-encoder",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/UrlEncoder.cshtml"
+      },
+      {
+        "Name": "HTML 實體轉义",
+        "Memo": "对 HTML 特殊字符进行轉义或反轉义。",
+        "Slug": "html-entities",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/HtmlEntities.cshtml"
+      },
+      {
+        "Name": "URL 解析器",
+        "Memo": "解析 URL 的协议、主機、端口、路径、查询参數和片段等组成部分。",
+        "Slug": "url-parser",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/UrlParser.cshtml"
+      },
+      {
+        "Name": "設備信息",
+        "Memo": "查看当前浏覽器、屏幕、語言、在線状态和视口等設備信息。",
+        "Slug": "device-information",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/DeviceInformation.cshtml"
+      },
+      {
+        "Name": "Basic Auth 生成器",
+        "Memo": "根據用户名和密碼生成 HTTP Basic Authorization 請求头。",
+        "Slug": "basic-auth-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/BasicAuthGenerator.cshtml"
+      },
+      {
+        "Name": "Open Graph Meta 生成器",
+        "Memo": "生成网頁標題、描述、Open Graph 和 Twitter Card 等 Meta 標簽。",
+        "Slug": "og-meta-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/OgMetaGenerator.cshtml"
+      },
+      {
+        "Name": "OTP 动态验证碼生成器",
+        "Memo": "基於 Base32 密钥生成 TOTP 动态验证碼，并顯示剩余有效时間。",
+        "Slug": "otp-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/OtpGenerator.cshtml"
+      },
+      {
+        "Name": "MIME 類型查询",
+        "Memo": "根據文件扩展名查询 MIME 類型，或根據 MIME 類型反查常见扩展名。",
+        "Slug": "mime-types",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/MimeTypes.cshtml"
+      },
+      {
+        "Name": "JWT 解析器",
+        "Memo": "解析 JWT 的 Header、Payload 和 Signature，便於调试令牌內容。",
+        "Slug": "jwt-parser",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/JwtParser.cshtml"
+      },
+      {
+        "Name": "鍵盘按鍵碼查询",
+        "Memo": "按下任意鍵后顯示 key、code、keyCode 和修饰鍵状态。",
+        "Slug": "keycode-info",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/KeycodeInfo.cshtml"
+      },
+      {
+        "Name": "URL Slug 生成器",
+        "Memo": "把標題或短語轉換為适合 URL、文件名和锚点 ID 的 slug。",
+        "Slug": "slugify-string",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/UrlSlugGenerator.cshtml"
+      },
+      {
+        "Name": "HTML 所见即所得编辑器",
+        "Memo": "在線编辑富文本內容，并實时查看生成的 HTML。",
+        "Slug": "html-wysiwyg-editor",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/HtmlWysiwygEditor.cshtml"
+      },
+      {
+        "Name": "User-Agent 解析器",
+        "Memo": "从 User-Agent 字符串中识别浏覽器、系统、設備類型等信息。",
+        "Slug": "user-agent-parser",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/UserAgentParser.cshtml"
+      },
+      {
+        "Name": "HTTP 状态碼查询",
+        "Memo": "查询常见 HTTP 状态碼及其含义。",
+        "Slug": "http-status-codes",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/HttpStatusCodes.cshtml"
+      },
+      {
+        "Name": "JSON 差异比较",
+        "Memo": "比较两個 JSON 对象，并列出字段级差异。",
+        "Slug": "json-diff",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/JsonDiff.cshtml"
+      },
+      {
+        "Name": "Safelink 解碼器",
+        "Memo": "从 Outlook Safelink 鏈接中提取真實目標地址。",
+        "Slug": "safelink-decoder",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/SafelinkDecoder.cshtml"
+      },
+      {
+        "Name": "標題轉 URL 别名",
+        "Memo": "將中文標題翻译并轉換成适合文章鏈接和 SEO 的 slug。",
+        "Slug": "slugify-string-translator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Web/SlugifyString.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "圖像與视頻",
+    "Memo": "圖片、二維碼、圖標和摄像头工具。",
+    "Slug": "images-and-videos",
+    "Children": [
+      {
+        "Name": "二維碼生成器",
+        "Memo": "為文本或鏈接生成二維碼，并支持前景色和背景色自定义。",
+        "Slug": "qrcode-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/QrcodeGenerator.cshtml"
+      },
+      {
+        "Name": "WiFi 二維碼生成器",
+        "Memo": "根據 WiFi 名称、密碼和加密方式生成快速连接二維碼。",
+        "Slug": "wifi-qrcode-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/WifiQrcodeGenerator.cshtml"
+      },
+      {
+        "Name": "SVG 占位圖生成器",
+        "Memo": "按尺寸、颜色和文本生成 SVG 占位圖。",
+        "Slug": "svg-placeholder-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/SvgPlaceholderGenerator.cshtml"
+      },
+      {
+        "Name": "摄像头拍照工具",
+        "Memo": "调用浏覽器摄像头进行预覽，并可截取当前画面。",
+        "Slug": "camera-recorder",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/CameraRecorder.cshtml"
+      },
+      {
+        "Name": "Icon 圖標轉換器",
+        "Memo": "將圖片轉換為 ICO 圖標，或按多尺寸導出圖標压缩包。",
+        "Slug": "icon-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/IconConverter.cshtml"
+      },
+      {
+        "Name": "挪车碼生成器",
+        "Memo": "根據手機号生成可扫碼联系车主的临时挪车二維碼。",
+        "Slug": "nuoche",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/ImagesAndVideos/NuoChe.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "開發工具",
+    "Memo": "日常開發格式化、正则、权限和命令辅助工具。",
+    "Slug": "development",
+    "Children": [
+      {
+        "Name": "Git 速查表",
+        "Memo": "整理常用 Git 命令，便於快速查閱提交、分支、变基和暂存操作。",
+        "Slug": "git-memo",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/GitMemo.cshtml"
+      },
+      {
+        "Name": "随機端口生成器",
+        "Memo": "生成 1024 到 65535 范围內的随機端口号。",
+        "Slug": "random-port-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/RandomPortGenerator.cshtml"
+      },
+      {
+        "Name": "Crontab 表达式生成器",
+        "Memo": "组合分钟、小时、日期、月份和星期字段，生成 crontab 表达式。",
+        "Slug": "crontab-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/CrontabGenerator.cshtml"
+      },
+      {
+        "Name": "JSON 格式化",
+        "Memo": "將 JSON 字符串格式化為易讀的缩进結构。",
+        "Slug": "json-prettify",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/JsonPrettify.cshtml"
+      },
+      {
+        "Name": "JSON 压缩",
+        "Memo": "移除 JSON 中多余空白，生成紧凑字符串。",
+        "Slug": "json-minify",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/JsonMinify.cshtml"
+      },
+      {
+        "Name": "JSON 轉 CSV",
+        "Memo": "把对象數组形式的 JSON 轉換為 CSV 文本。",
+        "Slug": "json-to-csv",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/JsonToCsv.cshtml"
+      },
+      {
+        "Name": "SQL 格式化",
+        "Memo": "对 SQL 查询进行基础換行和缩进，提升可讀性。",
+        "Slug": "sql-prettify",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/SqlPrettify.cshtml"
+      },
+      {
+        "Name": "Chmod 权限計算器",
+        "Memo": "選择讀、写、执行权限，生成八进制和符号形式的 chmod 命令。",
+        "Slug": "chmod-calculator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/ChmodCalculator.cshtml"
+      },
+      {
+        "Name": "Docker Run 轉 Compose",
+        "Memo": "把常见 docker run 参數轉換為 docker compose 服务片段。",
+        "Slug": "docker-run-to-docker-compose-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/DockerRunToDockerComposeConverter.cshtml"
+      },
+      {
+        "Name": "XML 格式化",
+        "Memo": "將 XML 字符串整理為缩进后的易讀格式。",
+        "Slug": "xml-formatter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/XmlFormatter.cshtml"
+      },
+      {
+        "Name": "YAML 格式化",
+        "Memo": "解析并重新輸出 YAML，使結构更清晰。",
+        "Slug": "yaml-prettify",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/YamlPrettify.cshtml"
+      },
+      {
+        "Name": "邮箱地址规范化",
+        "Memo": "对邮箱地址做小写、去標簽等规范化处理，支持 Gmail 点号规则。",
+        "Slug": "email-normalizer",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/EmailNormalizer.cshtml"
+      },
+      {
+        "Name": "正则表达式测试器",
+        "Memo": "輸入正则表达式、標志和样本文本，查看匹配結果。",
+        "Slug": "regex-tester",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/RegexTester.cshtml"
+      },
+      {
+        "Name": "正则表达式速查表",
+        "Memo": "列出常用正则語法、字符類、量詞和分组写法。",
+        "Slug": "regex-memo",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Development/RegexMemo.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "网络工具",
+    "Memo": "IP、MAC 和网络地址处理工具。",
+    "Slug": "network",
+    "Children": [
+      {
+        "Name": "IPv4 子网計算器",
+        "Memo": "根據 IPv4/CIDR 計算子网掩碼、网络地址、广播地址和主機范围。",
+        "Slug": "ipv4-subnet-calculator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/Ipv4SubnetCalculator.cshtml"
+      },
+      {
+        "Name": "IPv4 地址轉換器",
+        "Memo": "將 IPv4 地址轉換為十进制、十六进制、二进制和 IPv6 映射形式。",
+        "Slug": "ipv4-address-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/Ipv4AddressConverter.cshtml"
+      },
+      {
+        "Name": "IPv4 范围計算器",
+        "Memo": "根據起止 IPv4 地址計算地址數量和覆盖该范围的 CIDR。",
+        "Slug": "ipv4-range-expander",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/Ipv4RangeExpander.cshtml"
+      },
+      {
+        "Name": "MAC 地址厂商查询",
+        "Memo": "根據 MAC 地址查询設備厂商信息。",
+        "Slug": "mac-address-lookup",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/MacAddressLookup.cshtml"
+      },
+      {
+        "Name": "MAC 地址生成器",
+        "Memo": "按前缀和數量生成随機 MAC 地址。",
+        "Slug": "mac-address-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/MacAddressGenerator.cshtml"
+      },
+      {
+        "Name": "IPv6 ULA 生成器",
+        "Memo": "生成符合 RFC4193 的本地唯一 IPv6 地址前缀。",
+        "Slug": "ipv6-ula-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Network/Ipv6UlaGenerator.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "數学工具",
+    "Memo": "計算、百分比、複利和 ETA 工具。",
+    "Slug": "math",
+    "Children": [
+      {
+        "Name": "數学表达式計算器",
+        "Memo": "計算包含常见 Math 函數的數学表达式。",
+        "Slug": "math-evaluator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Math/MathEvaluator.cshtml"
+      },
+      {
+        "Name": "ETA 预計完成时間計算器",
+        "Memo": "根據已完成量、总量和已耗时估算剩余时間與完成时刻。",
+        "Slug": "eta-calculator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Math/EtaCalculator.cshtml"
+      },
+      {
+        "Name": "百分比計算器",
+        "Memo": "計算占比、百分比对應值以及两個數之間的变化百分比。",
+        "Slug": "percentage-calculator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Math/PercentageCalculator.cshtml"
+      },
+      {
+        "Name": "複利計算器",
+        "Memo": "按年、月、日複利方式計算本金、利率和收益变化。",
+        "Slug": "compound-interest-calculator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Math/CompoundInterestCalculator.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "計量工具",
+    "Memo": "計时、温度和性能测量工具。",
+    "Slug": "measurement",
+    "Children": [
+      {
+        "Name": "計时器",
+        "Memo": "提供簡单的開始、停止和重置計时功能。",
+        "Slug": "chronometer",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Measurement/Chronometer.cshtml"
+      },
+      {
+        "Name": "温度轉換器",
+        "Memo": "在摄氏度、华氏度、開尔文和兰氏度之間轉換。",
+        "Slug": "temperature-converter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Measurement/TemperatureConverter.cshtml"
+      },
+      {
+        "Name": "基准测试工具",
+        "Memo": "在当前浏覽器中多次运行 JavaScript 片段，统計最小、最大和平均耗时。",
+        "Slug": "benchmark-builder",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Measurement/BenchmarkBuilder.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "文本工具",
+    "Memo": "文本生成、统計、对比和处理工具。",
+    "Slug": "text",
+    "Children": [
+      {
+        "Name": "占位文本生成器",
+        "Memo": "按段落數量生成 Lorem ipsum 占位文本。",
+        "Slug": "lorem-ipsum-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/LoremIpsumGenerator.cshtml"
+      },
+      {
+        "Name": "文本统計",
+        "Memo": "统計文本字符數、字节數、詞數、行數、句子數和段落數。",
+        "Slug": "text-statistics",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/TextStatistics.cshtml"
+      },
+      {
+        "Name": "Emoji 選择器",
+        "Memo": "快速選择并複制常用 Emoji 表情。",
+        "Slug": "emoji-picker",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/EmojiPicker.cshtml"
+      },
+      {
+        "Name": "字符串脱敏工具",
+        "Memo": "隐藏字符串中間部分，便於分享令牌、账号或其他敏感片段。",
+        "Slug": "string-obfuscator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/StringObfuscator.cshtml"
+      },
+      {
+        "Name": "文本差异比较",
+        "Memo": "逐行比较两段文本，顯示新增和删除內容。",
+        "Slug": "text-diff",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/TextDiff.cshtml"
+      },
+      {
+        "Name": "數字缩写生成器",
+        "Memo": "把 internationalization 轉為 i18n 這類數字缩写形式。",
+        "Slug": "numeronym-generator",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/NumeronymGenerator.cshtml"
+      },
+      {
+        "Name": "ASCII 文本绘制器",
+        "Memo": "把輸入文本轉換為簡单的 ASCII 风格排列。",
+        "Slug": "ascii-text-drawer",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Text/AsciiTextDrawer.cshtml"
+      }
+    ]
+  },
+  {
+    "Name": "數據工具",
+    "Memo": "电话、IBAN 等結构化數據工具。",
+    "Slug": "data",
+    "Children": [
+      {
+        "Name": "电话号碼解析與格式化",
+        "Memo": "提取电话号碼中的數字，并生成近似 E.164 和分组顯示形式。",
+        "Slug": "phone-parser-and-formatter",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Data/PhoneParserAndFormatter.cshtml"
+      },
+      {
+        "Name": "IBAN 校验與解析",
+        "Memo": "校验 IBAN 编号并解析国家代碼、校验位和 BBAN。",
+        "Slug": "iban-validator-and-parser",
+        "Repository": "https://github.com/dotnet9/CodeWF/blob/main/src/WebApp/Pages/Tool/Data/IbanValidatorAndParser.cshtml"
+      }
+    ]
+  }
+]
