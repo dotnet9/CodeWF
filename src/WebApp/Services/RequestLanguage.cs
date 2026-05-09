@@ -16,18 +16,37 @@ public static class RequestLanguage
     public const string DefaultLanguage = "zh-cn";
     public const string CookieName = "codewf.lang";
 
-    public static readonly IReadOnlyList<LanguageInfo> SupportedLanguages =
-    [
-        new(DefaultLanguage, "zh-CN", "zh-CN", "zh_CN", "简体中文", "Simplified Chinese"),
-        new("zh-tw", "zh-TW", "zh-TW", "zh_TW", "繁體中文", "Traditional Chinese"),
-        new("en", "en-US", "en", "en_US", "English", "English"),
-        new("ja", "ja-JP", "ja", "ja_JP", "日本語", "Japanese")
-    ];
+    public static readonly IReadOnlyList<LanguageInfo> SupportedLanguages = BuildSupportedLanguages();
 
     private static readonly AsyncLocal<string?> CurrentLanguageHolder = new();
     private static readonly HashSet<string> SupportedCodes = SupportedLanguages
         .Select(static language => language.Code)
         .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    private static readonly HashSet<string> ReservedRouteSegments = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "about",
+        "album",
+        "api",
+        "cat",
+        "doc",
+        "donation",
+        "favicon.ico",
+        "favicon.png",
+        "img",
+        "lib",
+        "post",
+        "privacy",
+        "project",
+        "robots.txt",
+        "rss",
+        "s",
+        "search",
+        "sitemap",
+        "sitemap.xml",
+        "tag",
+        "timeline",
+        "tool"
+    };
 
     public static string CurrentLanguage
     {
@@ -39,12 +58,34 @@ public static class RequestLanguage
 
     public static void Clear() => CurrentLanguageHolder.Value = null;
 
+    public static bool IsDefaultLanguage(string? language) =>
+        string.Equals(Normalize(language), DefaultLanguage, StringComparison.OrdinalIgnoreCase);
+
     public static LanguageInfo GetLanguage(string? language)
     {
         var normalized = Normalize(language) ?? DefaultLanguage;
         return SupportedLanguages.FirstOrDefault(item =>
             string.Equals(item.Code, normalized, StringComparison.OrdinalIgnoreCase))
             ?? SupportedLanguages[0];
+    }
+
+    public static IReadOnlyList<LanguageInfo> GetSeoLanguages(string? currentLanguage)
+    {
+        string[] preferredCodes =
+        [
+            DefaultLanguage,
+            "zh-tw",
+            "en",
+            "ja",
+            Normalize(currentLanguage) ?? DefaultLanguage
+        ];
+
+        return preferredCodes
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(GetLanguage)
+            .GroupBy(static language => language.Code, StringComparer.OrdinalIgnoreCase)
+            .Select(static group => group.First())
+            .ToList();
     }
 
     public static string? Normalize(string? language)
@@ -55,35 +96,29 @@ public static class RequestLanguage
         }
 
         var value = language.Trim().Replace('_', '-').ToLowerInvariant();
+
+        if (value.Equals("zh", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("zh-hans", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("zh-cn", StringComparison.OrdinalIgnoreCase))
+        {
+            return DefaultLanguage;
+        }
+
         if (SupportedCodes.Contains(value))
         {
             return value;
         }
 
-        if (value.StartsWith("zh-hant", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("zh-tw", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("zh-hk", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("zh-mo", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            return "zh-tw";
+            var culture = CultureInfo.GetCultureInfo(value);
+            var normalized = NormalizeCultureName(culture.Name);
+            return SupportedCodes.Contains(normalized) ? normalized : null;
         }
-
-        if (value.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+        catch (CultureNotFoundException)
         {
-            return DefaultLanguage;
+            return null;
         }
-
-        if (value.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-        {
-            return "en";
-        }
-
-        if (value.StartsWith("ja", StringComparison.OrdinalIgnoreCase))
-        {
-            return "ja";
-        }
-
-        return null;
     }
 
     public static bool TryGetPathLanguage(PathString path, out string language, out PathString remainingPath)
@@ -102,9 +137,13 @@ public static class RequestLanguage
         var firstSegment = slashIndex >= 0
             ? span[..slashIndex].ToString()
             : span.ToString();
+        if (ReservedRouteSegments.Contains(firstSegment))
+        {
+            return false;
+        }
 
         var normalized = Normalize(firstSegment);
-        if (normalized is null || !SupportedCodes.Contains(normalized))
+        if (normalized is null)
         {
             return false;
         }
@@ -240,6 +279,43 @@ public static class RequestLanguage
             ?? context.Request.Path.ToString();
         return LocalizePath(originalPath, language);
     }
+
+    private static IReadOnlyList<LanguageInfo> BuildSupportedLanguages()
+    {
+        var languages = CultureInfo.GetCultures(CultureTypes.NeutralCultures | CultureTypes.SpecificCultures)
+            .Where(static culture => !string.IsNullOrWhiteSpace(culture.Name))
+            .Select(CreateLanguageInfo)
+            .GroupBy(static language => language.Code, StringComparer.OrdinalIgnoreCase)
+            .Select(static group => group.First())
+            .Where(static language => !string.Equals(language.Code, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(static language => language.EnglishName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(static language => language.Code, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        languages.Insert(0, CreateLanguageInfo(CultureInfo.GetCultureInfo("zh-CN")));
+        return languages;
+    }
+
+    private static LanguageInfo CreateLanguageInfo(CultureInfo culture)
+    {
+        var code = NormalizeCultureName(culture.Name);
+        var displayCulture = culture;
+        if (culture.IsNeutralCulture)
+        {
+            displayCulture = culture;
+        }
+
+        return new LanguageInfo(
+            code,
+            displayCulture.Name,
+            displayCulture.Name,
+            displayCulture.Name.Replace('-', '_'),
+            displayCulture.NativeName,
+            displayCulture.EnglishName);
+    }
+
+    private static string NormalizeCultureName(string cultureName) =>
+        cultureName.Replace('_', '-').ToLowerInvariant();
 }
 
 public sealed class RequestLanguageMiddleware
@@ -257,6 +333,17 @@ public sealed class RequestLanguageMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var originalPath = context.Request.Path;
+
+        if (originalPath == "/")
+        {
+            await InvokeWithLanguageAsync(
+                context,
+                RequestLanguage.DefaultLanguage,
+                originalPath,
+                originalPath,
+                persistCookie: false);
+            return;
+        }
 
         if (RequestLanguage.TryGetPathLanguage(originalPath, out var routeLanguage, out var remainingPath))
         {

@@ -85,11 +85,8 @@ public class IndexModel : PageModel
             .ToList(),
             3);
 
-        var docItems = await _appService.GetAllDocItemsAsync() ?? [];
-        TotalDocNodes = docItems.Count + docItems.Sum(item => item.Children?.Count ?? 0);
-
-        var toolItems = await _appService.GetAllToolItemsAsync() ?? [];
-        TotalToolEntries = toolItems.Sum(item => Math.Max(1, item.Children?.Count ?? 0));
+        TotalDocNodes = await _appService.GetDefaultDocNodeCountAsync();
+        TotalToolEntries = await _appService.GetDefaultToolEntryCountAsync();
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(

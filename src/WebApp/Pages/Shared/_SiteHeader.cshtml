@@ -82,22 +82,6 @@
                             <a class="dropdown-item" href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
                         </div>
                     </li>
-                    <li class="nav-item dropdown site-language-menu">
-                        <button class="nav-link dropdown-toggle site-menu-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="@I18n.T("language.switch", "切换语言")">
-                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                            <span>@I18n.CurrentLanguageInfo.NativeName</span>
-                        </button>
-                        <div class="dropdown-menu site-dropdown site-language-dropdown">
-                            @foreach (var language in I18n.Languages)
-                            {
-                                var active = string.Equals(language.Code, I18n.CurrentLanguage, StringComparison.OrdinalIgnoreCase);
-                                <a class="dropdown-item @(active ? "active" : string.Empty)" href="@I18n.SwitchUrl(language.Code)" lang="@language.HtmlLang" aria-current="@(active ? "true" : null)">
-                                    <span>@language.NativeName</span>
-                                    <small>@language.EnglishName</small>
-                                </a>
-                            }
-                        </div>
-                    </li>
                 </ul>
 
                 <div class="site-utility-bar">

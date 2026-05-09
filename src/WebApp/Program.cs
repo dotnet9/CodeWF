@@ -6,8 +6,14 @@ using Microsoft.Extensions.WebEncoders;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using Microsoft.Net.Http.Headers;
+using CodeWF.Log.Core;
+using CodeWfLogger = CodeWF.Log.Core.Logger;
 
 var builder = WebApplication.CreateBuilder(args);
+
+CodeWfLogger.EnableConsoleOutput = true;
+CodeWfLogger.Level = LogType.Debug;
+CodeWfLogger.Info("CodeWF.Log.Core server console logging enabled.", log2UI: false, log2File: false, log2Console: true);
 
 // Add services to the container.
 builder.Services.AddResponseCompression(options =>
@@ -33,7 +39,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<AppService>();
 builder.Services.AddSingleton<I18nService>();
+builder.Services.AddSingleton<LanguagePreparationService>();
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
+builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
+builder.Services.AddSingleton<IContentTranslationService, OpenAiContentTranslationService>();
 // 站点正文和配置里包含大量中文，统一放开编码范围，避免输出时被过度转义。
 builder.Services.Configure<WebEncoderOptions>(options =>
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));

@@ -92,8 +92,10 @@ public class IndexModel : PageModel
             .Where(static item => !string.IsNullOrWhiteSpace(item))
             .Select(static item => item.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Where(lookup.ContainsKey)
-            .Select(item => new ArticleTopicLink(item, urlFactory(lookup[item]), iconClass))
+            .Select(item => new ArticleTopicLink(
+                item,
+                urlFactory(lookup.TryGetValue(item, out var slug) ? slug : Uri.EscapeDataString(item)),
+                iconClass))
             .ToList();
     }
 

@@ -59,17 +59,16 @@
 
                 <div>
                     <h2 class="footer-title">@I18n.T("language.title", "语言")</h2>
-                    <ul class="footer-list footer-language-list">
+                    <label class="visually-hidden" for="footer-language-select">@I18n.T("language.switch", "切换语言")</label>
+                    <select id="footer-language-select" class="footer-language-select" data-language-switch>
                         @foreach (var language in I18n.Languages)
                         {
                             var active = string.Equals(language.Code, I18n.CurrentLanguage, StringComparison.OrdinalIgnoreCase);
-                            <li>
-                                <a class="@(active ? "is-current" : string.Empty)" href="@I18n.SwitchUrl(language.Code)" lang="@language.HtmlLang" aria-current="@(active ? "true" : null)">
-                                    @language.NativeName
-                                </a>
-                            </li>
+                            <option value="@I18n.SwitchUrl(language.Code)" lang="@language.HtmlLang" selected="@active">
+                                @language.NativeName (@language.EnglishName)
+                            </option>
                         }
-                    </ul>
+                    </select>
                 </div>
 
                 <div class="footer-qr">

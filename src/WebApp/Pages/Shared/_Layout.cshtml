@@ -79,7 +79,7 @@
     <meta name="description" content="@siteDescription" />
     <meta name="theme-color" content="#0f172a" />
     <link rel="canonical" href="@canonicalUrl" />
-    @foreach (var item in I18n.Languages)
+    @foreach (var item in I18n.SeoLanguages)
     {
         <link rel="alternate" hreflang="@item.Code" href="@ToAbsoluteUrl(I18n.SwitchPath(item.Code))" />
     }

@@ -56,14 +56,15 @@ public class IndexModel : PageModel
         var album = Albums.FirstOrDefault(c => c.Slug == slug);
         if (album == null)
         {
-            AlbumName = "专题不存在";
-            Posts = [];
-            Total = 0;
-            return;
+            AlbumName = WebApp.Extensions.ConstantUtil.DecodeTagSlug(slug);
+            AlbumMemo = $"查看 {AlbumName} 专题下的文章内容。";
+        }
+        else
+        {
+            AlbumName = album.Name ?? "所有专辑";
+            AlbumMemo = album.Memo;
         }
 
-        AlbumName = album.Name ?? "所有专辑";
-        AlbumMemo = album.Memo;
         var pageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;

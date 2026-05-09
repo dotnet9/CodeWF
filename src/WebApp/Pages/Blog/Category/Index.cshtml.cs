@@ -56,14 +56,15 @@ public class IndexModel : PageModel
         var category = Categories.FirstOrDefault(c => c.Slug == slug);
         if (category == null)
         {
-            CategoryName = "分类不存在";
-            Posts = [];
-            Total = 0;
-            return;
+            CategoryName = WebApp.Extensions.ConstantUtil.DecodeTagSlug(slug);
+            CategoryMemo = $"查看 {CategoryName} 分类下的文章内容。";
+        }
+        else
+        {
+            CategoryName = category.Name ?? CategoryName;
+            CategoryMemo = category.Memo;
         }
 
-        CategoryName = category.Name ?? CategoryName;
-        CategoryMemo = category.Memo;
         var pageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
         Posts = pageData.Data;
         Total = pageData.Total;
