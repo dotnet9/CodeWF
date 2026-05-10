@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -10,6 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using WebApp.Controllers;
 using WebApp.Options;
 using WebApp.Services;
 
@@ -907,6 +909,33 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public void LanguageController_PrepareTarget_AcceptsSameHostHttpsUrlBehindProxy()
+    {
+        var target = BuildLanguagePrepareTarget(
+            requestScheme: "http",
+            requestHost: "dotnet9.com",
+            targetUrl: "https://dotnet9.com/en",
+            language: "en",
+            forwardedProto: "https");
+
+        Assert.NotNull(target);
+        Assert.Equal("https://dotnet9.com/en", target.ToString().TrimEnd('/'));
+    }
+
+    [Fact]
+    public void LanguageController_PrepareTarget_RejectsExternalAbsoluteUrl()
+    {
+        var target = BuildLanguagePrepareTarget(
+            requestScheme: "http",
+            requestHost: "dotnet9.com",
+            targetUrl: "https://example.com/en",
+            language: "en",
+            forwardedProto: "https");
+
+        Assert.Null(target);
+    }
+
+    [Fact]
     public async Task I18nService_CreatesMissingLanguageResource_FromDefaultResource()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
@@ -1309,6 +1338,39 @@ public sealed class AppServiceTests : IDisposable
             },
             new HttpContextAccessor(),
             translationService);
+    }
+
+    private static Uri? BuildLanguagePrepareTarget(
+        string requestScheme,
+        string requestHost,
+        string? targetUrl,
+        string language,
+        string? forwardedProto = null)
+    {
+        var context = new DefaultHttpContext();
+        context.Request.Scheme = requestScheme;
+        context.Request.Host = new HostString(requestHost);
+        if (!string.IsNullOrWhiteSpace(forwardedProto))
+        {
+            context.Request.Headers["X-Forwarded-Proto"] = forwardedProto;
+        }
+
+        var controller = new LanguageController(
+            null!,
+            null!,
+            NullLogger<LanguageController>.Instance)
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = context
+            }
+        };
+        var method = typeof(LanguageController).GetMethod(
+            "BuildLocalTargetUri",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.NotNull(method);
+        return (Uri?)method.Invoke(controller, [targetUrl, language]);
     }
 
     private static void AssertSearchKeywordFileContains(string filePath, string query)

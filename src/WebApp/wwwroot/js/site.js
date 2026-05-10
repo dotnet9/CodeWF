@@ -404,6 +404,7 @@ async function fetchLanguageResourceStatus(language) {
 }
 
 async function queueLanguageTargetPreparation(language, targetUrl) {
+    const target = getLanguagePreparationTarget(targetUrl);
     const response = await fetch("/api/language/prepare", {
         method: "POST",
         headers: {
@@ -411,7 +412,7 @@ async function queueLanguageTargetPreparation(language, targetUrl) {
             "Content-Type": "application/json"
         },
         credentials: "same-origin",
-        body: JSON.stringify({ language, url: targetUrl, background: true })
+        body: JSON.stringify({ language, url: target, background: true })
     });
 
     if (!response.ok) {
@@ -424,6 +425,17 @@ async function queueLanguageTargetPreparation(language, targetUrl) {
     }
 
     return payload;
+}
+
+function getLanguagePreparationTarget(targetUrl) {
+    try {
+        const url = targetUrl instanceof URL
+            ? targetUrl
+            : new URL(targetUrl, window.location.href);
+        return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+        return targetUrl;
+    }
 }
 
 async function fetchLanguagePreparationJob(jobId) {

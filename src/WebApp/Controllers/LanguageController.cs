@@ -135,7 +135,7 @@ public sealed class LanguageController : ControllerBase
 
     private Uri? BuildLocalTargetUri(string? url, string language)
     {
-        var origin = $"{Request.Scheme}://{Request.Host}";
+        var origin = $"{GetExternalRequestScheme()}://{Request.Host}";
         var baseUri = new Uri($"{origin}/");
         var targetText = string.IsNullOrWhiteSpace(url)
             ? RequestLanguage.LocalizePath("/", language)
@@ -147,11 +147,13 @@ public sealed class LanguageController : ControllerBase
             return null;
         }
 
-        if (!string.Equals(targetUri.Scheme, Request.Scheme, StringComparison.OrdinalIgnoreCase)
-            || !string.Equals(targetUri.Authority, Request.Host.Value, StringComparison.OrdinalIgnoreCase))
+        if (!IsSameRequestHost(targetUri)
+            || !IsHttpScheme(targetUri.Scheme))
         {
             return null;
         }
+
+        targetUri = new Uri(baseUri, $"{targetUri.AbsolutePath}{targetUri.Query}{targetUri.Fragment}");
 
         var path = new PathString(targetUri.AbsolutePath);
         var hasPathLanguage = RequestLanguage.TryGetPathLanguage(path, out var pathLanguage, out var remainingPath);
@@ -177,6 +179,24 @@ public sealed class LanguageController : ControllerBase
 
         return targetUri;
     }
+
+    private bool IsSameRequestHost(Uri targetUri) =>
+        string.Equals(targetUri.Authority, Request.Host.Value, StringComparison.OrdinalIgnoreCase);
+
+    private string GetExternalRequestScheme()
+    {
+        var forwardedProto = Request.Headers["X-Forwarded-Proto"]
+            .FirstOrDefault()?
+            .Split(',', 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .FirstOrDefault();
+        return !string.IsNullOrWhiteSpace(forwardedProto) && IsHttpScheme(forwardedProto)
+            ? forwardedProto
+            : Request.Scheme;
+    }
+
+    private static bool IsHttpScheme(string scheme) =>
+        string.Equals(scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
+        || string.Equals(scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
 
     private static object ToJobResponse(
         LanguagePreparationJobSnapshot job,

@@ -10,6 +10,7 @@ V1.1.5 (2026-05-10)
 - 🔨 [Changed] Scoped article metadata sidecar generation to posts that are actually rendered on the current page, instead of translating every article during list, homepage, navigation, tag, or search preparation.
 - 🔨 [Changed] Reworked album/category counts to use source article metadata and default taxonomy slugs, so counts no longer depend on all translated article metadata being pre-generated.
 - 🐛 [Fixed] Added fallback windows for failed translation attempts so unavailable translation providers do not turn pages into 500 responses.
+- 🐛 [Fixed] Fixed language preparation requests being rejected behind reverse proxies when the browser submitted a same-host HTTPS target URL.
 - 🐛 [Fixed] Added repair logic for stale localized resources that still contain untranslated Chinese text.
 
 V1.1.4 (2026-05-01)
