@@ -4,9 +4,13 @@
 @{
     ViewData["Title"] = Model.IsDirectoryPage
         ? I18n.T("home.albums", "专题")
+        : Model.IsDefaultPage
+            ? I18n.T("nav.allAlbums", "全部专题")
         : I18n.Format("album.titleWithName", "{0} - 专题", I18n.Text(Model.AlbumName));
     ViewData["Description"] = Model.IsDirectoryPage
         ? I18n.T("album.directoryDescription", "浏览码墙全部专题。")
+        : Model.IsDefaultPage
+            ? I18n.T("album.defaultDescription", "按系列化内容连续阅读，更适合跟着主题系统学习。")
         : (string.IsNullOrWhiteSpace(Model.AlbumMemo)
             ? I18n.Format("album.descriptionWithName", "查看 {0} 专题下的文章内容。", I18n.Text(Model.AlbumName))
             : I18n.Text(Model.AlbumMemo));
@@ -21,8 +25,14 @@
         <div class="page-banner">
             <div>
                 <span class="eyebrow">@I18n.T("album.eyebrow", "专题")</span>
-                <h1 class="page-title">@(Model.IsDirectoryPage ? I18n.T("nav.allAlbums", "全部专题") : I18n.Text(Model.AlbumName))</h1>
-                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.AlbumMemo) ? I18n.T("album.browseDescription", "按专题浏览站内文章内容。") : I18n.Text(Model.AlbumMemo))</p>
+                <h1 class="page-title">@(Model.IsDirectoryPage || Model.IsDefaultPage ? I18n.T("nav.allAlbums", "全部专题") : I18n.Text(Model.AlbumName))</h1>
+                <p class="page-description">@(Model.IsDirectoryPage
+                    ? I18n.T("album.browseDescription", "按专题浏览站内文章内容。")
+                    : Model.IsDefaultPage
+                        ? I18n.T("album.defaultDescription", "按系列化内容连续阅读，更适合跟着主题系统学习。")
+                    : string.IsNullOrWhiteSpace(Model.AlbumMemo)
+                        ? I18n.Format("album.descriptionWithName", "查看 {0} 专题下的文章内容。", I18n.Text(Model.AlbumName))
+                        : I18n.Text(Model.AlbumMemo))</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {
@@ -112,7 +122,7 @@
                     @if (Model.TotalPages > 1)
                     {
                         <nav class="pagination-shell" aria-label="@I18n.T("album.pagination", "专题分页")">
-                            <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 篇文章")</p>
+                            <p class="pagination-summary">@I18n.Format("pagination.postsSummary", "第 {0} / {1} 页，共 {2} 篇文章", Model.PageIndex, Model.TotalPages, Model.Total)</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
                                     <a class="page-link" href="@ConstantUtil.GetAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex - 1)">@I18n.T("pagination.previous", "上一页")</a>

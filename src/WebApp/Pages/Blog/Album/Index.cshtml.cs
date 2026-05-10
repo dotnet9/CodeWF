@@ -15,6 +15,7 @@ public class IndexModel : PageModel
     public string? AlbumMemo { get; set; }
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
+    public bool IsDefaultPage => string.Equals(CurrentSlug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase);
     public List<BlogPostBrief> Posts { get; set; } = [];
     public List<AlbumItem> Albums { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
@@ -39,14 +40,14 @@ public class IndexModel : PageModel
         if (string.IsNullOrWhiteSpace(slug))
         {
             AlbumName = "全部专题";
-            AlbumMemo = "按专题浏览站内文章内容。";
+            AlbumMemo = null;
             return;
         }
 
         if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
         {
             AlbumName = "所有专辑";
-            AlbumMemo = "按系列化内容连续阅读，更适合跟着主题系统学习。";
+            AlbumMemo = null;
             var defaultPageData = await _appService.GetPostByAlbum(PageIndex, PageSize, slug, null);
             Posts = defaultPageData.Data;
             Total = defaultPageData.Total;
@@ -57,7 +58,7 @@ public class IndexModel : PageModel
         if (album == null)
         {
             AlbumName = WebApp.Extensions.ConstantUtil.DecodeTagSlug(slug);
-            AlbumMemo = $"查看 {AlbumName} 专题下的文章内容。";
+            AlbumMemo = null;
         }
         else
         {

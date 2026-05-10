@@ -15,6 +15,7 @@ public class IndexModel : PageModel
     public string? CategoryMemo { get; set; }
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
+    public bool IsDefaultPage => string.Equals(CurrentSlug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase);
     public List<BlogPostBrief> Posts { get; set; } = [];
     public List<CategoryItem> Categories { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
@@ -39,14 +40,14 @@ public class IndexModel : PageModel
         if (string.IsNullOrWhiteSpace(slug))
         {
             CategoryName = "全部分类";
-            CategoryMemo = "按分类浏览站内文章内容。";
+            CategoryMemo = null;
             return;
         }
 
         if (string.Equals(slug, WebApp.Extensions.ConstantUtil.DefaultCategory, StringComparison.OrdinalIgnoreCase))
         {
             CategoryName = "所有分类";
-            CategoryMemo = "聚焦同一技术主题下的文章，方便按方向连续阅读。";
+            CategoryMemo = null;
             var defaultPageData = await _appService.GetPostByCategory(PageIndex, PageSize, slug, null);
             Posts = defaultPageData.Data;
             Total = defaultPageData.Total;
@@ -57,7 +58,7 @@ public class IndexModel : PageModel
         if (category == null)
         {
             CategoryName = WebApp.Extensions.ConstantUtil.DecodeTagSlug(slug);
-            CategoryMemo = $"查看 {CategoryName} 分类下的文章内容。";
+            CategoryMemo = null;
         }
         else
         {

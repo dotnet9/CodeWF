@@ -150,7 +150,7 @@
                 @if (Model.TotalPages > 1)
                 {
                     <nav class="pagination-shell" aria-label="@I18n.T("blog.pagination", "博客分页")">
-                        <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 篇文章")</p>
+                        <p class="pagination-summary">@I18n.Format("pagination.postsSummary", "第 {0} / {1} 页，共 {2} 篇文章", Model.PageIndex, Model.TotalPages, Model.Total)</p>
                         <ul class="pagination justify-content-center pagination-list">
                             <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
                                 <a class="page-link" href="@ConstantUtil.GetBlogUrl(Model.PageIndex - 1)">@I18n.T("pagination.previous", "上一页")</a>

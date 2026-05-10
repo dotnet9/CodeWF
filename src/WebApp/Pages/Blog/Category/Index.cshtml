@@ -4,9 +4,13 @@
 @{
     ViewData["Title"] = Model.IsDirectoryPage
         ? I18n.T("home.categories", "分类")
+        : Model.IsDefaultPage
+            ? I18n.T("nav.allCategories", "全部分类")
         : I18n.Format("category.titleWithName", "{0} - 博客分类", I18n.Text(Model.CategoryName));
     ViewData["Description"] = Model.IsDirectoryPage
         ? I18n.T("category.directoryDescription", "浏览码墙全部文章分类。")
+        : Model.IsDefaultPage
+            ? I18n.T("category.defaultDescription", "聚焦同一技术主题下的文章，方便按方向连续阅读。")
         : (string.IsNullOrWhiteSpace(Model.CategoryMemo)
             ? I18n.Format("category.descriptionWithName", "查看 {0} 分类下的技术文章。", I18n.Text(Model.CategoryName))
             : I18n.Text(Model.CategoryMemo));
@@ -21,8 +25,14 @@
         <div class="page-banner">
             <div>
                 <span class="eyebrow">@I18n.T("category.eyebrow", "分类")</span>
-                <h1 class="page-title">@(Model.IsDirectoryPage ? I18n.T("nav.allCategories", "全部分类") : I18n.Text(Model.CategoryName))</h1>
-                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.CategoryMemo) ? I18n.T("category.browseDescription", "按分类浏览站内文章内容。") : I18n.Text(Model.CategoryMemo))</p>
+                <h1 class="page-title">@(Model.IsDirectoryPage || Model.IsDefaultPage ? I18n.T("nav.allCategories", "全部分类") : I18n.Text(Model.CategoryName))</h1>
+                <p class="page-description">@(Model.IsDirectoryPage
+                    ? I18n.T("category.browseDescription", "按分类浏览站内文章内容。")
+                    : Model.IsDefaultPage
+                        ? I18n.T("category.defaultDescription", "聚焦同一技术主题下的文章，方便按方向连续阅读。")
+                    : string.IsNullOrWhiteSpace(Model.CategoryMemo)
+                        ? I18n.Format("category.descriptionWithName", "查看 {0} 分类下的技术文章。", I18n.Text(Model.CategoryName))
+                        : I18n.Text(Model.CategoryMemo))</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {
@@ -112,7 +122,7 @@
                     @if (Model.TotalPages > 1)
                     {
                         <nav class="pagination-shell" aria-label="@I18n.T("category.pagination", "分类分页")">
-                            <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 篇文章")</p>
+                            <p class="pagination-summary">@I18n.Format("pagination.postsSummary", "第 {0} / {1} 页，共 {2} 篇文章", Model.PageIndex, Model.TotalPages, Model.Total)</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
                                     <a class="page-link" href="@ConstantUtil.GetCategoryUrl(categorySlug)?pageIndex=@(Model.PageIndex - 1)">@I18n.T("pagination.previous", "上一页")</a>

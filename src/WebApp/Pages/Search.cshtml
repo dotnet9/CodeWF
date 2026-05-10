@@ -69,13 +69,13 @@
         {
             <div class="search-summary-row">
                 <div class="page-banner__meta">
-                    <span class="meta-chip">@I18n.Text($"关键字：{Model.Query}")</span>
-                    <span class="meta-chip">@I18n.Text($"共 {Model.Total} 条结果")</span>
+                    <span class="meta-chip">@I18n.Format("search.queryMeta", "关键字：{0}", Model.Query)</span>
+                    <span class="meta-chip">@I18n.Format("search.totalResults", "共 {0} 条结果", Model.Total)</span>
                 </div>
                 <div class="page-banner__meta">
-                    <span class="meta-chip">@I18n.Text($"工具 {Model.ToolCount}")</span>
-                    <span class="meta-chip">@I18n.Text($"项目 {Model.DocCount}")</span>
-                    <span class="meta-chip">@I18n.Text($"文章 {Model.PostCount}")</span>
+                    <span class="meta-chip">@I18n.Format("search.toolCount", "工具 {0}", Model.ToolCount)</span>
+                    <span class="meta-chip">@I18n.Format("search.docCount", "项目 {0}", Model.DocCount)</span>
+                    <span class="meta-chip">@I18n.Format("search.postCount", "文章 {0}", Model.PostCount)</span>
                 </div>
             </div>
 
@@ -108,7 +108,7 @@
 
                         <article class="surface-panel search-result-card">
                             <div class="search-result-card__head">
-                                <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@I18n.Text(result.KindLabel)</span>
+                                <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@I18n.T(result.KindLabelKey, result.KindLabel)</span>
                                 @if (result.UpdatedAt.HasValue)
                                 {
                                     <span class="search-result-card__date">@I18n.FormatDate(result.UpdatedAt)</span>
@@ -126,7 +126,7 @@
 
                             @if (!string.IsNullOrWhiteSpace(snippet))
                             {
-                                <p class="search-result-card__matched">@I18n.Text($"匹配内容：{snippet}")</p>
+                                <p class="search-result-card__matched">@I18n.Format("search.matchedContent", "匹配内容：{0}", snippet)</p>
                             }
 
                             <div class="search-result-card__meta">
@@ -151,7 +151,7 @@
                 @if (Model.TotalPages > 1)
                 {
                     <nav class="pagination-shell" aria-label="@I18n.T("search.pagination", "搜索分页")">
-                        <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 条结果")</p>
+                        <p class="pagination-summary">@I18n.Format("pagination.resultsSummary", "第 {0} / {1} 页，共 {2} 条结果", Model.PageIndex, Model.TotalPages, Model.Total)</p>
                         <ul class="pagination justify-content-center pagination-list">
                             <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
                                 <a class="page-link" href="@ConstantUtil.GetSearchUrl(Model.Query, previousPage)">@I18n.T("pagination.previous", "上一页")</a>

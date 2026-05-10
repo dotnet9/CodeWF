@@ -63,9 +63,9 @@
                 </div>
 
                 <div class="hero-trustline">
-                    <a href="@ConstantUtil.GetBlogUrl()" class="hero-trustline__item">@I18n.Text($"{Model.TotalPosts} 篇文章")</a>
-                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="hero-trustline__item">@I18n.Text($"{Model.TotalDocNodes} 个项目条目")</a>
-                    <a href="/tool" class="hero-trustline__item">@I18n.Text($"{Model.TotalToolEntries} 个工具入口")</a>
+                    <a href="@ConstantUtil.GetBlogUrl()" class="hero-trustline__item">@I18n.Format("home.totalPosts", "{0} 篇文章", Model.TotalPosts)</a>
+                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="hero-trustline__item">@I18n.Format("home.totalDocNodes", "{0} 个项目条目", Model.TotalDocNodes)</a>
+                    <a href="/tool" class="hero-trustline__item">@I18n.Format("home.totalToolEntries", "{0} 个工具入口", Model.TotalToolEntries)</a>
                 </div>
             </div>
 

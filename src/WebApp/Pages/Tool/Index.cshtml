@@ -59,7 +59,7 @@
                         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         @I18n.T("tool.clear", "清空")
                     </button>
-                    <span class="tool-list-search__summary" id="tool-list-search-summary">@I18n.Text($"共 {totalToolCount} 个工具")</span>
+                    <span class="tool-list-search__summary" id="tool-list-search-summary">@I18n.Format("tool.totalCount", "共 {0} 个工具", totalToolCount)</span>
                 </div>
 
                 <nav class="tool-directory__nav" aria-label="@I18n.T("tool.categories", "工具分类")">
@@ -187,8 +187,8 @@
 
                 empty.hidden = visibleTools !== 0;
                 summary.textContent = tokens.length === 0
-                    ? codewfTranslate(`共 ${visibleTools} 个工具`)
-                    : codewfTranslate(`匹配 ${visibleTools} 个工具，分布在 ${visibleGroups} 个分组`);
+                    ? codewfFormat('tool.totalCount', '共 {0} 个工具', visibleTools)
+                    : codewfFormat('tool.matchSummary', '匹配 {0} 个工具，分布在 {1} 个分组', visibleTools, visibleGroups);
             }
 
             input.addEventListener('input', applyToolFilter);

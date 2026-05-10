@@ -24,6 +24,14 @@ function codewfTranslate(value) {
     return resource.textMap?.[text] ?? resource.strings?.[text] ?? text;
 }
 
+function codewfFormat(key, fallback, ...args) {
+    const resource = window.CodeWFI18n;
+    const template = String(resource?.strings?.[key] ?? fallback ?? key ?? "");
+    return args.reduce(
+        (text, value, index) => text.replaceAll(`{${index}}`, String(value ?? "")),
+        template);
+}
+
 function initializeI18nText() {
     const resource = window.CodeWFI18n;
     if (!resource || resource.language === "zh-cn") {
@@ -1305,7 +1313,7 @@ function initializeReadingToc() {
 
         const link = document.createElement("a");
         link.href = `#${heading.id}`;
-        link.textContent = heading.textContent?.trim() || codewfTranslate(`章节 ${index + 1}`);
+        link.textContent = heading.textContent?.trim() || codewfFormat("reading.chapterLabel", "章节 {0}", index + 1);
         link.className = `toc-link toc-link--${heading.tagName.toLowerCase()}`;
         link.dataset.targetId = heading.id;
         fragment.appendChild(link);

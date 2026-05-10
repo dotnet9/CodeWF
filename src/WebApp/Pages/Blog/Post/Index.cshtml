@@ -145,7 +145,7 @@
                         {
                             <div class="meta-chip article-banner__meta-card">
                                 <i class="fas fa-rotate-right"></i>
-                                <span>@I18n.Text($"最后更新 {updatedAt}")</span>
+                                <span>@I18n.Format("post.lastUpdated", "最后更新 {0}", updatedAt)</span>
                             </div>
                         }
                         <div class="meta-chip article-banner__meta-card">
@@ -154,7 +154,7 @@
                         </div>
                         <div class="meta-chip article-banner__meta-card">
                             <i class="far fa-clock"></i>
-                            <span>@I18n.Text($"预计阅读 {Model.EstimatedReadingMinutes} 分钟")</span>
+                            <span>@I18n.Format("post.readingTime", "预计阅读 {0} 分钟", Model.EstimatedReadingMinutes)</span>
                         </div>
                     </div>
 

@@ -28,6 +28,14 @@ public class SearchResultItem
         _ => "结果"
     };
 
+    public string KindLabelKey => Kind switch
+    {
+        SearchResultKind.Tool => "search.kind.tool",
+        SearchResultKind.Doc => "search.kind.doc",
+        SearchResultKind.Post => "search.kind.post",
+        _ => "search.kind.result"
+    };
+
     public string KindCssClass => Kind switch
     {
         SearchResultKind.Tool => "tool",
