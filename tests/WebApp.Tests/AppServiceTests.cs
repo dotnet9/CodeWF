@@ -156,8 +156,8 @@ public sealed class AppServiceTests : IDisposable
             RequestLanguage.CurrentLanguage = "ja";
             await appService.SearchAsync("avalonia ui", 1, 10);
 
-            var enPath = Path.Combine(_tempRoot, "i18n", "en", "site", "search-keywords.json");
-            var jaPath = Path.Combine(_tempRoot, "i18n", "ja", "site", "search-keywords.json");
+            var enPath = Path.Combine(_tempRoot, "site", "search-keywords.en.json");
+            var jaPath = Path.Combine(_tempRoot, "site", "search-keywords.ja.json");
 
             Assert.True(File.Exists(enPath));
             Assert.True(File.Exists(jaPath));
@@ -185,7 +185,7 @@ public sealed class AppServiceTests : IDisposable
         try
         {
             var (markdown, htmlContent) = await appService.ReadAboutAsync();
-            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "about.md");
+            var translatedPath = Path.Combine(_tempRoot, "site", "about.en.md");
 
             Assert.True(File.Exists(translatedPath));
             Assert.Contains("Translated content.", markdown);
@@ -213,7 +213,7 @@ public sealed class AppServiceTests : IDisposable
 
             Assert.Contains("中文内容。", markdown);
             Assert.Contains("中文内容", htmlContent);
-            Assert.False(Directory.Exists(Path.Combine(_tempRoot, "i18n", "en")));
+            Assert.False(File.Exists(Path.Combine(_tempRoot, "site", "about.en.md")));
         }
         finally
         {
@@ -461,13 +461,12 @@ public sealed class AppServiceTests : IDisposable
     public async Task GetPostBySlug_CreatesVersionedTranslation_AndDeletesStaleVersion()
     {
         var postDir = Path.Combine(_tempRoot, "2026", "05");
-        var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+        var localizedPostDir = postDir;
         Directory.CreateDirectory(postDir);
-        Directory.CreateDirectory(localizedPostDir);
         var sourcePath = Path.Combine(postDir, "sample-post.md");
-        var stalePath = Path.Combine(localizedPostDir, "sample-post.20260501213214.md");
-        var expectedPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.md");
-        var expectedMetadataPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.yml");
+        var stalePath = Path.Combine(localizedPostDir, "sample-post.20260501213214.en.md");
+        var expectedPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.en.md");
+        var expectedMetadataPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.en.yml");
 
         await File.WriteAllTextAsync(sourcePath, """
             ---
@@ -532,9 +531,8 @@ public sealed class AppServiceTests : IDisposable
     public async Task GetPostBySlug_ReusesLocalizedListCache_WhenTranslationAlreadyExists()
     {
         var postDir = Path.Combine(_tempRoot, "2026", "05");
-        var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+        var localizedPostDir = postDir;
         Directory.CreateDirectory(postDir);
-        Directory.CreateDirectory(localizedPostDir);
         await File.WriteAllTextAsync(Path.Combine(postDir, "cached-post.md"), """
             ---
             title: 中文标题
@@ -550,8 +548,8 @@ public sealed class AppServiceTests : IDisposable
 
             中文正文。
             """);
-        await File.WriteAllTextAsync(Path.Combine(localizedPostDir, "cached-post.20260501213231.md"), "English body.");
-        await File.WriteAllTextAsync(Path.Combine(localizedPostDir, "cached-post.20260501213231.yml"), """
+        await File.WriteAllTextAsync(Path.Combine(localizedPostDir, "cached-post.20260501213231.en.md"), "English body.");
+        await File.WriteAllTextAsync(Path.Combine(localizedPostDir, "cached-post.20260501213231.en.yml"), """
             title: English title
             slug: cached-post
             description: English description
@@ -657,7 +655,52 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAllCategoryItemsAsync_FallsBackToSource_WhenTranslationReturnsEmpty()
+    public async Task GetAllCategoryItemsAsync_FallsBackToSource_WithoutTranslatingJsonResource()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "categories.json"), """
+            [
+              {
+                "Sort": 1,
+                "Name": "中文分类",
+                "Memo": "中文说明",
+                "Slug": "cn-category"
+              }
+            ]
+            """);
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "i18n", "en", "site", "categories.json"), """
+            [
+              {
+                "Sort": 1,
+                "Name": "Legacy category",
+                "Memo": "Legacy memo",
+                "Slug": "cn-category"
+              }
+            ]
+            """);
+
+        var translationService = new EmptyContentTranslationService();
+        using var appService = CreateAppService(translationService);
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var categories = await appService.GetAllCategoryItemsAsync();
+
+            var category = Assert.Single(categories ?? [], static item => item.Slug == "cn-category");
+            Assert.Equal("中文分类", category.Name);
+            Assert.Equal(0, translationService.CallCount);
+            Assert.True(File.Exists(Path.Combine(_tempRoot, "i18n", "en", "site", "categories.json")));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
+    public async Task GetAllCategoryItemsAsync_LoadsSiblingLocalizedJsonResource()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "categories.json"), """
@@ -670,8 +713,18 @@ public sealed class AppServiceTests : IDisposable
               }
             ]
             """);
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "categories.en.json"), """
+            [
+              {
+                "Sort": 1,
+                "Name": "English category",
+                "Memo": "English memo",
+                "Slug": "cn-category"
+              }
+            ]
+            """);
 
-        using var appService = CreateAppService(new EmptyContentTranslationService());
+        using var appService = CreateAppService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
@@ -679,8 +732,8 @@ public sealed class AppServiceTests : IDisposable
             var categories = await appService.GetAllCategoryItemsAsync();
 
             var category = Assert.Single(categories ?? [], static item => item.Slug == "cn-category");
-            Assert.Equal("中文分类", category.Name);
-            Assert.False(File.Exists(Path.Combine(_tempRoot, "i18n", "en", "site", "categories.json")));
+            Assert.Equal("English category", category.Name);
+            Assert.Equal("English memo", category.Memo);
         }
         finally
         {
@@ -692,7 +745,7 @@ public sealed class AppServiceTests : IDisposable
     public async Task LocalizeBlogPostMetadataAsync_CreatesMetadataSidecar_WithoutTranslatingFullArticle()
     {
         var postDir = Path.Combine(_tempRoot, "2026", "05");
-        var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+        var localizedPostDir = postDir;
         Directory.CreateDirectory(postDir);
         await File.WriteAllTextAsync(Path.Combine(postDir, "next-post.md"), """
             ---
@@ -936,7 +989,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task I18nService_CreatesMissingLanguageResource_FromDefaultResource()
+    public async Task I18nService_DoesNotCreateMissingLanguageResource_FromDefaultResource()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
@@ -951,32 +1004,20 @@ public sealed class AppServiceTests : IDisposable
             }
             """);
 
-        var translatedJson = """
-            {
-              "strings": {
-                "nav.home": "Home"
-              },
-              "textMap": {
-                "复制": "Copy"
-              },
-              "patterns": []
-            }
-            """;
-
-        var service = CreateI18nService(new FakeContentTranslationService(translatedJson));
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "zh-tw";
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "i18n", "zh-tw", "site", "lang.json");
+            var translatedPath = Path.Combine(_tempRoot, "site", "lang.zh-tw.json");
             var before = service.GetLanguageResourceStatus("zh-tw");
 
             Assert.False(before.HasResourceFile);
             var prepareResult = await service.PrepareLanguageResourceAsync("zh-tw");
-            Assert.True(prepareResult.CreatedResourceFile);
-            Assert.True(prepareResult.HasResourceFile);
-            Assert.Equal("Home", service.T("nav.home", "fallback"));
-            Assert.True(File.Exists(translatedPath));
+            Assert.False(prepareResult.CreatedResourceFile);
+            Assert.False(prepareResult.HasResourceFile);
+            Assert.Equal("首页", service.T("nav.home", "fallback"));
+            Assert.False(File.Exists(translatedPath));
         }
         finally
         {
@@ -985,7 +1026,52 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task I18nService_TranslatesDiscoveredPageText_WhenLanguageResourceIsMissing()
+    public async Task I18nService_LoadsSiblingLanguageResourceFile()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
+            {
+              "strings": {
+                "nav.home": "首页"
+              },
+              "textMap": {},
+              "patterns": []
+            }
+            """);
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.en.json"), """
+            {
+              "strings": {
+                "nav.home": "Home"
+              },
+              "textMap": {
+                "浏览文章": "Browse posts"
+              },
+              "patterns": []
+            }
+            """);
+
+        var service = CreateI18nService(new ThrowingContentTranslationService());
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var status = service.GetLanguageResourceStatus("en");
+            var prepareResult = await service.PrepareLanguageResourceAsync("en");
+
+            Assert.True(status.HasResourceFile);
+            Assert.False(prepareResult.CreatedResourceFile);
+            Assert.True(prepareResult.HasResourceFile);
+            Assert.Equal("Home", service.T("nav.home", "fallback"));
+            Assert.Equal("Browse posts", service.Text("浏览文章"));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
+    public async Task I18nService_DoesNotTranslateDiscoveredPageText_WhenLanguageResourceIsMissing()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
@@ -1013,20 +1099,20 @@ public sealed class AppServiceTests : IDisposable
             const message = "新链接脚本文案";
             """);
 
-        var service = CreateI18nService(new MappingContentTranslationService());
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json");
+            var translatedPath = Path.Combine(_tempRoot, "site", "lang.en.json");
             await service.PrepareLanguageResourceAsync("en");
 
-            Assert.Equal("[en]新链接页面标题", service.Text("新链接页面标题"));
-            Assert.Equal("[en]新链接提示", service.Text("新链接提示"));
-            Assert.Equal("[en]新链接页面说明", service.Text("新链接页面说明"));
-            Assert.Equal("[en]新链接组件文字", service.Text("新链接组件文字"));
-            Assert.Equal("[en]新链接脚本文案", service.Text("新链接脚本文案"));
-            Assert.True(File.Exists(translatedPath));
+            Assert.Equal("新链接页面标题", service.Text("新链接页面标题"));
+            Assert.Equal("新链接提示", service.Text("新链接提示"));
+            Assert.Equal("新链接页面说明", service.Text("新链接页面说明"));
+            Assert.Equal("新链接组件文字", service.Text("新链接组件文字"));
+            Assert.Equal("新链接脚本文案", service.Text("新链接脚本文案"));
+            Assert.False(File.Exists(translatedPath));
 
             using var clientResource = JsonDocument.Parse(service.GetClientResourceJson());
             Assert.Contains(clientResource.RootElement.GetProperty("languages").EnumerateArray(), item =>
@@ -1039,11 +1125,18 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task I18nService_BackfillsDiscoveredI18nFallbackStrings()
+    public async Task I18nService_UsesDiscoveredFallbackStringsWithoutBackfillingLocalizedResource()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
         await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
+            {
+              "strings": {},
+              "textMap": {},
+              "patterns": []
+            }
+            """);
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.en.json"), """
             {
               "strings": {},
               "textMap": {},
@@ -1055,15 +1148,16 @@ public sealed class AppServiceTests : IDisposable
             <p>@I18n.Format("fallback.count", "{0} 篇文章", 3)</p>
             """);
 
-        var service = CreateI18nService(new MappingContentTranslationService());
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
         {
             await service.PrepareLanguageResourceAsync("en");
 
-            Assert.Equal("[en]新增静态标题", service.T("fallback.title", "fallback"));
-            Assert.Equal("[en]7 篇文章", service.Format("fallback.count", "{0} 篇文章", 7));
+            Assert.Equal("新增静态标题", service.T("fallback.title", "fallback"));
+            Assert.Equal("7 篇文章", service.Format("fallback.count", "{0} 篇文章", 7));
+            Assert.DoesNotContain("fallback.title", await File.ReadAllTextAsync(Path.Combine(_tempRoot, "site", "lang.en.json")));
         }
         finally
         {
@@ -1075,7 +1169,6 @@ public sealed class AppServiceTests : IDisposable
     public void I18nService_Text_AppliesResourcePatterns()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
-        Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
         File.WriteAllText(Path.Combine(_tempRoot, "site", "lang.json"), """
             {
               "strings": {},
@@ -1083,7 +1176,7 @@ public sealed class AppServiceTests : IDisposable
               "patterns": []
             }
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json"), """
+        File.WriteAllText(Path.Combine(_tempRoot, "site", "lang.en.json"), """
             {
               "strings": {},
               "textMap": {},
@@ -1110,10 +1203,9 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task I18nService_BackfillsDiscoveredPageText_WhenLanguageResourceExists()
+    public async Task I18nService_DoesNotBackfillDiscoveredPageText_WhenLanguageResourceExists()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
-        Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
         await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
             {
@@ -1124,7 +1216,7 @@ public sealed class AppServiceTests : IDisposable
               "patterns": []
             }
             """);
-        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.en.json"), """
             {
               "strings": {
                 "nav.home": "Home"
@@ -1139,17 +1231,17 @@ public sealed class AppServiceTests : IDisposable
             <h1>后来新增页面文案</h1>
             """);
 
-        var service = CreateI18nService(new MappingContentTranslationService());
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json");
+            var translatedPath = Path.Combine(_tempRoot, "site", "lang.en.json");
             await service.PrepareLanguageResourceAsync("en");
 
-            Assert.Equal("[en]后来新增页面文案", service.Text("后来新增页面文案"));
-            Assert.Contains("后来新增页面文案", File.ReadAllText(translatedPath));
-            Assert.Contains("[en]后来新增页面文案", File.ReadAllText(translatedPath));
+            Assert.Equal("后来新增页面文案", service.Text("后来新增页面文案"));
+            Assert.DoesNotContain("后来新增页面文案", File.ReadAllText(translatedPath));
+            Assert.DoesNotContain("[en]后来新增页面文案", File.ReadAllText(translatedPath));
         }
         finally
         {
@@ -1158,7 +1250,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task I18nService_RetranslatesEnglishResourceEntries_WhenExistingFileStillContainsChinese()
+    public async Task I18nService_IgnoresLegacyLanguageResourceFile()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
@@ -1188,17 +1280,19 @@ public sealed class AppServiceTests : IDisposable
             }
             """);
 
-        var service = CreateI18nService(new MappingContentTranslationService());
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
         {
+            var status = service.GetLanguageResourceStatus("en");
             await service.PrepareLanguageResourceAsync("en");
 
-            Assert.Equal("[en]首页", service.T("nav.home", "fallback"));
-            Assert.Equal("[en]赞助", service.T("nav.donation", "fallback"));
-            Assert.Equal("[en]浏览文章", service.Text("浏览文章"));
-            Assert.DoesNotContain("copyToClipboard", await File.ReadAllTextAsync(
+            Assert.False(status.HasResourceFile);
+            Assert.Equal("首页", service.T("nav.home", "fallback"));
+            Assert.Equal("赞助", service.T("nav.donation", "fallback"));
+            Assert.Equal("浏览文章", service.Text("浏览文章"));
+            Assert.Contains("copyToClipboard", await File.ReadAllTextAsync(
                 Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json")));
         }
         finally
@@ -1208,7 +1302,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public void I18nService_RetranslatesBadEnglishResource_OnDirectSynchronousAccess()
+    public void I18nService_DirectSynchronousAccessIgnoresLegacyLanguageResourceFile()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
@@ -1235,13 +1329,13 @@ public sealed class AppServiceTests : IDisposable
             }
             """);
 
-        var service = CreateI18nService(new MappingContentTranslationService());
+        var service = CreateI18nService(new ThrowingContentTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
         {
-            Assert.Equal("[en]首页", service.T("nav.home", "fallback"));
-            Assert.Equal("[en]浏览文章", service.Text("浏览文章"));
+            Assert.Equal("首页", service.T("nav.home", "fallback"));
+            Assert.Equal("浏览文章", service.Text("浏览文章"));
         }
         finally
         {
@@ -1283,12 +1377,12 @@ public sealed class AppServiceTests : IDisposable
             Assert.Contains("Web开发", brief.Categories ?? []);
             Assert.Contains("缓存", brief.Tags ?? []);
             Assert.Empty(translationService.Requests);
-            var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+            var localizedPostDir = postDir;
             var metadataFiles = Directory.Exists(localizedPostDir)
                 ? Directory.GetFiles(localizedPostDir, "metadata-list-post.*.yml")
                 : [];
             Assert.Empty(metadataFiles);
-            Assert.False(File.Exists(Path.Combine(_tempRoot, "i18n", "en", "2026", "05", "metadata-list-post.20260501103000.md")));
+            Assert.False(File.Exists(Path.Combine(postDir, "metadata-list-post.20260501103000.en.md")));
         }
         finally
         {
@@ -1344,10 +1438,10 @@ public sealed class AppServiceTests : IDisposable
             Assert.Contains("展示文章", request.Source);
             Assert.DoesNotContain("未展示文章", request.Source);
 
-            var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+            var localizedPostDir = postDir;
             Assert.Single(Directory.GetFiles(localizedPostDir, "displayed-post.*.yml"));
             Assert.Empty(Directory.GetFiles(localizedPostDir, "hidden-post.*.yml"));
-            Assert.Empty(Directory.GetFiles(localizedPostDir, "*.md"));
+            Assert.Empty(Directory.GetFiles(localizedPostDir, "*.en.md"));
         }
         finally
         {
@@ -1378,7 +1472,6 @@ public sealed class AppServiceTests : IDisposable
         var siteOptions = Microsoft.Extensions.Options.Options.Create(new SiteOption
         {
             LocalAssetsDir = _tempRoot,
-            I18nResourcesDir = Path.Combine(_tempRoot, "i18n"),
             StartYear = 2026
         });
 
@@ -1395,7 +1488,6 @@ public sealed class AppServiceTests : IDisposable
         var siteOptions = Microsoft.Extensions.Options.Options.Create(new SiteOption
         {
             LocalAssetsDir = _tempRoot,
-            I18nResourcesDir = Path.Combine(_tempRoot, "i18n"),
             StartYear = 2026
         });
 
@@ -1407,8 +1499,7 @@ public sealed class AppServiceTests : IDisposable
                 ContentRootPath = _tempRoot,
                 WebRootPath = _tempRoot
             },
-            new HttpContextAccessor(),
-            translationService);
+            new HttpContextAccessor());
     }
 
     private static Uri? BuildLanguagePrepareTarget(

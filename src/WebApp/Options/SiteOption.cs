@@ -9,7 +9,6 @@ public class SiteOption
     public string? Memo { get; set; }
     public string? Favicon { get; set; }
     public string? LocalAssetsDir { get; set; }
-    public string? I18nResourcesDir { get; set; }
     public string? RemoteAssetsRepository { get; set; }
     public int StartYear { get; set; }
     public string? BaiAn { get; set; }

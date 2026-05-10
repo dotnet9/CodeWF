@@ -142,11 +142,6 @@ public class AppService : IDisposable
         return ResolveConfiguredDirectory(siteOption.Value.LocalAssetsDir);
     }
 
-    private string? GetI18nResourcesDir()
-    {
-        return ResolveConfiguredDirectory(siteOption.Value.I18nResourcesDir);
-    }
-
     private string? ResolveConfiguredDirectory(string? configuredPath)
     {
         if (string.IsNullOrWhiteSpace(configuredPath))
@@ -161,42 +156,6 @@ public class AppService : IDisposable
 
         return Path.GetFullPath(path);
     }
-
-    private string? GetI18nCultureDir(string language, bool createDirectory = false)
-    {
-        var i18nResourcesDir = GetI18nResourcesDir();
-        if (i18nResourcesDir is null)
-        {
-            return null;
-        }
-
-        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
-        var cultureDir = Path.Combine(i18nResourcesDir, normalizedLanguage);
-        if (createDirectory)
-        {
-            Directory.CreateDirectory(cultureDir);
-        }
-
-        return cultureDir;
-    }
-
-    private string? GetI18nAssetPath(string language, bool createCultureDirectory, params string[] paths)
-    {
-        var cultureDir = GetI18nCultureDir(language, createCultureDirectory);
-        if (cultureDir is null)
-        {
-            return null;
-        }
-
-        var segments = new string[paths.Length + 1];
-        segments[0] = cultureDir;
-        Array.Copy(paths, 0, segments, 1, paths.Length);
-
-        return Path.Combine(segments);
-    }
-
-    private string? GetI18nAssetPath(string language, params string[] paths) =>
-        GetI18nAssetPath(language, false, paths);
 
     private void InitializeAssetWatcher()
     {
@@ -390,23 +349,15 @@ public class AppService : IDisposable
             return sourcePath;
         }
 
-        var targetPath = GetI18nAssetPath(normalizedLanguage, createCultureDirectory: false, sourceSegments);
+        var targetPath = GetLocalizedSiblingAssetPath(sourcePath, normalizedLanguage);
         if (targetPath is null)
         {
             return sourcePath;
         }
 
-        if (File.Exists(targetPath))
+        if (IsJsonAsset(sourcePath))
         {
-            if (await ShouldRepairLocalizedAssetAsync(normalizedLanguage, sourceSegments, sourcePath, targetPath))
-            {
-                File.Delete(targetPath);
-            }
-            else
-            {
-                ClearLocalizationFallback(targetPath);
-                return targetPath;
-            }
+            return File.Exists(targetPath) ? targetPath : sourcePath;
         }
 
         if (File.Exists(targetPath))
@@ -541,9 +492,25 @@ public class AppService : IDisposable
         Path.GetExtension(sourcePath).ToLowerInvariant() switch
         {
             ".md" => ContentTranslationKind.MarkdownPage,
-            ".json" => ContentTranslationKind.JsonResource,
             _ => null
         };
+
+    private static bool IsJsonAsset(string sourcePath) =>
+        string.Equals(Path.GetExtension(sourcePath), ".json", StringComparison.OrdinalIgnoreCase);
+
+    private static string? GetLocalizedSiblingAssetPath(string sourcePath, string language)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language);
+        if (string.IsNullOrWhiteSpace(sourcePath) || string.IsNullOrWhiteSpace(normalizedLanguage))
+        {
+            return null;
+        }
+
+        var directory = Path.GetDirectoryName(sourcePath) ?? string.Empty;
+        var fileName = Path.GetFileNameWithoutExtension(sourcePath);
+        var extension = Path.GetExtension(sourcePath);
+        return Path.Combine(directory, $"{fileName}.{normalizedLanguage}{extension}");
+    }
 
     public async Task SeedAsync()
     {
@@ -1202,7 +1169,7 @@ public class AppService : IDisposable
             var readFilePath = filePath;
             if (!File.Exists(filePath))
             {
-                var legacyFilePath = GetLegacySearchKeywordsFilePath(normalizedLanguage);
+                string? legacyFilePath = null;
                 if (!string.IsNullOrWhiteSpace(legacyFilePath)
                     && File.Exists(legacyFilePath))
                 {
@@ -1366,32 +1333,14 @@ public class AppService : IDisposable
     private string? GetSearchKeywordsFilePath(string language)
     {
         var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
-        if (RequestLanguage.IsDefaultLanguage(normalizedLanguage))
-        {
-            return GetAssetPath("site", SearchKeywordsFileName);
-        }
-
-        return GetI18nAssetPath(normalizedLanguage, true, "site", SearchKeywordsFileName);
-    }
-
-    private string? GetLegacySearchKeywordsFilePath(string? language = null)
-    {
         var defaultPath = GetAssetPath("site", SearchKeywordsFileName);
-        if (string.IsNullOrWhiteSpace(defaultPath))
-        {
-            return null;
-        }
-
-        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
-        if (RequestLanguage.IsDefaultLanguage(normalizedLanguage))
+        if (RequestLanguage.IsDefaultLanguage(normalizedLanguage)
+            || string.IsNullOrWhiteSpace(defaultPath))
         {
             return defaultPath;
         }
 
-        var directory = Path.GetDirectoryName(defaultPath) ?? string.Empty;
-        var fileName = Path.GetFileNameWithoutExtension(defaultPath);
-        var extension = Path.GetExtension(defaultPath);
-        return Path.Combine(directory, $"{fileName}.{normalizedLanguage}{extension}");
+        return GetLocalizedSiblingAssetPath(defaultPath, normalizedLanguage);
     }
 
     private void TouchSearchCacheEntry(string normalizedQuery, SearchCacheEntry cacheEntry)
@@ -2043,12 +1992,10 @@ public class AppService : IDisposable
     {
         var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
         var version = GetBlogPostVersion(sourcePost, sourcePath);
-        var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
         var targetPath = GetLocalizedBlogPostPath(
             sourcePath,
             normalizedLanguage,
-            version,
-            createCultureDirectory: false);
+            version);
         if (targetPath is null)
         {
             return sourcePath;
@@ -2306,8 +2253,7 @@ public class AppService : IDisposable
         var targetPath = GetLocalizedBlogPostMetadataPath(
             sourcePath,
             normalizedLanguage,
-            version,
-            createCultureDirectory: false);
+            version);
         if (targetPath is null)
         {
             return null;
@@ -2317,7 +2263,7 @@ public class AppService : IDisposable
         await gate.WaitAsync();
         try
         {
-            DeleteStaleLocalizedBlogPostMetadata(sourcePath, targetPath, version);
+            DeleteStaleLocalizedBlogPostMetadata(sourcePath, targetPath, version, normalizedLanguage);
             if (File.Exists(targetPath))
             {
                 bool shouldRepair;
@@ -2394,8 +2340,7 @@ public class AppService : IDisposable
     private string? GetLocalizedBlogPostMetadataPath(
         string sourcePath,
         string language,
-        string version,
-        bool createCultureDirectory)
+        string version)
     {
         var localAssetsDir = GetLocalAssetsDir();
         if (localAssetsDir is null)
@@ -2412,22 +2357,17 @@ public class AppService : IDisposable
 
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        var fileName = $"{sourceName}.{version}{BlogPostFiles.MetadataExtension}";
+        var fileName = $"{sourceName}.{version}.{language}{BlogPostFiles.MetadataExtension}";
         return string.IsNullOrWhiteSpace(relativeDirectory)
-            ? GetI18nAssetPath(language, createCultureDirectory, fileName)
-            : GetI18nAssetPath(
-                language,
-                createCultureDirectory,
-                relativeDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                    .Where(static segment => !string.IsNullOrWhiteSpace(segment))
-                    .Concat([fileName])
-                    .ToArray());
+            ? Path.Combine(localAssetsDir, fileName)
+            : Path.Combine(localAssetsDir, relativeDirectory, fileName);
     }
 
     private static void DeleteStaleLocalizedBlogPostMetadata(
         string sourcePath,
         string targetPath,
-        string expectedVersion)
+        string expectedVersion,
+        string language)
     {
         var directory = Path.GetDirectoryName(targetPath);
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
@@ -2442,11 +2382,14 @@ public class AppService : IDisposable
         foreach (var candidate in candidates)
         {
             var fileName = Path.GetFileName(candidate);
-            var isCurrentSidecar = fileName.EndsWith(BlogPostFiles.MetadataExtension, StringComparison.OrdinalIgnoreCase)
-                && fileName.Contains($".{expectedVersion}", StringComparison.OrdinalIgnoreCase);
+            var isCurrentLanguageSidecar = fileName.EndsWith($".{language}{BlogPostFiles.MetadataExtension}", StringComparison.OrdinalIgnoreCase)
+                || fileName.EndsWith($".{language}.meta.json", StringComparison.OrdinalIgnoreCase);
+            var isLegacyVersionSidecar = fileName.EndsWith(BlogPostFiles.MetadataExtension, StringComparison.OrdinalIgnoreCase)
+                && fileName.Contains($".{expectedVersion}", StringComparison.OrdinalIgnoreCase)
+                && !fileName.EndsWith($".{expectedVersion}.{language}{BlogPostFiles.MetadataExtension}", StringComparison.OrdinalIgnoreCase);
             if (string.Equals(fileName, expectedFileName, StringComparison.OrdinalIgnoreCase)
                 || !fileName.StartsWith($"{sourceName}.", StringComparison.OrdinalIgnoreCase)
-                || isCurrentSidecar)
+                || (!isCurrentLanguageSidecar && !isLegacyVersionSidecar))
             {
                 continue;
             }
@@ -2489,8 +2432,7 @@ public class AppService : IDisposable
     private string? GetLocalizedBlogPostPath(
         string sourcePath,
         string language,
-        string version,
-        bool createCultureDirectory)
+        string version)
     {
         var localAssetsDir = GetLocalAssetsDir();
         if (localAssetsDir is null)
@@ -2507,16 +2449,10 @@ public class AppService : IDisposable
 
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        var fileName = $"{sourceName}.{version}.md";
+        var fileName = $"{sourceName}.{version}.{language}.md";
         return string.IsNullOrWhiteSpace(relativeDirectory)
-            ? GetI18nAssetPath(language, createCultureDirectory, fileName)
-            : GetI18nAssetPath(
-                language,
-                createCultureDirectory,
-                relativeDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                    .Where(static segment => !string.IsNullOrWhiteSpace(segment))
-                    .Concat([fileName])
-                    .ToArray());
+            ? Path.Combine(localAssetsDir, fileName)
+            : Path.Combine(localAssetsDir, relativeDirectory, fileName);
     }
 
     private static void DeleteStaleLocalizedBlogPosts(
@@ -2535,6 +2471,11 @@ public class AppService : IDisposable
         foreach (var candidate in Directory.GetFiles(directory, $"{sourceName}.*.md"))
         {
             var fileName = Path.GetFileName(candidate);
+            if (string.Equals(fileName, Path.GetFileName(targetPath), StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
             var match = LocalizedBlogPostFileNameRegex.Match(fileName);
             var legacyMatch = LegacyLocalizedBlogPostFileNameRegex.Match(fileName);
             var isExpectedNewFile = match.Success
@@ -3189,39 +3130,6 @@ public class AppService : IDisposable
         {
             _blogPostSourcePathBySlug[post.Slug.Trim()] = sourcePath;
         }
-    }
-
-    private static async Task<bool> ShouldRepairLocalizedAssetAsync(
-        string language,
-        IReadOnlyList<string> sourceSegments,
-        string sourcePath,
-        string targetPath)
-    {
-        if (RequestLanguage.IsDefaultLanguage(language)
-            || !IsRepairableLocalizedAsset(sourceSegments)
-            || !File.Exists(sourcePath)
-            || !File.Exists(targetPath))
-        {
-            return false;
-        }
-
-        var source = await File.ReadAllTextAsync(sourcePath);
-        var target = await File.ReadAllTextAsync(targetPath);
-        return ContainsOnlySourceCjkText(source, target);
-    }
-
-    private static bool IsRepairableLocalizedAsset(IReadOnlyList<string> sourceSegments)
-    {
-        if (sourceSegments.Count < 2
-            || !string.Equals(sourceSegments[0], "site", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return string.Equals(sourceSegments[1], "albums.json", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sourceSegments[1], "categories.json", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sourceSegments[1], "friend-links.json", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(sourceSegments[1], "timelines.json", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool ShouldRepairLocalizedMetadata(
