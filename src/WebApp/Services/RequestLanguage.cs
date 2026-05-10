@@ -97,28 +97,41 @@ public static class RequestLanguage
 
         var value = language.Trim().Replace('_', '-').ToLowerInvariant();
 
+        if (value.Equals("zh-tw", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("zh-hk", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("zh-mo", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("zh-hant", StringComparison.OrdinalIgnoreCase))
+        {
+            return "zh-tw";
+        }
+
         if (value.Equals("zh", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("zh-hans", StringComparison.OrdinalIgnoreCase)
-            || value.Equals("zh-cn", StringComparison.OrdinalIgnoreCase))
+            || value.Equals("zh-cn", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("zh-sg", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("zh-hans", StringComparison.OrdinalIgnoreCase))
         {
             return DefaultLanguage;
         }
 
-        if (SupportedCodes.Contains(value))
+        if (value.Equals("en", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("en-", StringComparison.OrdinalIgnoreCase))
         {
-            return value;
+            return "en";
         }
 
-        try
+        if (value.Equals("ja", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("jp", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("ja-", StringComparison.OrdinalIgnoreCase))
         {
-            var culture = CultureInfo.GetCultureInfo(value);
-            var normalized = NormalizeCultureName(culture.Name);
-            return SupportedCodes.Contains(normalized) ? normalized : null;
+            return "ja";
         }
-        catch (CultureNotFoundException)
+
+        if (value.StartsWith("zh-", StringComparison.OrdinalIgnoreCase))
         {
-            return null;
+            return DefaultLanguage;
         }
+
+        return SupportedCodes.Contains(value) ? value : null;
     }
 
     public static bool TryGetPathLanguage(PathString path, out string language, out PathString remainingPath)
@@ -282,18 +295,13 @@ public static class RequestLanguage
 
     private static IReadOnlyList<LanguageInfo> BuildSupportedLanguages()
     {
-        var languages = CultureInfo.GetCultures(CultureTypes.NeutralCultures | CultureTypes.SpecificCultures)
-            .Where(static culture => !string.IsNullOrWhiteSpace(culture.Name))
-            .Select(CreateLanguageInfo)
-            .GroupBy(static language => language.Code, StringComparer.OrdinalIgnoreCase)
-            .Select(static group => group.First())
-            .Where(static language => !string.Equals(language.Code, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(static language => language.EnglishName, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(static language => language.Code, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        languages.Insert(0, CreateLanguageInfo(CultureInfo.GetCultureInfo("zh-CN")));
-        return languages;
+        return
+        [
+            CreateLanguageInfo(CultureInfo.GetCultureInfo("zh-CN")),
+            CreateLanguageInfo(CultureInfo.GetCultureInfo("zh-TW")),
+            CreateLanguageInfo(CultureInfo.GetCultureInfo("en")),
+            CreateLanguageInfo(CultureInfo.GetCultureInfo("ja"))
+        ];
     }
 
     private static LanguageInfo CreateLanguageInfo(CultureInfo culture)

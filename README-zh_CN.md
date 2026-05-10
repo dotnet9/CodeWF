@@ -53,7 +53,7 @@ tests/WebApp.Tests/
 - `site/blocked-search-keywords.json`
 - `site/about.md`
 - `site/pays/Donation.md`
-- `2019/` 到当前年份的文章 Markdown 目录
+- `2019/` 到当前年份的文章 Markdown 目录，并使用同名 `.yml` 保存文章元数据
 
 当前前台常用路由包括：
 
@@ -98,7 +98,7 @@ dotnet run
 
 当前测试覆盖了这些基础场景：
 
-- Front Matter 解析
+- 文章 sidecar 元数据解析
 - Markdown 转 HTML
 - 非法搜索关键词拦截
 
@@ -131,9 +131,10 @@ dotnet run --project D:\github\owner\CodeWF\src\WebApp
 ## 内容维护流程
 
 1. 在 `Assets.Dotnet9` 中新增或更新 Markdown、图片和站点数据。
-2. 保持文章 Front Matter 完整，至少包含 `title`、`slug`、`description`、`date`、`categories`、`cover`。
-3. 当分类、专题、文档、工具或友情链接发生变化时，同步更新 `site/*.json`。
-4. 本地运行站点，验证相关页面渲染是否正常。
+2. 文章正文放在 `YYYY/MM/slug.md`，文章元数据放在同名 `YYYY/MM/slug.yml`。
+3. 保持文章元数据完整，至少包含 `title`、`slug`、`description`、`date`、`categories`、`cover`。
+4. 当分类、专题、文档、工具或友情链接发生变化时，同步更新 `site/*.json`。
+5. 本地运行站点，验证相关页面渲染是否正常。
 
 ## 更专业的仓库习惯
 

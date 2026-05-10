@@ -11,8 +11,7 @@ using WebApp.Models;
 using WebApp.Options;
 using CodeWfLogger = CodeWF.Log.Core.Logger;
 using Microsoft.Extensions.Options;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace WebApp.Services;
 
@@ -37,6 +36,10 @@ public class AppService : IDisposable
     };
 
     private static readonly Regex LocalizedBlogPostFileNameRegex = new(
+        @"^(?<slug>.+)\.(?<timestamp>\d{14})\.md$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex LegacyLocalizedBlogPostFileNameRegex = new(
         @"^(?<slug>.+)\.(?<timestamp>\d{14})\.(?<language>[a-z]{2,3}(?:-[a-z0-9]+)*)\.md$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -92,6 +95,12 @@ public class AppService : IDisposable
 
     private sealed record SearchCacheEntry(SearchSnapshot Snapshot, int HitCount, DateTimeOffset LastUsedAt);
     private sealed record SearchQueryStats(string Query, int Count, DateTimeOffset LastSearchedAt);
+    private sealed record BlogPostMetadataTranslation(
+        string? Title,
+        string? Description,
+        List<string>? Albums,
+        List<string>? Categories,
+        List<string>? Tags);
 
     private readonly SemaphoreSlim _searchIndexLock = new(1, 1);
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _searchQueryStatsFileLocks = new(StringComparer.OrdinalIgnoreCase);
@@ -101,6 +110,7 @@ public class AppService : IDisposable
     private readonly IOptions<SiteOption> siteOption;
     private readonly IWebHostEnvironment environment;
     private readonly IContentTranslationService translationService;
+    private readonly ILogger<AppService> logger;
     private readonly object _assetWatcherGate = new();
     private FileSystemWatcher? _assetWatcher;
     private Timer? _assetWatcherDebounceTimer;
@@ -109,11 +119,13 @@ public class AppService : IDisposable
     public AppService(
         IOptions<SiteOption> siteOption,
         IWebHostEnvironment environment,
-        IContentTranslationService? translationService = null)
+        IContentTranslationService? translationService = null,
+        ILogger<AppService>? logger = null)
     {
         this.siteOption = siteOption;
         this.environment = environment;
         this.translationService = translationService ?? NullContentTranslationService.Instance;
+        this.logger = logger ?? NullLogger<AppService>.Instance;
 
         // 仅在开发环境监听资源仓库，便于改 Markdown/JSON 后即时刷新站点内容。
         InitializeAssetWatcher();
@@ -121,19 +133,64 @@ public class AppService : IDisposable
 
     private string? GetLocalAssetsDir()
     {
-        var localAssetsDir = siteOption.Value.LocalAssetsDir;
-        if (string.IsNullOrWhiteSpace(localAssetsDir))
+        return ResolveConfiguredDirectory(siteOption.Value.LocalAssetsDir);
+    }
+
+    private string? GetI18nResourcesDir()
+    {
+        return ResolveConfiguredDirectory(siteOption.Value.I18nResourcesDir);
+    }
+
+    private string? ResolveConfiguredDirectory(string? configuredPath)
+    {
+        if (string.IsNullOrWhiteSpace(configuredPath))
         {
             return null;
         }
 
-        var expandedPath = System.Environment.ExpandEnvironmentVariables(localAssetsDir.Trim());
+        var expandedPath = System.Environment.ExpandEnvironmentVariables(configuredPath.Trim());
         var path = Path.IsPathRooted(expandedPath)
             ? expandedPath
             : Path.Combine(environment.ContentRootPath, expandedPath);
 
         return Path.GetFullPath(path);
     }
+
+    private string? GetI18nCultureDir(string language, bool createDirectory = false)
+    {
+        var i18nResourcesDir = GetI18nResourcesDir();
+        if (i18nResourcesDir is null)
+        {
+            return null;
+        }
+
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var cultureDir = Path.Combine(i18nResourcesDir, normalizedLanguage);
+        if (createDirectory)
+        {
+            Directory.CreateDirectory(cultureDir);
+        }
+
+        return cultureDir;
+    }
+
+    private string? GetI18nAssetPath(string language, bool createCultureDirectory, params string[] paths)
+    {
+        var cultureDir = GetI18nCultureDir(language, createCultureDirectory);
+        if (cultureDir is null)
+        {
+            return null;
+        }
+
+        var segments = new string[paths.Length + 1];
+        segments[0] = cultureDir;
+        Array.Copy(paths, 0, segments, 1, paths.Length);
+
+        return Path.Combine(segments);
+    }
+
+    private string? GetI18nAssetPath(string language, params string[] paths) =>
+        GetI18nAssetPath(language, false, paths);
 
     private void InitializeAssetWatcher()
     {
@@ -196,6 +253,8 @@ public class AppService : IDisposable
         var interestingExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".md",
+            ".yml",
+            ".yaml",
             ".json",
             ".png",
             ".jpg",
@@ -323,7 +382,12 @@ public class AppService : IDisposable
             return sourcePath;
         }
 
-        var targetPath = GetLocalizedSiblingPath(sourcePath, normalizedLanguage);
+        var targetPath = GetI18nAssetPath(normalizedLanguage, createCultureDirectory: false, sourceSegments);
+        if (targetPath is null)
+        {
+            return sourcePath;
+        }
+
         if (File.Exists(targetPath))
         {
             return targetPath;
@@ -347,6 +411,12 @@ public class AppService : IDisposable
             log2UI: false,
             log2File: false,
             log2Console: true);
+        logger.LogInformation(
+            "Localized asset translation started. Language={Language}; Kind={Kind}; Source={SourcePath}; Target={TargetPath}.",
+            normalizedLanguage,
+            kind,
+            sourcePath,
+            targetPath);
         await gate.WaitAsync();
         try
         {
@@ -358,6 +428,12 @@ public class AppService : IDisposable
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                logger.LogInformation(
+                    "Localized asset already exists after waiting. Language={Language}; Kind={Kind}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    normalizedLanguage,
+                    kind,
+                    targetPath,
+                    stopwatch.ElapsedMilliseconds);
                 return targetPath;
             }
 
@@ -377,6 +453,13 @@ public class AppService : IDisposable
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                logger.LogWarning(
+                    "Localized asset translation returned empty result. Language={Language}; Kind={Kind}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    normalizedLanguage,
+                    kind,
+                    sourcePath,
+                    targetPath,
+                    stopwatch.ElapsedMilliseconds);
                 throw new InvalidOperationException(message);
             }
 
@@ -388,6 +471,14 @@ public class AppService : IDisposable
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            logger.LogInformation(
+                "Localized asset saved. Language={Language}; Kind={Kind}; Source={SourcePath}; Target={TargetPath}; OutputChars={OutputChars}; ElapsedMs={ElapsedMs}.",
+                normalizedLanguage,
+                kind,
+                sourcePath,
+                targetPath,
+                translated.Length,
+                stopwatch.ElapsedMilliseconds);
             return targetPath;
         }
         catch (Exception ex)
@@ -399,6 +490,14 @@ public class AppService : IDisposable
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            logger.LogError(
+                ex,
+                "Localized asset translation failed. Language={Language}; Kind={Kind}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                normalizedLanguage,
+                kind,
+                sourcePath,
+                targetPath,
+                stopwatch.ElapsedMilliseconds);
             throw;
         }
         finally
@@ -414,15 +513,6 @@ public class AppService : IDisposable
             ".json" => ContentTranslationKind.JsonResource,
             _ => null
         };
-
-    private static string GetLocalizedSiblingPath(string sourcePath, string language)
-    {
-        var directory = Path.GetDirectoryName(sourcePath) ?? string.Empty;
-        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(sourcePath);
-        var extension = Path.GetExtension(sourcePath);
-
-        return Path.Combine(directory, $"{fileNameWithoutExtension}.{language}{extension}");
-    }
 
     public async Task SeedAsync()
     {
@@ -1026,9 +1116,8 @@ public class AppService : IDisposable
             var readFilePath = filePath;
             if (!File.Exists(filePath))
             {
-                var legacyFilePath = GetLegacySearchKeywordsFilePath();
-                if (RequestLanguage.IsDefaultLanguage(normalizedLanguage)
-                    && !string.IsNullOrWhiteSpace(legacyFilePath)
+                var legacyFilePath = GetLegacySearchKeywordsFilePath(normalizedLanguage);
+                if (!string.IsNullOrWhiteSpace(legacyFilePath)
                     && File.Exists(legacyFilePath))
                 {
                     readFilePath = legacyFilePath;
@@ -1190,22 +1279,33 @@ public class AppService : IDisposable
 
     private string? GetSearchKeywordsFilePath(string language)
     {
-        var legacyPath = GetLegacySearchKeywordsFilePath();
-        if (string.IsNullOrWhiteSpace(legacyPath))
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        if (RequestLanguage.IsDefaultLanguage(normalizedLanguage))
+        {
+            return GetAssetPath("site", SearchKeywordsFileName);
+        }
+
+        return GetI18nAssetPath(normalizedLanguage, true, "site", SearchKeywordsFileName);
+    }
+
+    private string? GetLegacySearchKeywordsFilePath(string? language = null)
+    {
+        var defaultPath = GetAssetPath("site", SearchKeywordsFileName);
+        if (string.IsNullOrWhiteSpace(defaultPath))
         {
             return null;
         }
 
         var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
-        var directory = Path.GetDirectoryName(legacyPath) ?? string.Empty;
-        var fileName = Path.GetFileNameWithoutExtension(legacyPath);
-        var extension = Path.GetExtension(legacyPath);
-        return Path.Combine(directory, $"{fileName}.{normalizedLanguage}{extension}");
-    }
+        if (RequestLanguage.IsDefaultLanguage(normalizedLanguage))
+        {
+            return defaultPath;
+        }
 
-    private string? GetLegacySearchKeywordsFilePath()
-    {
-        return GetAssetPath("site", SearchKeywordsFileName);
+        var directory = Path.GetDirectoryName(defaultPath) ?? string.Empty;
+        var fileName = Path.GetFileNameWithoutExtension(defaultPath);
+        var extension = Path.GetExtension(defaultPath);
+        return Path.Combine(directory, $"{fileName}.{normalizedLanguage}{extension}");
     }
 
     private void TouchSearchCacheEntry(string normalizedQuery, SearchCacheEntry cacheEntry)
@@ -1852,6 +1952,7 @@ public class AppService : IDisposable
         }
 
         var localizedPost = await ReadBlogPostAsync(localizedPath, renderContent);
+        localizedPost.SourcePath = sourcePath;
         localizedPost.Slug = sourcePost.Slug;
         localizedPost.Date = sourcePost.Date;
         localizedPost.Lastmod = sourcePost.Lastmod;
@@ -1875,9 +1976,17 @@ public class AppService : IDisposable
     {
         var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
         var version = GetBlogPostVersion(sourcePost, sourcePath);
-        var directory = Path.GetDirectoryName(sourcePath) ?? string.Empty;
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        var targetPath = Path.Combine(directory, $"{sourceName}.{version}.{normalizedLanguage}.md");
+        var targetPath = GetLocalizedBlogPostPath(
+            sourcePath,
+            normalizedLanguage,
+            version,
+            createCultureDirectory: false);
+        if (targetPath is null)
+        {
+            return sourcePath;
+        }
+
         var gate = _localizedAssetLocks.GetOrAdd(targetPath, _ => new SemaphoreSlim(1, 1));
         var stopwatch = createMissingTranslation ? Stopwatch.StartNew() : null;
         if (createMissingTranslation)
@@ -1887,14 +1996,25 @@ public class AppService : IDisposable
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            logger.LogInformation(
+                "Localized article translation started. Language={Language}; Slug={Slug}; Source={SourcePath}; Target={TargetPath}.",
+                normalizedLanguage,
+                sourcePost.Slug,
+                sourcePath,
+                targetPath);
         }
 
         await gate.WaitAsync();
         try
         {
-            DeleteStaleLocalizedBlogPosts(sourcePath, version, normalizedLanguage);
+            DeleteStaleLocalizedBlogPosts(sourcePath, targetPath, version, normalizedLanguage);
             if (File.Exists(targetPath))
             {
+                if (createMissingTranslation)
+                {
+                    await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, normalizedLanguage);
+                }
+
                 stopwatch?.Stop();
                 if (stopwatch is not null)
                 {
@@ -1903,6 +2023,12 @@ public class AppService : IDisposable
                         log2UI: false,
                         log2File: false,
                         log2Console: true);
+                    logger.LogInformation(
+                        "Localized article already exists. Language={Language}; Slug={Slug}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                        normalizedLanguage,
+                        sourcePost.Slug,
+                        targetPath,
+                        stopwatch.ElapsedMilliseconds);
                 }
 
                 return targetPath;
@@ -1913,11 +2039,11 @@ public class AppService : IDisposable
                 return sourcePath;
             }
 
-            var source = await File.ReadAllTextAsync(sourcePath);
+            var source = await BlogPostFiles.ReadBodyAsync(sourcePath);
             var translated = await translationService.TranslateAsync(
                 source,
                 RequestLanguage.GetLanguage(normalizedLanguage),
-                ContentTranslationKind.MarkdownArticle,
+                ContentTranslationKind.MarkdownPage,
                 resourceName: targetPath);
 
             if (string.IsNullOrWhiteSpace(translated))
@@ -1929,17 +2055,35 @@ public class AppService : IDisposable
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                logger.LogWarning(
+                    "Localized article translation returned empty result. Language={Language}; Slug={Slug}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    normalizedLanguage,
+                    sourcePost.Slug,
+                    sourcePath,
+                    targetPath,
+                    stopwatch?.ElapsedMilliseconds ?? 0);
                 throw new InvalidOperationException(message);
             }
 
-            translated = PreserveArticleFrontMatter(source, translated);
-            await File.WriteAllTextAsync(targetPath, translated);
+            Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
+            await WriteAllTextAtomicallyAsync(targetPath, translated.Trim());
+            await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, normalizedLanguage);
+            _blogPostsByLanguage.TryRemove(normalizedLanguage, out _);
+            _searchIndexByLanguage.TryRemove(normalizedLanguage, out _);
             stopwatch?.Stop();
             CodeWfLogger.Info(
                 $"语言文章生成完成。language={normalizedLanguage}; slug={sourcePost.Slug}; outputChars={translated.Length}; elapsedMs={stopwatch?.ElapsedMilliseconds ?? 0}; target={targetPath}.",
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            logger.LogInformation(
+                "Localized article saved. Language={Language}; Slug={Slug}; Source={SourcePath}; Target={TargetPath}; OutputChars={OutputChars}; ElapsedMs={ElapsedMs}.",
+                normalizedLanguage,
+                sourcePost.Slug,
+                sourcePath,
+                targetPath,
+                translated.Length,
+                stopwatch?.ElapsedMilliseconds ?? 0);
             return targetPath;
         }
         catch (Exception ex)
@@ -1953,6 +2097,14 @@ public class AppService : IDisposable
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                logger.LogError(
+                    ex,
+                    "Localized article translation failed. Language={Language}; Slug={Slug}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    normalizedLanguage,
+                    sourcePost.Slug,
+                    sourcePath,
+                    targetPath,
+                    stopwatch.ElapsedMilliseconds);
             }
 
             throw;
@@ -1963,22 +2115,296 @@ public class AppService : IDisposable
         }
     }
 
-    private static void DeleteStaleLocalizedBlogPosts(string sourcePath, string expectedVersion, string language)
+    public async Task<BlogPost?> LocalizeBlogPostMetadataAsync(BlogPost? post)
     {
-        var directory = Path.GetDirectoryName(sourcePath);
+        if (post is null)
+        {
+            return null;
+        }
+
+        var language = RequestLanguage.Normalize(RequestLanguage.CurrentLanguage) ?? RequestLanguage.DefaultLanguage;
+        if (RequestLanguage.IsDefaultLanguage(language))
+        {
+            return post;
+        }
+
+        var sourcePath = post.SourcePath;
+        if (string.IsNullOrWhiteSpace(sourcePath) && !string.IsNullOrWhiteSpace(post.Slug))
+        {
+            sourcePath = await FindBlogPostSourcePathBySlugAsync(post.Slug);
+        }
+
+        if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+        {
+            return post;
+        }
+
+        // 详情页的上下篇和相关推荐只需要标题/摘要等 Front Matter 信息。
+        // 没有完整本地化文章时，只生成小体积 metadata sidecar，避免为了一个卡片翻译整篇正文。
+        var sourcePost = await ReadBlogPostAsync(sourcePath, renderContent: false);
+        var localizedArticlePath = await GetOrCreateLocalizedBlogPostPathAsync(
+            sourcePath,
+            sourcePost,
+            language,
+            createMissingTranslation: false);
+        if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase))
+        {
+            return await ReadLocalizedBlogPostAsync(
+                sourcePath,
+                language,
+                createMissingTranslation: false,
+                renderContent: false);
+        }
+
+        var metadataPath = await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, language);
+        if (metadataPath is null || !File.Exists(metadataPath))
+        {
+            return post;
+        }
+
+        try
+        {
+            var metadataPost = await BlogPostFiles.ReadMetadataAsync(metadataPath);
+            var metadata = new BlogPostMetadataTranslation(
+                metadataPost.Title,
+                metadataPost.Description,
+                metadataPost.Albums,
+                metadataPost.Categories,
+                metadataPost.Tags);
+            return ApplyLocalizedMetadata(post, metadata);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Localized article metadata could not be loaded. Language={Language}; Slug={Slug}; MetadataPath={MetadataPath}.",
+                language,
+                post.Slug,
+                metadataPath);
+            return post;
+        }
+    }
+
+    private async Task<string?> GetOrCreateLocalizedBlogPostMetadataPathAsync(
+        string sourcePath,
+        BlogPost sourcePost,
+        string language)
+    {
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var version = GetBlogPostVersion(sourcePost, sourcePath);
+        var targetPath = GetLocalizedBlogPostMetadataPath(
+            sourcePath,
+            normalizedLanguage,
+            version,
+            createCultureDirectory: false);
+        if (targetPath is null)
+        {
+            return null;
+        }
+
+        var gate = _localizedAssetLocks.GetOrAdd(targetPath, _ => new SemaphoreSlim(1, 1));
+        await gate.WaitAsync();
+        try
+        {
+            DeleteStaleLocalizedBlogPostMetadata(sourcePath, targetPath, version);
+            if (File.Exists(targetPath))
+            {
+                return targetPath;
+            }
+
+            var resource = JsonSerializer.Serialize(
+                new BlogPostMetadataTranslation(
+                    sourcePost.Title,
+                    sourcePost.Description,
+                    sourcePost.Albums,
+                    sourcePost.Categories,
+                    sourcePost.Tags),
+                WriteJsonOptions);
+            var translated = await translationService.TranslateAsync(
+                resource,
+                RequestLanguage.GetLanguage(normalizedLanguage),
+                ContentTranslationKind.JsonResource,
+                resourceName: targetPath);
+            if (string.IsNullOrWhiteSpace(translated))
+            {
+                return null;
+            }
+
+            var metadata = JsonSerializer.Deserialize<BlogPostMetadataTranslation>(translated, JsonOptions);
+            if (metadata is null)
+            {
+                return null;
+            }
+
+            var metadataYaml = BlogPostFiles.SerializeMetadata(ApplyLocalizedMetadata(sourcePost, metadata));
+            await WriteAllTextAtomicallyAsync(targetPath, metadataYaml);
+            _blogPostsByLanguage.TryRemove(normalizedLanguage, out _);
+            _searchIndexByLanguage.TryRemove(normalizedLanguage, out _);
+            return targetPath;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    private string? GetLocalizedBlogPostMetadataPath(
+        string sourcePath,
+        string language,
+        string version,
+        bool createCultureDirectory)
+    {
+        var localAssetsDir = GetLocalAssetsDir();
+        if (localAssetsDir is null)
+        {
+            return null;
+        }
+
+        var relativePath = Path.GetRelativePath(localAssetsDir, sourcePath);
+        if (relativePath.StartsWith("..", StringComparison.Ordinal)
+            || Path.IsPathRooted(relativePath))
+        {
+            return null;
+        }
+
+        var relativeDirectory = Path.GetDirectoryName(relativePath);
+        var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
+        var fileName = $"{sourceName}.{version}{BlogPostFiles.MetadataExtension}";
+        return string.IsNullOrWhiteSpace(relativeDirectory)
+            ? GetI18nAssetPath(language, createCultureDirectory, fileName)
+            : GetI18nAssetPath(
+                language,
+                createCultureDirectory,
+                relativeDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                    .Where(static segment => !string.IsNullOrWhiteSpace(segment))
+                    .Concat([fileName])
+                    .ToArray());
+    }
+
+    private static void DeleteStaleLocalizedBlogPostMetadata(
+        string sourcePath,
+        string targetPath,
+        string expectedVersion)
+    {
+        var directory = Path.GetDirectoryName(targetPath);
         if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
         {
             return;
         }
 
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        foreach (var candidate in Directory.GetFiles(directory, $"{sourceName}.*.{language}.md"))
+        var expectedFileName = Path.GetFileName(targetPath);
+        var candidates = Directory.GetFiles(directory, $"{sourceName}.*{BlogPostFiles.MetadataExtension}")
+            .Concat(Directory.GetFiles(directory, $"{sourceName}.*.meta.json"));
+        foreach (var candidate in candidates)
         {
-            var match = LocalizedBlogPostFileNameRegex.Match(Path.GetFileName(candidate));
-            if (!match.Success
-                || !string.Equals(match.Groups["slug"].Value, sourceName, StringComparison.OrdinalIgnoreCase)
-                || !string.Equals(match.Groups["language"].Value, language, StringComparison.OrdinalIgnoreCase)
-                || string.Equals(match.Groups["timestamp"].Value, expectedVersion, StringComparison.OrdinalIgnoreCase))
+            var fileName = Path.GetFileName(candidate);
+            var isCurrentSidecar = fileName.EndsWith(BlogPostFiles.MetadataExtension, StringComparison.OrdinalIgnoreCase)
+                && fileName.Contains($".{expectedVersion}", StringComparison.OrdinalIgnoreCase);
+            if (string.Equals(fileName, expectedFileName, StringComparison.OrdinalIgnoreCase)
+                || !fileName.StartsWith($"{sourceName}.", StringComparison.OrdinalIgnoreCase)
+                || isCurrentSidecar)
+            {
+                continue;
+            }
+
+            File.Delete(candidate);
+            var sidecarPath = BlogPostFiles.GetMetadataPath(candidate);
+            if (File.Exists(sidecarPath))
+            {
+                File.Delete(sidecarPath);
+            }
+        }
+    }
+
+    private static BlogPost ApplyLocalizedMetadata(BlogPost post, BlogPostMetadataTranslation metadata)
+    {
+        return new BlogPost
+        {
+            SourcePath = post.SourcePath,
+            Title = string.IsNullOrWhiteSpace(metadata.Title) ? post.Title : metadata.Title,
+            Slug = post.Slug,
+            Description = string.IsNullOrWhiteSpace(metadata.Description) ? post.Description : metadata.Description,
+            Date = post.Date,
+            Lastmod = post.Lastmod,
+            Copyright = post.Copyright,
+            Banner = post.Banner,
+            Author = post.Author,
+            LastModifyUser = post.LastModifyUser,
+            OriginalTitle = post.OriginalTitle,
+            OriginalLink = post.OriginalLink,
+            Draft = post.Draft,
+            Cover = post.Cover,
+            Albums = metadata.Albums?.Count > 0 ? metadata.Albums : post.Albums?.ToList(),
+            Categories = metadata.Categories?.Count > 0 ? metadata.Categories : post.Categories?.ToList(),
+            Tags = metadata.Tags?.Count > 0 ? metadata.Tags : post.Tags?.ToList(),
+            Content = post.Content,
+            HtmlContent = post.HtmlContent
+        };
+    }
+
+    private string? GetLocalizedBlogPostPath(
+        string sourcePath,
+        string language,
+        string version,
+        bool createCultureDirectory)
+    {
+        var localAssetsDir = GetLocalAssetsDir();
+        if (localAssetsDir is null)
+        {
+            return null;
+        }
+
+        var relativePath = Path.GetRelativePath(localAssetsDir, sourcePath);
+        if (relativePath.StartsWith("..", StringComparison.Ordinal)
+            || Path.IsPathRooted(relativePath))
+        {
+            return null;
+        }
+
+        var relativeDirectory = Path.GetDirectoryName(relativePath);
+        var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
+        var fileName = $"{sourceName}.{version}.md";
+        return string.IsNullOrWhiteSpace(relativeDirectory)
+            ? GetI18nAssetPath(language, createCultureDirectory, fileName)
+            : GetI18nAssetPath(
+                language,
+                createCultureDirectory,
+                relativeDirectory.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                    .Where(static segment => !string.IsNullOrWhiteSpace(segment))
+                    .Concat([fileName])
+                    .ToArray());
+    }
+
+    private static void DeleteStaleLocalizedBlogPosts(
+        string sourcePath,
+        string targetPath,
+        string expectedVersion,
+        string language)
+    {
+        var directory = Path.GetDirectoryName(targetPath);
+        if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+        {
+            return;
+        }
+
+        var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
+        foreach (var candidate in Directory.GetFiles(directory, $"{sourceName}.*.md"))
+        {
+            var fileName = Path.GetFileName(candidate);
+            var match = LocalizedBlogPostFileNameRegex.Match(fileName);
+            var legacyMatch = LegacyLocalizedBlogPostFileNameRegex.Match(fileName);
+            var isExpectedNewFile = match.Success
+                && string.Equals(match.Groups["slug"].Value, sourceName, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(match.Groups["timestamp"].Value, expectedVersion, StringComparison.OrdinalIgnoreCase);
+            var isStaleNewFile = match.Success
+                && string.Equals(match.Groups["slug"].Value, sourceName, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(match.Groups["timestamp"].Value, expectedVersion, StringComparison.OrdinalIgnoreCase);
+            var isStaleLegacyFile = legacyMatch.Success
+                && string.Equals(legacyMatch.Groups["slug"].Value, sourceName, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(legacyMatch.Groups["language"].Value, language, StringComparison.OrdinalIgnoreCase);
+
+            if (isExpectedNewFile || (!isStaleNewFile && !isStaleLegacyFile))
             {
                 continue;
             }
@@ -1993,122 +2419,34 @@ public class AppService : IDisposable
         return versionTime.ToString("yyyyMMddHHmmss");
     }
 
+    private static async Task WriteAllTextAtomicallyAsync(string path, string content)
+    {
+        // 翻译文件写一半会污染后续缓存读取，所以先写同目录临时文件，再原子替换目标文件。
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var tempPath = $"{path}.{Guid.NewGuid():N}.tmp";
+        try
+        {
+            await File.WriteAllTextAsync(tempPath, content, Encoding.UTF8);
+            File.Move(tempPath, path, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                File.Delete(tempPath);
+            }
+        }
+    }
+
     private static bool IsLocalizedBlogPostFile(string path) =>
-        LocalizedBlogPostFileNameRegex.IsMatch(Path.GetFileName(path));
-
-    private static string PreserveArticleFrontMatter(string sourceMarkdown, string translatedMarkdown)
-    {
-        if (!TrySplitFrontMatter(sourceMarkdown, out var sourceFrontMatter, out _)
-            || !TrySplitFrontMatter(translatedMarkdown, out var translatedFrontMatter, out var translatedBody))
-        {
-            return translatedMarkdown;
-        }
-
-        var protectedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "slug",
-            "date",
-            "lastmod",
-            "cover",
-            "banner",
-            "author",
-            "lastModifyUser",
-            "originalTitle",
-            "originalLink",
-            "copyright",
-            "draft"
-        };
-
-        var sourceBlocks = ParseFrontMatterBlocks(sourceFrontMatter);
-        var translatedBlocks = ParseFrontMatterBlocks(translatedFrontMatter);
-        var outputBlocks = new List<string>();
-        var emittedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var block in translatedBlocks)
-        {
-            if (protectedKeys.Contains(block.Key) && sourceBlocks.TryGetValue(block.Key, out var sourceBlock))
-            {
-                outputBlocks.Add(sourceBlock);
-            }
-            else
-            {
-                outputBlocks.Add(block.Value);
-            }
-
-            emittedKeys.Add(block.Key);
-        }
-
-        foreach (var block in sourceBlocks)
-        {
-            if (protectedKeys.Contains(block.Key) && !emittedKeys.Contains(block.Key))
-            {
-                outputBlocks.Add(block.Value);
-            }
-        }
-
-        return $"---{Environment.NewLine}{string.Join(Environment.NewLine, outputBlocks)}{Environment.NewLine}---{Environment.NewLine}{Environment.NewLine}{translatedBody.Trim()}";
-    }
-
-    private static bool TrySplitFrontMatter(string markdown, out string frontMatter, out string body)
-    {
-        frontMatter = string.Empty;
-        body = markdown;
-
-        if (!markdown.StartsWith("---", StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        var endOfFrontMatter = markdown.IndexOf("---", 3, StringComparison.Ordinal);
-        if (endOfFrontMatter == -1)
-        {
-            return false;
-        }
-
-        frontMatter = markdown[3..endOfFrontMatter].Trim();
-        body = markdown[(endOfFrontMatter + 3)..].Trim();
-        return true;
-    }
-
-    private static Dictionary<string, string> ParseFrontMatterBlocks(string frontMatter)
-    {
-        var blocks = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var lines = frontMatter.Replace("\r\n", "\n").Split('\n');
-        string? currentKey = null;
-        var currentLines = new List<string>();
-
-        void Flush()
-        {
-            if (!string.IsNullOrWhiteSpace(currentKey) && currentLines.Count > 0)
-            {
-                blocks[currentKey] = string.Join(Environment.NewLine, currentLines);
-            }
-        }
-
-        foreach (var line in lines)
-        {
-            var separatorIndex = line.IndexOf(':', StringComparison.Ordinal);
-            var isTopLevelKey = separatorIndex > 0
-                && !char.IsWhiteSpace(line[0])
-                && line[..separatorIndex].All(static c => char.IsLetterOrDigit(c) || c is '-' or '_');
-
-            if (isTopLevelKey)
-            {
-                Flush();
-                currentKey = line[..separatorIndex];
-                currentLines = [line];
-                continue;
-            }
-
-            if (currentKey is not null)
-            {
-                currentLines.Add(line);
-            }
-        }
-
-        Flush();
-        return blocks;
-    }
+        LocalizedBlogPostFileNameRegex.IsMatch(Path.GetFileName(path))
+        || LegacyLocalizedBlogPostFileNameRegex.IsMatch(Path.GetFileName(path))
+        || Path.GetFileName(path).EndsWith(".meta.json", StringComparison.OrdinalIgnoreCase);
 
     public async Task<List<BlogPostBrief>?> GetAllBlogPostBriefsAsync()
     {
@@ -2401,6 +2739,7 @@ public class AppService : IDisposable
 
     private static BlogPostBrief ToBlogPostBrief(BlogPost post) => new()
     {
+        SourcePath = post.SourcePath,
         Title = post.Title,
         Slug = post.Slug,
         Description = post.Description,
@@ -2564,52 +2903,8 @@ public class AppService : IDisposable
     public static Task<BlogPost> ReadBlogPostAsync(string markdownFilePath) =>
         ReadBlogPostAsync(markdownFilePath, renderContent: true);
 
-    private static async Task<BlogPost> ReadBlogPostAsync(string markdownFilePath, bool renderContent)
-    {
-        var markdown = await File.ReadAllTextAsync(markdownFilePath);
-        // 约定 Front Matter 必须放在文件开头，先切出 YAML，再把剩余正文交给 Markdown 渲染。
-        var endOfFrontMatter = markdown.IndexOf("---", 3, StringComparison.Ordinal);
-        if (endOfFrontMatter == -1)
-        {
-            throw new InvalidOperationException("Invalid markdown format. No ending '---' found for Front Matter.");
-        }
-
-        var frontMatterText = markdown[..(endOfFrontMatter + 3)];
-        var markdownContent = markdown[(endOfFrontMatter + 3)..].Trim();
-        if (frontMatterText.StartsWith("---"))
-        {
-            frontMatterText = frontMatterText[3..].Trim();
-        }
-
-        if (frontMatterText.EndsWith("---"))
-        {
-            frontMatterText = frontMatterText[..^3].Trim();
-        }
-
-        var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .Build();
-
-        BlogPost blogPost;
-        try
-        {
-            blogPost = deserializer.Deserialize<BlogPost>(frontMatterText);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to deserialize blog post front matter: {markdownFilePath}. {ex.Message}");
-
-            blogPost = new BlogPost();
-        }
-
-        if (renderContent)
-        {
-            blogPost.Content = markdownContent;
-            blogPost.HtmlContent = markdownContent.ToHtml();
-        }
-
-        return blogPost;
-    }
+    private static Task<BlogPost> ReadBlogPostAsync(string markdownFilePath, bool renderContent) =>
+        BlogPostFiles.ReadAsync(markdownFilePath, renderContent);
 
     public async Task<List<FriendLinkItem>?> GetAllFriendLinkItemsAsync()
     {

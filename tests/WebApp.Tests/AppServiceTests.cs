@@ -2,7 +2,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Net;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using WebApp.Options;
 using WebApp.Services;
 
@@ -68,6 +74,32 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task ReadBlogPostAsync_PrefersSidecarMetadata_WhenYmlExists()
+    {
+        Directory.CreateDirectory(_tempRoot);
+        var markdownFilePath = Path.Combine(_tempRoot, "sidecar-post.md");
+        await File.WriteAllTextAsync(markdownFilePath, """
+            # Body title
+
+            Body content.
+            """);
+        await File.WriteAllTextAsync(Path.ChangeExtension(markdownFilePath, ".yml"), """
+            title: Sidecar title
+            slug: sidecar-post
+            description: Metadata stored outside markdown.
+            date: 2026-05-01 12:00:00
+            draft: false
+            """);
+
+        var post = await AppService.ReadBlogPostAsync(markdownFilePath);
+
+        Assert.Equal("Sidecar title", post.Title);
+        Assert.Equal("sidecar-post", post.Slug);
+        Assert.Contains("Body content.", post.Content);
+        Assert.Contains("<h1", post.HtmlContent);
+    }
+
+    [Fact]
     public async Task SearchAsync_ReturnsBlockedNotice_WhenQueryMatchesBlockedKeyword()
     {
         Directory.CreateDirectory(_tempRoot);
@@ -121,8 +153,8 @@ public sealed class AppServiceTests : IDisposable
             RequestLanguage.CurrentLanguage = "ja";
             await appService.SearchAsync("avalonia ui", 1, 10);
 
-            var enPath = Path.Combine(_tempRoot, "site", "search-keywords.en.json");
-            var jaPath = Path.Combine(_tempRoot, "site", "search-keywords.ja.json");
+            var enPath = Path.Combine(_tempRoot, "i18n", "en", "site", "search-keywords.json");
+            var jaPath = Path.Combine(_tempRoot, "i18n", "ja", "site", "search-keywords.json");
 
             Assert.True(File.Exists(enPath));
             Assert.True(File.Exists(jaPath));
@@ -150,7 +182,7 @@ public sealed class AppServiceTests : IDisposable
         try
         {
             var (markdown, htmlContent) = await appService.ReadAboutAsync();
-            var translatedPath = Path.Combine(_tempRoot, "site", "about.en.md");
+            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "about.md");
 
             Assert.True(File.Exists(translatedPath));
             Assert.Contains("Translated content.", markdown);
@@ -164,13 +196,217 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task ReadAboutAsync_DoesNotCreateCultureDirectory_WhenTranslationFails()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "about.md"), "# 关于\n\n中文内容。");
+
+        var appService = CreateAppService(NullContentTranslationService.Instance);
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            await Assert.ThrowsAsync<InvalidOperationException>(() => appService.ReadAboutAsync());
+
+            Assert.False(Directory.Exists(Path.Combine(_tempRoot, "i18n", "en")));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+            appService.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task BaiduFanyiContentTranslationService_UsesUniversalTranslateApi_WithAppIdSign()
+    {
+        var handler = new CapturingHttpMessageHandler("""
+            {
+              "from": "zh",
+              "to": "en",
+              "trans_result": [
+                {
+                  "src": "你好",
+                  "dst": "Hello"
+                }
+              ]
+            }
+            """);
+        var service = new BaiduFanyiContentTranslationService(
+            Microsoft.Extensions.Options.Options.Create(new BaiduFanyiOption
+            {
+                AppID = "app123",
+                Key = "secret",
+                Endpoint = "https://example.test/api/trans/vip/translate"
+            }),
+            new SingleClientHttpClientFactory(new HttpClient(handler)),
+            NullLogger<BaiduFanyiContentTranslationService>.Instance);
+
+        var translated = await service.TranslateAsync(
+            "你好",
+            RequestLanguage.GetLanguage("en"),
+            ContentTranslationKind.MarkdownPage);
+
+        Assert.Equal("Hello", translated);
+        Assert.NotNull(handler.Request);
+        Assert.Equal(HttpMethod.Post, handler.Request.Method);
+        Assert.Equal("https://example.test/api/trans/vip/translate", handler.Request.RequestUri?.ToString());
+        Assert.Null(handler.Request.Headers.Authorization);
+        var form = ParseForm(handler.Body ?? string.Empty);
+        Assert.Equal("app123", form["appid"]);
+        Assert.Equal("你好", form["q"]);
+        Assert.Equal("zh", form["from"]);
+        Assert.Equal("en", form["to"]);
+        Assert.Equal(CreateMd5($"app123你好{form["salt"]}secret"), form["sign"]);
+    }
+
+    [Fact]
+    public async Task TencentFanyiContentTranslationService_UsesAppIdAndKey_BeforeLegacyAliases()
+    {
+        var service = new TencentFanyiContentTranslationService(
+            Microsoft.Extensions.Options.Options.Create(new TencentFanyiOption
+            {
+                AppID = "test-tencent-secret-id",
+                Key = "credential-key",
+                SecretId = "your secret id",
+                SecretKey = "your secret key"
+            }),
+            NullLogger<TencentFanyiContentTranslationService>.Instance);
+
+        var translated = await service.TranslateAsync(
+            "plain ascii",
+            RequestLanguage.GetLanguage("en"),
+            ContentTranslationKind.MarkdownPage);
+
+        Assert.Equal("plain ascii", translated);
+    }
+
+    [Fact]
+    public void TencentFanyiContentTranslationService_UsesSdkProtocolFormat()
+    {
+        var getProtocol = typeof(TencentFanyiContentTranslationService).GetMethod(
+            "GetProtocol",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.NotNull(getProtocol);
+        Assert.Equal("https://", getProtocol.Invoke(null, [new TencentFanyiOption()]));
+        Assert.Equal("http://", getProtocol.Invoke(null, [new TencentFanyiOption
+        {
+            Endpoint = "http://tmt.tencentcloudapi.com"
+        }]));
+    }
+
+    [Fact]
+    public void TencentFanyiContentTranslationService_UsesConservativeRateLimitDefaults()
+    {
+        var getMaxCharsPerRequest = typeof(TencentFanyiContentTranslationService).GetMethod(
+            "GetMaxCharsPerRequest",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        var getMaxRequestsPerSecond = typeof(TencentFanyiContentTranslationService).GetMethod(
+            "GetMaxRequestsPerSecond",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        var getRetryDelay = typeof(TencentFanyiContentTranslationService).GetMethod(
+            "GetRetryDelay",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        var getMemoryCacheLimit = typeof(TencentFanyiContentTranslationService).GetMethod(
+            "GetMemoryCacheLimit",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        Assert.NotNull(getMaxCharsPerRequest);
+        Assert.NotNull(getMaxRequestsPerSecond);
+        Assert.NotNull(getRetryDelay);
+        Assert.NotNull(getMemoryCacheLimit);
+        Assert.Equal(5999, getMaxCharsPerRequest.Invoke(null, [new TencentFanyiOption()]));
+        Assert.Equal(5999, getMaxCharsPerRequest.Invoke(null, [new TencentFanyiOption
+        {
+            MaxCharsPerRequest = 6000
+        }]));
+        Assert.Equal(500, getMaxCharsPerRequest.Invoke(null, [new TencentFanyiOption
+        {
+            MaxCharsPerRequest = 100
+        }]));
+        Assert.Equal(4, getMaxRequestsPerSecond.Invoke(null, [new TencentFanyiOption()]));
+        Assert.Equal(1, getMaxRequestsPerSecond.Invoke(null, [new TencentFanyiOption
+        {
+            MaxRequestsPerSecond = 0
+        }]));
+        Assert.Equal(10000, getMemoryCacheLimit.Invoke(null, [new TencentFanyiOption()]));
+        Assert.Equal(0, getMemoryCacheLimit.Invoke(null, [new TencentFanyiOption
+        {
+            MemoryCacheLimit = 0
+        }]));
+        Assert.Equal(
+            TimeSpan.FromSeconds(2),
+            getRetryDelay.Invoke(null, [new InvalidOperationException("超过了每秒频率上限"), 0]));
+        Assert.Equal(
+            TimeSpan.FromMilliseconds(200),
+            getRetryDelay.Invoke(null, [new InvalidOperationException("temporary"), 0]));
+    }
+
+    [Fact]
+    public async Task StructuredContentTranslation_BatchesJsonResourceStrings()
+    {
+        var requests = new List<string>();
+
+        Task<string?> TranslateChunkAsync(
+            string source,
+            LanguageInfo targetLanguage,
+            string resource,
+            int chunkIndex,
+            int chunkCount,
+            CancellationToken cancellationToken)
+        {
+            requests.Add(source);
+            return Task.FromResult<string?>(TranslateStructuredBatchPayload(source));
+        }
+
+        var translated = await StructuredContentTranslation.TranslateAsync(
+            """
+            {
+              "strings": {
+                "home": "首页",
+                "copy": "复制",
+                "shortcut": "按 \\ 键复制",
+                "slug": "keep-slug"
+              },
+              "items": [
+                { "title": "标题一" },
+                { "title": "标题二" }
+              ]
+            }
+            """,
+            RequestLanguage.GetLanguage("en"),
+            ContentTranslationKind.JsonResource,
+            "test.json",
+            5999,
+            TranslateChunkAsync,
+            CancellationToken.None);
+
+        Assert.Single(requests);
+        Assert.Contains("000000\t首页", requests[0], StringComparison.Ordinal);
+        Assert.Contains("000004\t标题二", requests[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("CODEWF_I18N", requests[0], StringComparison.Ordinal);
+        using var document = JsonDocument.Parse(translated!);
+        var root = document.RootElement;
+        Assert.Equal("[en]首页", root.GetProperty("strings").GetProperty("home").GetString());
+        Assert.Equal("[en]复制", root.GetProperty("strings").GetProperty("copy").GetString());
+        Assert.Equal("[en]按 \\ 键复制", root.GetProperty("strings").GetProperty("shortcut").GetString());
+        Assert.Equal("keep-slug", root.GetProperty("strings").GetProperty("slug").GetString());
+        Assert.Equal("[en]标题一", root.GetProperty("items")[0].GetProperty("title").GetString());
+        Assert.Equal("[en]标题二", root.GetProperty("items")[1].GetProperty("title").GetString());
+    }
+
+    [Fact]
     public async Task GetPostBySlug_CreatesVersionedTranslation_AndDeletesStaleVersion()
     {
         var postDir = Path.Combine(_tempRoot, "2026", "05");
+        var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
         Directory.CreateDirectory(postDir);
+        Directory.CreateDirectory(localizedPostDir);
         var sourcePath = Path.Combine(postDir, "sample-post.md");
-        var stalePath = Path.Combine(postDir, "sample-post.20260501213214.en.md");
-        var expectedPath = Path.Combine(postDir, "sample-post.20260501213231.en.md");
+        var stalePath = Path.Combine(localizedPostDir, "sample-post.20260501213214.md");
+        var expectedPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.md");
+        var expectedMetadataPath = Path.Combine(localizedPostDir, "sample-post.20260501213231.yml");
 
         await File.WriteAllTextAsync(sourcePath, """
             ---
@@ -202,24 +438,7 @@ public sealed class AppServiceTests : IDisposable
             Old body.
             """);
 
-        var translatedMarkdown = """
-            ---
-            title: English title
-            slug: sample-post
-            description: English description
-            date: 2026-05-01 10:30:00
-            lastmod: 2026-05-01 21:32:31
-            categories:
-              - Web Development
-            tags:
-              - Website Rebuild
-            draft: false
-            ---
-
-            English body.
-            """;
-
-        var appService = CreateAppService(new FakeContentTranslationService(translatedMarkdown));
+        var appService = CreateAppService(new ArticleSidecarTranslationService());
         RequestLanguage.CurrentLanguage = "en";
 
         try
@@ -232,15 +451,69 @@ public sealed class AppServiceTests : IDisposable
             Assert.Contains("Web Development", post.Categories ?? []);
             Assert.Contains("Website Rebuild", post.Tags ?? []);
             Assert.True(File.Exists(expectedPath));
+            Assert.True(File.Exists(expectedMetadataPath));
             Assert.False(File.Exists(stalePath));
             var translatedFile = await File.ReadAllTextAsync(expectedPath);
-            Assert.Contains("  - Web Development", translatedFile);
-            Assert.Contains("  - Website Rebuild", translatedFile);
+            Assert.Equal("English body.", translatedFile.Trim());
+            var translatedMetadata = await File.ReadAllTextAsync(expectedMetadataPath);
+            Assert.Contains("title: \"English title\"", translatedMetadata);
+            Assert.Contains("  - \"Web Development\"", translatedMetadata);
+            Assert.Contains("  - \"Website Rebuild\"", translatedMetadata);
         }
         finally
         {
             RequestLanguage.Clear();
             appService.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task LocalizeBlogPostMetadataAsync_CreatesMetadataSidecar_WithoutTranslatingFullArticle()
+    {
+        var postDir = Path.Combine(_tempRoot, "2026", "05");
+        var localizedPostDir = Path.Combine(_tempRoot, "i18n", "en", "2026", "05");
+        Directory.CreateDirectory(postDir);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "next-post.md"), """
+            ---
+            title: 下一篇标题
+            slug: next-post
+            description: 下一篇描述
+            date: 2026-05-02 10:00:00
+            categories:
+              - 技术文章
+            tags:
+              - 翻译
+            draft: false
+            ---
+
+            这里是正文，元数据本地化不应该翻译整篇正文。
+            """);
+
+        var translationService = new PrefixMetadataTranslationService();
+        using var appService = CreateAppService(translationService);
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var posts = await appService.GetAllBlogPostsAsync();
+            var post = Assert.Single(posts ?? []);
+
+            var localized = await appService.LocalizeBlogPostMetadataAsync(post);
+
+            Assert.NotNull(localized);
+            Assert.Equal("[en]下一篇标题", localized.Title);
+            Assert.Equal("[en]下一篇描述", localized.Description);
+            Assert.Contains("[en]技术文章", localized.Categories ?? []);
+            Assert.Contains("[en]翻译", localized.Tags ?? []);
+            Assert.Single(translationService.Requests);
+            Assert.Equal(ContentTranslationKind.JsonResource, translationService.Requests[0].Kind);
+            Assert.DoesNotContain("这里是正文", translationService.Requests[0].Source, StringComparison.Ordinal);
+            Assert.Single(Directory.GetFiles(localizedPostDir, "next-post.*.yml"));
+            Assert.Empty(Directory.GetFiles(localizedPostDir, "next-post.*.md"));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
         }
     }
 
@@ -355,10 +628,25 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public void I18nService_CreatesMissingLanguageResource_FromDefaultResource()
+    public void RequestLanguage_SupportsOnlyConfiguredLanguages_AndNormalizesAliases()
     {
-        Directory.CreateDirectory(Path.Combine(_tempRoot, "site", "i18n"));
-        File.WriteAllText(Path.Combine(_tempRoot, "site", "i18n", "zh-cn.json"), """
+        var codes = RequestLanguage.SupportedLanguages.Select(static language => language.Code).ToArray();
+
+        Assert.Equal(new[] { "zh-cn", "zh-tw", "en", "ja" }, codes);
+        Assert.Equal("zh-cn", RequestLanguage.Normalize("zh-Hans-CN"));
+        Assert.Equal("zh-tw", RequestLanguage.Normalize("zh-Hant"));
+        Assert.Equal("zh-tw", RequestLanguage.Normalize("zh-HK"));
+        Assert.Equal("en", RequestLanguage.Normalize("en-US"));
+        Assert.Equal("ja", RequestLanguage.Normalize("ja-JP"));
+        Assert.Null(RequestLanguage.Normalize("fr"));
+        Assert.Null(RequestLanguage.Normalize("af-za"));
+    }
+
+    [Fact]
+    public async Task I18nService_CreatesMissingLanguageResource_FromDefaultResource()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
             {
               "strings": {
                 "nav.home": "首页"
@@ -383,15 +671,15 @@ public sealed class AppServiceTests : IDisposable
             """;
 
         var service = CreateI18nService(new FakeContentTranslationService(translatedJson));
-        RequestLanguage.CurrentLanguage = "fr";
+        RequestLanguage.CurrentLanguage = "zh-tw";
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "site", "i18n", "fr.json");
-            var before = service.GetLanguageResourceStatus("fr");
+            var translatedPath = Path.Combine(_tempRoot, "i18n", "zh-tw", "site", "lang.json");
+            var before = service.GetLanguageResourceStatus("zh-tw");
 
             Assert.False(before.HasResourceFile);
-            var prepareResult = service.PrepareLanguageResource("fr");
+            var prepareResult = await service.PrepareLanguageResourceAsync("zh-tw");
             Assert.True(prepareResult.CreatedResourceFile);
             Assert.True(prepareResult.HasResourceFile);
             Assert.Equal("Home", service.T("nav.home", "fallback"));
@@ -404,13 +692,13 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public void I18nService_TranslatesDiscoveredPageText_WhenLanguageResourceIsMissing()
+    public async Task I18nService_TranslatesDiscoveredPageText_WhenLanguageResourceIsMissing()
     {
-        Directory.CreateDirectory(Path.Combine(_tempRoot, "site", "i18n"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Views", "Shared", "Components", "NewWidget"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "wwwroot", "js"));
-        File.WriteAllText(Path.Combine(_tempRoot, "site", "i18n", "zh-cn.json"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
             {
               "strings": {
                 "nav.home": "首页"
@@ -419,16 +707,16 @@ public sealed class AppServiceTests : IDisposable
               "patterns": []
             }
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "Pages", "NewPage.cshtml"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "Pages", "NewPage.cshtml"), """
             <section>
                 <h1>新链接页面标题</h1>
                 <p title="新链接提示">新链接页面说明</p>
             </section>
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "Views", "Shared", "Components", "NewWidget", "Default.cshtml"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "Views", "Shared", "Components", "NewWidget", "Default.cshtml"), """
             <strong>新链接组件文字</strong>
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "wwwroot", "js", "new-page.js"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "wwwroot", "js", "new-page.js"), """
             const message = "新链接脚本文案";
             """);
 
@@ -437,7 +725,8 @@ public sealed class AppServiceTests : IDisposable
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "site", "i18n", "en.json");
+            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json");
+            await service.PrepareLanguageResourceAsync("en");
 
             Assert.Equal("[en]新链接页面标题", service.Text("新链接页面标题"));
             Assert.Equal("[en]新链接提示", service.Text("新链接提示"));
@@ -457,11 +746,12 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public void I18nService_BackfillsDiscoveredPageText_WhenLanguageResourceExists()
+    public async Task I18nService_BackfillsDiscoveredPageText_WhenLanguageResourceExists()
     {
-        Directory.CreateDirectory(Path.Combine(_tempRoot, "site", "i18n"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
-        File.WriteAllText(Path.Combine(_tempRoot, "site", "i18n", "zh-cn.json"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
             {
               "strings": {
                 "nav.home": "首页"
@@ -470,7 +760,7 @@ public sealed class AppServiceTests : IDisposable
               "patterns": []
             }
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "site", "i18n", "en.json"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json"), """
             {
               "strings": {
                 "nav.home": "Home"
@@ -481,7 +771,7 @@ public sealed class AppServiceTests : IDisposable
               "patterns": []
             }
             """);
-        File.WriteAllText(Path.Combine(_tempRoot, "Pages", "AnotherPage.cshtml"), """
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "Pages", "AnotherPage.cshtml"), """
             <h1>后来新增页面文案</h1>
             """);
 
@@ -490,7 +780,8 @@ public sealed class AppServiceTests : IDisposable
 
         try
         {
-            var translatedPath = Path.Combine(_tempRoot, "site", "i18n", "en.json");
+            var translatedPath = Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json");
+            await service.PrepareLanguageResourceAsync("en");
 
             Assert.Equal("[en]后来新增页面文案", service.Text("后来新增页面文案"));
             Assert.Contains("后来新增页面文案", File.ReadAllText(translatedPath));
@@ -525,6 +816,7 @@ public sealed class AppServiceTests : IDisposable
         var siteOptions = Microsoft.Extensions.Options.Options.Create(new SiteOption
         {
             LocalAssetsDir = _tempRoot,
+            I18nResourcesDir = Path.Combine(_tempRoot, "i18n"),
             StartYear = 2026
         });
 
@@ -541,6 +833,7 @@ public sealed class AppServiceTests : IDisposable
         var siteOptions = Microsoft.Extensions.Options.Options.Create(new SiteOption
         {
             LocalAssetsDir = _tempRoot,
+            I18nResourcesDir = Path.Combine(_tempRoot, "i18n"),
             StartYear = 2026
         });
 
@@ -581,6 +874,72 @@ public sealed class AppServiceTests : IDisposable
         return null;
     }
 
+    private static Dictionary<string, string> ParseForm(string form)
+    {
+        return form
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(static item => item.Split('=', 2))
+            .Where(static parts => parts.Length == 2)
+            .ToDictionary(
+                static parts => Uri.UnescapeDataString(parts[0].Replace("+", " ", StringComparison.Ordinal)),
+                static parts => Uri.UnescapeDataString(parts[1].Replace("+", " ", StringComparison.Ordinal)),
+                StringComparer.Ordinal);
+    }
+
+    private static string CreateMd5(string value)
+    {
+        var bytes = MD5.HashData(Encoding.UTF8.GetBytes(value));
+        return Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    private static string TranslateStructuredBatchPayload(string source)
+    {
+        return Regex.Replace(
+            source,
+            @"(?m)^(?<id>\d{6})\s+(?<value>.*)$",
+            static match => $"{match.Groups["id"].Value}\t[en]{match.Groups["value"].Value}");
+    }
+
+    private sealed class SingleClientHttpClientFactory : IHttpClientFactory
+    {
+        private readonly HttpClient _client;
+
+        public SingleClientHttpClientFactory(HttpClient client)
+        {
+            _client = client;
+        }
+
+        public HttpClient CreateClient(string name) => _client;
+    }
+
+    private sealed class CapturingHttpMessageHandler : HttpMessageHandler
+    {
+        private readonly string _response;
+
+        public CapturingHttpMessageHandler(string response)
+        {
+            _response = response;
+        }
+
+        public HttpRequestMessage? Request { get; private set; }
+        public string? Body { get; private set; }
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            Request = request;
+            Body = request.Content is null
+                ? null
+                : await request.Content.ReadAsStringAsync(cancellationToken);
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(_response, Encoding.UTF8, "application/json")
+            };
+        }
+    }
+
     private sealed class FakeContentTranslationService : IContentTranslationService
     {
         private readonly string _translated;
@@ -597,6 +956,32 @@ public sealed class AppServiceTests : IDisposable
             string? resourceName = null,
             CancellationToken cancellationToken = default) =>
             Task.FromResult<string?>(_translated);
+    }
+
+    private sealed class ArticleSidecarTranslationService : IContentTranslationService
+    {
+        public Task<string?> TranslateAsync(
+            string source,
+            LanguageInfo targetLanguage,
+            ContentTranslationKind kind,
+            string? resourceName = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (kind == ContentTranslationKind.MarkdownPage)
+            {
+                return Task.FromResult<string?>("English body.");
+            }
+
+            return Task.FromResult<string?>("""
+                {
+                  "Title": "English title",
+                  "Description": "English description",
+                  "Albums": null,
+                  "Categories": ["Web Development"],
+                  "Tags": ["Website Rebuild"]
+                }
+                """);
+        }
     }
 
     private sealed class MappingContentTranslationService : IContentTranslationService
@@ -625,6 +1010,49 @@ public sealed class AppServiceTests : IDisposable
             }
 
             return Task.FromResult<string?>(JsonSerializer.Serialize(resource));
+        }
+    }
+
+    private sealed class PrefixMetadataTranslationService : IContentTranslationService
+    {
+        public List<(ContentTranslationKind Kind, string Source)> Requests { get; } = [];
+
+        public Task<string?> TranslateAsync(
+            string source,
+            LanguageInfo targetLanguage,
+            ContentTranslationKind kind,
+            string? resourceName = null,
+            CancellationToken cancellationToken = default)
+        {
+            Requests.Add((kind, source));
+            using var document = JsonDocument.Parse(source);
+            var root = document.RootElement;
+            var payload = new
+            {
+                Title = Prefix(root, "Title", targetLanguage.Code),
+                Description = Prefix(root, "Description", targetLanguage.Code),
+                Albums = PrefixArray(root, "Albums", targetLanguage.Code),
+                Categories = PrefixArray(root, "Categories", targetLanguage.Code),
+                Tags = PrefixArray(root, "Tags", targetLanguage.Code)
+            };
+            return Task.FromResult<string?>(JsonSerializer.Serialize(payload));
+        }
+
+        private static string? Prefix(JsonElement root, string propertyName, string language)
+        {
+            return root.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String
+                ? $"[{language}]{value.GetString()}"
+                : null;
+        }
+
+        private static List<string>? PrefixArray(JsonElement root, string propertyName, string language)
+        {
+            return root.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.Array
+                ? value.EnumerateArray()
+                    .Where(static item => item.ValueKind == JsonValueKind.String)
+                    .Select(item => $"[{language}]{item.GetString()}")
+                    .ToList()
+                : null;
         }
     }
 }

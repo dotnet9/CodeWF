@@ -15,6 +15,11 @@
 		<PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.5.2" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
 		<PackageReference Include="QRCoder" Version="1.6.0" />
+		<PackageReference Include="TencentCloudSDK" Version="3.0.1422" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="WebApp.Tests" />
 	</ItemGroup>
 
 </Project>

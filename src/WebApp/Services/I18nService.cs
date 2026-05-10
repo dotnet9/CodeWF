@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using CodeWfLogger = CodeWF.Log.Core.Logger;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using WebApp.Options;
 
@@ -60,6 +61,7 @@ public sealed class I18nService
     private readonly IWebHostEnvironment _environment;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IContentTranslationService _translationService;
+    private readonly ILogger<I18nService> _logger;
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _resourceFileLocks = new(StringComparer.OrdinalIgnoreCase);
     private IReadOnlyCollection<string>? _discoveredDefaultTexts;
 
@@ -67,12 +69,14 @@ public sealed class I18nService
         IOptions<SiteOption> siteOption,
         IWebHostEnvironment environment,
         IHttpContextAccessor httpContextAccessor,
-        IContentTranslationService translationService)
+        IContentTranslationService translationService,
+        ILogger<I18nService>? logger = null)
     {
         _siteOption = siteOption;
         _environment = environment;
         _httpContextAccessor = httpContextAccessor;
         _translationService = translationService;
+        _logger = logger ?? NullLogger<I18nService>.Instance;
     }
 
     public IReadOnlyList<LanguageInfo> Languages => RequestLanguage.SupportedLanguages;
@@ -96,7 +100,9 @@ public sealed class I18nService
             hasResourceFile);
     }
 
-    public LanguageResourcePrepareResult PrepareLanguageResource(string? language)
+    public async Task<LanguageResourcePrepareResult> PrepareLanguageResourceAsync(
+        string? language,
+        CancellationToken cancellationToken = default)
     {
         var before = GetLanguageResourceStatus(language);
         var stopwatch = Stopwatch.StartNew();
@@ -107,10 +113,24 @@ public sealed class I18nService
             log2Console: true);
 
         _resources.TryRemove(before.Code, out _);
-        var resource = GetResource(before.Code);
+        var resource = await GetResourceAsync(before.Code, cancellationToken);
         var after = GetLanguageResourceStatus(before.Code);
 
         stopwatch.Stop();
+        if (!after.IsDefaultLanguage && !after.HasResourceFile)
+        {
+            CodeWfLogger.Warn(
+                $"i18n 语言资源预热未生成文件，当前返回内容为默认资源回退。language={after.Code}; target={GetResourceFilePath(after.Code)}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            _logger.LogWarning(
+                "I18n language resource file was not generated and fallback resource is being returned. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                after.Code,
+                GetResourceFilePath(after.Code),
+                stopwatch.ElapsedMilliseconds);
+        }
+
         CodeWfLogger.Info(
             $"i18n 语言资源预热完成。language={after.Code}; hadResourceFile={before.HasResourceFile}; hasResourceFile={after.HasResourceFile}; strings={resource.Strings.Count}; textMap={resource.TextMap.Count}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
             log2UI: false,
@@ -212,6 +232,19 @@ public sealed class I18nService
         return _resources.GetOrAdd(normalized, LoadResource);
     }
 
+    private async Task<I18nResource> GetResourceAsync(string language, CancellationToken cancellationToken)
+    {
+        var normalized = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        if (_resources.TryGetValue(normalized, out var cached))
+        {
+            return cached;
+        }
+
+        var resource = await LoadResourceAsync(normalized, cancellationToken);
+        _resources[normalized] = resource;
+        return resource;
+    }
+
     private I18nResource LoadResource(string language)
     {
         if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
@@ -224,10 +257,36 @@ public sealed class I18nService
         var parent = parentLanguage is null
             ? new I18nResource()
             : LoadResourceFile(parentLanguage) ?? new I18nResource();
-        var current = LoadResourceFile(language)
-            ?? CreateResourceFileFromDefault(language, fallback)
+        var current = LoadResourceFile(language) ?? new I18nResource();
+
+        return new I18nResource
+        {
+            Strings = Merge(Merge(fallback.Strings, parent.Strings), current.Strings),
+            TextMap = Merge(Merge(fallback.TextMap, parent.TextMap), current.TextMap),
+            Patterns = current.Patterns.Count > 0
+                ? current.Patterns
+                : parent.Patterns.Count > 0
+                    ? parent.Patterns
+                    : fallback.Patterns
+        };
+    }
+
+    private async Task<I18nResource> LoadResourceAsync(string language, CancellationToken cancellationToken)
+    {
+        if (string.Equals(language, RequestLanguage.DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+        {
+            return await LoadDefaultResourceAsync(cancellationToken);
+        }
+
+        var fallback = await LoadDefaultResourceAsync(cancellationToken);
+        var parentLanguage = GetParentLanguage(language);
+        var parent = parentLanguage is null
+            ? new I18nResource()
+            : await LoadResourceFileAsync(parentLanguage, cancellationToken) ?? new I18nResource();
+        var current = await LoadResourceFileAsync(language, cancellationToken)
+            ?? await CreateResourceFileFromDefaultAsync(language, fallback, cancellationToken)
             ?? new I18nResource();
-        current = CompleteResourceFromDefault(language, fallback, parent, current);
+        current = await CompleteResourceFromDefaultAsync(language, fallback, parent, current, cancellationToken);
 
         return new I18nResource
         {
@@ -245,6 +304,13 @@ public sealed class I18nService
     {
         var resource = LoadResourceFile(RequestLanguage.DefaultLanguage) ?? new I18nResource();
         EnrichDefaultResource(resource);
+        return resource;
+    }
+
+    private async Task<I18nResource> LoadDefaultResourceAsync(CancellationToken cancellationToken)
+    {
+        var resource = await LoadResourceFileAsync(RequestLanguage.DefaultLanguage, cancellationToken) ?? new I18nResource();
+        await EnrichDefaultResourceAsync(resource, cancellationToken);
         return resource;
     }
 
@@ -268,32 +334,122 @@ public sealed class I18nService
         }
     }
 
+    private async Task<I18nResource?> LoadResourceFileAsync(string language, CancellationToken cancellationToken)
+    {
+        var filePath = GetResourceFilePath(language);
+        if (filePath is null || !File.Exists(filePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            var json = await File.ReadAllTextAsync(filePath, cancellationToken);
+            return JsonSerializer.Deserialize<I18nResource>(json, ReadJsonOptions);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Console.WriteLine($"Failed to load i18n resource {language}: {ex.Message}");
+            return null;
+        }
+    }
+
     private bool HasResourceFile(string language)
     {
         var filePath = GetResourceFilePath(language);
         return !string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath);
     }
 
-    private string? GetResourceFilePath(string language) => GetAssetPath("site", "i18n", $"{language}.json");
-
-    private string? GetAssetPath(params string[] paths)
+    private string? GetResourceFilePath(string language)
     {
-        var localAssetsDir = _siteOption.Value.LocalAssetsDir;
-        if (string.IsNullOrWhiteSpace(localAssetsDir))
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        return RequestLanguage.IsDefaultLanguage(normalizedLanguage)
+            ? GetDefaultResourceFilePath()
+            : GetI18nResourceFilePath(normalizedLanguage);
+    }
+
+    private string? GetDefaultResourceFilePath()
+    {
+        var primaryPath = GetAssetPath("site", "lang.json");
+        if (!string.IsNullOrWhiteSpace(primaryPath) && File.Exists(primaryPath))
+        {
+            return primaryPath;
+        }
+
+        var legacyPath = GetAssetPath("site", "i18n", $"{RequestLanguage.DefaultLanguage}.json");
+        return !string.IsNullOrWhiteSpace(legacyPath) && File.Exists(legacyPath)
+            ? legacyPath
+            : primaryPath;
+    }
+
+    private string? GetI18nResourceFilePath(string language, bool createCultureDirectory = false) =>
+        GetI18nAssetPath(language, createCultureDirectory, "site", "lang.json");
+
+    private string? GetI18nAssetPath(string language, bool createCultureDirectory, params string[] paths)
+    {
+        var cultureDir = GetI18nCultureDir(language, createCultureDirectory);
+        if (cultureDir is null)
         {
             return null;
         }
 
-        var expandedPath = Environment.ExpandEnvironmentVariables(localAssetsDir.Trim());
-        var root = Path.IsPathRooted(expandedPath)
-            ? expandedPath
-            : Path.Combine(_environment.ContentRootPath, expandedPath);
-
         var segments = new string[paths.Length + 1];
-        segments[0] = Path.GetFullPath(root);
+        segments[0] = cultureDir;
         Array.Copy(paths, 0, segments, 1, paths.Length);
 
         return Path.Combine(segments);
+    }
+
+    private string? GetI18nCultureDir(string language, bool createDirectory = false)
+    {
+        var i18nResourcesDir = GetI18nResourcesDir();
+        if (i18nResourcesDir is null)
+        {
+            return null;
+        }
+
+        var normalizedLanguage = RequestLanguage.Normalize(language) ?? RequestLanguage.DefaultLanguage;
+        var cultureDir = Path.Combine(i18nResourcesDir, normalizedLanguage);
+        if (createDirectory)
+        {
+            Directory.CreateDirectory(cultureDir);
+        }
+
+        return cultureDir;
+    }
+
+    private string? GetAssetPath(params string[] paths)
+    {
+        var root = GetLocalAssetsDir();
+        if (root is null)
+        {
+            return null;
+        }
+
+        var segments = new string[paths.Length + 1];
+        segments[0] = root;
+        Array.Copy(paths, 0, segments, 1, paths.Length);
+
+        return Path.Combine(segments);
+    }
+
+    private string? GetLocalAssetsDir() => ResolveConfiguredDirectory(_siteOption.Value.LocalAssetsDir);
+
+    private string? GetI18nResourcesDir() => ResolveConfiguredDirectory(_siteOption.Value.I18nResourcesDir);
+
+    private string? ResolveConfiguredDirectory(string? configuredPath)
+    {
+        if (string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return null;
+        }
+
+        var expandedPath = Environment.ExpandEnvironmentVariables(configuredPath.Trim());
+        var path = Path.IsPathRooted(expandedPath)
+            ? expandedPath
+            : Path.Combine(_environment.ContentRootPath, expandedPath);
+
+        return Path.GetFullPath(path);
     }
 
     private static Dictionary<string, string> Merge(
@@ -311,12 +467,29 @@ public sealed class I18nService
 
     private I18nResource? CreateResourceFileFromDefault(string language, I18nResource defaultResource)
     {
-        var defaultFilePath = GetAssetPath("site", "i18n", $"{RequestLanguage.DefaultLanguage}.json");
-        var targetFilePath = GetAssetPath("site", "i18n", $"{language}.json");
-        if (defaultFilePath is null
-            || targetFilePath is null
-            || !File.Exists(defaultFilePath)
-            || File.Exists(targetFilePath))
+        var defaultFilePath = GetDefaultResourceFilePath();
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: false);
+        if (defaultFilePath is null || !File.Exists(defaultFilePath))
+        {
+            CodeWfLogger.Warn(
+                $"i18n 语言资源未生成，默认资源文件不存在。language={language}; source={defaultFilePath ?? "(null)"}; target={targetFilePath ?? "(null)"}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            return null;
+        }
+
+        if (targetFilePath is null)
+        {
+            CodeWfLogger.Warn(
+                $"i18n 语言资源未生成，目标资源路径为空。language={language}; source={defaultFilePath}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            return null;
+        }
+
+        if (File.Exists(targetFilePath))
         {
             return null;
         }
@@ -328,6 +501,11 @@ public sealed class I18nService
             log2UI: false,
             log2File: false,
             log2Console: true);
+        _logger.LogInformation(
+            "I18n language resource translation started. Language={Language}; Source={SourcePath}; Target={TargetPath}.",
+            language,
+            defaultFilePath,
+            targetFilePath);
         gate.Wait();
         try
         {
@@ -339,6 +517,11 @@ public sealed class I18nService
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                _logger.LogInformation(
+                    "I18n language resource already exists after waiting. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
                 return LoadResourceFile(language);
             }
 
@@ -359,6 +542,12 @@ public sealed class I18nService
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                _logger.LogWarning(
+                    "I18n language resource translation returned empty result. Language={Language}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    defaultFilePath,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
                 return null;
             }
 
@@ -382,6 +571,13 @@ public sealed class I18nService
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            _logger.LogInformation(
+                "I18n language resource saved. Language={Language}; Source={SourcePath}; Target={TargetPath}; OutputChars={OutputChars}; ElapsedMs={ElapsedMs}.",
+                language,
+                defaultFilePath,
+                targetFilePath,
+                translated.Length,
+                stopwatch.ElapsedMilliseconds);
             return resource;
         }
         catch (Exception ex)
@@ -393,6 +589,155 @@ public sealed class I18nService
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            _logger.LogError(
+                ex,
+                "I18n language resource translation failed. Language={Language}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                language,
+                defaultFilePath,
+                targetFilePath,
+                stopwatch.ElapsedMilliseconds);
+            Console.WriteLine($"Failed to create i18n resource {language}: {ex.Message}");
+            return null;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    private async Task<I18nResource?> CreateResourceFileFromDefaultAsync(
+        string language,
+        I18nResource defaultResource,
+        CancellationToken cancellationToken)
+    {
+        var defaultFilePath = GetDefaultResourceFilePath();
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: false);
+        if (defaultFilePath is null || !File.Exists(defaultFilePath))
+        {
+            CodeWfLogger.Warn(
+                $"i18n 璇█璧勬簮鏈敓鎴愶紝榛樿璧勬簮鏂囦欢涓嶅瓨鍦ㄣ€俵anguage={language}; source={defaultFilePath ?? "(null)"}; target={targetFilePath ?? "(null)"}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            return null;
+        }
+
+        if (targetFilePath is null)
+        {
+            CodeWfLogger.Warn(
+                $"i18n 璇█璧勬簮鏈敓鎴愶紝鐩爣璧勬簮璺緞涓虹┖銆俵anguage={language}; source={defaultFilePath}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            return null;
+        }
+
+        if (File.Exists(targetFilePath))
+        {
+            return null;
+        }
+
+        var gate = _resourceFileLocks.GetOrAdd(targetFilePath, _ => new SemaphoreSlim(1, 1));
+        var stopwatch = Stopwatch.StartNew();
+        CodeWfLogger.Info(
+            $"i18n 璇█璧勬簮鍑嗗寮€濮嬨€俵anguage={language}; source={defaultFilePath}; target={targetFilePath}.",
+            log2UI: false,
+            log2File: false,
+            log2Console: true);
+        _logger.LogInformation(
+            "I18n language resource translation started. Language={Language}; Source={SourcePath}; Target={TargetPath}.",
+            language,
+            defaultFilePath,
+            targetFilePath);
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            if (File.Exists(targetFilePath))
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Info(
+                    $"i18n 璇█璧勬簮宸茬敱鍏朵粬璇锋眰鐢熸垚銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                _logger.LogInformation(
+                    "I18n language resource already exists after waiting. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
+                return await LoadResourceFileAsync(language, cancellationToken);
+            }
+
+            var source = JsonSerializer.Serialize(defaultResource, WriteJsonOptions);
+            var translated = await _translationService.TranslateAsync(
+                source,
+                RequestLanguage.GetLanguage(language),
+                ContentTranslationKind.JsonResource,
+                resourceName: targetFilePath,
+                cancellationToken: cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(translated))
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Warn(
+                    $"i18n 璇█璧勬簮鏈敓鎴愶紝缈昏瘧缁撴灉涓虹┖銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; source={defaultFilePath}; target={targetFilePath}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                _logger.LogWarning(
+                    "I18n language resource translation returned empty result. Language={Language}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    defaultFilePath,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
+                return null;
+            }
+
+            var resource = JsonSerializer.Deserialize<I18nResource>(translated, ReadJsonOptions);
+            if (resource is null)
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Warn(
+                    $"i18n 璇█璧勬簮鏈敓鎴愶紝缈昏瘧缁撴灉鏃犳硶鍙嶅簭鍒楀寲銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; source={defaultFilePath}; target={targetFilePath}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                return null;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath)!);
+            await File.WriteAllTextAsync(targetFilePath, translated, cancellationToken);
+            stopwatch.Stop();
+            CodeWfLogger.Info(
+                $"i18n 璇█璧勬簮鐢熸垚瀹屾垚銆俵anguage={language}; outputChars={translated.Length}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            _logger.LogInformation(
+                "I18n language resource saved. Language={Language}; Source={SourcePath}; Target={TargetPath}; OutputChars={OutputChars}; ElapsedMs={ElapsedMs}.",
+                language,
+                defaultFilePath,
+                targetFilePath,
+                translated.Length,
+                stopwatch.ElapsedMilliseconds);
+            return resource;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            stopwatch.Stop();
+            CodeWfLogger.Error(
+                $"i18n 璇█璧勬簮鐢熸垚澶辫触銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                ex,
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            _logger.LogError(
+                ex,
+                "I18n language resource translation failed. Language={Language}; Source={SourcePath}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                language,
+                defaultFilePath,
+                targetFilePath,
+                stopwatch.ElapsedMilliseconds);
             Console.WriteLine($"Failed to create i18n resource {language}: {ex.Message}");
             return null;
         }
@@ -422,7 +767,7 @@ public sealed class I18nService
             return current;
         }
 
-        var targetFilePath = GetAssetPath("site", "i18n", $"{language}.json");
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: false);
         if (targetFilePath is null)
         {
             return current;
@@ -441,6 +786,12 @@ public sealed class I18nService
             log2UI: false,
             log2File: false,
             log2Console: true);
+        _logger.LogInformation(
+            "I18n language resource backfill started. Language={Language}; MissingStrings={MissingStrings}; MissingTextMap={MissingTextMap}; Target={TargetPath}.",
+            language,
+            missingStrings.Count,
+            missingTextMap.Count,
+            targetFilePath);
         gate.Wait();
         try
         {
@@ -461,6 +812,11 @@ public sealed class I18nService
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                _logger.LogInformation(
+                    "I18n language resource backfill skipped because another request completed it. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
                 return latest;
             }
 
@@ -485,6 +841,11 @@ public sealed class I18nService
                     log2UI: false,
                     log2File: false,
                     log2Console: true);
+                _logger.LogWarning(
+                    "I18n language resource backfill returned empty result. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
                 return latest;
             }
 
@@ -518,6 +879,13 @@ public sealed class I18nService
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            _logger.LogInformation(
+                "I18n language resource backfill saved. Language={Language}; Target={TargetPath}; Strings={Strings}; TextMap={TextMap}; ElapsedMs={ElapsedMs}.",
+                language,
+                targetFilePath,
+                translatedPatch.Strings.Count,
+                translatedPatch.TextMap.Count,
+                stopwatch.ElapsedMilliseconds);
             return latest;
         }
         catch (Exception ex)
@@ -529,6 +897,176 @@ public sealed class I18nService
                 log2UI: false,
                 log2File: false,
                 log2Console: true);
+            _logger.LogError(
+                ex,
+                "I18n language resource backfill failed. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                language,
+                targetFilePath,
+                stopwatch.ElapsedMilliseconds);
+            return current;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    private async Task<I18nResource> CompleteResourceFromDefaultAsync(
+        string language,
+        I18nResource fallback,
+        I18nResource parent,
+        I18nResource current,
+        CancellationToken cancellationToken)
+    {
+        var mergedExistingStrings = Merge(parent.Strings, current.Strings);
+        var mergedExistingTextMap = Merge(parent.TextMap, current.TextMap);
+        var missingStrings = fallback.Strings
+            .Where(item => !mergedExistingStrings.ContainsKey(item.Key))
+            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+        var missingTextMap = fallback.TextMap
+            .Where(item => !mergedExistingTextMap.ContainsKey(item.Key))
+            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+
+        if (missingStrings.Count == 0 && missingTextMap.Count == 0)
+        {
+            return current;
+        }
+
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: false);
+        if (targetFilePath is null)
+        {
+            return current;
+        }
+
+        var patch = new I18nResource
+        {
+            Strings = missingStrings,
+            TextMap = missingTextMap
+        };
+        var source = JsonSerializer.Serialize(patch, WriteJsonOptions);
+        var gate = _resourceFileLocks.GetOrAdd(targetFilePath, _ => new SemaphoreSlim(1, 1));
+        var stopwatch = Stopwatch.StartNew();
+        CodeWfLogger.Info(
+            $"i18n 璇█璧勬簮琛ヨ瘧寮€濮嬨€俵anguage={language}; missingStrings={missingStrings.Count}; missingTextMap={missingTextMap.Count}; target={targetFilePath}.",
+            log2UI: false,
+            log2File: false,
+            log2Console: true);
+        _logger.LogInformation(
+            "I18n language resource backfill started. Language={Language}; MissingStrings={MissingStrings}; MissingTextMap={MissingTextMap}; Target={TargetPath}.",
+            language,
+            missingStrings.Count,
+            missingTextMap.Count,
+            targetFilePath);
+        await gate.WaitAsync(cancellationToken);
+        try
+        {
+            var latest = await LoadResourceFileAsync(language, cancellationToken) ?? current;
+            var latestWithParentStrings = Merge(parent.Strings, latest.Strings);
+            var latestWithParentTextMap = Merge(parent.TextMap, latest.TextMap);
+            missingStrings = fallback.Strings
+                .Where(item => !latestWithParentStrings.ContainsKey(item.Key))
+                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+            missingTextMap = fallback.TextMap
+                .Where(item => !latestWithParentTextMap.ContainsKey(item.Key))
+                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+            if (missingStrings.Count == 0 && missingTextMap.Count == 0)
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Info(
+                    $"i18n 璇█璧勬簮琛ヨ瘧璺宠繃锛岀己澶遍」宸茬敱鍏朵粬璇锋眰琛ラ綈銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                _logger.LogInformation(
+                    "I18n language resource backfill skipped because another request completed it. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
+                return latest;
+            }
+
+            patch = new I18nResource
+            {
+                Strings = missingStrings,
+                TextMap = missingTextMap
+            };
+            source = JsonSerializer.Serialize(patch, WriteJsonOptions);
+            var translated = await _translationService.TranslateAsync(
+                source,
+                RequestLanguage.GetLanguage(language),
+                ContentTranslationKind.JsonResource,
+                resourceName: targetFilePath,
+                cancellationToken: cancellationToken);
+            if (string.IsNullOrWhiteSpace(translated))
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Warn(
+                    $"i18n 璇█璧勬簮琛ヨ瘧鏈畬鎴愶紝缈昏瘧缁撴灉涓虹┖銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                _logger.LogWarning(
+                    "I18n language resource backfill returned empty result. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                    language,
+                    targetFilePath,
+                    stopwatch.ElapsedMilliseconds);
+                return latest;
+            }
+
+            var translatedPatch = JsonSerializer.Deserialize<I18nResource>(translated, ReadJsonOptions);
+            if (translatedPatch is null)
+            {
+                stopwatch.Stop();
+                CodeWfLogger.Warn(
+                    $"i18n 璇█璧勬簮琛ヨ瘧鏈畬鎴愶紝缈昏瘧缁撴灉鏃犳硶鍙嶅簭鍒楀寲銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+                return latest;
+            }
+
+            foreach (var item in translatedPatch.Strings)
+            {
+                latest.Strings[item.Key] = item.Value;
+            }
+
+            foreach (var item in translatedPatch.TextMap)
+            {
+                latest.TextMap[item.Key] = item.Value;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath)!);
+            await File.WriteAllTextAsync(targetFilePath, JsonSerializer.Serialize(latest, WriteJsonOptions), cancellationToken);
+            stopwatch.Stop();
+            CodeWfLogger.Info(
+                $"i18n 璇█璧勬簮琛ヨ瘧瀹屾垚銆俵anguage={language}; strings={translatedPatch.Strings.Count}; textMap={translatedPatch.TextMap.Count}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            _logger.LogInformation(
+                "I18n language resource backfill saved. Language={Language}; Target={TargetPath}; Strings={Strings}; TextMap={TextMap}; ElapsedMs={ElapsedMs}.",
+                language,
+                targetFilePath,
+                translatedPatch.Strings.Count,
+                translatedPatch.TextMap.Count,
+                stopwatch.ElapsedMilliseconds);
+            return latest;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            stopwatch.Stop();
+            CodeWfLogger.Error(
+                $"i18n 璇█璧勬簮琛ヨ瘧澶辫触銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetFilePath}.",
+                ex,
+                log2UI: false,
+                log2File: false,
+                log2Console: true);
+            _logger.LogError(
+                ex,
+                "I18n language resource backfill failed. Language={Language}; Target={TargetPath}; ElapsedMs={ElapsedMs}.",
+                language,
+                targetFilePath,
+                stopwatch.ElapsedMilliseconds);
             return current;
         }
         finally
@@ -550,6 +1088,24 @@ public sealed class I18nService
         }
 
         foreach (var text in GetDiscoveredDefaultTexts())
+        {
+            resource.TextMap.TryAdd(text, text);
+        }
+    }
+
+    private async Task EnrichDefaultResourceAsync(I18nResource resource, CancellationToken cancellationToken)
+    {
+        foreach (var item in resource.Strings.Values.Where(ShouldIncludeDiscoveredText))
+        {
+            resource.TextMap.TryAdd(item, item);
+        }
+
+        foreach (var item in RequiredDefaultTextMapKeys)
+        {
+            resource.TextMap.TryAdd(item, item);
+        }
+
+        foreach (var text in await GetDiscoveredDefaultTextsAsync(cancellationToken))
         {
             resource.TextMap.TryAdd(text, text);
         }
@@ -604,6 +1160,62 @@ public sealed class I18nService
         _discoveredDefaultTexts = texts;
         CodeWfLogger.Info(
             $"i18n 页面文案扫描完成。count={texts.Count}; roots={string.Join('|', scannedRoots)}.",
+            log2UI: false,
+            log2File: false,
+            log2Console: true);
+        return _discoveredDefaultTexts;
+    }
+
+    private async Task<IReadOnlyCollection<string>> GetDiscoveredDefaultTextsAsync(CancellationToken cancellationToken)
+    {
+        if (_discoveredDefaultTexts is not null)
+        {
+            return _discoveredDefaultTexts;
+        }
+
+        var texts = new HashSet<string>(StringComparer.Ordinal);
+        var scannedRoots = new List<string>();
+        foreach (var root in TextDiscoveryRoots)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var rootPath = Path.Combine(
+                new[] { _environment.ContentRootPath }
+                    .Concat(root.Split('/', StringSplitOptions.RemoveEmptyEntries))
+                    .ToArray());
+            if (!Directory.Exists(rootPath))
+            {
+                continue;
+            }
+
+            scannedRoots.Add(rootPath);
+            foreach (var filePath in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)
+                         .Where(static path => TextDiscoveryExtensions.Contains(
+                             Path.GetExtension(path),
+                             StringComparer.OrdinalIgnoreCase)))
+            {
+                try
+                {
+                    var content = await File.ReadAllTextAsync(filePath, cancellationToken);
+                    AddMatches(texts, HtmlTextRegex, content);
+                    AddMatches(texts, AttributeTextRegex, content);
+                    AddMatches(texts, DoubleQuotedTextRegex, content);
+                    AddMatches(texts, SingleQuotedTextRegex, content);
+                    AddMatches(texts, BacktickTextRegex, content);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    CodeWfLogger.Warn(
+                        $"i18n 椤甸潰鏂囨鎵弿璺宠繃鏂囦欢銆俧ile={filePath}; error={ex.Message}.",
+                        log2UI: false,
+                        log2File: false,
+                        log2Console: true);
+                }
+            }
+        }
+
+        _discoveredDefaultTexts = texts;
+        CodeWfLogger.Info(
+            $"i18n 椤甸潰鏂囨鎵弿瀹屾垚銆俢ount={texts.Count}; roots={string.Join('|', scannedRoots)}.",
             log2UI: false,
             log2File: false,
             log2Console: true);

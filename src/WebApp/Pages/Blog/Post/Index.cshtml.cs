@@ -15,6 +15,7 @@ public class IndexModel : PageModel
 {
     private readonly AppService _appService;
     private const int RelatedPostLimit = 4;
+    private sealed record RelatedPostCandidate(BlogPost Post, string ContextLabel);
 
     public BlogPost? Post { get; set; }
     public BlogPost? PreviousPost { get; private set; }
@@ -47,12 +48,12 @@ public class IndexModel : PageModel
 
         if (currentIndex > 0)
         {
-            PreviousPost = posts[currentIndex - 1];
+            PreviousPost = await _appService.LocalizeBlogPostMetadataAsync(posts[currentIndex - 1]);
         }
 
         if (currentIndex >= 0 && currentIndex < posts.Count - 1)
         {
-            NextPost = posts[currentIndex + 1];
+            NextPost = await _appService.LocalizeBlogPostMetadataAsync(posts[currentIndex + 1]);
         }
 
         var categories = await _appService.GetAllCategoryItemsAsync() ?? [];
@@ -72,7 +73,7 @@ public class IndexModel : PageModel
         AlbumLinks = BuildTopicLinks(Post.Albums, albumLookup, ConstantUtil.GetAlbumUrl, "fas fa-layer-group");
         TagLinks = BuildTagLinks(Post.Tags);
         ExploreLinks = BuildExploreLinks(CategoryLinks, AlbumLinks, TagLinks);
-        RelatedPosts = BuildRelatedPosts(Post, posts, RelatedPostLimit);
+        RelatedPosts = await BuildRelatedPostsAsync(Post, posts, RelatedPostLimit);
         EstimatedReadingMinutes = EstimateReadingMinutes(Post.HtmlContent ?? Post.Content);
         HeadingCount = CountArticleHeadings(Post.HtmlContent ?? Post.Content);
     }
@@ -147,7 +148,23 @@ public class IndexModel : PageModel
             .ToList();
     }
 
-    private static IReadOnlyList<RelatedPostCard> BuildRelatedPosts(BlogPost currentPost, IEnumerable<BlogPost> posts, int limit)
+    private async Task<IReadOnlyList<RelatedPostCard>> BuildRelatedPostsAsync(
+        BlogPost currentPost,
+        IEnumerable<BlogPost> posts,
+        int limit)
+    {
+        var candidates = SelectRelatedPostCandidates(currentPost, posts, limit);
+        var cards = new List<RelatedPostCard>(candidates.Count);
+        foreach (var candidate in candidates)
+        {
+            var localizedPost = await _appService.LocalizeBlogPostMetadataAsync(candidate.Post) ?? candidate.Post;
+            cards.Add(ToRelatedPostCard(localizedPost, candidate.ContextLabel));
+        }
+
+        return cards;
+    }
+
+    private static IReadOnlyList<RelatedPostCandidate> SelectRelatedPostCandidates(BlogPost currentPost, IEnumerable<BlogPost> posts, int limit)
     {
         var currentCategories = ToHashSet(currentPost.Categories);
         var currentAlbums = ToHashSet(currentPost.Albums);
@@ -196,12 +213,7 @@ public class IndexModel : PageModel
             .OrderByDescending(item => item.Score)
             .ThenByDescending(item => item.Post.Lastmod ?? item.Post.Date ?? DateTime.MinValue)
             .Take(limit)
-            .Select(item => new RelatedPostCard(
-                item.Post.Title!,
-                ConstantUtil.GetPostUrl(item.Post),
-                item.Post.Description,
-                item.ContextLabel,
-                item.Post.Lastmod ?? item.Post.Date))
+            .Select(item => new RelatedPostCandidate(item.Post, item.ContextLabel))
             .ToList();
 
         if (related.Count >= limit)
@@ -210,7 +222,7 @@ public class IndexModel : PageModel
         }
 
         var existingUrls = related
-            .Select(static item => item.Url)
+            .Select(static item => ConstantUtil.GetPostUrl(item.Post))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (var post in posts
@@ -226,12 +238,7 @@ public class IndexModel : PageModel
                 continue;
             }
 
-            related.Add(new RelatedPostCard(
-                post.Title!,
-                url,
-                post.Description,
-                "近期更新",
-                post.Lastmod ?? post.Date));
+            related.Add(new RelatedPostCandidate(post, "近期更新"));
 
             if (related.Count >= limit)
             {
@@ -241,6 +248,14 @@ public class IndexModel : PageModel
 
         return related;
     }
+
+    private static RelatedPostCard ToRelatedPostCard(BlogPost post, string contextLabel) =>
+        new(
+            post.Title!,
+            ConstantUtil.GetPostUrl(post),
+            post.Description,
+            contextLabel,
+            post.Lastmod ?? post.Date);
 
     private static HashSet<string> ToHashSet(IEnumerable<string>? values) =>
         values?

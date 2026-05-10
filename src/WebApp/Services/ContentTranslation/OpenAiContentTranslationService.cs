@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using CodeWfLogger = CodeWF.Log.Core.Logger;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenAI;
 using WebApp.Options;
@@ -12,40 +13,6 @@ using AiChatRole = Microsoft.Extensions.AI.ChatRole;
 using OpenAIChatClient = OpenAI.Chat.ChatClient;
 
 namespace WebApp.Services;
-
-public enum ContentTranslationKind
-{
-    MarkdownPage,
-    MarkdownArticle,
-    JsonResource
-}
-
-public interface IContentTranslationService
-{
-    Task<string?> TranslateAsync(
-        string source,
-        LanguageInfo targetLanguage,
-        ContentTranslationKind kind,
-        string? resourceName = null,
-        CancellationToken cancellationToken = default);
-}
-
-public sealed class NullContentTranslationService : IContentTranslationService
-{
-    public static readonly NullContentTranslationService Instance = new();
-
-    private NullContentTranslationService()
-    {
-    }
-
-    public Task<string?> TranslateAsync(
-        string source,
-        LanguageInfo targetLanguage,
-        ContentTranslationKind kind,
-        string? resourceName = null,
-        CancellationToken cancellationToken = default) =>
-        Task.FromResult<string?>(null);
-}
 
 public sealed class OpenAiContentTranslationService : IContentTranslationService
 {

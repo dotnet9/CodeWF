@@ -927,7 +927,7 @@ const languageDisplayNameByCode = {
     "vi": "Tiếng Việt"
 };
 
-const fallbackSupportedLanguageCodes = new Set(Object.keys(languageLoadingTextByCode));
+const fallbackSupportedLanguageCodes = new Set(["zh-cn", "zh-tw", "en", "ja"]);
 
 function getLanguageLoadingStateText(language, state, languageName) {
     const normalized = normalizeLanguageCode(language);
@@ -965,8 +965,11 @@ function getSupportedLanguageCodes() {
         const resourceCodes = Array.isArray(window.CodeWFI18n?.languages)
             ? window.CodeWFI18n.languages
             : [];
+        const sourceCodes = resourceCodes.length > 0
+            ? resourceCodes
+            : [...fallbackSupportedLanguageCodes];
         window.__codewfSupportedLanguageCodes = new Set(
-            [...fallbackSupportedLanguageCodes, ...resourceCodes]
+            sourceCodes
                 .map(normalizeLanguageCode)
                 .filter(Boolean));
     }
@@ -975,7 +978,35 @@ function getSupportedLanguageCodes() {
 }
 
 function normalizeLanguageCode(value) {
-    return String(value || "").trim().replace(/_/g, "-").toLowerCase();
+    const normalized = String(value || "").trim().replace(/_/g, "-").toLowerCase();
+    if (!normalized) {
+        return "";
+    }
+
+    if (normalized === "zh-tw"
+        || normalized === "zh-hk"
+        || normalized === "zh-mo"
+        || normalized.startsWith("zh-hant")) {
+        return "zh-tw";
+    }
+
+    if (normalized === "zh"
+        || normalized === "zh-cn"
+        || normalized === "zh-sg"
+        || normalized.startsWith("zh-hans")
+        || normalized.startsWith("zh-")) {
+        return "zh-cn";
+    }
+
+    if (normalized === "en" || normalized.startsWith("en-")) {
+        return "en";
+    }
+
+    if (normalized === "ja" || normalized === "jp" || normalized.startsWith("ja-")) {
+        return "ja";
+    }
+
+    return normalized;
 }
 
 function getTargetLanguageFromUrl(value) {
@@ -1017,10 +1048,6 @@ function getPathLanguage(pathname) {
     const firstSegment = normalizeLanguageCode(pathname.split("/").filter(Boolean)[0]);
     if (!firstSegment) {
         return "";
-    }
-
-    if (firstSegment === "zh" || firstSegment === "zh-hans" || firstSegment === "zh-cn") {
-        return "zh-cn";
     }
 
     return getSupportedLanguageCodes().has(firstSegment) ? firstSegment : "";

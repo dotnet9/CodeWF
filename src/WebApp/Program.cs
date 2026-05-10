@@ -1,5 +1,6 @@
 using WebApp.Options;
 using WebApp.Services;
+using WebApp.Extensions;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Microsoft.Extensions.WebEncoders;
@@ -41,8 +42,7 @@ builder.Services.AddSingleton<AppService>();
 builder.Services.AddSingleton<I18nService>();
 builder.Services.AddSingleton<LanguagePreparationService>();
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
-builder.Services.Configure<OpenAIOption>(builder.Configuration.GetSection("OpenAI"));
-builder.Services.AddSingleton<IContentTranslationService, OpenAiContentTranslationService>();
+builder.Services.AddContentTranslation(builder.Configuration);
 // 站点正文和配置里包含大量中文，统一放开编码范围，避免输出时被过度转义。
 builder.Services.Configure<WebEncoderOptions>(options =>
     options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));

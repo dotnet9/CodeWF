@@ -79,7 +79,7 @@ public sealed class LanguagePreparationService
 
         try
         {
-            var resourceResult = _i18nService.PrepareLanguageResource(job.Language);
+            var resourceResult = await _i18nService.PrepareLanguageResourceAsync(job.Language, cancellationToken);
             if (!resourceResult.IsDefaultLanguage && !resourceResult.HasResourceFile)
             {
                 throw new InvalidOperationException($"Language resource was not generated. language={job.Language}.");

@@ -53,7 +53,7 @@ Main inputs:
 - `site/blocked-search-keywords.json`
 - `site/about.md`
 - `site/pays/Donation.md`
-- `2019/` to current year article markdown trees
+- `2019/` to current year article markdown trees, with matching `.yml` metadata sidecars
 
 Common public routes:
 
@@ -98,7 +98,7 @@ The repository now includes a minimal safety net:
 
 Current tests cover:
 
-- front matter parsing
+- article sidecar metadata parsing
 - markdown-to-HTML conversion
 - blocked search keyword handling
 
@@ -131,9 +131,10 @@ dotnet run --project D:\github\owner\CodeWF\src\WebApp
 ## Content Workflow
 
 1. Add or update markdown/images in `Assets.Dotnet9`.
-2. Keep article front matter complete: `title`, `slug`, `description`, `date`, `categories`, and `cover`.
-3. Update `site/*.json` when categories, albums, docs, tools, or friend links change.
-4. Run the site locally and verify the related page renders correctly.
+2. Keep each article body in `YYYY/MM/slug.md` and its metadata in `YYYY/MM/slug.yml`.
+3. Keep article metadata complete: `title`, `slug`, `description`, `date`, `categories`, and `cover`.
+4. Update `site/*.json` when categories, albums, docs, tools, or friend links change.
+5. Run the site locally and verify the related page renders correctly.
 
 ## Professional Repo Checklist
 
