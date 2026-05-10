@@ -2,6 +2,16 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.5 (2026-05-10)
+
+- 😄 [Added] Added request-language detection, localized route prefixes, language switch APIs, and culture-aware date formatting for multilingual browsing.
+- 😄 [Added] Added structured JSON, Markdown, and article-metadata translation support with batching, duplicate string de-duplication, and regression coverage.
+- 🔨 [Changed] Updated homepage, blog, search, navigation, article, tag, category, and album views to use localized UI text and language-aware links.
+- 🔨 [Changed] Scoped article metadata sidecar generation to posts that are actually rendered on the current page, instead of translating every article during list, homepage, navigation, tag, or search preparation.
+- 🔨 [Changed] Reworked album/category counts to use source article metadata and default taxonomy slugs, so counts no longer depend on all translated article metadata being pre-generated.
+- 🐛 [Fixed] Added fallback windows for failed translation attempts so unavailable translation providers do not turn pages into 500 responses.
+- 🐛 [Fixed] Added repair logic for stale localized resources that still contain untranslated Chinese text.
+
 V1.1.4 (2026-05-01)
 
 - 😄 [Added] Added development-time asset hot reload for markdown, JSON, and common image assets in the external content repository via `FileSystemWatcher`.

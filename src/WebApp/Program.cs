@@ -41,6 +41,16 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<AppService>();
 builder.Services.AddSingleton<I18nService>();
 builder.Services.AddSingleton<LanguagePreparationService>();
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(policy => policy
+        // 页面 HTML 做短期服务端缓存；搜索、API、语言预热等请求仍然实时执行，避免吞掉副作用。
+        .With(context => ShouldCachePageResponse(context.HttpContext))
+        .Expire(TimeSpan.FromMinutes(10))
+        .SetVaryByQuery("*")
+        // 语言中间件会把 /en、/zh-cn 等路径改写为真实 Razor 路径，缓存键必须额外按语言拆开。
+        .VaryByValue(context => new KeyValuePair<string, string>("language", GetOutputCacheLanguage(context))));
+});
 builder.Services.Configure<SiteOption>(builder.Configuration.GetSection("Site"));
 builder.Services.AddContentTranslation(builder.Configuration);
 // 站点正文和配置里包含大量中文，统一放开编码范围，避免输出时被过度转义。
@@ -112,6 +122,7 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 app.UseRouting();
+app.UseOutputCache();
 
 app.UseAuthorization();
 
@@ -119,3 +130,37 @@ app.MapRazorPages();
 app.MapControllers();
 
 app.Run();
+
+static bool ShouldCachePageResponse(HttpContext context)
+{
+    if (!HttpMethods.IsGet(context.Request.Method) && !HttpMethods.IsHead(context.Request.Method))
+    {
+        return false;
+    }
+
+    if (context.Request.Headers.ContainsKey("X-CodeWF-Language-Prepare"))
+    {
+        return false;
+    }
+
+    var path = context.Request.Path;
+    if (path.StartsWithSegments("/api")
+        || path.StartsWithSegments("/search"))
+    {
+        return false;
+    }
+
+    return !Path.HasExtension(path);
+}
+
+static string GetOutputCacheLanguage(HttpContext context)
+{
+    if (context.Items.TryGetValue(RequestLanguageMiddleware.LanguageItemKey, out var item)
+        && item is string language
+        && RequestLanguage.Normalize(language) is { } normalized)
+    {
+        return normalized;
+    }
+
+    return RequestLanguage.CurrentLanguage;
+}

@@ -19,20 +19,24 @@ public class NavigationViewComponent : ViewComponent
         var albums = await _appService.GetAllAlbumItemsAsync();
         var categories = await _appService.GetAllCategoryItemsAsync();
         var posts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
+        var latestPost = await _appService.LocalizeBlogPostBriefAsync(posts
+            .Where(post => !string.IsNullOrWhiteSpace(post.Slug) && !string.IsNullOrWhiteSpace(post.Title))
+            .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .FirstOrDefault());
+        var albumCounts = await _appService.GetAlbumPostCountsBySlugAsync();
+        var categoryCounts = await _appService.GetCategoryPostCountsBySlugAsync();
 
         var model = new NavigationViewModel
         {
             IsActive = isActive,
-            LatestPost = posts
-                .Where(post => !string.IsNullOrWhiteSpace(post.Slug) && !string.IsNullOrWhiteSpace(post.Title))
-                .OrderByDescending(post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
-                .Select(post => new NavigationFeaturedPost(
-                    post.Title!,
-                    ConstantUtil.GetPostUrl(post),
-                    post.Description,
-                    post.Date,
-                    post.Cover))
-                .FirstOrDefault(),
+            LatestPost = latestPost is null
+                ? null
+                : new NavigationFeaturedPost(
+                    latestPost.Title!,
+                    ConstantUtil.GetPostUrl(latestPost),
+                    latestPost.Description,
+                    latestPost.Date,
+                    latestPost.Cover),
             Albums = (albums ?? [])
                 .Where(item =>
                     !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase)
@@ -43,7 +47,7 @@ public class NavigationViewComponent : ViewComponent
                     item.Name!,
                     item.Slug!,
                     item.Memo,
-                    posts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                    GetPostCount(albumCounts, item.Slug)))
                 .ToList(),
             Categories = (categories ?? [])
                 .Where(item =>
@@ -55,12 +59,15 @@ public class NavigationViewComponent : ViewComponent
                     item.Name!,
                     item.Slug!,
                     item.Memo,
-                    posts.Count(post => post.Categories?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                    GetPostCount(categoryCounts, item.Slug)))
                 .ToList()
         };
 
         return View(model);
     }
+
+    private static int GetPostCount(IReadOnlyDictionary<string, int> counts, string? slug) =>
+        !string.IsNullOrWhiteSpace(slug) && counts.TryGetValue(slug, out var count) ? count : 0;
 }
 
 public sealed record NavigationBrowseItem(string Name, string Slug, string? Memo, int PostCount);

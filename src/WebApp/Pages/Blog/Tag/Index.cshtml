@@ -92,7 +92,7 @@
                                         }
                                         <div class="meta-line">
                                             <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
-                                            <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd HH:mm"))</span>
+                                            <span><i class="far fa-calendar"></i>@I18n.FormatDateTime(post.Lastmod ?? post.Date)</span>
                                         </div>
                                     </div>
                                 </article>

@@ -10,6 +10,7 @@ public sealed record HomeBrowseItem(string Name, string Slug, string? Memo, int 
 public class IndexModel : PageModel
 {
     private readonly AppService _appService;
+    private readonly I18nService _i18nService;
     private const int FeaturedAlbumLimit = 4;
     private const int FeaturedCategoryLimit = 4;
 
@@ -27,25 +28,28 @@ public class IndexModel : PageModel
     public int TotalToolEntries { get; private set; }
     public BlogPostBrief? SpotlightPost => LatestPosts.FirstOrDefault() ?? Posts.FirstOrDefault();
 
-    public IndexModel(AppService appService)
+    public IndexModel(AppService appService, I18nService i18nService)
     {
         _appService = appService;
+        _i18nService = i18nService;
     }
 
     public async Task OnGetAsync()
     {
         var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
-        LatestPosts = allPosts.Take(4).ToList();
+        LatestPosts = await _appService.LocalizeBlogPostBriefsAsync(allPosts.Take(4));
         // Hero 区域使用随机文章，避免首页长期只被同一组内容占据。
-        HeroPosts = TakeRandom(allPosts, 2);
-        Posts = (await _appService.GetBannerPostAsync())?.Take(6).ToList() ?? [];
+        HeroPosts = await _appService.LocalizeBlogPostBriefsAsync(TakeRandom(allPosts, 2));
+        Posts = await _appService.GetBannerPostAsync(6) ?? [];
         if (Posts.Count == 0)
         {
-            Posts = allPosts.Take(6).ToList();
+            Posts = await _appService.LocalizeBlogPostBriefsAsync(allPosts.Take(6));
         }
 
         Albums = await _appService.GetAllAlbumItemsAsync() ?? [];
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
+        var albumCounts = await _appService.GetAlbumPostCountsBySlugAsync();
+        var categoryCounts = await _appService.GetCategoryPostCountsBySlugAsync();
         TotalPosts = allPosts.Count;
 
         FeaturedAlbums = Albums
@@ -57,7 +61,7 @@ public class IndexModel : PageModel
                 item.Name!,
                 item.Slug!,
                 item.Memo,
-                allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                GetPostCount(albumCounts, item.Slug)))
             .OrderByDescending(item => item.PostCount)
             .ThenBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase)
             .Take(FeaturedAlbumLimit)
@@ -72,31 +76,35 @@ public class IndexModel : PageModel
                 item.Name!,
                 item.Slug!,
                 item.Memo,
-                allPosts.Count(post => post.Categories?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)))
+                GetPostCount(categoryCounts, item.Slug)))
             .OrderByDescending(item => item.PostCount)
             .ThenBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase)
             .Take(FeaturedCategoryLimit)
             .ToList();
 
-        GettingStartedLinks = BuildGettingStartedLinks(allPosts, FeaturedCategories, FeaturedAlbums);
-        DiscoveryPosts = BuildDiscoveryPosts(
+        var latestPost = await _appService.LocalizeBlogPostBriefAsync(allPosts.FirstOrDefault());
+        GettingStartedLinks = BuildGettingStartedLinks(latestPost, FeaturedCategories, FeaturedAlbums);
+        var discoverySource = TakeRandom(
             allPosts.Where(post =>
                 Posts.All(featured => !string.Equals(featured.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
             .ToList(),
             3);
+        DiscoveryPosts = BuildDiscoveryPosts(
+            await _appService.LocalizeBlogPostBriefsAsync(discoverySource),
+            _i18nService);
 
         TotalDocNodes = await _appService.GetDefaultDocNodeCountAsync();
         TotalToolEntries = await _appService.GetDefaultToolEntryCountAsync();
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
-        IReadOnlyList<BlogPostBrief> allPosts,
+        BlogPostBrief? latestPost,
         IReadOnlyList<HomeBrowseItem> categories,
         IReadOnlyList<HomeBrowseItem> albums)
     {
         var links = new List<DiscoveryLinkCard>();
 
-        if (allPosts.FirstOrDefault() is { } latestPost)
+        if (latestPost is not null)
         {
             links.Add(new DiscoveryLinkCard(
                 "从这里开始",
@@ -132,7 +140,9 @@ public class IndexModel : PageModel
         return links.Take(4).ToList();
     }
 
-    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts, int count)
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(
+        IReadOnlyList<BlogPostBrief> posts,
+        I18nService i18nService)
     {
         if (posts.Count == 0)
         {
@@ -141,18 +151,21 @@ public class IndexModel : PageModel
 
         var items = new List<DiscoveryPostCard>();
 
-        foreach (var post in TakeRandom(posts, count))
+        foreach (var post in posts)
         {
             items.Add(new DiscoveryPostCard(
                 "随机发现",
                 post.Title ?? "未命名文章",
                 post.Description ?? "换一篇看看，也许会撞上正想看的主题。",
                 ConstantUtil.GetPostUrl(post),
-                (post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd") ?? "文章"));
+                i18nService.FormatDate(post.Lastmod ?? post.Date) is { Length: > 0 } dateLabel ? dateLabel : "文章"));
         }
 
         return items;
     }
+
+    private static int GetPostCount(IReadOnlyDictionary<string, int> counts, string? slug) =>
+        !string.IsNullOrWhiteSpace(slug) && counts.TryGetValue(slug, out var count) ? count : 0;
 
     private static T? PickRandom<T>(IReadOnlyList<T> items)
     {

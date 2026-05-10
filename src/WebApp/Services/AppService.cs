@@ -21,6 +21,7 @@ public class AppService : IDisposable
     private const int SearchQueryStatsLimit = 50;
     private const string SearchKeywordsFileName = "search-keywords.json";
     private const string BlockedSearchNotice = "这个搜索词不适合展示，请换一个技术关键词。";
+    private static readonly TimeSpan FailedLocalizationRetryDelay = TimeSpan.FromMinutes(10);
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -42,6 +43,8 @@ public class AppService : IDisposable
     private static readonly Regex LegacyLocalizedBlogPostFileNameRegex = new(
         @"^(?<slug>.+)\.(?<timestamp>\d{14})\.(?<language>[a-z]{2,3}(?:-[a-z0-9]+)*)\.md$",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex ChineseTextRegex = new(@"[\u3400-\u9fff]", RegexOptions.Compiled);
+    private static readonly string[] PreservedCjkTerms = ["码坊"];
 
     private List<DocItem>? _docItems;
     private List<ToolItem>? _toolItems;
@@ -58,7 +61,8 @@ public class AppService : IDisposable
     private readonly ConcurrentDictionary<string, List<SearchBlockedKeywordGroup>> _searchBlockedKeywordGroupsByLanguage = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, IReadOnlyList<string>> _searchBlockedKeywordsByLanguage = new(StringComparer.OrdinalIgnoreCase);
     private List<BlogPost>? _blogPosts;
-    private readonly ConcurrentDictionary<string, List<BlogPost>> _blogPostsByLanguage = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> _blogPostSourcePathBySlug = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, List<TagItem>> _tagItemsByLanguage = new(StringComparer.OrdinalIgnoreCase);
     private List<FriendLinkItem>? _friendLinkItems;
     private List<TimeLineItem>? _timeLineItems;
     private readonly ConcurrentDictionary<string, List<FriendLinkItem>> _friendLinkItemsByLanguage = new(StringComparer.OrdinalIgnoreCase);
@@ -85,7 +89,8 @@ public class AppService : IDisposable
         DateTime? UpdatedAt,
         IReadOnlyList<SearchField> Fields,
         IReadOnlyList<string?> SummaryCandidates,
-        IReadOnlyList<string?> SnippetCandidates);
+        IReadOnlyList<string?> SnippetCandidates,
+        string? SourcePath);
 
     private sealed record SearchSnapshot(
         List<SearchResultItem> OrderedResults,
@@ -115,6 +120,7 @@ public class AppService : IDisposable
     private FileSystemWatcher? _assetWatcher;
     private Timer? _assetWatcherDebounceTimer;
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _localizedAssetLocks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, DateTimeOffset> _localizationFallbackUntil = new(StringComparer.OrdinalIgnoreCase);
 
     public AppService(
         IOptions<SiteOption> siteOption,
@@ -303,7 +309,8 @@ public class AppService : IDisposable
         _searchBlockedKeywordGroups = null;
         _searchBlockedKeywords = null;
         _blogPosts = null;
-        _blogPostsByLanguage.Clear();
+        _blogPostSourcePathBySlug.Clear();
+        _tagItemsByLanguage.Clear();
         _friendLinkItems = null;
         _timeLineItems = null;
         _friendLinkItemsByLanguage.Clear();
@@ -320,6 +327,7 @@ public class AppService : IDisposable
         _searchCache.Clear();
         _searchBlockedKeywordGroupsByLanguage.Clear();
         _searchBlockedKeywordsByLanguage.Clear();
+        _localizationFallbackUntil.Clear();
     }
 
     private string? GetAssetPath(params string[] paths)
@@ -390,7 +398,26 @@ public class AppService : IDisposable
 
         if (File.Exists(targetPath))
         {
+            if (await ShouldRepairLocalizedAssetAsync(normalizedLanguage, sourceSegments, sourcePath, targetPath))
+            {
+                File.Delete(targetPath);
+            }
+            else
+            {
+                ClearLocalizationFallback(targetPath);
+                return targetPath;
+            }
+        }
+
+        if (File.Exists(targetPath))
+        {
+            ClearLocalizationFallback(targetPath);
             return targetPath;
+        }
+
+        if (IsLocalizationFallbackActive(targetPath))
+        {
+            return sourcePath;
         }
 
         var kind = GetContentTranslationKind(sourcePath);
@@ -422,6 +449,7 @@ public class AppService : IDisposable
         {
             if (File.Exists(targetPath))
             {
+                ClearLocalizationFallback(targetPath);
                 stopwatch.Stop();
                 CodeWfLogger.Info(
                     $"语言资源文件已由其他请求生成。language={normalizedLanguage}; kind={kind}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetPath}.",
@@ -460,11 +488,14 @@ public class AppService : IDisposable
                     sourcePath,
                     targetPath,
                     stopwatch.ElapsedMilliseconds);
-                throw new InvalidOperationException(message);
+                // 站点公共资源翻译失败时回退源文件，避免分类、标签等边栏数据导致整页 500。
+                MarkLocalizationFallback(targetPath);
+                return sourcePath;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
             await File.WriteAllTextAsync(targetPath, translated);
+            ClearLocalizationFallback(targetPath);
             stopwatch.Stop();
             CodeWfLogger.Info(
                 $"语言资源文件生成完成。language={normalizedLanguage}; kind={kind}; outputChars={translated.Length}; elapsedMs={stopwatch.ElapsedMilliseconds}; target={targetPath}.",
@@ -734,14 +765,14 @@ public class AppService : IDisposable
         {
             // 站内搜索的查询模式很容易重复，命中缓存时直接复用排序后的快照。
             TouchSearchCacheEntry(cacheKey, cacheEntry);
-            return CreateSearchPageData(cacheEntry.Snapshot, safePageIndex, safePageSize, kind);
+            return await CreateSearchPageDataAsync(cacheEntry.Snapshot, safePageIndex, safePageSize, kind);
         }
 
         var snapshot = await BuildSearchSnapshotAsync(normalizedQuery);
         _searchCache[cacheKey] = new SearchCacheEntry(snapshot, 1, DateTimeOffset.UtcNow);
         TrimSearchCache();
 
-        return CreateSearchPageData(snapshot, safePageIndex, safePageSize, kind);
+        return await CreateSearchPageDataAsync(snapshot, safePageIndex, safePageSize, kind);
     }
 
     public async Task<List<SearchSuggestionItem>> GetSearchSuggestionsAsync(string? query, int size = 10)
@@ -832,11 +863,12 @@ public class AppService : IDisposable
                 Url = entry.Url,
                 Summary = summary,
                 MatchedSnippet = matchedSnippet,
-                Context = entry.Context,
-                Slug = entry.Slug,
-                UpdatedAt = entry.UpdatedAt,
-                Score = score
-            });
+                    Context = entry.Context,
+                    Slug = entry.Slug,
+                    SourcePath = entry.SourcePath,
+                    UpdatedAt = entry.UpdatedAt,
+                    Score = score
+                });
         }
 
         var ordered = results
@@ -891,7 +923,8 @@ public class AppService : IDisposable
                         new SearchField(tool.GroupName, 70, 45, 24)
                     ],
                     [tool.Item.Memo, tool.GroupName],
-                    [tool.Item.Memo, tool.GroupName]));
+                    [tool.Item.Memo, tool.GroupName],
+                    null));
             }
 
             var searchableDocs = await GetSearchableDocNodesAsync(docItems);
@@ -913,7 +946,8 @@ public class AppService : IDisposable
                         new SearchField(plainContent, 26, 18, 12)
                     ],
                     [doc.Item.Memo, plainContent],
-                    [doc.Item.Memo, plainContent]));
+                    [doc.Item.Memo, plainContent],
+                    null));
             }
 
             foreach (var post in blogPosts)
@@ -946,7 +980,8 @@ public class AppService : IDisposable
                         new SearchField(plainContent, 28, 20, 14)
                     ],
                     [post.Description, plainContent],
-                    [post.Description, plainContent]));
+                    [post.Description, plainContent],
+                    post.SourcePath));
             }
 
             _searchIndexByLanguage[language] = index;
@@ -963,7 +998,7 @@ public class AppService : IDisposable
         }
     }
 
-    private static SearchResultPageData CreateSearchPageData(
+    private async Task<SearchResultPageData> CreateSearchPageDataAsync(
         SearchSnapshot snapshot,
         int pageIndex,
         int pageSize,
@@ -981,6 +1016,7 @@ public class AppService : IDisposable
             .Skip((currentPageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+        data = await LocalizeSearchResultItemsAsync(data);
 
         return new SearchResultPageData(
             currentPageIndex,
@@ -990,6 +1026,56 @@ public class AppService : IDisposable
             snapshot.ToolCount,
             snapshot.DocCount,
             snapshot.PostCount);
+    }
+
+    private async Task<List<SearchResultItem>> LocalizeSearchResultItemsAsync(List<SearchResultItem> items)
+    {
+        if (RequestLanguage.IsDefaultLanguage(RequestLanguage.CurrentLanguage)
+            || items.All(static item => item.Kind != SearchResultKind.Post))
+        {
+            return items;
+        }
+
+        var localizedItems = new List<SearchResultItem>(items.Count);
+        foreach (var item in items)
+        {
+            if (item.Kind != SearchResultKind.Post)
+            {
+                localizedItems.Add(item);
+                continue;
+            }
+
+            var brief = new BlogPostBrief
+            {
+                SourcePath = item.SourcePath,
+                Title = item.Title,
+                Slug = item.Slug,
+                Description = item.Summary,
+                Lastmod = item.UpdatedAt
+            };
+            var localized = await LocalizeBlogPostBriefAsync(brief);
+            if (localized is null)
+            {
+                localizedItems.Add(item);
+                continue;
+            }
+
+            localizedItems.Add(new SearchResultItem
+            {
+                Kind = item.Kind,
+                Title = localized.Title?.Trim() ?? item.Title,
+                Url = item.Url,
+                Summary = localized.Description ?? item.Summary,
+                MatchedSnippet = item.MatchedSnippet,
+                Context = GetBlogPostContext(localized) ?? item.Context,
+                Slug = item.Slug,
+                SourcePath = item.SourcePath,
+                UpdatedAt = item.UpdatedAt,
+                Score = item.Score
+            });
+        }
+
+        return localizedItems;
     }
 
     private static string NormalizeSearchQuery(string? query) =>
@@ -1839,27 +1925,16 @@ public class AppService : IDisposable
 
     public async Task<List<BlogPost>?> GetAllBlogPostsAsync()
     {
-        var language = RequestLanguage.CurrentLanguage;
-        if (RequestLanguage.IsDefaultLanguage(language) && _blogPosts?.Any() == true)
+        if (_blogPosts is { } cachedPosts)
         {
-            return _blogPosts;
-        }
-
-        if (_blogPostsByLanguage.TryGetValue(language, out var localizedPosts) && localizedPosts.Any())
-        {
-            return localizedPosts;
+            return cachedPosts;
         }
 
         var localAssetsDir = GetLocalAssetsDir();
         if (localAssetsDir is null)
         {
             var emptyPosts = new List<BlogPost>();
-            if (RequestLanguage.IsDefaultLanguage(language))
-            {
-                _blogPosts = emptyPosts;
-            }
-
-            _blogPostsByLanguage[language] = emptyPosts;
+            _blogPosts = emptyPosts;
             return emptyPosts;
         }
 
@@ -1876,11 +1951,8 @@ public class AppService : IDisposable
 
                 try
                 {
-                    var blogPost = await ReadLocalizedBlogPostAsync(
-                        postFile,
-                        language,
-                        createMissingTranslation: false,
-                        renderContent: false);
+                    var blogPost = await ReadBlogPostAsync(postFile, renderContent: false);
+                    CacheBlogPostSourcePath(blogPost, postFile);
                     if (!blogPost.Draft)
                     {
                         posts.Add(blogPost);
@@ -1898,12 +1970,7 @@ public class AppService : IDisposable
             .ThenByDescending(post => post.Date ?? DateTime.MinValue)
             .ToList();
 
-        if (RequestLanguage.IsDefaultLanguage(language))
-        {
-            _blogPosts = posts;
-        }
-
-        _blogPostsByLanguage[language] = posts;
+        _blogPosts = posts;
         return posts;
     }
 
@@ -1987,6 +2054,13 @@ public class AppService : IDisposable
             return sourcePath;
         }
 
+        if (createMissingTranslation
+            && IsLocalizationFallbackActive(targetPath)
+            && !File.Exists(targetPath))
+        {
+            return sourcePath;
+        }
+
         var gate = _localizedAssetLocks.GetOrAdd(targetPath, _ => new SemaphoreSlim(1, 1));
         var stopwatch = createMissingTranslation ? Stopwatch.StartNew() : null;
         if (createMissingTranslation)
@@ -2010,6 +2084,7 @@ public class AppService : IDisposable
             DeleteStaleLocalizedBlogPosts(sourcePath, targetPath, version, normalizedLanguage);
             if (File.Exists(targetPath))
             {
+                ClearLocalizationFallback(targetPath);
                 if (createMissingTranslation)
                 {
                     await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, normalizedLanguage);
@@ -2039,6 +2114,11 @@ public class AppService : IDisposable
                 return sourcePath;
             }
 
+            if (IsLocalizationFallbackActive(targetPath))
+            {
+                return sourcePath;
+            }
+
             var source = await BlogPostFiles.ReadBodyAsync(sourcePath);
             var translated = await translationService.TranslateAsync(
                 source,
@@ -2062,14 +2142,17 @@ public class AppService : IDisposable
                     sourcePath,
                     targetPath,
                     stopwatch?.ElapsedMilliseconds ?? 0);
-                throw new InvalidOperationException(message);
+                // 翻译服务关闭、额度耗尽或临时失败时，详情页降级展示原文，避免用户直接看到 500。
+                MarkLocalizationFallback(targetPath);
+                return sourcePath;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
             await WriteAllTextAtomicallyAsync(targetPath, translated.Trim());
+            ClearLocalizationFallback(targetPath);
             await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, normalizedLanguage);
-            _blogPostsByLanguage.TryRemove(normalizedLanguage, out _);
             _searchIndexByLanguage.TryRemove(normalizedLanguage, out _);
+            _tagItemsByLanguage.TryRemove(normalizedLanguage, out _);
             stopwatch?.Stop();
             CodeWfLogger.Info(
                 $"语言文章生成完成。language={normalizedLanguage}; slug={sourcePost.Slug}; outputChars={translated.Length}; elapsedMs={stopwatch?.ElapsedMilliseconds ?? 0}; target={targetPath}.",
@@ -2147,6 +2230,7 @@ public class AppService : IDisposable
             sourcePost,
             language,
             createMissingTranslation: false);
+        var metadataPath = await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, language);
         if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase))
         {
             return await ReadLocalizedBlogPostAsync(
@@ -2156,7 +2240,6 @@ public class AppService : IDisposable
                 renderContent: false);
         }
 
-        var metadataPath = await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, language);
         if (metadataPath is null || !File.Exists(metadataPath))
         {
             return post;
@@ -2185,6 +2268,34 @@ public class AppService : IDisposable
         }
     }
 
+    public async Task<BlogPostBrief?> LocalizeBlogPostBriefAsync(BlogPostBrief? brief)
+    {
+        if (brief is null)
+        {
+            return null;
+        }
+
+        if (RequestLanguage.IsDefaultLanguage(RequestLanguage.CurrentLanguage))
+        {
+            return brief;
+        }
+
+        var post = brief as BlogPost ?? ToBlogPost(brief);
+        var localizedPost = await LocalizeBlogPostMetadataAsync(post) ?? post;
+        return ToBlogPostBrief(localizedPost);
+    }
+
+    public async Task<List<BlogPostBrief>> LocalizeBlogPostBriefsAsync(IEnumerable<BlogPostBrief> briefs)
+    {
+        var localized = new List<BlogPostBrief>();
+        foreach (var brief in briefs)
+        {
+            localized.Add(await LocalizeBlogPostBriefAsync(brief) ?? brief);
+        }
+
+        return localized;
+    }
+
     private async Task<string?> GetOrCreateLocalizedBlogPostMetadataPathAsync(
         string sourcePath,
         BlogPost sourcePost,
@@ -2209,7 +2320,37 @@ public class AppService : IDisposable
             DeleteStaleLocalizedBlogPostMetadata(sourcePath, targetPath, version);
             if (File.Exists(targetPath))
             {
+                bool shouldRepair;
+                try
+                {
+                    var localizedMetadataPost = await BlogPostFiles.ReadMetadataAsync(targetPath);
+                    shouldRepair = ShouldRepairLocalizedMetadata(normalizedLanguage, sourcePost, localizedMetadataPost);
+                }
+                catch
+                {
+                    shouldRepair = true;
+                }
+
+                if (shouldRepair)
+                {
+                    File.Delete(targetPath);
+                }
+                else
+                {
+                    ClearLocalizationFallback(targetPath);
+                    return targetPath;
+                }
+            }
+
+            if (File.Exists(targetPath))
+            {
+                ClearLocalizationFallback(targetPath);
                 return targetPath;
+            }
+
+            if (IsLocalizationFallbackActive(targetPath))
+            {
+                return null;
             }
 
             var resource = JsonSerializer.Serialize(
@@ -2227,6 +2368,7 @@ public class AppService : IDisposable
                 resourceName: targetPath);
             if (string.IsNullOrWhiteSpace(translated))
             {
+                MarkLocalizationFallback(targetPath);
                 return null;
             }
 
@@ -2238,8 +2380,9 @@ public class AppService : IDisposable
 
             var metadataYaml = BlogPostFiles.SerializeMetadata(ApplyLocalizedMetadata(sourcePost, metadata));
             await WriteAllTextAtomicallyAsync(targetPath, metadataYaml);
-            _blogPostsByLanguage.TryRemove(normalizedLanguage, out _);
+            ClearLocalizationFallback(targetPath);
             _searchIndexByLanguage.TryRemove(normalizedLanguage, out _);
+            _tagItemsByLanguage.TryRemove(normalizedLanguage, out _);
             return targetPath;
         }
         finally
@@ -2454,6 +2597,22 @@ public class AppService : IDisposable
         return posts?.Select(ToBlogPostBrief).ToList();
     }
 
+    public async Task<IReadOnlyDictionary<string, int>> GetAlbumPostCountsBySlugAsync()
+    {
+        var albums = await LoadDefaultAlbumItemsForMatchingAsync();
+        return await GetTaxonomyPostCountsBySlugAsync(
+            albums.Select(static item => (item.Slug, item.Name)),
+            static post => post.Albums);
+    }
+
+    public async Task<IReadOnlyDictionary<string, int>> GetCategoryPostCountsBySlugAsync()
+    {
+        var categories = await LoadDefaultCategoryItemsForMatchingAsync();
+        return await GetTaxonomyPostCountsBySlugAsync(
+            categories.Select(static item => (item.Slug, item.Name)),
+            static post => post.Categories);
+    }
+
     public async Task<PageData<BlogPostBrief>> GetPostByAlbum(int pageIndex, int pageSize, string albumSlug,
         string? key)
     {
@@ -2488,6 +2647,7 @@ public class AppService : IDisposable
             .Take(pageSize)
             .Select(ToBlogPostBrief)
             .ToList();
+        postDatas = await LocalizeBlogPostBriefsAsync(postDatas);
         return new PageData<BlogPostBrief>(pageIndex, pageSize, total, postDatas);
     }
 
@@ -2525,6 +2685,7 @@ public class AppService : IDisposable
             .Take(pageSize)
             .Select(ToBlogPostBrief)
             .ToList();
+        postDatas = await LocalizeBlogPostBriefsAsync(postDatas);
         return new PageData<BlogPostBrief>(pageIndex, pageSize, total, postDatas);
     }
 
@@ -2638,11 +2799,71 @@ public class AppService : IDisposable
         }
     }
 
-    public async Task<List<TagItem>> GetAllTagItemsAsync()
+    private async Task<IReadOnlyDictionary<string, int>> GetTaxonomyPostCountsBySlugAsync(
+        IEnumerable<(string? Slug, string? Name)> taxonomyItems,
+        Func<BlogPost, IEnumerable<string>?> valueSelector)
     {
         var allPosts = await GetAllBlogPostsAsync() ?? [];
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            [ConstantUtil.DefaultCategory] = allPosts.Count
+        };
+        var slugByName = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
-        return allPosts
+        foreach (var (slug, name) in taxonomyItems)
+        {
+            if (string.IsNullOrWhiteSpace(slug) || string.IsNullOrWhiteSpace(name))
+            {
+                continue;
+            }
+
+            var normalizedName = name.Trim();
+            if (!slugByName.TryGetValue(normalizedName, out var slugs))
+            {
+                slugs = [];
+                slugByName[normalizedName] = slugs;
+            }
+
+            slugs.Add(slug.Trim());
+        }
+
+        foreach (var post in allPosts)
+        {
+            var countedSlugs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var value in valueSelector(post) ?? [])
+            {
+                if (string.IsNullOrWhiteSpace(value)
+                    || !slugByName.TryGetValue(value.Trim(), out var slugs))
+                {
+                    continue;
+                }
+
+                foreach (var slug in slugs)
+                {
+                    countedSlugs.Add(slug);
+                }
+            }
+
+            foreach (var slug in countedSlugs)
+            {
+                counts[slug] = counts.TryGetValue(slug, out var count) ? count + 1 : 1;
+            }
+        }
+
+        return counts;
+    }
+
+    public async Task<List<TagItem>> GetAllTagItemsAsync()
+    {
+        var language = RequestLanguage.Normalize(RequestLanguage.CurrentLanguage) ?? RequestLanguage.DefaultLanguage;
+        if (_tagItemsByLanguage.TryGetValue(language, out var cachedTags))
+        {
+            return cachedTags;
+        }
+
+        var allPosts = await GetAllBlogPostsAsync() ?? [];
+
+        var tags = allPosts
             .SelectMany(static post => post.Tags ?? [])
             .Where(static tag => !string.IsNullOrWhiteSpace(tag))
             .Select(ConstantUtil.NormalizeTagName)
@@ -2656,6 +2877,8 @@ public class AppService : IDisposable
             .OrderByDescending(static tag => tag.PostCount)
             .ThenBy(static tag => tag.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
+        _tagItemsByLanguage[language] = tags;
+        return tags;
     }
 
     public async Task<PageData<BlogPostBrief>> GetPostByTag(int pageIndex, int pageSize, string tag, string? key = null)
@@ -2694,19 +2917,28 @@ public class AppService : IDisposable
             .Take(pageSize)
             .Select(ToBlogPostBrief)
             .ToList();
+        data = await LocalizeBlogPostBriefsAsync(data);
 
         return new PageData<BlogPostBrief>(pageIndex, pageSize, total, data);
     }
 
-    public async Task<List<BlogPostBrief>?> GetBannerPostAsync()
+    public async Task<List<BlogPostBrief>?> GetBannerPostAsync(int? limit = null)
     {
         var posts = await GetAllBlogPostsAsync();
-        var bannerPosts = posts
+        var source = posts
             ?.Where(post => post.Banner)
             .OrderByDescending(post => post.Date)
+            .AsEnumerable()
+            ?? [];
+        if (limit.HasValue)
+        {
+            source = source.Take(Math.Max(0, limit.Value));
+        }
+
+        var bannerPosts = source
             .Select(ToBlogPostBrief)
             .ToList();
-        return bannerPosts;
+        return await LocalizeBlogPostBriefsAsync(bannerPosts);
     }
 
     public async Task<PageData<BlogPostBrief>> GetPagedBlogPostsAsync(int pageIndex, int pageSize, string? key = null)
@@ -2733,6 +2965,7 @@ public class AppService : IDisposable
             .Take(pageSize)
             .Select(ToBlogPostBrief)
             .ToList();
+        data = await LocalizeBlogPostBriefsAsync(data);
 
         return new PageData<BlogPostBrief>(pageIndex, pageSize, total, data);
     }
@@ -2757,6 +2990,39 @@ public class AppService : IDisposable
         Categories = post.Categories?.ToList(),
         Tags = post.Tags?.ToList()
     };
+
+    private static BlogPost ToBlogPost(BlogPostBrief brief) => new()
+    {
+        SourcePath = brief.SourcePath,
+        Title = brief.Title,
+        Slug = brief.Slug,
+        Description = brief.Description,
+        Date = brief.Date,
+        Lastmod = brief.Lastmod,
+        Copyright = brief.Copyright,
+        Banner = brief.Banner,
+        Author = brief.Author,
+        LastModifyUser = brief.LastModifyUser,
+        OriginalTitle = brief.OriginalTitle,
+        OriginalLink = brief.OriginalLink,
+        Draft = brief.Draft,
+        Cover = brief.Cover,
+        Albums = brief.Albums?.ToList(),
+        Categories = brief.Categories?.ToList(),
+        Tags = brief.Tags?.ToList()
+    };
+
+    private static string? GetBlogPostContext(BlogPostBrief post)
+    {
+        var categoryText = string.Join(" / ", post.Categories?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+        if (!string.IsNullOrWhiteSpace(categoryText))
+        {
+            return categoryText;
+        }
+
+        var albumText = string.Join(" / ", post.Albums?.Where(static item => !string.IsNullOrWhiteSpace(item)) ?? []);
+        return string.IsNullOrWhiteSpace(albumText) ? null : albumText;
+    }
 
     public Task<Dictionary<string, string>> GetWebSiteCountAsync()
     {
@@ -2861,12 +3127,28 @@ public class AppService : IDisposable
             language,
             createMissingTranslation: true,
             renderContent: true);
-        _blogPostsByLanguage.TryRemove(language, out _);
         return post;
     }
 
     private async Task<string?> FindBlogPostSourcePathBySlugAsync(string slug)
     {
+        var normalizedSlug = slug.Trim();
+        if (_blogPostSourcePathBySlug.TryGetValue(normalizedSlug, out var cachedPath)
+            && File.Exists(cachedPath))
+        {
+            return cachedPath;
+        }
+
+        // 列表缓存里已经包含 slug -> 源文件路径关系，详情页优先复用，避免每次按 slug 访问都全仓库扫描。
+        var cachedPosts = await GetAllBlogPostsAsync();
+        var cachedPost = cachedPosts?.FirstOrDefault(post =>
+            string.Equals(post.Slug, normalizedSlug, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(cachedPost?.SourcePath) && File.Exists(cachedPost.SourcePath))
+        {
+            CacheBlogPostSourcePath(cachedPost, cachedPost.SourcePath);
+            return cachedPost.SourcePath;
+        }
+
         var localAssetsDir = GetLocalAssetsDir();
         if (localAssetsDir is null)
         {
@@ -2885,7 +3167,8 @@ public class AppService : IDisposable
                 try
                 {
                     var post = await ReadBlogPostAsync(postFile, renderContent: false);
-                    if (string.Equals(post.Slug, slug, StringComparison.OrdinalIgnoreCase))
+                    CacheBlogPostSourcePath(post, postFile);
+                    if (string.Equals(post.Slug, normalizedSlug, StringComparison.OrdinalIgnoreCase))
                     {
                         return postFile;
                     }
@@ -2899,6 +3182,224 @@ public class AppService : IDisposable
 
         return null;
     }
+
+    private void CacheBlogPostSourcePath(BlogPost post, string sourcePath)
+    {
+        if (!string.IsNullOrWhiteSpace(post.Slug) && !string.IsNullOrWhiteSpace(sourcePath))
+        {
+            _blogPostSourcePathBySlug[post.Slug.Trim()] = sourcePath;
+        }
+    }
+
+    private static async Task<bool> ShouldRepairLocalizedAssetAsync(
+        string language,
+        IReadOnlyList<string> sourceSegments,
+        string sourcePath,
+        string targetPath)
+    {
+        if (RequestLanguage.IsDefaultLanguage(language)
+            || !IsRepairableLocalizedAsset(sourceSegments)
+            || !File.Exists(sourcePath)
+            || !File.Exists(targetPath))
+        {
+            return false;
+        }
+
+        var source = await File.ReadAllTextAsync(sourcePath);
+        var target = await File.ReadAllTextAsync(targetPath);
+        return ContainsOnlySourceCjkText(source, target);
+    }
+
+    private static bool IsRepairableLocalizedAsset(IReadOnlyList<string> sourceSegments)
+    {
+        if (sourceSegments.Count < 2
+            || !string.Equals(sourceSegments[0], "site", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return string.Equals(sourceSegments[1], "albums.json", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sourceSegments[1], "categories.json", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sourceSegments[1], "friend-links.json", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(sourceSegments[1], "timelines.json", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool ShouldRepairLocalizedMetadata(
+        string language,
+        BlogPost sourcePost,
+        BlogPost localizedPost)
+    {
+        if (RequestLanguage.IsDefaultLanguage(language))
+        {
+            return false;
+        }
+
+        if (IsUntranslatedCjkText(sourcePost.Title, localizedPost.Title)
+            || IsUntranslatedCjkText(sourcePost.Description, localizedPost.Description))
+        {
+            return true;
+        }
+
+        var sourceTexts = GetComparableCjkTexts(EnumerateMetadataTexts(sourcePost)).ToList();
+        if (sourceTexts.Count == 0)
+        {
+            return false;
+        }
+
+        var targetTexts = GetComparableCjkTexts(EnumerateMetadataTexts(localizedPost))
+            .ToHashSet(StringComparer.Ordinal);
+        return sourceTexts.All(targetTexts.Contains);
+    }
+
+    private static IEnumerable<string?> EnumerateMetadataTexts(BlogPost post)
+    {
+        yield return post.Title;
+        yield return post.Description;
+        foreach (var item in post.Albums ?? [])
+        {
+            yield return item;
+        }
+
+        foreach (var item in post.Categories ?? [])
+        {
+            yield return item;
+        }
+
+        foreach (var item in post.Tags ?? [])
+        {
+            yield return item;
+        }
+    }
+
+    private static bool ContainsOnlySourceCjkText(string source, string target)
+    {
+        var sourceTexts = ExtractComparableCjkTexts(source).ToList();
+        if (sourceTexts.Count == 0)
+        {
+            return false;
+        }
+
+        var targetTexts = ExtractComparableCjkTexts(target).ToHashSet(StringComparer.Ordinal);
+        return sourceTexts.All(targetTexts.Contains);
+    }
+
+    private static IEnumerable<string> ExtractComparableCjkTexts(string content)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(content, new JsonDocumentOptions
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            });
+            return GetComparableCjkTexts(EnumerateJsonStrings(document.RootElement)).Distinct(StringComparer.Ordinal).ToList();
+        }
+        catch
+        {
+            return GetComparableCjkTexts([content]).Distinct(StringComparer.Ordinal).ToList();
+        }
+    }
+
+    private static IEnumerable<string> EnumerateJsonStrings(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.String:
+                yield return element.GetString() ?? string.Empty;
+                yield break;
+            case JsonValueKind.Array:
+                foreach (var item in element.EnumerateArray())
+                {
+                    foreach (var value in EnumerateJsonStrings(item))
+                    {
+                        yield return value;
+                    }
+                }
+                yield break;
+            case JsonValueKind.Object:
+                foreach (var property in element.EnumerateObject())
+                {
+                    foreach (var value in EnumerateJsonStrings(property.Value))
+                    {
+                        yield return value;
+                    }
+                }
+                yield break;
+        }
+    }
+
+    private static IEnumerable<string> GetComparableCjkTexts(IEnumerable<string?> values)
+    {
+        foreach (var value in values)
+        {
+            var comparable = GetComparableCjkText(value);
+            if (!string.IsNullOrWhiteSpace(comparable))
+            {
+                yield return comparable;
+            }
+        }
+    }
+
+    private static bool IsUntranslatedCjkText(string? source, string? target)
+    {
+        var comparableSource = GetComparableCjkText(source);
+        if (string.IsNullOrWhiteSpace(comparableSource))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            return true;
+        }
+
+        var comparableTarget = GetComparableCjkText(target);
+        return !string.IsNullOrWhiteSpace(comparableTarget)
+               && string.Equals(comparableSource, comparableTarget, StringComparison.Ordinal);
+    }
+
+    private static string? GetComparableCjkText(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var comparable = RemovePreservedCjkTerms(value.Trim());
+        return ChineseTextRegex.IsMatch(comparable) ? comparable : null;
+    }
+
+    private static string RemovePreservedCjkTerms(string value)
+    {
+        foreach (var term in PreservedCjkTerms)
+        {
+            value = value.Replace(term, string.Empty, StringComparison.Ordinal);
+        }
+
+        return value;
+    }
+
+    private bool IsLocalizationFallbackActive(string targetPath)
+    {
+        if (!_localizationFallbackUntil.TryGetValue(targetPath, out var retryAfter))
+        {
+            return false;
+        }
+
+        if (retryAfter > DateTimeOffset.UtcNow)
+        {
+            return true;
+        }
+
+        _localizationFallbackUntil.TryRemove(targetPath, out _);
+        return false;
+    }
+
+    private void MarkLocalizationFallback(string targetPath) =>
+        _localizationFallbackUntil[targetPath] = DateTimeOffset.UtcNow.Add(FailedLocalizationRetryDelay);
+
+    private void ClearLocalizationFallback(string targetPath) =>
+        _localizationFallbackUntil.TryRemove(targetPath, out _);
 
     public static Task<BlogPost> ReadBlogPostAsync(string markdownFilePath) =>
         ReadBlogPostAsync(markdownFilePath, renderContent: true);

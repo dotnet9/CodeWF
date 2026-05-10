@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -42,6 +43,8 @@ public sealed class I18nService
     private static readonly Regex SingleQuotedTextRegex = new(@"'(?<value>(?:[^'\\]|\\.)*[\u3400-\u9fff](?:[^'\\]|\\.)*)'", RegexOptions.Compiled);
     private static readonly Regex BacktickTextRegex = new(@"`(?<value>[^`]*[\u3400-\u9fff][^`]*)`", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex InterpolatedExpressionRegex = new(@"\{[A-Za-z_]\w*(?:\.[^}]*)+\}", RegexOptions.Compiled);
+    private static readonly string[] PreservedCjkTerms = ["码坊"];
 
     private static readonly JsonSerializerOptions ReadJsonOptions = new()
     {
@@ -198,6 +201,12 @@ public sealed class I18nService
 
     public string Url(string? url, string? language = null) => RequestLanguage.LocalizePath(url, language);
 
+    public string FormatDate(DateTime? value) =>
+        value.HasValue ? value.Value.ToString("d", CultureInfo.CurrentCulture) : string.Empty;
+
+    public string FormatDateTime(DateTime? value) =>
+        value.HasValue ? value.Value.ToString("g", CultureInfo.CurrentCulture) : string.Empty;
+
     public string SwitchUrl(string language)
     {
         var context = _httpContextAccessor.HttpContext;
@@ -257,7 +266,10 @@ public sealed class I18nService
         var parent = parentLanguage is null
             ? new I18nResource()
             : LoadResourceFile(parentLanguage) ?? new I18nResource();
-        var current = LoadResourceFile(language) ?? new I18nResource();
+        var current = LoadResourceFile(language)
+            ?? CreateResourceFileFromDefault(language, fallback)
+            ?? new I18nResource();
+        current = CompleteResourceFromDefault(language, fallback, parent, current);
 
         return new I18nResource
         {
@@ -753,17 +765,19 @@ public sealed class I18nService
         I18nResource parent,
         I18nResource current)
     {
+        var removedTextMapCount = PruneInvalidLocalizedTextMap(fallback, parent, current);
         var mergedExistingStrings = Merge(parent.Strings, current.Strings);
         var mergedExistingTextMap = Merge(parent.TextMap, current.TextMap);
-        var missingStrings = fallback.Strings
-            .Where(item => !mergedExistingStrings.ContainsKey(item.Key))
-            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
-        var missingTextMap = fallback.TextMap
-            .Where(item => !mergedExistingTextMap.ContainsKey(item.Key))
-            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+        var missingStrings = GetResourceEntriesNeedingTranslation(language, fallback.Strings, mergedExistingStrings);
+        var missingTextMap = GetResourceEntriesNeedingTranslation(language, fallback.TextMap, mergedExistingTextMap);
 
         if (missingStrings.Count == 0 && missingTextMap.Count == 0)
         {
+            if (removedTextMapCount > 0)
+            {
+                SaveResourceFile(language, current);
+            }
+
             return current;
         }
 
@@ -796,16 +810,18 @@ public sealed class I18nService
         try
         {
             var latest = LoadResourceFile(language) ?? current;
+            removedTextMapCount += PruneInvalidLocalizedTextMap(fallback, parent, latest);
             var latestWithParentStrings = Merge(parent.Strings, latest.Strings);
             var latestWithParentTextMap = Merge(parent.TextMap, latest.TextMap);
-            missingStrings = fallback.Strings
-                .Where(item => !latestWithParentStrings.ContainsKey(item.Key))
-                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
-            missingTextMap = fallback.TextMap
-                .Where(item => !latestWithParentTextMap.ContainsKey(item.Key))
-                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+            missingStrings = GetResourceEntriesNeedingTranslation(language, fallback.Strings, latestWithParentStrings);
+            missingTextMap = GetResourceEntriesNeedingTranslation(language, fallback.TextMap, latestWithParentTextMap);
             if (missingStrings.Count == 0 && missingTextMap.Count == 0)
             {
+                if (removedTextMapCount > 0)
+                {
+                    SaveResourceFile(language, latest);
+                }
+
                 stopwatch.Stop();
                 CodeWfLogger.Info(
                     $"i18n 语言资源补译跳过，缺失项已由其他请求补齐。language={language}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
@@ -918,17 +934,19 @@ public sealed class I18nService
         I18nResource current,
         CancellationToken cancellationToken)
     {
+        var removedTextMapCount = PruneInvalidLocalizedTextMap(fallback, parent, current);
         var mergedExistingStrings = Merge(parent.Strings, current.Strings);
         var mergedExistingTextMap = Merge(parent.TextMap, current.TextMap);
-        var missingStrings = fallback.Strings
-            .Where(item => !mergedExistingStrings.ContainsKey(item.Key))
-            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
-        var missingTextMap = fallback.TextMap
-            .Where(item => !mergedExistingTextMap.ContainsKey(item.Key))
-            .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+        var missingStrings = GetResourceEntriesNeedingTranslation(language, fallback.Strings, mergedExistingStrings);
+        var missingTextMap = GetResourceEntriesNeedingTranslation(language, fallback.TextMap, mergedExistingTextMap);
 
         if (missingStrings.Count == 0 && missingTextMap.Count == 0)
         {
+            if (removedTextMapCount > 0)
+            {
+                await SaveResourceFileAsync(language, current, cancellationToken);
+            }
+
             return current;
         }
 
@@ -961,16 +979,18 @@ public sealed class I18nService
         try
         {
             var latest = await LoadResourceFileAsync(language, cancellationToken) ?? current;
+            removedTextMapCount += PruneInvalidLocalizedTextMap(fallback, parent, latest);
             var latestWithParentStrings = Merge(parent.Strings, latest.Strings);
             var latestWithParentTextMap = Merge(parent.TextMap, latest.TextMap);
-            missingStrings = fallback.Strings
-                .Where(item => !latestWithParentStrings.ContainsKey(item.Key))
-                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
-            missingTextMap = fallback.TextMap
-                .Where(item => !latestWithParentTextMap.ContainsKey(item.Key))
-                .ToDictionary(static item => item.Key, static item => item.Value, StringComparer.Ordinal);
+            missingStrings = GetResourceEntriesNeedingTranslation(language, fallback.Strings, latestWithParentStrings);
+            missingTextMap = GetResourceEntriesNeedingTranslation(language, fallback.TextMap, latestWithParentTextMap);
             if (missingStrings.Count == 0 && missingTextMap.Count == 0)
             {
+                if (removedTextMapCount > 0)
+                {
+                    await SaveResourceFileAsync(language, latest, cancellationToken);
+                }
+
                 stopwatch.Stop();
                 CodeWfLogger.Info(
                     $"i18n 璇█璧勬簮琛ヨ瘧璺宠繃锛岀己澶遍」宸茬敱鍏朵粬璇锋眰琛ラ綈銆俵anguage={language}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
@@ -1256,11 +1276,146 @@ public sealed class I18nService
         var text = value.Trim();
         return text.Length is >= 2 and <= 240
             && ChineseTextRegex.IsMatch(text)
+            && !ContainsMarkupFragment(text)
+            && !ContainsCodeFragment(text)
             && !text.Contains('@', StringComparison.Ordinal)
             && !text.Contains("${", StringComparison.Ordinal)
             && !text.Contains("=>", StringComparison.Ordinal)
             && !text.StartsWith("//", StringComparison.Ordinal)
             && !text.StartsWith("/*", StringComparison.Ordinal);
+    }
+
+    private static Dictionary<string, string> GetResourceEntriesNeedingTranslation(
+        string language,
+        IReadOnlyDictionary<string, string> fallback,
+        IReadOnlyDictionary<string, string> current)
+    {
+        var entries = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var item in fallback)
+        {
+            if (!current.TryGetValue(item.Key, out var currentValue)
+                || ShouldRetranslateLocalizedValue(language, item.Value, currentValue))
+            {
+                entries[item.Key] = item.Value;
+            }
+        }
+
+        return entries;
+    }
+
+    private static bool ShouldRetranslateLocalizedValue(string language, string source, string? currentValue)
+    {
+        if (RequestLanguage.IsDefaultLanguage(language) || !ChineseTextRegex.IsMatch(source))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(currentValue))
+        {
+            return true;
+        }
+
+        var comparableSource = RemovePreservedCjkTerms(source.Trim());
+        var comparableCurrentValue = RemovePreservedCjkTerms(currentValue.Trim());
+        if (string.IsNullOrWhiteSpace(comparableSource) && string.IsNullOrWhiteSpace(comparableCurrentValue))
+        {
+            return false;
+        }
+
+        if (string.Equals(comparableSource, comparableCurrentValue, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        // 英文资源中残留中文通常表示历史资源未真正翻译，不能继续视为命中缓存。
+        return IsCjkUnsafeTargetLanguage(language) && ChineseTextRegex.IsMatch(comparableCurrentValue);
+    }
+
+    private static bool IsCjkUnsafeTargetLanguage(string language) =>
+        string.Equals(RequestLanguage.Normalize(language), "en", StringComparison.OrdinalIgnoreCase);
+
+    private static bool ContainsMarkupFragment(string text) =>
+        text.Contains('<', StringComparison.Ordinal)
+        || text.Contains('>', StringComparison.Ordinal)
+        || text.Contains("class=", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("href=", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("src=", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("</", StringComparison.Ordinal)
+        || text.Contains("/>", StringComparison.Ordinal);
+
+    private static bool ContainsCodeFragment(string text) =>
+        text.Contains(';', StringComparison.Ordinal)
+        || text.Contains("throw ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("function ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("return ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("const ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("let ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("var ", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("while(", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("while (", StringComparison.OrdinalIgnoreCase)
+        || text.Contains("new Error", StringComparison.OrdinalIgnoreCase)
+        || InterpolatedExpressionRegex.IsMatch(text);
+
+    private static string RemovePreservedCjkTerms(string value)
+    {
+        foreach (var term in PreservedCjkTerms)
+        {
+            value = value.Replace(term, string.Empty, StringComparison.Ordinal);
+        }
+
+        return value;
+    }
+
+    private int PruneInvalidLocalizedTextMap(
+        I18nResource fallback,
+        I18nResource parent,
+        I18nResource current)
+    {
+        if (current.TextMap.Count == 0)
+        {
+            return 0;
+        }
+
+        var validKeys = new HashSet<string>(fallback.TextMap.Keys, StringComparer.Ordinal);
+        validKeys.UnionWith(parent.TextMap.Keys);
+        var removed = 0;
+        foreach (var key in current.TextMap.Keys.ToList())
+        {
+            if (!validKeys.Contains(key) && !ShouldIncludeDiscoveredText(key))
+            {
+                current.TextMap.Remove(key);
+                removed++;
+            }
+        }
+
+        return removed;
+    }
+
+    private void SaveResourceFile(string language, I18nResource resource)
+    {
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: true);
+        if (targetFilePath is null)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath)!);
+        File.WriteAllText(targetFilePath, JsonSerializer.Serialize(resource, WriteJsonOptions));
+    }
+
+    private async Task SaveResourceFileAsync(
+        string language,
+        I18nResource resource,
+        CancellationToken cancellationToken)
+    {
+        var targetFilePath = GetI18nResourceFilePath(language, createCultureDirectory: true);
+        if (targetFilePath is null)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath)!);
+        await File.WriteAllTextAsync(targetFilePath, JsonSerializer.Serialize(resource, WriteJsonOptions), cancellationToken);
     }
 
     private static string? GetParentLanguage(string language)

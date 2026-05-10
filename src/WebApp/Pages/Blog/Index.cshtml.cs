@@ -33,26 +33,33 @@ public class IndexModel : PageModel
         Total = pageData.Total;
         Categories = await _appService.GetAllCategoryItemsAsync() ?? [];
         Albums = await _appService.GetAllAlbumItemsAsync() ?? [];
+        var categoryCounts = await _appService.GetCategoryPostCountsBySlugAsync();
+        var albumCounts = await _appService.GetAlbumPostCountsBySlugAsync();
 
         var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
-        GettingStartedLinks = BuildGettingStartedLinks(allPosts, Categories, Albums);
-        SerialReadingLinks = BuildSerialReadingLinks(allPosts, Albums);
+        var latestPost = await _appService.LocalizeBlogPostBriefAsync(allPosts.FirstOrDefault());
+        GettingStartedLinks = BuildGettingStartedLinks(latestPost, Categories, categoryCounts, Albums, albumCounts);
+        SerialReadingLinks = BuildSerialReadingLinks(Albums, albumCounts);
         // “随机发现”刻意排除当前列表页已展示的文章，降低同屏重复感。
-        RandomPosts = BuildDiscoveryPosts(
+        var randomSource = TakeRandom(
             allPosts.Where(post =>
                 Posts.All(listed => !string.Equals(listed.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
             .ToList(),
             3);
+        RandomPosts = BuildDiscoveryPosts(
+            await _appService.LocalizeBlogPostBriefsAsync(randomSource));
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
-        IReadOnlyList<BlogPostBrief> allPosts,
+        BlogPostBrief? latestPost,
         IReadOnlyList<CategoryItem> categories,
-        IReadOnlyList<AlbumItem> albums)
+        IReadOnlyDictionary<string, int> categoryCounts,
+        IReadOnlyList<AlbumItem> albums,
+        IReadOnlyDictionary<string, int> albumCounts)
     {
         var links = new List<DiscoveryLinkCard>();
 
-        if (allPosts.FirstOrDefault() is { } latestPost)
+        if (latestPost is not null)
         {
             links.Add(new DiscoveryLinkCard(
                 "先看更新",
@@ -69,7 +76,7 @@ public class IndexModel : PageModel
             .Select(item => new
             {
                 Item = item,
-                Count = allPosts.Count(post => post.Categories?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+                Count = GetPostCount(categoryCounts, item.Slug)
             })
             .OrderByDescending(item => item.Count)
             .FirstOrDefault();
@@ -91,7 +98,7 @@ public class IndexModel : PageModel
             .Select(item => new
             {
                 Item = item,
-                Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+                Count = GetPostCount(albumCounts, item.Slug)
             })
             .Where(static item => item.Count > 0)
             .ToList(), 1)
@@ -110,8 +117,8 @@ public class IndexModel : PageModel
     }
 
     private static List<DiscoveryLinkCard> BuildSerialReadingLinks(
-        IReadOnlyList<BlogPostBrief> allPosts,
-        IReadOnlyList<AlbumItem> albums)
+        IReadOnlyList<AlbumItem> albums,
+        IReadOnlyDictionary<string, int> albumCounts)
     {
         var candidates = albums
             .Where(item =>
@@ -121,7 +128,7 @@ public class IndexModel : PageModel
             .Select(item => new
             {
                 Item = item,
-                Count = allPosts.Count(post => post.Albums?.Contains(item.Name, StringComparer.OrdinalIgnoreCase) == true)
+                Count = GetPostCount(albumCounts, item.Slug)
             })
             .Where(item => item.Count > 0)
             .ToList();
@@ -135,7 +142,7 @@ public class IndexModel : PageModel
             .ToList();
     }
 
-    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts, int count)
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts)
     {
         if (posts.Count == 0)
         {
@@ -144,7 +151,7 @@ public class IndexModel : PageModel
 
         var items = new List<DiscoveryPostCard>();
 
-        foreach (var post in TakeRandom(posts, count))
+        foreach (var post in posts)
         {
             var label = post.Categories?.FirstOrDefault()
                 ?? post.Albums?.FirstOrDefault()
@@ -160,6 +167,9 @@ public class IndexModel : PageModel
 
         return items;
     }
+
+    private static int GetPostCount(IReadOnlyDictionary<string, int> counts, string? slug) =>
+        !string.IsNullOrWhiteSpace(slug) && counts.TryGetValue(slug, out var count) ? count : 0;
 
     private static List<T> TakeRandom<T>(IReadOnlyList<T> source, int count)
     {

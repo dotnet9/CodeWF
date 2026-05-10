@@ -383,8 +383,9 @@ public sealed class RequestLanguageMiddleware
         RequestLanguage.CurrentLanguage = language;
         RequestLanguage.ApplyCulture(language);
 
-        if (persistCookie)
+        if (persistCookie && ShouldWriteLanguageCookie(context, language))
         {
+            // 语言已写入 Cookie 时不重复 Set-Cookie，减少页面切换后的响应头体积，也避免影响浏览器缓存判断。
             context.Response.Cookies.Append(
                 RequestLanguage.CookieName,
                 language,
@@ -409,5 +410,18 @@ public sealed class RequestLanguageMiddleware
             context.Request.Path = previousPath;
             RequestLanguage.Clear();
         }
+    }
+
+    private static bool ShouldWriteLanguageCookie(HttpContext context, string language)
+    {
+        if (!context.Request.Cookies.TryGetValue(RequestLanguage.CookieName, out var existingLanguage))
+        {
+            return true;
+        }
+
+        return !string.Equals(
+            RequestLanguage.Normalize(existingLanguage),
+            RequestLanguage.Normalize(language),
+            StringComparison.OrdinalIgnoreCase);
     }
 }

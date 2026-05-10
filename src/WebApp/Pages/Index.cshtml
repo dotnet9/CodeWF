@@ -89,7 +89,7 @@
                                     <p title="@post.Description">@post.Description</p>
                                 }
                                 <div class="spotlight-story__meta">
-                                    <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
+                                    <span><i class="far fa-calendar"></i>@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
                                     <span><i class="far fa-user"></i>@spotlightAuthor</span>
                                 </div>
                             </a>
@@ -256,7 +256,7 @@
                             {
                                 var postUrl = ConstantUtil.GetPostUrl(post);
                                 <a href="@postUrl" class="dispatch-item">
-                                    <span class="dispatch-item__meta">@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
+                                    <span class="dispatch-item__meta">@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
                                     <strong>@post.Title</strong>
                                     @if (!string.IsNullOrWhiteSpace(post.Description))
                                     {
@@ -310,7 +310,7 @@
                                 <p class="resource-card__desc" title="@post.Description">@post.Description</p>
                             }
                             <div class="resource-card__meta">
-                                <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
+                                <span><i class="far fa-calendar"></i>@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
                                 <span><i class="far fa-user"></i>@postAuthor</span>
                             </div>
                         </div>

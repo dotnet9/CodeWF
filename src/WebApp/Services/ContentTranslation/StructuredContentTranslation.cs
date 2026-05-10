@@ -7,12 +7,13 @@ namespace WebApp.Services;
 
 internal static class StructuredContentTranslation
 {
-    private const int JsonBatchLineNumberWidth = 6;
+    private const int IndexedBatchLineNumberWidth = 6;
 
     private static readonly Regex ChineseTextRegex = new(@"[\u3400-\u9fff]", RegexOptions.Compiled);
     private static readonly Regex YamlKeyValueRegex = new(@"^(?<prefix>\s*)(?<key>[A-Za-z][\w-]*)\s*:\s*(?<value>.*)$", RegexOptions.Compiled);
     private static readonly Regex YamlListItemRegex = new(@"^(?<prefix>\s*-\s*)(?<value>.*)$", RegexOptions.Compiled);
     private static readonly Regex MarkdownLinePrefixRegex = new(@"^(?<prefix>\s*(?:#{1,6}\s+|[-*+]\s+|\d+\.\s+|>\s*)*)(?<text>.*)$", RegexOptions.Compiled);
+    private static readonly Regex MarkdownTableSeparatorCellRegex = new(@"^:?-{3,}:?$", RegexOptions.Compiled);
 
     // JSON 资源里不是所有字符串都该翻译，路由、CSS 类名、文件路径等字段必须原样保留。
     private static readonly HashSet<string> JsonValueSkipNames = new(StringComparer.OrdinalIgnoreCase)
@@ -187,6 +188,26 @@ internal static class StructuredContentTranslation
         TextChunkTranslator translateChunkAsync,
         CancellationToken cancellationToken)
     {
+        // 相同中文只翻译一次，既减少请求字符数，也避免同一资源内重复扣费。
+        return await TranslateDistinctTextValuesAsync(
+            stringsToTranslate,
+            targetLanguage,
+            resource,
+            maxCharsPerRequest,
+            translateChunkAsync,
+            "JSON",
+            cancellationToken);
+    }
+
+    private static async Task<IReadOnlyDictionary<string, string>> TranslateDistinctTextValuesAsync(
+        IReadOnlyList<string> stringsToTranslate,
+        LanguageInfo targetLanguage,
+        string resource,
+        int maxCharsPerRequest,
+        TextChunkTranslator translateChunkAsync,
+        string contentKind,
+        CancellationToken cancellationToken)
+    {
         if (stringsToTranslate.Count == 0)
         {
             return new Dictionary<string, string>(StringComparer.Ordinal);
@@ -203,9 +224,22 @@ internal static class StructuredContentTranslation
             }
         }
 
-        // 相同中文只翻译一次，既减少请求字符数，也避免同一资源内重复扣费。
+        if (distinctSources.Count == 1)
+        {
+            return new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [distinctSources[0]] = await TranslateRequiredAsync(
+                    distinctSources[0],
+                    targetLanguage,
+                    resource,
+                    maxCharsPerRequest,
+                    translateChunkAsync,
+                    cancellationToken)
+            };
+        }
+
         var translatedSources = new string[distinctSources.Count];
-        var batches = CreateJsonTranslationBatches(distinctSources, maxCharsPerRequest).ToList();
+        var batches = CreateIndexedTranslationBatches(distinctSources, maxCharsPerRequest).ToList();
         for (var i = 0; i < batches.Count; i++)
         {
             var batch = batches[i];
@@ -231,10 +265,10 @@ internal static class StructuredContentTranslation
                 cancellationToken);
             string? parseError = null;
             if (translated is null
-                || !TryReadIndexedJsonBatchTranslations(translated, batch.SourceIndexes, translatedSources, out parseError))
+                || !TryReadIndexedBatchTranslations(translated, batch.SourceIndexes, translatedSources, out parseError))
             {
                 throw new InvalidOperationException(
-                    $"JSON translation batch returned an invalid indexed result. language={targetLanguage.Code}; resource={resource}; batch={i + 1}/{batches.Count}; reason={parseError ?? "empty result"}.");
+                    $"{contentKind} translation batch returned an invalid indexed result. language={targetLanguage.Code}; resource={resource}; batch={i + 1}/{batches.Count}; reason={parseError ?? "empty result"}.");
             }
         }
 
@@ -247,7 +281,7 @@ internal static class StructuredContentTranslation
         return translations;
     }
 
-    private static IEnumerable<JsonTranslationBatch> CreateJsonTranslationBatches(
+    private static IEnumerable<IndexedTranslationBatch> CreateIndexedTranslationBatches(
         IReadOnlyList<string> sources,
         int maxCharsPerRequest)
     {
@@ -261,32 +295,32 @@ internal static class StructuredContentTranslation
             // 批量协议改用“固定数字序号 + 制表符 + 文本”的行协议，避免 JSON 转义被翻译器破坏。
             var canUseLineBatch = !ContainsLineBreak(sources[i]);
             var singlePayload = canUseLineBatch
-                ? CreateIndexedJsonBatchPayload([i], [sources[i]])
+                ? CreateIndexedBatchPayload([i], [sources[i]])
                 : sources[i];
             if (!canUseLineBatch || singlePayload.Length > maxChars)
             {
                 if (currentIndexes.Count > 0)
                 {
-                    yield return new JsonTranslationBatch(
+                    yield return new IndexedTranslationBatch(
                         currentIndexes.ToArray(),
-                        CreateIndexedJsonBatchPayload(currentIndexes, currentValues),
+                        CreateIndexedBatchPayload(currentIndexes, currentValues),
                         IsIndexedLineBatch: true);
                     currentIndexes.Clear();
                     currentValues.Clear();
                 }
 
-                yield return new JsonTranslationBatch([i], sources[i], IsIndexedLineBatch: false);
+                yield return new IndexedTranslationBatch([i], sources[i], IsIndexedLineBatch: false);
                 continue;
             }
 
             currentValues.Add(sources[i]);
-            var payload = CreateIndexedJsonBatchPayload(currentIndexes.Append(i), currentValues);
+            var payload = CreateIndexedBatchPayload(currentIndexes.Append(i), currentValues);
             if (payload.Length > maxChars)
             {
                 currentValues.RemoveAt(currentValues.Count - 1);
-                yield return new JsonTranslationBatch(
+                yield return new IndexedTranslationBatch(
                     currentIndexes.ToArray(),
-                    CreateIndexedJsonBatchPayload(currentIndexes, currentValues),
+                    CreateIndexedBatchPayload(currentIndexes, currentValues),
                     IsIndexedLineBatch: true);
                 currentIndexes.Clear();
                 currentValues.Clear();
@@ -298,14 +332,14 @@ internal static class StructuredContentTranslation
 
         if (currentIndexes.Count > 0)
         {
-            yield return new JsonTranslationBatch(
+            yield return new IndexedTranslationBatch(
                 currentIndexes.ToArray(),
-                CreateIndexedJsonBatchPayload(currentIndexes, currentValues),
+                CreateIndexedBatchPayload(currentIndexes, currentValues),
                 IsIndexedLineBatch: true);
         }
     }
 
-    private static string CreateIndexedJsonBatchPayload(
+    private static string CreateIndexedBatchPayload(
         IEnumerable<int> sourceIndexes,
         IReadOnlyList<string> values)
     {
@@ -319,7 +353,7 @@ internal static class StructuredContentTranslation
             }
 
             builder
-                .Append(sourceIndex.ToString($"D{JsonBatchLineNumberWidth}"))
+                .Append(sourceIndex.ToString($"D{IndexedBatchLineNumberWidth}"))
                 .Append('\t')
                 .Append(values[valueIndex]);
             valueIndex++;
@@ -328,7 +362,7 @@ internal static class StructuredContentTranslation
         return builder.ToString();
     }
 
-    private static bool TryReadIndexedJsonBatchTranslations(
+    private static bool TryReadIndexedBatchTranslations(
         string translatedBatch,
         IReadOnlyList<int> sourceIndexes,
         string[] translatedSources,
@@ -453,7 +487,15 @@ internal static class StructuredContentTranslation
         }
     }
 
-    private sealed record JsonTranslationBatch(int[] SourceIndexes, string Source, bool IsIndexedLineBatch);
+    private sealed record IndexedTranslationBatch(int[] SourceIndexes, string Source, bool IsIndexedLineBatch);
+
+    private sealed record MarkdownTranslationSegment(
+        int LineIndex,
+        int? CellIndex,
+        string Prefix,
+        string LeadingWhitespace,
+        string Source,
+        string TrailingWhitespace);
 
     private static bool ShouldTranslateJsonString(string? value, string? propertyName)
     {
@@ -595,6 +637,8 @@ internal static class StructuredContentTranslation
         CancellationToken cancellationToken)
     {
         var lines = NormalizeLineEndings(source).Split('\n');
+        var segments = new List<MarkdownTranslationSegment>();
+        var tableCellsByLine = new Dictionary<int, string[]>();
         var inFence = false;
         for (var i = 0; i < lines.Length; i++)
         {
@@ -610,25 +654,56 @@ internal static class StructuredContentTranslation
                 continue;
             }
 
-            lines[i] = await TranslateMarkdownLineAsync(
+            CollectMarkdownLineSegments(
                 lines[i],
+                i,
+                segments,
+                tableCellsByLine);
+        }
+
+        if (segments.Count > 0)
+        {
+            // Markdown 不能整篇原样交给翻译 API，否则代码块、链接和表格分隔符都可能被改坏。
+            // 这里只抽取安全的正文片段，再用带序号的行协议尽量凑满单次 6000 字符上限。
+            var translations = await TranslateDistinctTextValuesAsync(
+                segments.Select(static segment => segment.Source).ToList(),
                 targetLanguage,
                 resource,
                 maxCharsPerRequest,
                 translateChunkAsync,
+                "Markdown",
                 cancellationToken);
+
+            foreach (var segment in segments)
+            {
+                var translated = translations.TryGetValue(segment.Source, out var value)
+                    ? value
+                    : segment.Source;
+                var replacement = $"{segment.LeadingWhitespace}{translated}{segment.TrailingWhitespace}";
+                if (segment.CellIndex.HasValue)
+                {
+                    tableCellsByLine[segment.LineIndex][segment.CellIndex.Value] = replacement;
+                }
+                else
+                {
+                    lines[segment.LineIndex] = $"{segment.Prefix}{replacement}";
+                }
+            }
+
+            foreach (var item in tableCellsByLine)
+            {
+                lines[item.Key] = string.Join('|', item.Value);
+            }
         }
 
         return string.Join('\n', lines).Trim();
     }
 
-    private static async Task<string> TranslateMarkdownLineAsync(
+    private static void CollectMarkdownLineSegments(
         string line,
-        LanguageInfo targetLanguage,
-        string resource,
-        int maxCharsPerRequest,
-        TextChunkTranslator translateChunkAsync,
-        CancellationToken cancellationToken)
+        int lineIndex,
+        List<MarkdownTranslationSegment> segments,
+        Dictionary<int, string[]> tableCellsByLine)
     {
         if (line.TrimStart().StartsWith("|", StringComparison.Ordinal) && line.Contains('|', StringComparison.Ordinal))
         {
@@ -636,61 +711,65 @@ internal static class StructuredContentTranslation
             for (var i = 0; i < cells.Length; i++)
             {
                 var cell = cells[i];
-                if (string.IsNullOrWhiteSpace(cell) || Regex.IsMatch(cell.Trim(), "^:?-{3,}:?$"))
+                if (string.IsNullOrWhiteSpace(cell)
+                    || MarkdownTableSeparatorCellRegex.IsMatch(cell.Trim())
+                    || ContainsUnsafeInlineMarkdown(cell))
                 {
                     continue;
                 }
 
-                cells[i] = await TranslatePreservingOuterWhitespaceAsync(
+                TryAddMarkdownTranslationSegment(
                     cell,
-                    targetLanguage,
-                    resource,
-                    maxCharsPerRequest,
-                    translateChunkAsync,
-                    cancellationToken);
+                    lineIndex,
+                    i,
+                    string.Empty,
+                    segments);
             }
 
-            return string.Join('|', cells);
+            if (segments.Any(segment => segment.LineIndex == lineIndex && segment.CellIndex.HasValue))
+            {
+                tableCellsByLine[lineIndex] = cells;
+            }
+
+            return;
         }
 
         var match = MarkdownLinePrefixRegex.Match(line);
         if (!match.Success)
         {
-            return await TranslatePreservingOuterWhitespaceAsync(
+            TryAddMarkdownTranslationSegment(
                 line,
-                targetLanguage,
-                resource,
-                maxCharsPerRequest,
-                translateChunkAsync,
-                cancellationToken);
+                lineIndex,
+                null,
+                string.Empty,
+                segments);
+            return;
         }
 
         var text = match.Groups["text"].Value;
-        if (text.Contains("](", StringComparison.Ordinal) || text.Contains('`', StringComparison.Ordinal))
+        if (ContainsUnsafeInlineMarkdown(text))
         {
-            return line;
+            return;
         }
 
-        return $"{match.Groups["prefix"].Value}{await TranslatePreservingOuterWhitespaceAsync(
+        TryAddMarkdownTranslationSegment(
             text,
-            targetLanguage,
-            resource,
-            maxCharsPerRequest,
-            translateChunkAsync,
-            cancellationToken)}";
+            lineIndex,
+            null,
+            match.Groups["prefix"].Value,
+            segments);
     }
 
-    private static async Task<string> TranslatePreservingOuterWhitespaceAsync(
+    private static bool TryAddMarkdownTranslationSegment(
         string value,
-        LanguageInfo targetLanguage,
-        string resource,
-        int maxCharsPerRequest,
-        TextChunkTranslator translateChunkAsync,
-        CancellationToken cancellationToken)
+        int lineIndex,
+        int? cellIndex,
+        string prefix,
+        List<MarkdownTranslationSegment> segments)
     {
         if (!ChineseTextRegex.IsMatch(value))
         {
-            return value;
+            return false;
         }
 
         var start = 0;
@@ -706,15 +785,23 @@ internal static class StructuredContentTranslation
         }
 
         var core = value[start..(end + 1)];
-        var translated = await TranslateRequiredAsync(
+        if (!ChineseTextRegex.IsMatch(core))
+        {
+            return false;
+        }
+
+        segments.Add(new MarkdownTranslationSegment(
+            lineIndex,
+            cellIndex,
+            prefix,
+            value[..start],
             core,
-            targetLanguage,
-            resource,
-            maxCharsPerRequest,
-            translateChunkAsync,
-            cancellationToken);
-        return $"{value[..start]}{translated}{value[(end + 1)..]}";
+            value[(end + 1)..]));
+        return true;
     }
+
+    private static bool ContainsUnsafeInlineMarkdown(string value) =>
+        value.Contains("](", StringComparison.Ordinal) || value.Contains('`', StringComparison.Ordinal);
 
     private static async Task<string> TranslateRequiredAsync(
         string source,

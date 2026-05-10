@@ -110,7 +110,7 @@
                                 <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@result.KindLabel</span>
                                 @if (result.UpdatedAt.HasValue)
                                 {
-                                    <span class="search-result-card__date">@result.UpdatedAt.Value.ToString("yyyy-MM-dd")</span>
+                                    <span class="search-result-card__date">@I18n.FormatDate(result.UpdatedAt)</span>
                                 }
                             </div>
 

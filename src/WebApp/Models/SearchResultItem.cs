@@ -16,6 +16,7 @@ public class SearchResultItem
     public string? MatchedSnippet { get; init; }
     public string? Context { get; init; }
     public string? Slug { get; init; }
+    public string? SourcePath { get; init; }
     public DateTime? UpdatedAt { get; init; }
     public int Score { get; init; }
 

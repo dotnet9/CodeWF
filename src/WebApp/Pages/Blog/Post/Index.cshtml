@@ -109,7 +109,7 @@
         else
         {
             var authorName = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
-            var updatedAt = (Model.Post.Lastmod ?? Model.Post.Date)?.ToString("yyyy-MM-dd HH:mm");
+            var updatedAt = I18n.FormatDateTime(Model.Post.Lastmod ?? Model.Post.Date);
             var categorySummary = string.Join(" / ", Model.CategoryLinks.Select(item => item.Label));
             var albumSummary = string.Join(" / ", Model.AlbumLinks.Select(item => item.Label));
             var tagSummary = string.Join(" / ", Model.TagLinks.Select(item => item.Label));
@@ -234,7 +234,7 @@
                                             <span class="article-related-card__badge">@relatedPost.ContextLabel</span>
                                             @if (relatedPost.UpdatedAt.HasValue)
                                             {
-                                                <span>@relatedPost.UpdatedAt.Value.ToString("yyyy-MM-dd")</span>
+                                                <span>@I18n.FormatDate(relatedPost.UpdatedAt)</span>
                                             }
                                         </div>
                                         <h3>

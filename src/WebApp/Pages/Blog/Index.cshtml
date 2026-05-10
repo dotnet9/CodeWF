@@ -132,7 +132,7 @@
                                         <p class="post-list-card__excerpt">@post.Description</p>
                                     }
                                     <div class="meta-line">
-                                        <span><i class="far fa-calendar"></i>@((post.Lastmod ?? post.Date)?.ToString("yyyy-MM-dd"))</span>
+                                        <span><i class="far fa-calendar"></i>@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
                                         <span><i class="far fa-user"></i>@authorName</span>
                                         @if (post.Categories?.Any() == true)
                                         {

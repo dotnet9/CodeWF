@@ -51,7 +51,7 @@
                     <div class="nav-feature-card__meta">
                         @if (latestPost.Date.HasValue)
                         {
-                            <span><i class="far fa-calendar"></i>@latestPost.Date.Value.ToString("yyyy-MM-dd")</span>
+                            <span><i class="far fa-calendar"></i>@I18n.FormatDate(latestPost.Date)</span>
                         }
                         <span>@I18n.T("nav.latestPostLink", "去看最新更新") <i class="fas fa-arrow-right"></i></span>
                     </div>
