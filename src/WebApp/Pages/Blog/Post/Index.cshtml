@@ -7,9 +7,10 @@
 @model WebApp.Pages.Blog.Post.IndexModel
 @{
     var site = SiteOptions.Value;
-    ViewData["Title"] = Model.Post?.Title ?? "文章详情";
-    ViewData["Description"] = Model.Post?.Description ?? "浏览码坊技术文章。";
-    var siteOwner = site.Owner ?? site.AppTitle ?? "码坊";
+    ViewData["Title"] = Model.Post?.Title ?? I18n.T("post.detailTitle", "文章详情");
+    ViewData["Description"] = Model.Post?.Description ?? I18n.T("post.detailDescription", "浏览码坊技术文章。");
+    var siteDisplayName = I18n.T("site.name", site.AppTitle ?? "码坊");
+    var siteOwner = site.Owner ?? siteDisplayName;
     var articleJson = string.Empty;
 
     if (Model.Post != null)
@@ -43,7 +44,7 @@
         ViewData["OgImage"] = articleImage;
         ViewData["Keywords"] = keywords.Any()
             ? string.Join(",", keywords)
-            : ".NET,C#,技术文章,码坊";
+            : I18n.T("post.keywordsFallback", ".NET,C#,技术文章,码坊");
         ViewData["ArticlePublishedTime"] = Model.Post.Date?.ToString("O");
         ViewData["ArticleModifiedTime"] = (Model.Post.Lastmod ?? Model.Post.Date)?.ToString("O");
         ViewData["ArticleAuthor"] = string.IsNullOrWhiteSpace(Model.Post.Author) ? siteOwner : Model.Post.Author;
@@ -70,7 +71,7 @@
             ["publisher"] = new Dictionary<string, object?>
             {
                 ["@type"] = "Organization",
-                ["name"] = site.AppTitle ?? "码坊",
+                ["name"] = siteDisplayName,
                 ["logo"] = new Dictionary<string, string>
                 {
                     ["@type"] = "ImageObject",
@@ -102,8 +103,8 @@
         @if (Model.Post == null)
         {
             <div class="empty-state">
-                <h2>文章不存在或已下线</h2>
-                <p>可以返回博客首页继续浏览其他内容。</p>
+                <h2>@I18n.T("post.notFoundTitle", "文章不存在或已下线")</h2>
+                <p>@I18n.T("post.notFoundDescription", "可以返回博客首页继续浏览其他内容。")</p>
             </div>
         }
         else
@@ -144,7 +145,7 @@
                         {
                             <div class="meta-chip article-banner__meta-card">
                                 <i class="fas fa-rotate-right"></i>
-                                <span>最后更新 @updatedAt</span>
+                                <span>@I18n.Text($"最后更新 {updatedAt}")</span>
                             </div>
                         }
                         <div class="meta-chip article-banner__meta-card">
@@ -153,7 +154,7 @@
                         </div>
                         <div class="meta-chip article-banner__meta-card">
                             <i class="far fa-clock"></i>
-                            <span>预计阅读 @Model.EstimatedReadingMinutes 分钟</span>
+                            <span>@I18n.Text($"预计阅读 {Model.EstimatedReadingMinutes} 分钟")</span>
                         </div>
                     </div>
 
@@ -161,13 +162,13 @@
                         @if (!string.IsNullOrWhiteSpace(categorySummary))
                         {
                             <div class="article-topic-summary">
-                                <span class="article-topic-summary__label">分类</span>
+                                <span class="article-topic-summary__label">@I18n.T("post.category", "分类")</span>
                                 <div class="article-topic-summary__value article-topic-link-list" title="@categorySummary">
                                     @foreach (var link in Model.CategoryLinks)
                                     {
                                         <a href="@link.Url" class="article-topic-link">
                                             <i class="@link.IconClass"></i>
-                                            <span>@link.Label</span>
+                                            <span>@I18n.Text(link.Label)</span>
                                         </a>
                                     }
                                 </div>
@@ -176,13 +177,13 @@
                         @if (!string.IsNullOrWhiteSpace(albumSummary))
                         {
                             <div class="article-topic-summary">
-                                <span class="article-topic-summary__label">专题</span>
+                                <span class="article-topic-summary__label">@I18n.T("post.album", "专题")</span>
                                 <div class="article-topic-summary__value article-topic-link-list" title="@albumSummary">
                                     @foreach (var link in Model.AlbumLinks)
                                     {
                                         <a href="@link.Url" class="article-topic-link">
                                             <i class="@link.IconClass"></i>
-                                            <span>@link.Label</span>
+                                            <span>@I18n.Text(link.Label)</span>
                                         </a>
                                     }
                                 </div>
@@ -191,13 +192,13 @@
                         @if (!string.IsNullOrWhiteSpace(tagSummary))
                         {
                             <div class="article-topic-summary">
-                                <span class="article-topic-summary__label">标签</span>
+                                <span class="article-topic-summary__label">@I18n.T("post.tags", "标签")</span>
                                 <div class="article-topic-summary__value article-topic-link-list" title="@tagSummary">
                                     @foreach (var link in Model.TagLinks)
                                     {
                                         <a href="@link.Url" class="article-topic-link">
                                             <i class="@link.IconClass"></i>
-                                            <span>@link.Label</span>
+                                            <span>@I18n.Text(link.Label)</span>
                                         </a>
                                     }
                                 </div>
@@ -220,10 +221,10 @@
                         <section class="surface-panel article-related-panel">
                             <div class="surface-panel__header">
                                 <div>
-                                    <span class="eyebrow">Keep Exploring</span>
-                                    <h2 class="surface-title">延伸阅读</h2>
+                                    <span class="eyebrow">@I18n.T("post.relatedEyebrow", "继续探索")</span>
+                                    <h2 class="surface-title">@I18n.T("post.relatedTitle", "延伸阅读")</h2>
                                 </div>
-                                <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">更多文章</a>
+                                <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">@I18n.T("post.morePosts", "更多文章")</a>
                             </div>
 
                             <div class="article-related-grid">
@@ -231,7 +232,7 @@
                                 {
                                     <article class="article-related-card">
                                         <div class="article-related-card__meta">
-                                            <span class="article-related-card__badge">@relatedPost.ContextLabel</span>
+                                            <span class="article-related-card__badge">@I18n.Text(relatedPost.ContextLabel)</span>
                                             @if (relatedPost.UpdatedAt.HasValue)
                                             {
                                                 <span>@I18n.FormatDate(relatedPost.UpdatedAt)</span>
@@ -242,10 +243,10 @@
                                         </h3>
                                         @if (!string.IsNullOrWhiteSpace(relatedPost.Description))
                                         {
-                                            <p>@relatedPost.Description</p>
+                                            <p>@I18n.Text(relatedPost.Description)</p>
                                         }
                                         <a href="@relatedPost.Url" class="inline-link">
-                                            继续阅读
+                                            @I18n.T("post.continueReading", "继续阅读")
                                             <i class="fas fa-arrow-right"></i>
                                         </a>
                                     </article>
@@ -256,19 +257,19 @@
 
                     @if (Model.PreviousPost != null || Model.NextPost != null)
                     {
-                        <nav class="doc-pager" aria-label="文章阅读导航">
+                        <nav class="doc-pager" aria-label="@I18n.T("post.readingNavigation", "文章阅读导航")">
                             @if (Model.PreviousPost != null)
                             {
                                 var previousUrl = ConstantUtil.GetPostUrl(Model.PreviousPost);
                                 <a href="@previousUrl" class="surface-panel doc-pager__item doc-pager__item--prev">
                                     <span class="doc-pager__label">
                                         <i class="fas fa-arrow-left"></i>
-                                        上一篇
+                                        @I18n.T("post.previous", "上一篇")
                                     </span>
-                                    <strong>@Model.PreviousPost.Title</strong>
+                                    <strong>@I18n.Text(Model.PreviousPost.Title)</strong>
                                     @if (!string.IsNullOrWhiteSpace(Model.PreviousPost.Description))
                                     {
-                                        <p>@Model.PreviousPost.Description</p>
+                                        <p>@I18n.Text(Model.PreviousPost.Description)</p>
                                     }
                                 </a>
                             }
@@ -282,13 +283,13 @@
                                 var nextUrl = ConstantUtil.GetPostUrl(Model.NextPost);
                                 <a href="@nextUrl" class="surface-panel doc-pager__item doc-pager__item--next">
                                     <span class="doc-pager__label">
-                                        下一篇
+                                        @I18n.T("post.next", "下一篇")
                                         <i class="fas fa-arrow-right"></i>
                                     </span>
-                                    <strong>@Model.NextPost.Title</strong>
+                                    <strong>@I18n.Text(Model.NextPost.Title)</strong>
                                     @if (!string.IsNullOrWhiteSpace(Model.NextPost.Description))
                                     {
-                                        <p>@Model.NextPost.Description</p>
+                                        <p>@I18n.Text(Model.NextPost.Description)</p>
                                     }
                                 </a>
                             }
@@ -302,7 +303,7 @@
 
                 <aside class="article-aside sticky-panel">
                     <div id="toc" class="surface-panel toc-panel" data-reading-toc data-toc-hide-empty="true">
-                        <h2 class="sidebar-title">目录</h2>
+                        <h2 class="sidebar-title">@I18n.T("post.toc", "目录")</h2>
                         <div class="toc-nav"></div>
                     </div>
                 </aside>

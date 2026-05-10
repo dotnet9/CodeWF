@@ -42,6 +42,9 @@ public sealed class I18nService
     private static readonly Regex DoubleQuotedTextRegex = new(@"""(?<value>(?:[^""\\]|\\.)*[\u3400-\u9fff](?:[^""\\]|\\.)*)""", RegexOptions.Compiled);
     private static readonly Regex SingleQuotedTextRegex = new(@"'(?<value>(?:[^'\\]|\\.)*[\u3400-\u9fff](?:[^'\\]|\\.)*)'", RegexOptions.Compiled);
     private static readonly Regex BacktickTextRegex = new(@"`(?<value>[^`]*[\u3400-\u9fff][^`]*)`", RegexOptions.Compiled);
+    private static readonly Regex I18nFallbackRegex = new(
+        @"(?:I18n|i18nService|_i18nService)\.(?:T|Format)\(\s*""(?<key>[^""]+)""\s*,\s*""(?<value>(?:[^""\\]|\\.)*[\u3400-\u9fff](?:[^""\\]|\\.)*)""",
+        RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
     private static readonly Regex InterpolatedExpressionRegex = new(@"\{[A-Za-z_]\w*(?:\.[^}]*)+\}", RegexOptions.Compiled);
     private static readonly string[] PreservedCjkTerms = ["码坊"];
@@ -66,6 +69,7 @@ public sealed class I18nService
     private readonly IContentTranslationService _translationService;
     private readonly ILogger<I18nService> _logger;
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _resourceFileLocks = new(StringComparer.OrdinalIgnoreCase);
+    private IReadOnlyDictionary<string, string>? _discoveredDefaultStrings;
     private IReadOnlyCollection<string>? _discoveredDefaultTexts;
 
     public I18nService(
@@ -156,31 +160,42 @@ public sealed class I18nService
 
     public string T(string key, string fallback)
     {
+        var resource = GetResource(CurrentLanguage);
         if (string.IsNullOrWhiteSpace(key))
         {
-            return fallback;
+            return TranslateText(resource, fallback);
         }
 
-        var resource = GetResource(CurrentLanguage);
         return resource.Strings.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
-            ? value
-            : fallback;
+            ? TranslateText(resource, value)
+            : TranslateText(resource, fallback);
     }
 
     public string Format(string key, string fallback, params object[] args)
     {
-        var template = T(key, fallback);
-        return args.Length == 0 ? template : string.Format(template, args);
+        var resource = GetResource(CurrentLanguage);
+        var template = !string.IsNullOrWhiteSpace(key)
+                       && resource.Strings.TryGetValue(key, out var value)
+                       && !string.IsNullOrWhiteSpace(value)
+            ? value
+            : fallback;
+        var formatted = args.Length == 0 ? template : string.Format(template, args);
+        return TranslateText(resource, formatted);
     }
 
     public string Text(string? text)
+    {
+        var resource = GetResource(CurrentLanguage);
+        return TranslateText(resource, text);
+    }
+
+    private static string TranslateText(I18nResource resource, string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             return text ?? string.Empty;
         }
 
-        var resource = GetResource(CurrentLanguage);
         var start = 0;
         var end = text.Length - 1;
         while (start <= end && char.IsWhiteSpace(text[start]))
@@ -194,9 +209,28 @@ public sealed class I18nService
         }
 
         var trimmed = text[start..(end + 1)];
-        return resource.TextMap.TryGetValue(trimmed, out var value) && !string.IsNullOrWhiteSpace(value)
-            ? $"{text[..start]}{value}{text[(end + 1)..]}"
-            : text;
+        if (resource.TextMap.TryGetValue(trimmed, out var value) && !string.IsNullOrWhiteSpace(value))
+        {
+            return $"{text[..start]}{value}{text[(end + 1)..]}";
+        }
+
+        foreach (var pattern in resource.Patterns)
+        {
+            try
+            {
+                var regex = new Regex(pattern.Pattern);
+                if (regex.IsMatch(trimmed))
+                {
+                    return $"{text[..start]}{regex.Replace(trimmed, pattern.Replacement)}{text[(end + 1)..]}";
+                }
+            }
+            catch (ArgumentException)
+            {
+                continue;
+            }
+        }
+
+        return text;
     }
 
     public string Url(string? url, string? language = null) => RequestLanguage.LocalizePath(url, language);
@@ -380,19 +414,7 @@ public sealed class I18nService
             : GetI18nResourceFilePath(normalizedLanguage);
     }
 
-    private string? GetDefaultResourceFilePath()
-    {
-        var primaryPath = GetAssetPath("site", "lang.json");
-        if (!string.IsNullOrWhiteSpace(primaryPath) && File.Exists(primaryPath))
-        {
-            return primaryPath;
-        }
-
-        var legacyPath = GetAssetPath("site", "i18n", $"{RequestLanguage.DefaultLanguage}.json");
-        return !string.IsNullOrWhiteSpace(legacyPath) && File.Exists(legacyPath)
-            ? legacyPath
-            : primaryPath;
-    }
+    private string? GetDefaultResourceFilePath() => GetAssetPath("site", "lang.json");
 
     private string? GetI18nResourceFilePath(string language, bool createCultureDirectory = false) =>
         GetI18nAssetPath(language, createCultureDirectory, "site", "lang.json");
@@ -1097,6 +1119,11 @@ public sealed class I18nService
 
     private void EnrichDefaultResource(I18nResource resource)
     {
+        foreach (var item in GetDiscoveredDefaultStrings())
+        {
+            resource.Strings.TryAdd(item.Key, item.Value);
+        }
+
         foreach (var item in resource.Strings.Values.Where(ShouldIncludeDiscoveredText))
         {
             resource.TextMap.TryAdd(item, item);
@@ -1115,6 +1142,11 @@ public sealed class I18nService
 
     private async Task EnrichDefaultResourceAsync(I18nResource resource, CancellationToken cancellationToken)
     {
+        foreach (var item in await GetDiscoveredDefaultStringsAsync(cancellationToken))
+        {
+            resource.Strings.TryAdd(item.Key, item.Value);
+        }
+
         foreach (var item in resource.Strings.Values.Where(ShouldIncludeDiscoveredText))
         {
             resource.TextMap.TryAdd(item, item);
@@ -1131,6 +1163,73 @@ public sealed class I18nService
         }
     }
 
+    private IReadOnlyDictionary<string, string> GetDiscoveredDefaultStrings()
+    {
+        if (_discoveredDefaultStrings is not null)
+        {
+            return _discoveredDefaultStrings;
+        }
+
+        var strings = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var filePath in EnumerateDiscoveryFiles())
+        {
+            try
+            {
+                AddI18nFallbackMatches(strings, File.ReadAllText(filePath));
+            }
+            catch (Exception ex)
+            {
+                CodeWfLogger.Warn(
+                    $"i18n 页面键值扫描跳过文件。file={filePath}; error={ex.Message}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+            }
+        }
+
+        _discoveredDefaultStrings = strings;
+        CodeWfLogger.Info(
+            $"i18n 页面键值扫描完成。count={strings.Count}.",
+            log2UI: false,
+            log2File: false,
+            log2Console: true);
+        return _discoveredDefaultStrings;
+    }
+
+    private async Task<IReadOnlyDictionary<string, string>> GetDiscoveredDefaultStringsAsync(CancellationToken cancellationToken)
+    {
+        if (_discoveredDefaultStrings is not null)
+        {
+            return _discoveredDefaultStrings;
+        }
+
+        var strings = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var filePath in EnumerateDiscoveryFiles())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                AddI18nFallbackMatches(strings, await File.ReadAllTextAsync(filePath, cancellationToken));
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                CodeWfLogger.Warn(
+                    $"i18n 页面键值扫描跳过文件。file={filePath}; error={ex.Message}.",
+                    log2UI: false,
+                    log2File: false,
+                    log2Console: true);
+            }
+        }
+
+        _discoveredDefaultStrings = strings;
+        CodeWfLogger.Info(
+            $"i18n 页面键值扫描完成。count={strings.Count}.",
+            log2UI: false,
+            log2File: false,
+            log2Console: true);
+        return _discoveredDefaultStrings;
+    }
+
     private IReadOnlyCollection<string> GetDiscoveredDefaultTexts()
     {
         if (_discoveredDefaultTexts is not null)
@@ -1140,22 +1239,10 @@ public sealed class I18nService
 
         var texts = new HashSet<string>(StringComparer.Ordinal);
         var scannedRoots = new List<string>();
-        foreach (var root in TextDiscoveryRoots)
+        foreach (var rootPath in EnumerateDiscoveryRoots())
         {
-            var rootPath = Path.Combine(
-                new[] { _environment.ContentRootPath }
-                    .Concat(root.Split('/', StringSplitOptions.RemoveEmptyEntries))
-                    .ToArray());
-            if (!Directory.Exists(rootPath))
-            {
-                continue;
-            }
-
             scannedRoots.Add(rootPath);
-            foreach (var filePath in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)
-                         .Where(static path => TextDiscoveryExtensions.Contains(
-                             Path.GetExtension(path),
-                             StringComparer.OrdinalIgnoreCase)))
+            foreach (var filePath in EnumerateDiscoveryFiles(rootPath))
             {
                 try
                 {
@@ -1195,23 +1282,11 @@ public sealed class I18nService
 
         var texts = new HashSet<string>(StringComparer.Ordinal);
         var scannedRoots = new List<string>();
-        foreach (var root in TextDiscoveryRoots)
+        foreach (var rootPath in EnumerateDiscoveryRoots())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var rootPath = Path.Combine(
-                new[] { _environment.ContentRootPath }
-                    .Concat(root.Split('/', StringSplitOptions.RemoveEmptyEntries))
-                    .ToArray());
-            if (!Directory.Exists(rootPath))
-            {
-                continue;
-            }
-
             scannedRoots.Add(rootPath);
-            foreach (var filePath in Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)
-                         .Where(static path => TextDiscoveryExtensions.Contains(
-                             Path.GetExtension(path),
-                             StringComparer.OrdinalIgnoreCase)))
+            foreach (var filePath in EnumerateDiscoveryFiles(rootPath))
             {
                 try
                 {
@@ -1240,6 +1315,43 @@ public sealed class I18nService
             log2File: false,
             log2Console: true);
         return _discoveredDefaultTexts;
+    }
+
+    private IEnumerable<string> EnumerateDiscoveryRoots()
+    {
+        foreach (var root in TextDiscoveryRoots)
+        {
+            var rootPath = Path.Combine(
+                new[] { _environment.ContentRootPath }
+                    .Concat(root.Split('/', StringSplitOptions.RemoveEmptyEntries))
+                    .ToArray());
+            if (Directory.Exists(rootPath))
+            {
+                yield return rootPath;
+            }
+        }
+    }
+
+    private IEnumerable<string> EnumerateDiscoveryFiles() =>
+        EnumerateDiscoveryRoots().SelectMany(EnumerateDiscoveryFiles);
+
+    private static IEnumerable<string> EnumerateDiscoveryFiles(string rootPath) =>
+        Directory.EnumerateFiles(rootPath, "*.*", SearchOption.AllDirectories)
+            .Where(static path => TextDiscoveryExtensions.Contains(
+                Path.GetExtension(path),
+                StringComparer.OrdinalIgnoreCase));
+
+    private static void AddI18nFallbackMatches(Dictionary<string, string> strings, string content)
+    {
+        foreach (Match match in I18nFallbackRegex.Matches(content))
+        {
+            var key = match.Groups["key"].Value.Trim();
+            var value = NormalizeDiscoveredText(match.Groups["value"].Value);
+            if (!string.IsNullOrWhiteSpace(key) && ShouldIncludeDiscoveredText(value))
+            {
+                strings.TryAdd(key, value);
+            }
+        }
     }
 
     private static void AddMatches(HashSet<string> texts, Regex regex, string content)

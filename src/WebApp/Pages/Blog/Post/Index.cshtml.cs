@@ -14,6 +14,7 @@ public sealed record RelatedPostCard(string Title, string Url, string? Descripti
 public class IndexModel : PageModel
 {
     private readonly AppService _appService;
+    private readonly I18nService _i18nService;
     private const int RelatedPostLimit = 4;
     private sealed record RelatedPostCandidate(BlogPost Post, string ContextLabel);
 
@@ -28,9 +29,10 @@ public class IndexModel : PageModel
     public int EstimatedReadingMinutes { get; private set; }
     public int HeadingCount { get; private set; }
 
-    public IndexModel(AppService appService)
+    public IndexModel(AppService appService, I18nService i18nService)
     {
         _appService = appService;
+        _i18nService = i18nService;
     }
 
     public async Task OnGetAsync(int year, int month, string slug)
@@ -72,7 +74,7 @@ public class IndexModel : PageModel
         CategoryLinks = BuildTopicLinks(Post.Categories, categoryLookup, ConstantUtil.GetCategoryUrl, "fas fa-folder-open");
         AlbumLinks = BuildTopicLinks(Post.Albums, albumLookup, ConstantUtil.GetAlbumUrl, "fas fa-layer-group");
         TagLinks = BuildTagLinks(Post.Tags);
-        ExploreLinks = BuildExploreLinks(CategoryLinks, AlbumLinks, TagLinks);
+        ExploreLinks = BuildExploreLinks(CategoryLinks, AlbumLinks, TagLinks, _i18nService);
         RelatedPosts = await BuildRelatedPostsAsync(Post, posts, RelatedPostLimit);
         EstimatedReadingMinutes = EstimateReadingMinutes(Post.HtmlContent ?? Post.Content);
         HeadingCount = CountArticleHeadings(Post.HtmlContent ?? Post.Content);
@@ -118,28 +120,49 @@ public class IndexModel : PageModel
     private static IReadOnlyList<ArticleExploreLink> BuildExploreLinks(
         IReadOnlyList<ArticleTopicLink> categories,
         IReadOnlyList<ArticleTopicLink> albums,
-        IReadOnlyList<ArticleTopicLink> tags)
+        IReadOnlyList<ArticleTopicLink> tags,
+        I18nService i18nService)
     {
         // 优先给当前文章补一条“继续阅读”路径，再兜底站内工具和项目入口，避免侧栏完全空掉。
         var links = new List<ArticleExploreLink>();
 
         if (categories.FirstOrDefault() is { } primaryCategory)
         {
-            links.Add(new ArticleExploreLink("继续看同分类", primaryCategory.Url, primaryCategory.IconClass, primaryCategory.Label));
+            links.Add(new ArticleExploreLink(
+                i18nService.T("post.explore.sameCategory", "继续看同分类"),
+                primaryCategory.Url,
+                primaryCategory.IconClass,
+                i18nService.Text(primaryCategory.Label)));
         }
 
         if (albums.FirstOrDefault() is { } primaryAlbum)
         {
-            links.Add(new ArticleExploreLink("继续追这个专题", primaryAlbum.Url, primaryAlbum.IconClass, primaryAlbum.Label));
+            links.Add(new ArticleExploreLink(
+                i18nService.T("post.explore.sameAlbum", "继续追这个专题"),
+                primaryAlbum.Url,
+                primaryAlbum.IconClass,
+                i18nService.Text(primaryAlbum.Label)));
         }
 
         if (tags.FirstOrDefault() is { } primaryTag)
         {
-            links.Add(new ArticleExploreLink("继续看同标签", primaryTag.Url, primaryTag.IconClass, primaryTag.Label));
+            links.Add(new ArticleExploreLink(
+                i18nService.T("post.explore.sameTag", "继续看同标签"),
+                primaryTag.Url,
+                primaryTag.IconClass,
+                i18nService.Text(primaryTag.Label)));
         }
 
-        links.Add(new ArticleExploreLink("顺手逛工具库", "/tool", "fas fa-screwdriver-wrench", "从文章跳到实用工具"));
-        links.Add(new ArticleExploreLink("看看相关项目", ConstantUtil.GetProjectDirectoryUrl(), "fas fa-cube", "继续查看开源项目与用法说明"));
+        links.Add(new ArticleExploreLink(
+            i18nService.T("post.explore.toolsTitle", "顺手逛工具库"),
+            "/tool",
+            "fas fa-screwdriver-wrench",
+            i18nService.T("post.explore.toolsDescription", "从文章跳到实用工具")));
+        links.Add(new ArticleExploreLink(
+            i18nService.T("post.explore.projectsTitle", "看看相关项目"),
+            ConstantUtil.GetProjectDirectoryUrl(),
+            "fas fa-cube",
+            i18nService.T("post.explore.projectsDescription", "继续查看开源项目与用法说明")));
 
         return links
             .GroupBy(link => link.Url, StringComparer.OrdinalIgnoreCase)
@@ -158,13 +181,13 @@ public class IndexModel : PageModel
         foreach (var candidate in candidates)
         {
             var localizedPost = await _appService.LocalizeBlogPostMetadataAsync(candidate.Post) ?? candidate.Post;
-            cards.Add(ToRelatedPostCard(localizedPost, candidate.ContextLabel));
+            cards.Add(ToRelatedPostCard(localizedPost, _i18nService.Text(candidate.ContextLabel)));
         }
 
         return cards;
     }
 
-    private static IReadOnlyList<RelatedPostCandidate> SelectRelatedPostCandidates(BlogPost currentPost, IEnumerable<BlogPost> posts, int limit)
+    private IReadOnlyList<RelatedPostCandidate> SelectRelatedPostCandidates(BlogPost currentPost, IEnumerable<BlogPost> posts, int limit)
     {
         var currentCategories = ToHashSet(currentPost.Categories);
         var currentAlbums = ToHashSet(currentPost.Albums);
@@ -185,21 +208,21 @@ public class IndexModel : PageModel
                 if (sharedCategories > 0)
                 {
                     score += sharedCategories * 6;
-                    reasons.Add("同分类");
+                    reasons.Add(_i18nService.T("post.related.sameCategory", "同分类"));
                 }
 
                 var sharedAlbums = CountOverlap(currentAlbums, post.Albums);
                 if (sharedAlbums > 0)
                 {
                     score += sharedAlbums * 5;
-                    reasons.Add("同专题");
+                    reasons.Add(_i18nService.T("post.related.sameAlbum", "同专题"));
                 }
 
                 var sharedTags = CountOverlap(currentTags, post.Tags);
                 if (sharedTags > 0)
                 {
                     score += sharedTags * 4;
-                    reasons.Add("同标签");
+                    reasons.Add(_i18nService.T("post.related.sameTag", "同标签"));
                 }
 
                 return new
@@ -238,7 +261,7 @@ public class IndexModel : PageModel
                 continue;
             }
 
-            related.Add(new RelatedPostCandidate(post, "近期更新"));
+            related.Add(new RelatedPostCandidate(post, _i18nService.T("post.related.recent", "近期更新")));
 
             if (related.Count >= limit)
             {

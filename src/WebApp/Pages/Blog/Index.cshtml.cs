@@ -8,6 +8,7 @@ namespace WebApp.Pages.Blog;
 public class IndexModel : PageModel
 {
     private readonly AppService _appService;
+    private readonly I18nService _i18nService;
 
     public List<BlogPostBrief> Posts { get; private set; } = [];
     public List<CategoryItem> Categories { get; private set; } = [];
@@ -20,9 +21,10 @@ public class IndexModel : PageModel
     public int Total { get; private set; }
     public int TotalPages => (int)Math.Ceiling(Total / (double)PageSize);
 
-    public IndexModel(AppService appService)
+    public IndexModel(AppService appService, I18nService i18nService)
     {
         _appService = appService;
+        _i18nService = i18nService;
     }
 
     public async Task OnGetAsync(int pageIndex = 1)
@@ -38,8 +40,8 @@ public class IndexModel : PageModel
 
         var allPosts = await _appService.GetAllBlogPostBriefsAsync() ?? [];
         var latestPost = await _appService.LocalizeBlogPostBriefAsync(allPosts.FirstOrDefault());
-        GettingStartedLinks = BuildGettingStartedLinks(latestPost, Categories, categoryCounts, Albums, albumCounts);
-        SerialReadingLinks = BuildSerialReadingLinks(Albums, albumCounts);
+        GettingStartedLinks = BuildGettingStartedLinks(latestPost, Categories, categoryCounts, Albums, albumCounts, _i18nService);
+        SerialReadingLinks = BuildSerialReadingLinks(Albums, albumCounts, _i18nService);
         // “随机发现”刻意排除当前列表页已展示的文章，降低同屏重复感。
         var randomSource = TakeRandom(
             allPosts.Where(post =>
@@ -47,7 +49,8 @@ public class IndexModel : PageModel
             .ToList(),
             3);
         RandomPosts = BuildDiscoveryPosts(
-            await _appService.LocalizeBlogPostBriefsAsync(randomSource));
+            await _appService.LocalizeBlogPostBriefsAsync(randomSource),
+            _i18nService);
     }
 
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
@@ -55,16 +58,17 @@ public class IndexModel : PageModel
         IReadOnlyList<CategoryItem> categories,
         IReadOnlyDictionary<string, int> categoryCounts,
         IReadOnlyList<AlbumItem> albums,
-        IReadOnlyDictionary<string, int> albumCounts)
+        IReadOnlyDictionary<string, int> albumCounts,
+        I18nService i18nService)
     {
         var links = new List<DiscoveryLinkCard>();
 
         if (latestPost is not null)
         {
             links.Add(new DiscoveryLinkCard(
-                "先看更新",
-                "从最新文章进入",
-                latestPost.Title ?? "最近更新",
+                i18nService.T("blog.start.latestEyebrow", "先看更新"),
+                i18nService.T("blog.start.latestTitle", "从最新文章进入"),
+                i18nService.Text(latestPost.Title ?? "最近更新"),
                 ConstantUtil.GetPostUrl(latestPost)));
         }
 
@@ -84,9 +88,9 @@ public class IndexModel : PageModel
         if (topCategory != null)
         {
             links.Add(new DiscoveryLinkCard(
-                "按主题看",
-                $"先逛 {topCategory.Item.Name}",
-                $"{topCategory.Count} 篇文章，适合按技术方向快速筛选",
+                i18nService.T("blog.start.categoryEyebrow", "按主题看"),
+                i18nService.Format("blog.start.categoryTitle", "先逛 {0}", i18nService.Text(topCategory.Item.Name)),
+                i18nService.Format("blog.start.categoryDescription", "{0} 篇文章，适合按技术方向快速筛选", topCategory.Count),
                 ConstantUtil.GetCategoryUrl(topCategory.Item.Slug!)));
         }
 
@@ -107,9 +111,9 @@ public class IndexModel : PageModel
         if (topAlbum != null)
         {
             links.Add(new DiscoveryLinkCard(
-                "连续阅读",
-                $"跟着专题读 {topAlbum.Item.Name}",
-                $"{topAlbum.Count} 篇文章，更适合系统连读",
+                i18nService.T("blog.start.albumEyebrow", "连续阅读"),
+                i18nService.Format("blog.start.albumTitle", "跟着专题读 {0}", i18nService.Text(topAlbum.Item.Name)),
+                i18nService.Format("blog.start.albumDescription", "{0} 篇文章，更适合系统连读", topAlbum.Count),
                 ConstantUtil.GetAlbumUrl(topAlbum.Item.Slug!)));
         }
 
@@ -118,7 +122,8 @@ public class IndexModel : PageModel
 
     private static List<DiscoveryLinkCard> BuildSerialReadingLinks(
         IReadOnlyList<AlbumItem> albums,
-        IReadOnlyDictionary<string, int> albumCounts)
+        IReadOnlyDictionary<string, int> albumCounts,
+        I18nService i18nService)
     {
         var candidates = albums
             .Where(item =>
@@ -135,14 +140,16 @@ public class IndexModel : PageModel
 
         return TakeRandom(candidates, 4)
             .Select(item => new DiscoveryLinkCard(
-                "专题连读",
-                item.Item.Name!,
-                $"{item.Count} 篇文章，适合连续阅读",
+                i18nService.T("blog.serial.eyebrow", "专题连读"),
+                i18nService.Text(item.Item.Name!),
+                i18nService.Format("blog.serial.description", "{0} 篇文章，适合连续阅读", item.Count),
                 ConstantUtil.GetAlbumUrl(item.Item.Slug!)))
             .ToList();
     }
 
-    private static List<DiscoveryPostCard> BuildDiscoveryPosts(IReadOnlyList<BlogPostBrief> posts)
+    private static List<DiscoveryPostCard> BuildDiscoveryPosts(
+        IReadOnlyList<BlogPostBrief> posts,
+        I18nService i18nService)
     {
         if (posts.Count == 0)
         {
@@ -155,14 +162,14 @@ public class IndexModel : PageModel
         {
             var label = post.Categories?.FirstOrDefault()
                 ?? post.Albums?.FirstOrDefault()
-                ?? "随机发现";
+                ?? i18nService.T("blog.random.fallbackLabel", "随机发现");
 
             items.Add(new DiscoveryPostCard(
-                "随机发现",
-                post.Title ?? "未命名文章",
-                post.Description ?? "换个方向看看，也许正好碰到你感兴趣的主题。",
+                i18nService.T("blog.random.eyebrow", "随机发现"),
+                i18nService.Text(post.Title ?? "未命名文章"),
+                i18nService.Text(post.Description ?? "换个方向看看，也许正好碰到你感兴趣的主题。"),
                 ConstantUtil.GetPostUrl(post),
-                label));
+                i18nService.Text(label)));
         }
 
         return items;

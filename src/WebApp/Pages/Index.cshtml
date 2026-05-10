@@ -4,10 +4,10 @@
 @inject IOptions<WebApp.Options.SiteOption> SiteOptions
 @model IndexModel
 @{
-    ViewData["Title"] = "首页";
-    ViewData["Description"] = "码坊聚合 .NET 文章、项目与在线工具。";
+    ViewData["Title"] = I18n.T("nav.home", "首页");
+    ViewData["Description"] = I18n.T("site.description", "码坊聚合 .NET 文章、项目与在线工具。");
     ViewData["BodyClass"] = "home-page";
-    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? "码坊";
+    var siteOwner = SiteOptions.Value.Owner ?? SiteOptions.Value.AppTitle ?? I18n.T("site.name", "码坊");
 
     var heroPosts = Model.HeroPosts.Take(2).ToList();
     if (!heroPosts.Any())
@@ -44,35 +44,35 @@
     <div class="container">
         <div class="home-hero">
             <div class="home-hero__content">
-                <span class="eyebrow">Tech Blog / Engineering Notes</span>
-                <h1>用工程视角记录 .NET 与现代开发</h1>
+                <span class="eyebrow">@I18n.T("home.eyebrow", "技术博客 / 工程笔记")</span>
+                <h1>@I18n.T("home.heroTitle", "用工程视角记录 .NET 与现代开发")</h1>
                 <p class="hero-copy">
-                    深入框架、源码实践、工具链与真实项目经验，沉淀可复用的技术判断。
+                    @I18n.T("home.heroDescription", "深入框架、源码实践、工具链与真实项目经验，沉淀可复用的技术判断。")
                 </p>
 
                 <div class="hero-actions">
                     <a href="@ConstantUtil.GetBlogUrl()" class="btn btn-primary btn-lg">
-                        <i class="fas fa-book-open me-2"></i>浏览文章
+                        <i class="fas fa-book-open me-2"></i>@I18n.T("home.browsePosts", "浏览文章")
                     </a>
                     <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="btn btn-ghost btn-lg">
-                        <i class="fas fa-compass me-2"></i>进入项目
+                        <i class="fas fa-compass me-2"></i>@I18n.T("home.openProjects", "进入项目")
                     </a>
                     <a href="@ConstantUtil.GetSearchUrl("dotnet")" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-magnifying-glass me-2"></i>全站搜索
+                        <i class="fas fa-magnifying-glass me-2"></i>@I18n.T("search.global", "全站搜索")
                     </a>
                 </div>
 
                 <div class="hero-trustline">
-                    <a href="@ConstantUtil.GetBlogUrl()" class="hero-trustline__item">@Model.TotalPosts 篇文章</a>
-                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="hero-trustline__item">@Model.TotalDocNodes 个项目条目</a>
-                    <a href="/tool" class="hero-trustline__item">@Model.TotalToolEntries 个工具入口</a>
+                    <a href="@ConstantUtil.GetBlogUrl()" class="hero-trustline__item">@I18n.Text($"{Model.TotalPosts} 篇文章")</a>
+                    <a href="@ConstantUtil.GetProjectDirectoryUrl()" class="hero-trustline__item">@I18n.Text($"{Model.TotalDocNodes} 个项目条目")</a>
+                    <a href="/tool" class="hero-trustline__item">@I18n.Text($"{Model.TotalToolEntries} 个工具入口")</a>
                 </div>
             </div>
 
             <aside class="surface-panel hero-terminal hero-terminal--focus">
                 <div class="hero-terminal__header">
-                    <span>Featured</span>
-                    <strong>推荐文章</strong>
+                    <span>@I18n.T("home.featuredEyebrow", "精选")</span>
+                    <strong>@I18n.T("home.featuredPosts", "推荐文章")</strong>
                 </div>
 
                 @if (heroPosts.Any())
@@ -82,11 +82,13 @@
                         {
                             var spotlightUrl = ConstantUtil.GetPostUrl(post);
                             var spotlightAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
+                            var spotlightTitle = I18n.Text(post.Title);
+                            var spotlightDescription = I18n.Text(post.Description);
                             <a href="@spotlightUrl" class="spotlight-story spotlight-story--hero">
-                                <h2 title="@post.Title">@post.Title</h2>
-                                @if (!string.IsNullOrWhiteSpace(post.Description))
+                                <h2 title="@spotlightTitle">@spotlightTitle</h2>
+                                @if (!string.IsNullOrWhiteSpace(spotlightDescription))
                                 {
-                                    <p title="@post.Description">@post.Description</p>
+                                    <p title="@spotlightDescription">@spotlightDescription</p>
                                 }
                                 <div class="spotlight-story__meta">
                                     <span><i class="far fa-calendar"></i>@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
@@ -99,7 +101,7 @@
                 else
                 {
                     <div class="empty-state empty-state--compact">
-                        <p>暂无推荐内容。</p>
+                        <p>@I18n.T("home.emptyFeatured", "暂无推荐内容。")</p>
                     </div>
                 }
             </aside>
@@ -113,18 +115,18 @@
             <section class="surface-panel discovery-panel">
                 <div class="surface-panel__header">
                     <div>
-                        <span class="eyebrow">Start Here</span>
-                        <h2 class="surface-title">新用户起步路线</h2>
+                        <span class="eyebrow">@I18n.T("home.startEyebrow", "从这里开始")</span>
+                        <h2 class="surface-title">@I18n.T("home.startTitle", "新用户起步路线")</h2>
                     </div>
                 </div>
                 <div class="discovery-link-list">
                     @foreach (var link in Model.GettingStartedLinks)
                     {
                         <a href="@link.Url" class="discovery-link-card">
-                            <span class="card-kicker">@link.Eyebrow</span>
-                            <strong>@link.Title</strong>
-                            <p>@link.Description</p>
-                            <span class="inline-link">现在开始 <i class="fas fa-arrow-right"></i></span>
+                            <span class="card-kicker">@I18n.Text(link.Eyebrow)</span>
+                            <strong>@I18n.Text(link.Title)</strong>
+                            <p>@I18n.Text(link.Description)</p>
+                            <span class="inline-link">@I18n.T("home.startNow", "现在开始") <i class="fas fa-arrow-right"></i></span>
                         </a>
                     }
                 </div>
@@ -133,15 +135,15 @@
             <section class="surface-panel discovery-panel">
                 <div class="surface-panel__header">
                     <div>
-                        <span class="eyebrow">Unexpected Finds</span>
-                        <h2 class="surface-title">随机发现</h2>
+                        <span class="eyebrow">@I18n.T("home.randomEyebrow", "随机探索")</span>
+                        <h2 class="surface-title">@I18n.T("home.randomTitle", "随机发现")</h2>
                     </div>
                 </div>
 
                 @if (!Model.DiscoveryPosts.Any())
                 {
                     <div class="empty-state empty-state--compact">
-                        <p>内容整理中，稍后会补上更多随机发现入口。</p>
+                        <p>@I18n.T("home.emptyRandom", "内容整理中，稍后会补上更多随机发现入口。")</p>
                     </div>
                 }
                 else
@@ -150,11 +152,11 @@
                         @foreach (var post in Model.DiscoveryPosts)
                         {
                             <article class="discovery-post-card">
-                                <span class="card-kicker">@post.Eyebrow</span>
-                                <h3><a href="@post.Url">@post.Title</a></h3>
-                                <p>@post.Description</p>
+                                <span class="card-kicker">@I18n.Text(post.Eyebrow)</span>
+                                <h3><a href="@post.Url">@I18n.Text(post.Title)</a></h3>
+                                <p>@I18n.Text(post.Description)</p>
                                 <div class="resource-card__meta">
-                                    <span><i class="far fa-calendar"></i>@post.MetaLabel</span>
+                                    <span><i class="far fa-calendar"></i>@I18n.Text(post.MetaLabel)</span>
                                 </div>
                             </article>
                         }
@@ -172,14 +174,14 @@
                 <div class="home-index-grid">
                     <article class="home-index-card">
                         <div class="home-index-card__header">
-                            <h2 class="surface-title home-index-card__title">专题</h2>
-                            <a href="@ConstantUtil.GetAlbumDirectoryUrl()" class="surface-link">查看更多</a>
+                            <h2 class="surface-title home-index-card__title">@I18n.T("home.albums", "专题")</h2>
+                            <a href="@ConstantUtil.GetAlbumDirectoryUrl()" class="surface-link">@I18n.T("home.viewMore", "查看更多")</a>
                         </div>
 
                         @if (!albums.Any())
                         {
                             <div class="empty-state empty-state--compact">
-                                <p>暂未配置专题内容。</p>
+                                <p>@I18n.T("home.emptyAlbums", "暂未配置专题内容。")</p>
                             </div>
                         }
                         else
@@ -189,10 +191,10 @@
                                 {
                                     <a href="@ConstantUtil.GetAlbumUrl(album.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
-                                            <strong>@album.Name</strong>
+                                            <strong>@I18n.Text(album.Name)</strong>
                                             @if (!string.IsNullOrWhiteSpace(album.Memo))
                                             {
-                                                <p>@album.Memo</p>
+                                                <p>@I18n.Text(album.Memo)</p>
                                             }
                                         </div>
                                         <span class="topic-list__count">@album.PostCount</span>
@@ -204,14 +206,14 @@
 
                     <article class="home-index-card">
                         <div class="home-index-card__header">
-                            <h2 class="surface-title home-index-card__title">分类</h2>
-                            <a href="@ConstantUtil.GetCategoryDirectoryUrl()" class="surface-link">查看更多</a>
+                            <h2 class="surface-title home-index-card__title">@I18n.T("home.categories", "分类")</h2>
+                            <a href="@ConstantUtil.GetCategoryDirectoryUrl()" class="surface-link">@I18n.T("home.viewMore", "查看更多")</a>
                         </div>
 
                         @if (!categories.Any())
                         {
                             <div class="empty-state empty-state--compact">
-                                <p>暂未配置文章分类。</p>
+                                <p>@I18n.T("home.emptyCategories", "暂未配置文章分类。")</p>
                             </div>
                         }
                         else
@@ -221,10 +223,10 @@
                                 {
                                     <a href="@ConstantUtil.GetCategoryUrl(category.Slug)" class="topic-list__item">
                                         <div class="topic-list__content">
-                                            <strong>@category.Name</strong>
+                                            <strong>@I18n.Text(category.Name)</strong>
                                             @if (!string.IsNullOrWhiteSpace(category.Memo))
                                             {
-                                                <p>@category.Memo</p>
+                                                <p>@I18n.Text(category.Memo)</p>
                                             }
                                         </div>
                                         <span class="topic-list__count">@category.PostCount</span>
@@ -239,14 +241,14 @@
             <aside class="home-rail">
                 <div class="surface-panel dispatch-panel">
                     <div class="dispatch-panel__header">
-                        <h2 class="surface-title dispatch-panel__title">最新文章</h2>
-                        <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">更多</a>
+                        <h2 class="surface-title dispatch-panel__title">@I18n.T("home.latestPosts", "最新文章")</h2>
+                        <a href="@ConstantUtil.GetBlogUrl()" class="surface-link">@I18n.T("nav.more", "更多")</a>
                     </div>
 
                     @if (!latestPosts.Any())
                     {
                         <div class="empty-state empty-state--compact">
-                            <p>近期更新会在这里展示。</p>
+                            <p>@I18n.T("home.emptyLatest", "近期更新会在这里展示。")</p>
                         </div>
                     }
                     else
@@ -257,10 +259,10 @@
                                 var postUrl = ConstantUtil.GetPostUrl(post);
                                 <a href="@postUrl" class="dispatch-item">
                                     <span class="dispatch-item__meta">@I18n.FormatDate(post.Lastmod ?? post.Date)</span>
-                                    <strong>@post.Title</strong>
+                                    <strong>@I18n.Text(post.Title)</strong>
                                     @if (!string.IsNullOrWhiteSpace(post.Description))
                                     {
-                                        <p>@post.Description</p>
+                                        <p>@I18n.Text(post.Description)</p>
                                     }
                                 </a>
                             }
@@ -277,8 +279,8 @@
         @if (!Model.Posts.Any())
         {
             <div class="empty-state">
-                <h2>内容还在整理中</h2>
-                <p>可以先浏览文章或项目。</p>
+                <h2>@I18n.T("home.emptyTitle", "内容还在整理中")</h2>
+                <p>@I18n.T("home.emptyDescription", "可以先浏览文章或项目。")</p>
             </div>
         }
         else
@@ -288,11 +290,13 @@
                 {
                     var postUrl = ConstantUtil.GetPostUrl(post);
                     var postAuthor = string.IsNullOrWhiteSpace(post.Author) ? siteOwner : post.Author;
+                    var postTitle = I18n.Text(post.Title);
+                    var postDescription = I18n.Text(post.Description);
                     <article class="resource-card">
                         <a href="@postUrl" class="resource-card__media">
                             @if (!string.IsNullOrWhiteSpace(post.Cover))
                             {
-                                <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
+                                <img src="@post.Cover" alt="@postTitle" class="cover-media" loading="lazy" decoding="async" />
                             }
                             else
                             {
@@ -303,11 +307,11 @@
                         </a>
                         <div class="resource-card__body">
                             <h3 class="resource-card__title">
-                                <a href="@postUrl" title="@post.Title" aria-label="@post.Title">@post.Title</a>
+                                <a href="@postUrl" title="@postTitle" aria-label="@postTitle">@postTitle</a>
                             </h3>
-                            @if (!string.IsNullOrWhiteSpace(post.Description))
+                            @if (!string.IsNullOrWhiteSpace(postDescription))
                             {
-                                <p class="resource-card__desc" title="@post.Description">@post.Description</p>
+                                <p class="resource-card__desc" title="@postDescription">@postDescription</p>
                             }
                             <div class="resource-card__meta">
                                 <span><i class="far fa-calendar"></i>@I18n.FormatDate(post.Lastmod ?? post.Date)</span>

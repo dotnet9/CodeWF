@@ -2,14 +2,18 @@
 @using WebApp.Extensions
 @model WebApp.Pages.Tool.IndexModel
 @{
-    ViewData["Title"] = "工具";
-    ViewData["Description"] = "查看码坊提供的在线开发工具，提升日常开发效率。";
+    ViewData["Title"] = I18n.T("nav.tools", "工具");
+    ViewData["Description"] = I18n.T("tool.description", "查看码坊提供的在线开发工具，提升日常开发效率。");
     var banner = new WebApp.Models.PageBannerViewModel
     {
-        Eyebrow = "Toolbox",
-        Title = "在线工具",
-        Description = "面向日常开发场景整理的小工具集合，优先覆盖高频、直接、可以马上派上用场的能力。",
-        MetaItems = ["即开即用", "面向开发场景", "减少来回切换"]
+        Eyebrow = I18n.T("tool.eyebrow", "工具箱"),
+        Title = I18n.T("tool.title", "在线工具"),
+        Description = I18n.T("tool.intro", "面向日常开发场景整理的小工具集合，优先覆盖高频、直接、可以马上派上用场的能力。"),
+        MetaItems = [
+            I18n.T("tool.meta.ready", "即开即用"),
+            I18n.T("tool.meta.developer", "面向开发场景"),
+            I18n.T("tool.meta.focus", "减少来回切换")
+        ]
     };
 }
 
@@ -20,8 +24,8 @@
         @if (!Model.Tools.Any())
         {
             <div class="empty-state">
-                <h2>工具列表暂未配置</h2>
-                <p>后续可以在这里继续补充更多贴近开发流程的小工具。</p>
+                <h2>@I18n.T("tool.emptyTitle", "工具列表暂未配置")</h2>
+                <p>@I18n.T("tool.emptyDescription", "后续可以在这里继续补充更多贴近开发流程的小工具。")</p>
             </div>
         }
         else
@@ -42,23 +46,23 @@
             };
 
             <div class="tool-directory">
-                <div class="tool-list-search" role="search" aria-label="工具列表搜索">
+                <div class="tool-list-search" role="search" aria-label="@I18n.T("tool.listSearch", "工具列表搜索")">
                     <label class="tool-list-search__field" for="tool-list-search">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <input id="tool-list-search"
                                type="search"
                                autocomplete="off"
-                               placeholder="搜索当前工具列表"
+                               placeholder="@I18n.T("tool.listSearchPlaceholder", "搜索当前工具列表")"
                                aria-describedby="tool-list-search-summary" />
                     </label>
                     <button class="btn btn-ghost btn-sm" type="button" id="tool-list-search-clear">
                         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        清空
+                        @I18n.T("tool.clear", "清空")
                     </button>
-                    <span class="tool-list-search__summary" id="tool-list-search-summary">共 @totalToolCount 个工具</span>
+                    <span class="tool-list-search__summary" id="tool-list-search-summary">@I18n.Text($"共 {totalToolCount} 个工具")</span>
                 </div>
 
-                <nav class="tool-directory__nav" aria-label="工具分类">
+                <nav class="tool-directory__nav" aria-label="@I18n.T("tool.categories", "工具分类")">
                     <div class="tool-category-nav">
                         @foreach (var tool in Model.Tools)
                         {
@@ -68,7 +72,7 @@
 
                             <a class="tool-category-nav__item" href="#@groupId" data-tool-category-link data-tool-target="@groupId">
                                 <i class="@iconClass" aria-hidden="true"></i>
-                                <span>@tool.Name</span>
+                                <span>@I18n.Text(tool.Name)</span>
                                 <strong>@childCount</strong>
                             </a>
                         }
@@ -89,11 +93,11 @@
                                     <i class="@iconClass" aria-hidden="true"></i>
                                 </span>
                                 <div>
-                                    <span class="tool-category-section__meta">@childCount 个工具</span>
-                                    <h2>@tool.Name</h2>
+                                    <span class="tool-category-section__meta">@I18n.Format("tool.groupCount", "{0} 个工具", childCount)</span>
+                                    <h2>@I18n.Text(tool.Name)</h2>
                                     @if (!string.IsNullOrWhiteSpace(tool.Memo))
                                     {
-                                        <p>@tool.Memo</p>
+                                        <p>@I18n.Text(tool.Memo)</p>
                                     }
                                 </div>
                             </header>
@@ -108,10 +112,10 @@
 
                                         <a href="@toolLink" class="tool-card-link" data-tool-chip data-tool-search="@childSearchText">
                                             <span class="tool-card-link__main">
-                                                <strong>@child.Name</strong>
+                                                <strong>@I18n.Text(child.Name)</strong>
                                                 @if (!string.IsNullOrWhiteSpace(child.Memo))
                                                 {
-                                                    <span>@child.Memo</span>
+                                                    <span>@I18n.Text(child.Memo)</span>
                                                 }
                                             </span>
                                             <span class="tool-card-link__meta">
@@ -127,8 +131,8 @@
                 </div>
 
                 <div class="empty-state tool-list-search__empty" id="tool-list-search-empty" hidden>
-                    <h2>没有匹配的工具</h2>
-                    <p>换一个工具名称、分组或 slug 试试。</p>
+                    <h2>@I18n.T("tool.noMatchesTitle", "没有匹配的工具")</h2>
+                    <p>@I18n.T("tool.noMatchesDescription", "换一个工具名称、分组或 slug 试试。")</p>
                 </div>
             </div>
         }
@@ -183,8 +187,8 @@
 
                 empty.hidden = visibleTools !== 0;
                 summary.textContent = tokens.length === 0
-                    ? `共 ${visibleTools} 个工具`
-                    : `匹配 ${visibleTools} 个工具，分布在 ${visibleGroups} 个分组`;
+                    ? codewfTranslate(`共 ${visibleTools} 个工具`)
+                    : codewfTranslate(`匹配 ${visibleTools} 个工具，分布在 ${visibleGroups} 个分组`);
             }
 
             input.addEventListener('input', applyToolFilter);

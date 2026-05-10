@@ -4,9 +4,9 @@
 @{
     var banner = new WebApp.Models.PageBannerViewModel
     {
-        Eyebrow = "Global Search",
-        Title = "搜索工具、项目与文章",
-        Description = "一个入口检索站内内容，优先返回最相关的工具、项目说明与技术文章。"
+        Eyebrow = I18n.T("search.eyebrow", "全局搜索"),
+        Title = I18n.T("search.pageTitle", "搜索工具、项目与文章"),
+        Description = I18n.T("search.pageDescription", "一个入口检索站内内容，优先返回最相关的工具、项目说明与技术文章。")
     };
     var startPage = Math.Max(1, Model.PageIndex - 2);
     var endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
@@ -31,7 +31,7 @@
         <div class="search-banner">
             <partial name="_PageBanner" model="banner" />
             <form class="search-page-form search-suggest" method="get" action="@ConstantUtil.GetSearchUrl()" role="search" data-search-suggestions-url="@($"{ConstantUtil.GetSearchUrl()}?handler=Suggest")">
-                <label class="visually-hidden" for="search-page-query">搜索关键字</label>
+                <label class="visually-hidden" for="search-page-query">@I18n.T("search.keywords", "搜索关键字")</label>
                 <div class="search-page-form__shell">
                     <span class="search-page-form__icon" aria-hidden="true">
                         <i class="fas fa-magnifying-glass"></i>
@@ -42,12 +42,12 @@
                         type="search"
                         name="q"
                         value="@Model.Query"
-                        placeholder="输入项目、工具或文章关键字"
+                        placeholder="@I18n.T("search.inputPlaceholder", "输入项目、工具或文章关键字")"
                         autocomplete="off"
                         aria-autocomplete="list"
                         aria-controls="search-page-suggestions"
                         data-search-suggest-input />
-                    <button type="submit" class="btn btn-primary search-page-submit">搜索</button>
+                    <button type="submit" class="btn btn-primary search-page-submit">@I18n.T("search.submit", "搜索")</button>
                 </div>
                 <div id="search-page-suggestions" class="search-suggest-panel" data-search-suggest-panel hidden></div>
             </form>
@@ -56,12 +56,12 @@
         @if (string.IsNullOrWhiteSpace(Model.Query))
         {
             <div class="empty-state">
-                <h2>输入关键字开始搜索</h2>
-                <p>可以直接搜索项目名、包名、工具名、文章标题或正文里的技术关键词。</p>
+                <h2>@I18n.T("search.emptyTitle", "输入关键字开始搜索")</h2>
+                <p>@I18n.T("search.emptyDescription", "可以直接搜索项目名、包名、工具名、文章标题或正文里的技术关键词。")</p>
                 <div class="chip-row chip-row--secondary">
-                    <span class="tag-chip tag-chip--muted">工具</span>
-                    <span class="tag-chip tag-chip--muted">项目</span>
-                    <span class="tag-chip tag-chip--muted">文章</span>
+                    <span class="tag-chip tag-chip--muted">@I18n.T("search.kind.tool", "工具")</span>
+                    <span class="tag-chip tag-chip--muted">@I18n.T("search.kind.doc", "项目")</span>
+                    <span class="tag-chip tag-chip--muted">@I18n.T("search.kind.post", "文章")</span>
                 </div>
             </div>
         }
@@ -69,28 +69,28 @@
         {
             <div class="search-summary-row">
                 <div class="page-banner__meta">
-                    <span class="meta-chip">关键字：@Model.Query</span>
-                    <span class="meta-chip">共 @Model.Total 条结果</span>
+                    <span class="meta-chip">@I18n.Text($"关键字：{Model.Query}")</span>
+                    <span class="meta-chip">@I18n.Text($"共 {Model.Total} 条结果")</span>
                 </div>
                 <div class="page-banner__meta">
-                    <span class="meta-chip">工具 @Model.ToolCount</span>
-                    <span class="meta-chip">项目 @Model.DocCount</span>
-                    <span class="meta-chip">文章 @Model.PostCount</span>
+                    <span class="meta-chip">@I18n.Text($"工具 {Model.ToolCount}")</span>
+                    <span class="meta-chip">@I18n.Text($"项目 {Model.DocCount}")</span>
+                    <span class="meta-chip">@I18n.Text($"文章 {Model.PostCount}")</span>
                 </div>
             </div>
 
             @if (Model.IsBlocked)
             {
                 <div class="empty-state">
-                    <h2>换一个技术关键词试试</h2>
-                    <p>@Model.Notice</p>
+                    <h2>@I18n.T("search.blockedTitle", "换一个技术关键词试试")</h2>
+                    <p>@I18n.Text(Model.Notice)</p>
                 </div>
             }
             else if (!Model.Results.Any())
             {
                 <div class="empty-state">
-                    <h2>没有找到相关结果</h2>
-                    <p>可以试试更短的关键词，或者直接搜索项目名、包名、工具名和文章标题中的核心词。</p>
+                    <h2>@I18n.T("search.noResultsTitle", "没有找到相关结果")</h2>
+                    <p>@I18n.T("search.noResultsDescription", "可以试试更短的关键词，或者直接搜索项目名、包名、工具名和文章标题中的核心词。")</p>
                 </div>
             }
             else
@@ -104,10 +104,11 @@
                         var snippet = string.Equals(result.MatchedSnippet, result.Summary, StringComparison.Ordinal)
                             ? null
                             : result.MatchedSnippet;
+                        var resultTitle = I18n.Text(result.Title);
 
                         <article class="surface-panel search-result-card">
                             <div class="search-result-card__head">
-                                <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@result.KindLabel</span>
+                                <span class="search-kind-badge search-kind-badge--@result.KindCssClass">@I18n.Text(result.KindLabel)</span>
                                 @if (result.UpdatedAt.HasValue)
                                 {
                                     <span class="search-result-card__date">@I18n.FormatDate(result.UpdatedAt)</span>
@@ -115,23 +116,23 @@
                             </div>
 
                             <h2 class="search-result-card__title">
-                                <a href="@result.Url">@result.Title</a>
+                                <a href="@result.Url">@resultTitle</a>
                             </h2>
 
                             @if (!string.IsNullOrWhiteSpace(summary))
                             {
-                                <p class="search-result-card__summary">@summary</p>
+                                <p class="search-result-card__summary">@I18n.Text(summary)</p>
                             }
 
                             @if (!string.IsNullOrWhiteSpace(snippet))
                             {
-                                <p class="search-result-card__matched">匹配内容：@snippet</p>
+                                <p class="search-result-card__matched">@I18n.Text($"匹配内容：{snippet}")</p>
                             }
 
                             <div class="search-result-card__meta">
                                 @if (!string.IsNullOrWhiteSpace(result.Context))
                                 {
-                                    <span><i class="fas fa-diagram-project"></i>@result.Context</span>
+                                    <span><i class="fas fa-diagram-project"></i>@I18n.Text(result.Context)</span>
                                 }
                                 @if (!string.IsNullOrWhiteSpace(result.Slug))
                                 {
@@ -140,7 +141,7 @@
                             </div>
 
                             <a href="@result.Url" class="inline-link">
-                                查看结果
+                                @I18n.T("search.viewResult", "查看结果")
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </article>
@@ -149,11 +150,11 @@
 
                 @if (Model.TotalPages > 1)
                 {
-                    <nav class="pagination-shell" aria-label="搜索分页">
-                        <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 条结果</p>
+                    <nav class="pagination-shell" aria-label="@I18n.T("search.pagination", "搜索分页")">
+                        <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 条结果")</p>
                         <ul class="pagination justify-content-center pagination-list">
                             <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                <a class="page-link" href="@ConstantUtil.GetSearchUrl(Model.Query, previousPage)">上一页</a>
+                                <a class="page-link" href="@ConstantUtil.GetSearchUrl(Model.Query, previousPage)">@I18n.T("pagination.previous", "上一页")</a>
                             </li>
 
                             @if (startPage > 1)
@@ -190,7 +191,7 @@
                             }
 
                             <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                <a class="page-link" href="@ConstantUtil.GetSearchUrl(Model.Query, nextPage)">下一页</a>
+                                <a class="page-link" href="@ConstantUtil.GetSearchUrl(Model.Query, nextPage)">@I18n.T("pagination.next", "下一页")</a>
                             </li>
                         </ul>
                     </nav>

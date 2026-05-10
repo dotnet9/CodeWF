@@ -2,14 +2,18 @@
 @using WebApp.Extensions
 @model WebApp.Pages.Doc.IndexModel
 @{
-    ViewData["Title"] = "项目";
-    ViewData["Description"] = "浏览码坊的开源项目与 NuGet 包说明，按主题快速定位内容。";
+    ViewData["Title"] = I18n.T("nav.projects", "项目");
+    ViewData["Description"] = I18n.T("project.description", "浏览码坊的开源项目与 NuGet 包说明，按主题快速定位内容。");
     var banner = new WebApp.Models.PageBannerViewModel
     {
-        Eyebrow = "Projects",
-        Title = "项目中心",
-        Description = "这里集中整理开源项目、NuGet 包以及对应的使用说明，方便快速查阅和持续维护。",
-        MetaItems = ["项目索引", "使用说明", "便于快速复用"]
+        Eyebrow = I18n.T("nav.projects", "项目"),
+        Title = I18n.T("project.center", "项目中心"),
+        Description = I18n.T("project.intro", "这里集中整理开源项目、NuGet 包以及对应的使用说明，方便快速查阅和持续维护。"),
+        MetaItems = [
+            I18n.T("project.index", "项目索引"),
+            I18n.T("project.docs", "使用说明"),
+            I18n.T("project.reuse", "便于快速复用")
+        ]
     };
 }
 
@@ -20,8 +24,8 @@
         @if (Model.DocItems == null || !Model.DocItems.Any())
         {
             <div class="empty-state">
-                <h2>项目内容暂未就绪</h2>
-                <p>可以稍后再来查看，或先浏览博客里的技术文章。</p>
+                <h2>@I18n.T("project.emptyTitle", "项目内容暂未就绪")</h2>
+                <p>@I18n.T("project.emptyDescription", "可以稍后再来查看，或先浏览博客里的技术文章。")</p>
             </div>
         }
         else
@@ -31,11 +35,11 @@
                 {
                     <article class="resource-card">
                         <div class="resource-card__body">
-                            <span class="card-kicker">项目分组</span>
-                            <h2 class="resource-card__title">@doc.Name</h2>
+                            <span class="card-kicker">@I18n.T("project.group", "项目分组")</span>
+                            <h2 class="resource-card__title">@I18n.Text(doc.Name)</h2>
                             @if (!string.IsNullOrWhiteSpace(doc.Memo))
                             {
-                                <p class="resource-card__desc">@doc.Memo</p>
+                                <p class="resource-card__desc">@I18n.Text(doc.Memo)</p>
                             }
 
                             @if (doc.Children != null && doc.Children.Any())
@@ -44,7 +48,7 @@
                                     @foreach (var child in doc.Children)
                                     {
                                         <a href="@ConstantUtil.GetProjectUrl(child.Slug)" class="sidebar-link">
-                                            <span>@child.Name</span>
+                                            <span>@I18n.Text(child.Name)</span>
                                             <i class="fas fa-arrow-right"></i>
                                         </a>
                                     }

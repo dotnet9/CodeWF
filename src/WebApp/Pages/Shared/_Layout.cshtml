@@ -24,13 +24,14 @@
         siteKeywords = I18n.T("site.keywords", ".NET,C#,ASP.NET Core,Razor Pages,开发工具,技术文章,开源项目,码坊");
     }
 
-    var isHomeTitle = string.IsNullOrWhiteSpace(rawPageTitle)
+    var requestPath = Context.Request.Path.ToUriComponent();
+    var isHomeTitle = requestPath.Equals("/", StringComparison.OrdinalIgnoreCase)
+        || string.IsNullOrWhiteSpace(rawPageTitle)
         || string.Equals(rawPageTitle, "首页", StringComparison.OrdinalIgnoreCase);
     var pageTitleText = isHomeTitle || string.IsNullOrWhiteSpace(pageTitle)
         ? appTitle
         : $"{pageTitle} - {appTitle}";
     var siteDomain = (site.Domain ?? $"{Context.Request.Scheme}://{Context.Request.Host}").TrimEnd('/');
-    var requestPath = Context.Request.Path.ToUriComponent();
     var canonicalPath = RequestLanguage.LocalizePath(ViewData["CanonicalPath"] as string ?? requestPath);
     if (string.IsNullOrWhiteSpace(canonicalPath))
     {
@@ -123,7 +124,7 @@
     {
         <script>
             window.addEventListener("load", () => {
-                // 统计脚本延后到页面主内容稳定后再加载，避免影响首屏可交互时间。
+                // Defer analytics until the main content is stable.
                 const loadAnalytics = () => {
                     const analytics = document.createElement("script");
                     analytics.async = true;

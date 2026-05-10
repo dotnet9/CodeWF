@@ -1,15 +1,16 @@
 @model WebApp.Models.PageBannerViewModel
+@inject WebApp.Services.I18nService I18n
 
 <div class="page-banner">
     <div>
         @if (!string.IsNullOrWhiteSpace(Model.Eyebrow))
         {
-            <span class="eyebrow">@Model.Eyebrow</span>
+            <span class="eyebrow">@I18n.Text(Model.Eyebrow)</span>
         }
-        <h1 class="page-title">@Model.Title</h1>
+        <h1 class="page-title">@I18n.Text(Model.Title)</h1>
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
-            <p class="page-description">@Model.Description</p>
+            <p class="page-description">@I18n.Text(Model.Description)</p>
         }
     </div>
     @if (Model.MetaItems.Any())
@@ -17,7 +18,7 @@
         <div class="page-banner__meta">
             @foreach (var item in Model.MetaItems)
             {
-                <span class="meta-chip">@item</span>
+                <span class="meta-chip">@I18n.Text(item)</span>
             }
         </div>
     }

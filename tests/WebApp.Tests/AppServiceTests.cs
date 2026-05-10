@@ -1039,6 +1039,77 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task I18nService_BackfillsDiscoveredI18nFallbackStrings()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "Pages"));
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "lang.json"), """
+            {
+              "strings": {},
+              "textMap": {},
+              "patterns": []
+            }
+            """);
+        await File.WriteAllTextAsync(Path.Combine(_tempRoot, "Pages", "FallbackPage.cshtml"), """
+            <h1>@I18n.T("fallback.title", "新增静态标题")</h1>
+            <p>@I18n.Format("fallback.count", "{0} 篇文章", 3)</p>
+            """);
+
+        var service = CreateI18nService(new MappingContentTranslationService());
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            await service.PrepareLanguageResourceAsync("en");
+
+            Assert.Equal("[en]新增静态标题", service.T("fallback.title", "fallback"));
+            Assert.Equal("[en]7 篇文章", service.Format("fallback.count", "{0} 篇文章", 7));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
+    public void I18nService_Text_AppliesResourcePatterns()
+    {
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
+        Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
+        File.WriteAllText(Path.Combine(_tempRoot, "site", "lang.json"), """
+            {
+              "strings": {},
+              "textMap": {},
+              "patterns": []
+            }
+            """);
+        File.WriteAllText(Path.Combine(_tempRoot, "i18n", "en", "site", "lang.json"), """
+            {
+              "strings": {},
+              "textMap": {},
+              "patterns": [
+                {
+                  "pattern": "^第 (\\d+) / (\\d+) 页，共 (\\d+) 篇文章$",
+                  "replacement": "Page $1 of $2, $3 posts"
+                }
+              ]
+            }
+            """);
+
+        var service = CreateI18nService(new ThrowingContentTranslationService());
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            Assert.Equal("Page 2 of 5, 36 posts", service.Text("第 2 / 5 页，共 36 篇文章"));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
     public async Task I18nService_BackfillsDiscoveredPageText_WhenLanguageResourceExists()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));

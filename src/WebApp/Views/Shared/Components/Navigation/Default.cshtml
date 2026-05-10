@@ -42,11 +42,11 @@
                     }
                 </div>
                 <div class="nav-feature-card__content">
-                    <span class="nav-mega-menu__eyebrow">Latest</span>
-                    <strong>@latestPost.Title</strong>
+                    <span class="nav-mega-menu__eyebrow">@I18n.T("nav.latestPost", "最新")</span>
+                    <strong>@I18n.Text(latestPost.Title)</strong>
                     @if (!string.IsNullOrWhiteSpace(latestPost.Description))
                     {
-                        <p>@latestPost.Description</p>
+                        <p>@I18n.Text(latestPost.Description)</p>
                     }
                     <div class="nav-feature-card__meta">
                         @if (latestPost.Date.HasValue)
@@ -64,7 +64,7 @@
             {
                 <section class="nav-browse-section">
                     <div class="nav-browse-section__header">
-                        <span class="nav-mega-menu__eyebrow">Albums</span>
+                        <span class="nav-mega-menu__eyebrow">@I18n.T("nav.albums", "专题")</span>
                         <strong>@I18n.T("nav.readByAlbum", "按专题连续阅读")</strong>
                     </div>
                     <div class="nav-menu-list nav-menu-list--stacked">
@@ -72,10 +72,10 @@
                         {
                             <a class="nav-menu-link" href="@ConstantUtil.GetAlbumUrl(album.Slug)">
                                 <span class="nav-menu-link__content">
-                                    <strong>@album.Name</strong>
+                                    <strong>@I18n.Text(album.Name)</strong>
                                     @if (!string.IsNullOrWhiteSpace(album.Memo))
                                     {
-                                        <small>@album.Memo</small>
+                                        <small>@I18n.Text(album.Memo)</small>
                                     }
                                 </span>
                                 @if (album.PostCount > 0)
@@ -92,7 +92,7 @@
             {
                 <section class="nav-browse-section">
                     <div class="nav-browse-section__header">
-                        <span class="nav-mega-menu__eyebrow">Categories</span>
+                        <span class="nav-mega-menu__eyebrow">@I18n.T("nav.categories", "分类")</span>
                         <strong>@I18n.T("nav.readByCategory", "按分类快速筛选")</strong>
                     </div>
                     <div class="nav-menu-list nav-menu-list--stacked">
@@ -100,10 +100,10 @@
                         {
                             <a class="nav-menu-link" href="@ConstantUtil.GetCategoryUrl(category.Slug)">
                                 <span class="nav-menu-link__content">
-                                    <strong>@category.Name</strong>
+                                    <strong>@I18n.Text(category.Name)</strong>
                                     @if (!string.IsNullOrWhiteSpace(category.Memo))
                                     {
-                                        <small>@category.Memo</small>
+                                        <small>@I18n.Text(category.Memo)</small>
                                     }
                                 </span>
                                 @if (category.PostCount > 0)

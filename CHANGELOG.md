@@ -7,6 +7,8 @@ V1.1.5 (2026-05-10)
 - 😄 [Added] Added request-language detection, localized route prefixes, language switch APIs, and culture-aware date formatting for multilingual browsing.
 - 😄 [Added] Added structured JSON, Markdown, and article-metadata translation support with batching, duplicate string de-duplication, and regression coverage.
 - 🔨 [Changed] Updated homepage, blog, search, navigation, article, tag, category, and album views to use localized UI text and language-aware links.
+- 🔨 [Changed] Localized remaining project, toolbox, search, pagination, and related-reading static labels through site language resources.
+- 🔨 [Changed] Extended English/Japanese/Chinese `site/lang.json` resources so localized pages render translated SEO titles, descriptions, Open Graph metadata, and tool/search copy directly in source HTML.
 - 🔨 [Changed] Scoped article metadata sidecar generation to posts that are actually rendered on the current page, instead of translating every article during list, homepage, navigation, tag, or search preparation.
 - 🔨 [Changed] Reworked album/category counts to use source article metadata and default taxonomy slugs, so counts no longer depend on all translated article metadata being pre-generated.
 - 🐛 [Fixed] Added fallback windows for failed translation attempts so unavailable translation providers do not turn pages into 500 responses.

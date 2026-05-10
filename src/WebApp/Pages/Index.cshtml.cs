@@ -83,7 +83,7 @@ public class IndexModel : PageModel
             .ToList();
 
         var latestPost = await _appService.LocalizeBlogPostBriefAsync(allPosts.FirstOrDefault());
-        GettingStartedLinks = BuildGettingStartedLinks(latestPost, FeaturedCategories, FeaturedAlbums);
+        GettingStartedLinks = BuildGettingStartedLinks(latestPost, FeaturedCategories, FeaturedAlbums, _i18nService);
         var discoverySource = TakeRandom(
             allPosts.Where(post =>
                 Posts.All(featured => !string.Equals(featured.Slug, post.Slug, StringComparison.OrdinalIgnoreCase)))
@@ -100,41 +100,42 @@ public class IndexModel : PageModel
     private static List<DiscoveryLinkCard> BuildGettingStartedLinks(
         BlogPostBrief? latestPost,
         IReadOnlyList<HomeBrowseItem> categories,
-        IReadOnlyList<HomeBrowseItem> albums)
+        IReadOnlyList<HomeBrowseItem> albums,
+        I18nService i18nService)
     {
         var links = new List<DiscoveryLinkCard>();
 
         if (latestPost is not null)
         {
             links.Add(new DiscoveryLinkCard(
-                "从这里开始",
-                "先看最新更新",
-                latestPost.Title ?? "最近更新",
+                i18nService.T("home.start.latestEyebrow", "从这里开始"),
+                i18nService.T("home.start.latestTitle", "先看最新更新"),
+                i18nService.Text(latestPost.Title ?? "最近更新"),
                 ConstantUtil.GetPostUrl(latestPost)));
         }
 
         if (categories.FirstOrDefault() is { } category)
         {
             links.Add(new DiscoveryLinkCard(
-                "内容地图",
-                $"先逛 {category.Name}",
-                $"{category.PostCount} 篇文章，适合快速熟悉站内内容结构",
+                i18nService.T("home.start.categoryEyebrow", "内容地图"),
+                i18nService.Format("home.start.categoryTitle", "先逛 {0}", i18nService.Text(category.Name)),
+                i18nService.Format("home.start.categoryDescription", "{0} 篇文章，适合快速熟悉站内内容结构", category.PostCount),
                 ConstantUtil.GetCategoryUrl(category.Slug)));
         }
 
         if (PickRandom(albums.Where(static item => item.PostCount > 0).ToList()) is { } album)
         {
             links.Add(new DiscoveryLinkCard(
-                "连续阅读",
-                $"跟着专题读 {album.Name}",
-                $"{album.PostCount} 篇文章，适合按主题连续阅读",
+                i18nService.T("home.start.albumEyebrow", "连续阅读"),
+                i18nService.Format("home.start.albumTitle", "跟着专题读 {0}", i18nService.Text(album.Name)),
+                i18nService.Format("home.start.albumDescription", "{0} 篇文章，适合按主题连续阅读", album.PostCount),
                 ConstantUtil.GetAlbumUrl(album.Slug)));
         }
 
         links.Add(new DiscoveryLinkCard(
-            "项目索引",
-            "看看开源项目",
-            "这里整理了开源项目、NuGet 包和对应的使用说明。",
+            i18nService.T("home.start.projectEyebrow", "项目索引"),
+            i18nService.T("home.start.projectTitle", "看看开源项目"),
+            i18nService.T("home.start.projectDescription", "这里整理了开源项目、NuGet 包和对应的使用说明。"),
             ConstantUtil.GetProjectDirectoryUrl()));
 
         return links.Take(4).ToList();
@@ -154,11 +155,13 @@ public class IndexModel : PageModel
         foreach (var post in posts)
         {
             items.Add(new DiscoveryPostCard(
-                "随机发现",
-                post.Title ?? "未命名文章",
-                post.Description ?? "换一篇看看，也许会撞上正想看的主题。",
+                i18nService.T("home.discovery.eyebrow", "随机发现"),
+                i18nService.Text(post.Title ?? "未命名文章"),
+                i18nService.Text(post.Description ?? "换一篇看看，也许会撞上正想看的主题。"),
                 ConstantUtil.GetPostUrl(post),
-                i18nService.FormatDate(post.Lastmod ?? post.Date) is { Length: > 0 } dateLabel ? dateLabel : "文章"));
+                i18nService.FormatDate(post.Lastmod ?? post.Date) is { Length: > 0 } dateLabel
+                    ? dateLabel
+                    : i18nService.T("search.kind.post", "文章")));
         }
 
         return items;

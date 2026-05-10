@@ -8,6 +8,7 @@ namespace WebApp.Pages;
 public class SearchModel : PageModel
 {
     private readonly AppService _appService;
+    private readonly I18nService _i18nService;
 
     [BindProperty(SupportsGet = true, Name = "q")]
     public string Query { get; set; } = string.Empty;
@@ -25,9 +26,10 @@ public class SearchModel : PageModel
     public List<SearchResultItem> Results { get; private set; } = [];
     public int TotalPages => Total <= 0 ? 0 : (int)Math.Ceiling(Total / (double)PageSize);
 
-    public SearchModel(AppService appService)
+    public SearchModel(AppService appService, I18nService i18nService)
     {
         _appService = appService;
+        _i18nService = i18nService;
     }
 
     public async Task OnGetAsync()
@@ -35,10 +37,12 @@ public class SearchModel : PageModel
         Query = Query?.Trim() ?? string.Empty;
         PageIndex = Math.Max(1, PageIndex);
 
-        ViewData["Title"] = string.IsNullOrWhiteSpace(Query) ? "全局搜索" : $"搜索：{Query}";
+        ViewData["Title"] = string.IsNullOrWhiteSpace(Query)
+            ? _i18nService.T("search.global", "全站搜索")
+            : _i18nService.Format("search.titleWithQuery", "搜索：{0}", Query);
         ViewData["Description"] = string.IsNullOrWhiteSpace(Query)
-            ? "搜索站内的工具、项目和技术文章。"
-            : $"查看与 {Query} 相关的工具、项目和技术文章搜索结果。";
+            ? _i18nService.T("search.description", "搜索站内的工具、项目和技术文章。")
+            : _i18nService.Format("search.descriptionWithQuery", "查看与 {0} 相关的工具、项目和技术文章搜索结果。", Query);
 
         if (string.IsNullOrWhiteSpace(Query))
         {

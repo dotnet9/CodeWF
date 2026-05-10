@@ -2,10 +2,14 @@
 @using WebApp.Extensions
 @model WebApp.Pages.Blog.Album.IndexModel
 @{
-    ViewData["Title"] = Model.IsDirectoryPage ? "专题" : $"{Model.AlbumName} - 专题";
+    ViewData["Title"] = Model.IsDirectoryPage
+        ? I18n.T("home.albums", "专题")
+        : I18n.Format("album.titleWithName", "{0} - 专题", I18n.Text(Model.AlbumName));
     ViewData["Description"] = Model.IsDirectoryPage
-        ? "浏览码墙全部专题。"
-        : (string.IsNullOrWhiteSpace(Model.AlbumMemo) ? $"查看 {Model.AlbumName} 专题下的文章内容。" : Model.AlbumMemo);
+        ? I18n.T("album.directoryDescription", "浏览码墙全部专题。")
+        : (string.IsNullOrWhiteSpace(Model.AlbumMemo)
+            ? I18n.Format("album.descriptionWithName", "查看 {0} 专题下的文章内容。", I18n.Text(Model.AlbumName))
+            : I18n.Text(Model.AlbumMemo));
     var albumSlug = Model.CurrentSlug ?? string.Empty;
     var albums = Model.Albums
         .Where(item => !string.Equals(item.Slug, "default", StringComparison.OrdinalIgnoreCase))
@@ -16,20 +20,20 @@
     <div class="container">
         <div class="page-banner">
             <div>
-                <span class="eyebrow">Album</span>
-                <h1 class="page-title">@(Model.IsDirectoryPage ? "全部专题" : Model.AlbumName)</h1>
-                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.AlbumMemo) ? "按专题浏览站内文章内容。" : Model.AlbumMemo)</p>
+                <span class="eyebrow">@I18n.T("album.eyebrow", "专题")</span>
+                <h1 class="page-title">@(Model.IsDirectoryPage ? I18n.T("nav.allAlbums", "全部专题") : I18n.Text(Model.AlbumName))</h1>
+                <p class="page-description">@(string.IsNullOrWhiteSpace(Model.AlbumMemo) ? I18n.T("album.browseDescription", "按专题浏览站内文章内容。") : I18n.Text(Model.AlbumMemo))</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {
                 <div class="page-banner__stats">
                     <div class="stat-chip">
                         <strong>@Model.Total</strong>
-                        <span>篇文章</span>
+                        <span>@I18n.T("blog.postCountUnit", "篇文章")</span>
                     </div>
                     <div class="stat-chip">
                         <strong>@Model.PageIndex</strong>
-                        <span>当前页</span>
+                        <span>@I18n.T("pagination.currentPage", "当前页")</span>
                     </div>
                 </div>
             }
@@ -41,8 +45,8 @@
                 @if (!albums.Any())
                 {
                     <div class="empty-state">
-                        <h2>暂未配置专题</h2>
-                        <p>后续会在这里展示全部专题。</p>
+                        <h2>@I18n.T("album.emptyDirectoryTitle", "暂未配置专题")</h2>
+                        <p>@I18n.T("album.emptyDirectoryDescription", "后续会在这里展示全部专题。")</p>
                     </div>
                 }
                 else
@@ -51,10 +55,10 @@
                         @foreach (var album in albums)
                         {
                             <a href="@ConstantUtil.GetAlbumUrl(album.Slug!)" class="directory-card">
-                                <strong>@album.Name</strong>
+                                <strong>@I18n.Text(album.Name)</strong>
                                 @if (!string.IsNullOrWhiteSpace(album.Memo))
                                 {
-                                    <p>@album.Memo</p>
+                                    <p>@I18n.Text(album.Memo)</p>
                                 }
                             </a>
                         }
@@ -69,8 +73,8 @@
                     @if (!Model.Posts.Any())
                     {
                         <div class="empty-state">
-                            <h2>该专题下暂无文章</h2>
-                            <p>可以先返回博客首页，或切换到其他专题继续浏览。</p>
+                            <h2>@I18n.T("album.emptyPostsTitle", "该专题下暂无文章")</h2>
+                            <p>@I18n.T("album.emptyPostsDescription", "可以先返回博客首页，或切换到其他专题继续浏览。")</p>
                         </div>
                     }
                     else
@@ -80,21 +84,23 @@
                             {
                                 var postUrl = ConstantUtil.GetPostUrl(post);
                                 var hasCover = !string.IsNullOrWhiteSpace(post.Cover);
+                                var postTitle = I18n.Text(post.Title);
+                                var authorName = I18n.Text(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author);
                                 <article class="post-list-card @(hasCover ? string.Empty : "post-list-card--text-only")">
                                     @if (hasCover)
                                     {
                                         <a href="@postUrl" class="post-list-card__cover">
-                                            <img src="@post.Cover" alt="@post.Title" class="cover-media" loading="lazy" decoding="async" />
+                                            <img src="@post.Cover" alt="@postTitle" class="cover-media" loading="lazy" decoding="async" />
                                         </a>
                                     }
                                     <div class="post-list-card__body">
-                                        <h2 class="post-list-card__title"><a href="@postUrl">@post.Title</a></h2>
+                                        <h2 class="post-list-card__title"><a href="@postUrl">@I18n.Text(post.Title)</a></h2>
                                         @if (!string.IsNullOrWhiteSpace(post.Description))
                                         {
-                                            <p class="post-list-card__excerpt">@post.Description</p>
+                                            <p class="post-list-card__excerpt">@I18n.Text(post.Description)</p>
                                         }
                                         <div class="meta-line">
-                                            <span><i class="far fa-user"></i>@(string.IsNullOrWhiteSpace(post.Author) ? Model.Owner : post.Author)</span>
+                                            <span><i class="far fa-user"></i>@authorName</span>
                                             <span><i class="far fa-calendar"></i>@I18n.FormatDateTime(post.Lastmod ?? post.Date)</span>
                                         </div>
                                     </div>
@@ -105,11 +111,11 @@
 
                     @if (Model.TotalPages > 1)
                     {
-                        <nav class="pagination-shell" aria-label="专题分页">
-                            <p class="pagination-summary">第 @Model.PageIndex / @Model.TotalPages 页，共 @Model.Total 篇文章</p>
+                        <nav class="pagination-shell" aria-label="@I18n.T("album.pagination", "专题分页")">
+                            <p class="pagination-summary">@I18n.Text($"第 {Model.PageIndex} / {Model.TotalPages} 页，共 {Model.Total} 篇文章")</p>
                             <ul class="pagination justify-content-center pagination-list">
                                 <li class="page-item @(Model.PageIndex <= 1 ? "disabled" : "")">
-                                    <a class="page-link" href="@ConstantUtil.GetAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex - 1)">上一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex - 1)">@I18n.T("pagination.previous", "上一页")</a>
                                 </li>
                                 @{
                                     var startPage = Math.Max(1, Model.PageIndex - 2);
@@ -157,7 +163,7 @@
                                     </li>
                                 }
                                 <li class="page-item @(Model.PageIndex >= Model.TotalPages ? "disabled" : "")">
-                                    <a class="page-link" href="@ConstantUtil.GetAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex + 1)">下一页</a>
+                                    <a class="page-link" href="@ConstantUtil.GetAlbumUrl(albumSlug)?pageIndex=@(Model.PageIndex + 1)">@I18n.T("pagination.next", "下一页")</a>
                                 </li>
                             </ul>
                         </nav>
@@ -166,12 +172,12 @@
 
                 <aside class="content-sidebar">
                     <div class="surface-panel sidebar-panel sticky-panel">
-                        <h2 class="sidebar-title">全部专题</h2>
+                        <h2 class="sidebar-title">@I18n.T("nav.allAlbums", "全部专题")</h2>
                         <div class="sidebar-link-list">
                             @foreach (var album in albums)
                             {
                                 <a href="@ConstantUtil.GetAlbumUrl(album.Slug!)" class="sidebar-link @(album.Slug == albumSlug ? "is-current" : string.Empty)">
-                                    <span>@album.Name</span>
+                                    <span>@I18n.Text(album.Name)</span>
                                     <i class="fas fa-angle-right"></i>
                                 </a>
                             }

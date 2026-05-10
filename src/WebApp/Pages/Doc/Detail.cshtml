@@ -2,16 +2,16 @@
 @model WebApp.Pages.Doc.DetailModel
 @using WebApp.Extensions
 @{
-    ViewData["Title"] = $"{Model.Doc?.Name ?? "项目"} - 项目中心";
-    ViewData["Description"] = Model.Doc?.Memo ?? "浏览码坊的项目与使用说明。";
+    ViewData["Title"] = $"{I18n.Text(Model.Doc?.Name ?? I18n.T("nav.projects", "项目"))} - {I18n.T("project.center", "项目中心")}";
+    ViewData["Description"] = I18n.Text(Model.Doc?.Memo ?? I18n.T("project.description", "浏览码坊的项目与使用说明。"));
     var banner = Model.Doc == null
         ? null
         : new WebApp.Models.PageBannerViewModel
         {
             Eyebrow = "Projects",
-            Title = Model.Doc.Name ?? "项目",
+            Title = I18n.Text(Model.Doc.Name ?? I18n.T("nav.projects", "项目")),
             Description = Model.Doc.Memo,
-            MetaItems = ["项目说明"]
+            MetaItems = [I18n.T("project.docs", "项目说明")]
         };
 }
 
@@ -24,8 +24,8 @@
         @if (Model.Doc == null)
         {
             <div class="empty-state">
-                <h2>项目不存在或已删除</h2>
-                <p>可以返回项目中心查看其他内容。</p>
+                <h2>@I18n.T("project.notFoundTitle", "项目不存在或已删除")</h2>
+                <p>@I18n.T("project.notFoundDescription", "可以返回项目中心查看其他内容。")</p>
             </div>
         }
         else
@@ -35,7 +35,7 @@
             {
                 <div class="page-banner__meta">
                     <a class="meta-chip" href="@Model.Doc.Repository" target="_blank" rel="noreferrer">
-                        <i class="fab fa-github"></i>相关仓库
+                        <i class="fab fa-github"></i>@I18n.T("project.repository", "相关仓库")
                     </a>
                 </div>
             }
@@ -59,18 +59,18 @@
 
                     @if (Model.PreviousDoc != null || Model.NextDoc != null)
                     {
-                        <nav class="doc-pager" aria-label="项目阅读导航">
+                        <nav class="doc-pager" aria-label="@I18n.T("project.readingNavigation", "项目阅读导航")">
                             @if (Model.PreviousDoc != null)
                             {
                                 <a href="@ConstantUtil.GetProjectUrl(Model.PreviousDoc.Slug)" class="surface-panel doc-pager__item doc-pager__item--prev">
                                     <span class="doc-pager__label">
                                         <i class="fas fa-arrow-left"></i>
-                                        上一篇
+                                        @I18n.T("pagination.previousPost", "上一篇")
                                     </span>
-                                    <strong>@Model.PreviousDoc.Name</strong>
+                                    <strong>@I18n.Text(Model.PreviousDoc.Name)</strong>
                                     @if (!string.IsNullOrWhiteSpace(Model.PreviousDoc.Memo))
                                     {
-                                        <p>@Model.PreviousDoc.Memo</p>
+                                        <p>@I18n.Text(Model.PreviousDoc.Memo)</p>
                                     }
                                 </a>
                             }
@@ -83,13 +83,13 @@
                             {
                                 <a href="@ConstantUtil.GetProjectUrl(Model.NextDoc.Slug)" class="surface-panel doc-pager__item doc-pager__item--next">
                                     <span class="doc-pager__label">
-                                        下一篇
+                                        @I18n.T("pagination.nextPost", "下一篇")
                                         <i class="fas fa-arrow-right"></i>
                                     </span>
-                                    <strong>@Model.NextDoc.Name</strong>
+                                    <strong>@I18n.Text(Model.NextDoc.Name)</strong>
                                     @if (!string.IsNullOrWhiteSpace(Model.NextDoc.Memo))
                                     {
-                                        <p>@Model.NextDoc.Memo</p>
+                                        <p>@I18n.Text(Model.NextDoc.Memo)</p>
                                     }
                                 </a>
                             }
@@ -103,7 +103,7 @@
 
                 <aside class="article-aside sticky-panel">
                     <div class="surface-panel toc-panel" data-reading-toc data-toc-hide-empty="true">
-                        <h2 class="sidebar-title">目录</h2>
+                        <h2 class="sidebar-title">@I18n.T("post.toc", "目录")</h2>
                         <div class="toc-nav"></div>
                     </div>
                 </aside>
