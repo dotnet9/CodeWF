@@ -1,6 +1,7 @@
 using System.ClientModel;
 using System.ClientModel.Primitives;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using CodeWfLogger = CodeWF.Log.Core.Logger;
 using Microsoft.Extensions.AI;
@@ -83,19 +84,11 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
                 maxRetries);
             var client = CreateChatClient(option);
             var targetName = $"{targetLanguage.NativeName} ({targetLanguage.DotNetCulture})";
-            var response = await client.GetResponseAsync(
-                [
-                    new AiChatMessage(AiChatRole.System, BuildSystemPrompt(kind, targetName)),
-                    new AiChatMessage(AiChatRole.User, source)
-                ],
-                new ChatOptions
-                {
-                    Temperature = 0.2f,
-                    MaxOutputTokens = EstimateMaxOutputTokens(source)
-                },
-                cancellationToken);
-
-            var translated = NormalizeResponse(response.ToString());
+            var translated = NormalizeResponse(await TranslateStreamingAsync(
+                client,
+                BuildStatelessTranslationMessages(kind, targetName, source),
+                CreateStatelessTranslationOptions(source),
+                cancellationToken));
             stopwatch.Stop();
             CodeWfLogger.Info(
                 $"语言内容翻译完成。language={targetLanguage.Code}; kind={kind}; resource={resource}; outputChars={translated.Length}; elapsedMs={stopwatch.ElapsedMilliseconds}.",
@@ -136,6 +129,41 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
         string.IsNullOrWhiteSpace(resourceName)
             ? "unknown"
             : resourceName.Trim().Replace('\r', ' ').Replace('\n', ' ');
+
+    private static async Task<string> TranslateStreamingAsync(
+        IChatClient client,
+        IReadOnlyList<AiChatMessage> messages,
+        ChatOptions options,
+        CancellationToken cancellationToken)
+    {
+        var builder = new StringBuilder();
+        await foreach (var update in client.GetStreamingResponseAsync(messages, options, cancellationToken))
+        {
+            if (!string.IsNullOrEmpty(update.Text))
+            {
+                builder.Append(update.Text);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static AiChatMessage[] BuildStatelessTranslationMessages(
+        ContentTranslationKind kind,
+        string targetName,
+        string source) =>
+        [
+            new(AiChatRole.System, BuildSystemPrompt(kind, targetName)),
+            new(AiChatRole.User, source)
+        ];
+
+    private static ChatOptions CreateStatelessTranslationOptions(string source) =>
+        new()
+        {
+            ConversationId = null,
+            Temperature = 0.2f,
+            MaxOutputTokens = EstimateMaxOutputTokens(source)
+        };
 
     private static IChatClient CreateChatClient(OpenAIOption option)
     {
