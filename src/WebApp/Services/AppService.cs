@@ -2197,8 +2197,35 @@ public class AppService : IDisposable
             sourcePost,
             language,
             createMissingTranslation: false);
-        var metadataPath = await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, language);
         if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                var localizedPost = await ReadLocalizedBlogPostAsync(
+                    sourcePath,
+                    language,
+                    createMissingTranslation: false,
+                    renderContent: false);
+                if (!ShouldRepairLocalizedMetadata(language, sourcePost, localizedPost))
+                {
+                    return localizedPost;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "Existing localized article metadata could not be loaded. Language={Language}; Slug={Slug}; ArticlePath={ArticlePath}.",
+                    language,
+                    post.Slug,
+                    localizedArticlePath);
+            }
+        }
+
+        var metadataPath = await GetOrCreateLocalizedBlogPostMetadataPathAsync(sourcePath, sourcePost, language);
+        if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase)
+            && metadataPath is not null
+            && File.Exists(metadataPath))
         {
             return await ReadLocalizedBlogPostAsync(
                 sourcePath,

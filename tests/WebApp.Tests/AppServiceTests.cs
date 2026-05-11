@@ -908,6 +908,89 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task LocalizeBlogPostBriefsAsync_ReusesExistingLocalizedArticleAndMetadataSidecars()
+    {
+        var postDir = Path.Combine(_tempRoot, "2026", "05");
+        Directory.CreateDirectory(postDir);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "cached-inline.md"), """
+            ---
+            title: 中文标题一
+            slug: cached-inline
+            description: 中文描述一
+            date: 2026-05-03 10:30:00
+            lastmod: 2026-05-03 21:32:31
+            tags:
+              - 缓存一
+            draft: false
+            ---
+
+            中文正文一。
+            """);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "cached-sidecar.md"), """
+            ---
+            title: 中文标题二
+            slug: cached-sidecar
+            description: 中文描述二
+            date: 2026-05-02 10:30:00
+            lastmod: 2026-05-02 21:32:31
+            tags:
+              - 缓存二
+            draft: false
+            ---
+
+            中文正文二。
+            """);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "cached-inline.20260503213231.en.md"), """
+            ---
+            title: English inline title
+            slug: cached-inline
+            description: English inline description
+            date: 2026-05-03 10:30:00
+            lastmod: 2026-05-03 21:32:31
+            tags:
+              - Inline Cache
+            draft: false
+            ---
+
+            English body.
+            """);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "cached-sidecar.20260502213231.en.yml"), """
+            title: English sidecar title
+            slug: cached-sidecar
+            description: English sidecar description
+            date: 2026-05-02 10:30:00
+            lastmod: 2026-05-02 21:32:31
+            tags:
+              - Sidecar Cache
+            draft: false
+            """);
+
+        using var appService = CreateAppService(new ThrowingContentTranslationService());
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var posts = await appService.GetAllBlogPostsAsync();
+            var localized = await appService.LocalizeBlogPostBriefsAsync(posts ?? []);
+
+            Assert.Equal(2, localized.Count);
+            Assert.Contains(localized, static post =>
+                string.Equals(post.Slug, "cached-inline", StringComparison.Ordinal)
+                && string.Equals(post.Title, "English inline title", StringComparison.Ordinal)
+                && post.Tags?.Contains("Inline Cache") == true);
+            Assert.Contains(localized, static post =>
+                string.Equals(post.Slug, "cached-sidecar", StringComparison.Ordinal)
+                && string.Equals(post.Title, "English sidecar title", StringComparison.Ordinal)
+                && post.Tags?.Contains("Sidecar Cache") == true);
+            Assert.False(File.Exists(Path.Combine(postDir, "cached-inline.20260503213231.en.yml")));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
     public async Task GetPostByAlbum_LoadsPostsFromAllYearDirectories()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));

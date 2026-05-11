@@ -2,12 +2,19 @@
 @using WebApp.Extensions
 @model WebApp.Pages.Blog.Tag.IndexModel
 @{
+    var tagDisplayName = Model.IsTagMissing
+        ? I18n.T("tag.notFoundTitle", "标签不存在")
+        : I18n.Text(Model.TagName);
     ViewData["Title"] = Model.IsDirectoryPage
         ? I18n.T("nav.tags", "标签")
-        : I18n.Format("tag.titleWithName", "{0} - 标签", I18n.Text(Model.TagName));
+        : Model.IsTagMissing
+            ? I18n.T("tag.notFoundTitle", "标签不存在")
+            : I18n.Format("tag.titleWithName", "{0} - 标签", tagDisplayName);
     ViewData["Description"] = Model.IsDirectoryPage
         ? I18n.T("tag.directoryDescription", "浏览码坊全部文章标签。")
-        : I18n.Format("tag.descriptionWithName", "查看 {0} 标签下的技术文章。", I18n.Text(Model.TagName));
+        : Model.IsTagMissing
+            ? I18n.T("tag.notFoundDescription", "这个标签不存在或暂未收录文章。")
+            : I18n.Format("tag.descriptionWithName", "查看 {0} 标签下的技术文章。", tagDisplayName);
     var tagSlug = Model.CurrentSlug ?? string.Empty;
     var maxTagCount = Math.Max(1, Model.Tags.Any() ? Model.Tags.Max(item => item.PostCount) : 1);
     var tagIndex = 0;
@@ -18,8 +25,12 @@
         <div class="page-banner">
             <div>
                 <span class="eyebrow">@I18n.T("tag.eyebrow", "标签")</span>
-                <h1 class="page-title">@(Model.IsDirectoryPage ? I18n.T("nav.allTags", "全部标签") : I18n.Text(Model.TagName))</h1>
-                <p class="page-description">@(Model.IsDirectoryPage ? I18n.T("tag.browseDescription", "按标签快速聚合站内文章。") : I18n.Format("tag.browsingDescriptionWithName", "正在浏览与 {0} 相关的文章。", I18n.Text(Model.TagName)))</p>
+                <h1 class="page-title">@(Model.IsDirectoryPage ? I18n.T("nav.allTags", "全部标签") : tagDisplayName)</h1>
+                <p class="page-description">@(Model.IsDirectoryPage
+                    ? I18n.T("tag.browseDescription", "按标签快速聚合站内文章。")
+                    : Model.IsTagMissing
+                        ? I18n.T("tag.notFoundPageDescription", "可以返回标签列表查看其他已收录标签。")
+                        : I18n.Format("tag.browsingDescriptionWithName", "正在浏览与 {0} 相关的文章。", tagDisplayName))</p>
             </div>
             @if (!Model.IsDirectoryPage)
             {
@@ -68,8 +79,8 @@
                     @if (!Model.Posts.Any())
                     {
                         <div class="empty-state">
-                            <h2>@I18n.T("tag.emptyPostsTitle", "这个标签下还没有文章")</h2>
-                            <p>@I18n.T("tag.emptyPostsDescription", "可以返回标签列表或博客首页继续浏览。")</p>
+                            <h2>@(Model.IsTagMissing ? I18n.T("tag.notFoundTitle", "标签不存在") : I18n.T("tag.emptyPostsTitle", "这个标签下还没有文章"))</h2>
+                            <p>@(Model.IsTagMissing ? I18n.T("tag.notFoundEmptyDescription", "可以返回标签列表查看其他标签。") : I18n.T("tag.emptyPostsDescription", "可以返回标签列表或博客首页继续浏览。"))</p>
                         </div>
                     }
                     else

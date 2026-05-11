@@ -12,9 +12,10 @@ public class IndexModel : PageModel
     private readonly AppService _appService;
     private readonly IOptions<SiteOption> _siteOption;
 
-    public string TagName { get; set; } = "全部标签";
+    public string TagName { get; set; } = string.Empty;
     public string? CurrentSlug { get; private set; }
     public bool IsDirectoryPage => string.IsNullOrWhiteSpace(CurrentSlug);
+    public bool IsTagMissing { get; private set; }
     public List<BlogPostBrief> Posts { get; set; } = [];
     public List<TagItem> Tags { get; set; } = [];
     public string Owner => _siteOption.Value.Owner ?? _siteOption.Value.AppTitle ?? "码坊";
@@ -36,11 +37,12 @@ public class IndexModel : PageModel
             ? null
             : ConstantUtil.DecodeTagSlug(slug);
         PageIndex = pageIndex > 0 ? pageIndex : 1;
+        IsTagMissing = false;
 
         Tags = await _appService.GetAllTagItemsAsync();
         if (string.IsNullOrWhiteSpace(CurrentSlug))
         {
-            TagName = "全部标签";
+            TagName = string.Empty;
             return;
         }
 
@@ -48,7 +50,8 @@ public class IndexModel : PageModel
             string.Equals(item.Name, CurrentSlug, StringComparison.OrdinalIgnoreCase));
         if (tag == null)
         {
-            TagName = "标签不存在";
+            TagName = CurrentSlug ?? string.Empty;
+            IsTagMissing = true;
             Posts = [];
             Total = 0;
             return;
