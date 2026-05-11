@@ -191,6 +191,12 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
                 Keep slug, date, lastmod, cover, banner, author, draft, originalTitle, originalLink, and copyright values unchanged.
                 Translate the article body naturally for technical readers.
                 """,
+            ContentTranslationKind.ArticleMetadata => basePrompt + """
+
+                Keep the metadata payload valid and preserve its property names.
+                Translate only article title, description, categories, albums, and tags values.
+                Do not translate slugs, dates, booleans, URLs, IDs, field names, or any other identifiers.
+                """,
             ContentTranslationKind.JsonResource => basePrompt + """
 
                 Keep the JSON valid and preserve its original formatting as much as possible.

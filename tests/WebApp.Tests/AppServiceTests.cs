@@ -528,6 +528,57 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task GetPostBySlug_WritesTranslationsToLocalI8NAssetsDir_WhenConfigured()
+    {
+        var postDir = Path.Combine(_tempRoot, "2026", "05");
+        var localI8NAssetsDir = Path.Combine(_tempRoot, "local-i8n-assets");
+        Directory.CreateDirectory(postDir);
+        var sourcePath = Path.Combine(postDir, "i8n-dir-post.md");
+        var expectedPath = Path.Combine(localI8NAssetsDir, "en", "2026", "05", "i8n-dir-post.20260501213231.md");
+        var expectedMetadataPath = Path.Combine(localI8NAssetsDir, "en", "2026", "05", "i8n-dir-post.20260501213231.yml");
+
+        await File.WriteAllTextAsync(sourcePath, """
+            ---
+            title: i8n目录标题
+            slug: i8n-dir-post
+            description: i8n目录摘要
+            date: 2026-05-01 10:30:00
+            lastmod: 2026-05-01 21:32:31
+            categories:
+              - Web开发
+            tags:
+              - 站点翻译
+            draft: false
+            ---
+
+            i8n目录正文。
+            """);
+
+        using var appService = CreateAppService(
+            new ArticleSidecarTranslationService(),
+            localI8NAssetsDir);
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var post = await appService.GetPostBySlug("i8n-dir-post");
+
+            Assert.NotNull(post);
+            Assert.Equal("English title", post.Title);
+            Assert.True(File.Exists(expectedPath));
+            Assert.True(File.Exists(expectedMetadataPath));
+            Assert.Empty(Directory.GetFiles(postDir, "i8n-dir-post.*.md"));
+            Assert.Empty(Directory.GetFiles(postDir, "i8n-dir-post.*.yml"));
+            Assert.Equal("English body.", (await File.ReadAllTextAsync(expectedPath)).Trim());
+            Assert.Contains("title: \"English title\"", await File.ReadAllTextAsync(expectedMetadataPath));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
     public async Task GetPostBySlug_ReusesLocalizedListCache_WhenTranslationAlreadyExists()
     {
         var postDir = Path.Combine(_tempRoot, "2026", "05");
@@ -780,10 +831,75 @@ public sealed class AppServiceTests : IDisposable
             Assert.Contains("[en]技术文章", localized.Categories ?? []);
             Assert.Contains("[en]翻译", localized.Tags ?? []);
             Assert.Single(translationService.Requests);
-            Assert.Equal(ContentTranslationKind.JsonResource, translationService.Requests[0].Kind);
+            Assert.Equal(ContentTranslationKind.ArticleMetadata, translationService.Requests[0].Kind);
             Assert.DoesNotContain("这里是正文", translationService.Requests[0].Source, StringComparison.Ordinal);
             Assert.Single(Directory.GetFiles(localizedPostDir, "next-post.*.yml"));
             Assert.Empty(Directory.GetFiles(localizedPostDir, "next-post.*.md"));
+        }
+        finally
+        {
+            RequestLanguage.Clear();
+        }
+    }
+
+    [Fact]
+    public async Task LocalizeBlogPostBriefsAsync_BatchesDisplayedMetadataSidecars()
+    {
+        var postDir = Path.Combine(_tempRoot, "2026", "05");
+        var localI8NAssetsDir = Path.Combine(_tempRoot, "local-i8n-assets");
+        var localizedPostDir = Path.Combine(localI8NAssetsDir, "en", "2026", "05");
+        Directory.CreateDirectory(postDir);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "batch-post-one.md"), """
+            ---
+            title: 批量标题一
+            slug: batch-post-one
+            description: 批量摘要一
+            date: 2026-05-03 10:30:00
+            categories:
+              - 批量分类
+            tags:
+              - 批量标签一
+            draft: false
+            ---
+
+            批量正文一。
+            """);
+        await File.WriteAllTextAsync(Path.Combine(postDir, "batch-post-two.md"), """
+            ---
+            title: 批量标题二
+            slug: batch-post-two
+            description: 批量摘要二
+            date: 2026-05-02 10:30:00
+            categories:
+              - 批量分类
+            tags:
+              - 批量标签二
+            draft: false
+            ---
+
+            批量正文二。
+            """);
+
+        var translationService = new PrefixMetadataTranslationService();
+        using var appService = CreateAppService(translationService, localI8NAssetsDir);
+        RequestLanguage.CurrentLanguage = "en";
+
+        try
+        {
+            var posts = await appService.GetAllBlogPostsAsync();
+            var localized = await appService.LocalizeBlogPostBriefsAsync(posts ?? []);
+
+            Assert.Equal(2, localized.Count);
+            Assert.All(localized, post => Assert.StartsWith("[en]", post.Title));
+            var request = Assert.Single(translationService.Requests);
+            Assert.Equal(ContentTranslationKind.ArticleMetadata, request.Kind);
+            Assert.Contains("\"Items\"", request.Source, StringComparison.Ordinal);
+            Assert.Contains("批量标题一", request.Source, StringComparison.Ordinal);
+            Assert.Contains("批量标题二", request.Source, StringComparison.Ordinal);
+            Assert.Equal(2, Directory.GetFiles(localizedPostDir, "batch-post-*.yml").Length);
+            Assert.Empty(Directory.GetFiles(localizedPostDir, "batch-post-*.md"));
+            Assert.Empty(Directory.GetFiles(postDir, "batch-post-*.en.yml"));
+            Assert.Empty(Directory.GetFiles(postDir, "batch-post-*.en.md"));
         }
         finally
         {
@@ -1434,7 +1550,7 @@ public sealed class AppServiceTests : IDisposable
             Assert.Equal("[en]展示文章", post.Title);
             Assert.Equal(2, pageData.Total);
             var request = Assert.Single(translationService.Requests);
-            Assert.Equal(ContentTranslationKind.JsonResource, request.Kind);
+            Assert.Equal(ContentTranslationKind.ArticleMetadata, request.Kind);
             Assert.Contains("展示文章", request.Source);
             Assert.DoesNotContain("未展示文章", request.Source);
 
@@ -1467,11 +1583,14 @@ public sealed class AppServiceTests : IDisposable
         public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
-    private AppService CreateAppService(IContentTranslationService? translationService = null)
+    private AppService CreateAppService(
+        IContentTranslationService? translationService = null,
+        string? localI8NAssetsDir = null)
     {
         var siteOptions = Microsoft.Extensions.Options.Options.Create(new SiteOption
         {
             LocalAssetsDir = _tempRoot,
+            LocalI8NAssetsDir = localI8NAssetsDir,
             StartYear = 2026
         });
 
@@ -1742,6 +1861,27 @@ public sealed class AppServiceTests : IDisposable
             Requests.Add((kind, source));
             using var document = JsonDocument.Parse(source);
             var root = document.RootElement;
+            if (root.TryGetProperty("Items", out var items) && items.ValueKind == JsonValueKind.Array)
+            {
+                var batchPayload = new
+                {
+                    Items = items.EnumerateArray()
+                        .Select(item => new
+                        {
+                            Id = item.TryGetProperty("Id", out var id) && id.ValueKind == JsonValueKind.String
+                                ? id.GetString()
+                                : null,
+                            Title = Prefix(item, "Title", targetLanguage.Code),
+                            Description = Prefix(item, "Description", targetLanguage.Code),
+                            Albums = PrefixArray(item, "Albums", targetLanguage.Code),
+                            Categories = PrefixArray(item, "Categories", targetLanguage.Code),
+                            Tags = PrefixArray(item, "Tags", targetLanguage.Code)
+                        })
+                        .ToList()
+                };
+                return Task.FromResult<string?>(JsonSerializer.Serialize(batchPayload));
+            }
+
             var payload = new
             {
                 Title = Prefix(root, "Title", targetLanguage.Code),

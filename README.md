@@ -40,6 +40,7 @@ tests/WebApp.Tests/
 ## How Content Is Loaded
 
 `AppService` reads content from the local assets directory configured by `Site:LocalAssetsDir`.
+When `Site:LocalI8NAssetsDir` is configured, generated article translations are stored outside the assets repository under `Site:LocalI8NAssetsDir/{lang}/YYYY/MM/`.
 
 Main inputs:
 
@@ -69,7 +70,7 @@ Common public routes:
 ## Local Development
 
 1. Clone both repositories side by side.
-2. Make sure `src/WebApp/appsettings.json` points `Site:LocalAssetsDir` to your local `Assets.Dotnet9` path.
+2. Make sure `src/WebApp/appsettings.json` points `Site:LocalAssetsDir` to your local `Assets.Dotnet9` path and `Site:LocalI8NAssetsDir` to a separate local translation cache path.
 3. Run:
 
 ```powershell
@@ -118,12 +119,14 @@ Recommended overrides:
 - `OpenAI__Endpoint`
 - `OpenAI__ChatModel`
 - `Site__LocalAssetsDir`
+- `Site__LocalI8NAssetsDir`
 - `Site__Domain`
 
 Example PowerShell session:
 
 ```powershell
 $env:Site__LocalAssetsDir = "D:\github\owner\Assets.Dotnet9"
+$env:Site__LocalI8NAssetsDir = "D:\github\owner\Assets.Dotnet9.I8N"
 $env:OpenAI__Key = "your-real-key"
 dotnet run --project D:\github\owner\CodeWF\src\WebApp
 ```
@@ -134,7 +137,8 @@ dotnet run --project D:\github\owner\CodeWF\src\WebApp
 2. Keep each article body in `YYYY/MM/slug.md` and its metadata in `YYYY/MM/slug.yml`.
 3. Keep article metadata complete: `title`, `slug`, `description`, `date`, `categories`, and `cover`.
 4. Update `site/*.json` when categories, albums, docs, tools, or friend links change.
-5. Run the site locally and verify the related page renders correctly.
+5. Do not maintain generated non-default article translations in the assets repository. They belong under `LocalI8NAssetsDir/{lang}/YYYY/MM/slug.{yyyyMMddHHmmss}.md` and `.yml`.
+6. Run the site locally and verify the related page renders correctly.
 
 ## Professional Repo Checklist
 

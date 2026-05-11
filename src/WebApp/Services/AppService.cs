@@ -106,6 +106,20 @@ public class AppService : IDisposable
         List<string>? Albums,
         List<string>? Categories,
         List<string>? Tags);
+    private sealed record BlogPostMetadataBatchItem(
+        string Id,
+        string? Title,
+        string? Description,
+        List<string>? Albums,
+        List<string>? Categories,
+        List<string>? Tags);
+    private sealed record BlogPostMetadataBatchPayload(List<BlogPostMetadataBatchItem> Items);
+    private sealed record BlogPostMetadataLocalizationCandidate(
+        int Index,
+        string SourcePath,
+        BlogPost SourcePost,
+        string TargetPath,
+        string Version);
 
     private readonly SemaphoreSlim _searchIndexLock = new(1, 1);
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _searchQueryStatsFileLocks = new(StringComparer.OrdinalIgnoreCase);
@@ -140,6 +154,11 @@ public class AppService : IDisposable
     private string? GetLocalAssetsDir()
     {
         return ResolveConfiguredDirectory(siteOption.Value.LocalAssetsDir);
+    }
+
+    private string? GetLocalI8NAssetsDir()
+    {
+        return ResolveConfiguredDirectory(siteOption.Value.LocalI8NAssetsDir);
     }
 
     private string? ResolveConfiguredDirectory(string? configuredPath)
@@ -2234,13 +2253,250 @@ public class AppService : IDisposable
 
     public async Task<List<BlogPostBrief>> LocalizeBlogPostBriefsAsync(IEnumerable<BlogPostBrief> briefs)
     {
-        var localized = new List<BlogPostBrief>();
-        foreach (var brief in briefs)
+        var materialized = briefs.ToList();
+        var language = RequestLanguage.Normalize(RequestLanguage.CurrentLanguage) ?? RequestLanguage.DefaultLanguage;
+        if (!RequestLanguage.IsDefaultLanguage(language) && materialized.Count > 1)
+        {
+            var candidates = await GetBlogPostMetadataLocalizationCandidatesAsync(materialized, language);
+            await EnsureLocalizedBlogPostMetadataBatchAsync(candidates, language);
+        }
+
+        var localized = new List<BlogPostBrief>(materialized.Count);
+        foreach (var brief in materialized)
         {
             localized.Add(await LocalizeBlogPostBriefAsync(brief) ?? brief);
         }
 
         return localized;
+    }
+
+    private async Task<IReadOnlyList<BlogPostMetadataLocalizationCandidate>> GetBlogPostMetadataLocalizationCandidatesAsync(
+        IReadOnlyList<BlogPostBrief> briefs,
+        string language)
+    {
+        var candidates = new List<BlogPostMetadataLocalizationCandidate>(briefs.Count);
+        for (var i = 0; i < briefs.Count; i++)
+        {
+            var post = briefs[i] as BlogPost ?? ToBlogPost(briefs[i]);
+            var sourcePath = post.SourcePath;
+            if (string.IsNullOrWhiteSpace(sourcePath) && !string.IsNullOrWhiteSpace(post.Slug))
+            {
+                sourcePath = await FindBlogPostSourcePathBySlugAsync(post.Slug);
+            }
+
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+            {
+                continue;
+            }
+
+            var sourcePost = await ReadBlogPostAsync(sourcePath, renderContent: false);
+            var localizedArticlePath = await GetOrCreateLocalizedBlogPostPathAsync(
+                sourcePath,
+                sourcePost,
+                language,
+                createMissingTranslation: false);
+            if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var version = GetBlogPostVersion(sourcePost, sourcePath);
+            var targetPath = GetLocalizedBlogPostMetadataPath(sourcePath, language, version);
+            if (targetPath is null)
+            {
+                continue;
+            }
+
+            candidates.Add(new BlogPostMetadataLocalizationCandidate(
+                i,
+                sourcePath,
+                sourcePost,
+                targetPath,
+                version));
+        }
+
+        return candidates;
+    }
+
+    private async Task EnsureLocalizedBlogPostMetadataBatchAsync(
+        IReadOnlyList<BlogPostMetadataLocalizationCandidate> candidates,
+        string language)
+    {
+        if (candidates.Count == 0)
+        {
+            return;
+        }
+
+        var gates = candidates
+            .Select(static candidate => candidate.TargetPath)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(static path => path, StringComparer.OrdinalIgnoreCase)
+            .Select(path => _localizedAssetLocks.GetOrAdd(path, _ => new SemaphoreSlim(1, 1)))
+            .ToList();
+
+        foreach (var gate in gates)
+        {
+            await gate.WaitAsync();
+        }
+
+        try
+        {
+            var pending = new List<BlogPostMetadataLocalizationCandidate>(candidates.Count);
+            foreach (var candidate in candidates)
+            {
+                DeleteStaleLocalizedBlogPostMetadata(
+                    candidate.SourcePath,
+                    candidate.TargetPath,
+                    candidate.Version,
+                    language);
+
+                if (File.Exists(candidate.TargetPath))
+                {
+                    bool shouldRepair;
+                    try
+                    {
+                        var localizedMetadataPost = await BlogPostFiles.ReadMetadataAsync(candidate.TargetPath);
+                        shouldRepair = ShouldRepairLocalizedMetadata(language, candidate.SourcePost, localizedMetadataPost);
+                    }
+                    catch
+                    {
+                        shouldRepair = true;
+                    }
+
+                    if (shouldRepair)
+                    {
+                        File.Delete(candidate.TargetPath);
+                    }
+                    else
+                    {
+                        ClearLocalizationFallback(candidate.TargetPath);
+                        continue;
+                    }
+                }
+
+                if (File.Exists(candidate.TargetPath))
+                {
+                    ClearLocalizationFallback(candidate.TargetPath);
+                    continue;
+                }
+
+                if (!IsLocalizationFallbackActive(candidate.TargetPath))
+                {
+                    pending.Add(candidate);
+                }
+            }
+
+            if (pending.Count == 0)
+            {
+                return;
+            }
+
+            var payload = new BlogPostMetadataBatchPayload(
+                pending.Select(static candidate => new BlogPostMetadataBatchItem(
+                        candidate.Index.ToString(),
+                        candidate.SourcePost.Title,
+                        candidate.SourcePost.Description,
+                        candidate.SourcePost.Albums,
+                        candidate.SourcePost.Categories,
+                        candidate.SourcePost.Tags))
+                    .ToList());
+            var resource = JsonSerializer.Serialize(payload, WriteJsonOptions);
+            var translated = await translationService.TranslateAsync(
+                resource,
+                RequestLanguage.GetLanguage(language),
+                ContentTranslationKind.ArticleMetadata,
+                resourceName: BuildBlogPostMetadataBatchResourceName(pending));
+            if (string.IsNullOrWhiteSpace(translated))
+            {
+                foreach (var candidate in pending)
+                {
+                    MarkLocalizationFallback(candidate.TargetPath);
+                }
+
+                return;
+            }
+
+            BlogPostMetadataBatchPayload? translatedBatch;
+            try
+            {
+                translatedBatch = JsonSerializer.Deserialize<BlogPostMetadataBatchPayload>(translated, JsonOptions);
+            }
+            catch (JsonException ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "Localized article metadata batch returned invalid JSON. Language={Language}; Count={Count}.",
+                    language,
+                    pending.Count);
+                foreach (var candidate in pending)
+                {
+                    MarkLocalizationFallback(candidate.TargetPath);
+                }
+
+                return;
+            }
+
+            if (translatedBatch?.Items is not { Count: > 0 } translatedItems)
+            {
+                foreach (var candidate in pending)
+                {
+                    MarkLocalizationFallback(candidate.TargetPath);
+                }
+
+                return;
+            }
+
+            var translatedById = translatedItems
+                .Where(static item => !string.IsNullOrWhiteSpace(item.Id))
+                .GroupBy(static item => item.Id, StringComparer.Ordinal)
+                .ToDictionary(static group => group.Key, static group => group.First(), StringComparer.Ordinal);
+            var savedAny = false;
+            foreach (var candidate in pending)
+            {
+                if (!translatedById.TryGetValue(candidate.Index.ToString(), out var item))
+                {
+                    MarkLocalizationFallback(candidate.TargetPath);
+                    continue;
+                }
+
+                var metadata = new BlogPostMetadataTranslation(
+                    item.Title,
+                    item.Description,
+                    item.Albums,
+                    item.Categories,
+                    item.Tags);
+                var metadataYaml = BlogPostFiles.SerializeMetadata(ApplyLocalizedMetadata(candidate.SourcePost, metadata));
+                await WriteAllTextAtomicallyAsync(candidate.TargetPath, metadataYaml);
+                ClearLocalizationFallback(candidate.TargetPath);
+                savedAny = true;
+            }
+
+            if (savedAny)
+            {
+                _searchIndexByLanguage.TryRemove(language, out _);
+                _tagItemsByLanguage.TryRemove(language, out _);
+            }
+        }
+        finally
+        {
+            for (var i = gates.Count - 1; i >= 0; i--)
+            {
+                gates[i].Release();
+            }
+        }
+    }
+
+    private static string BuildBlogPostMetadataBatchResourceName(
+        IReadOnlyList<BlogPostMetadataLocalizationCandidate> candidates)
+    {
+        if (candidates.Count == 0)
+        {
+            return "blog-post-metadata-batch";
+        }
+
+        return candidates.Count == 1
+            ? candidates[0].TargetPath
+            : $"{candidates[0].TargetPath} (+{candidates.Count - 1} metadata files)";
     }
 
     private async Task<string?> GetOrCreateLocalizedBlogPostMetadataPathAsync(
@@ -2310,7 +2566,7 @@ public class AppService : IDisposable
             var translated = await translationService.TranslateAsync(
                 resource,
                 RequestLanguage.GetLanguage(normalizedLanguage),
-                ContentTranslationKind.JsonResource,
+                ContentTranslationKind.ArticleMetadata,
                 resourceName: targetPath);
             if (string.IsNullOrWhiteSpace(translated))
             {
@@ -2357,10 +2613,16 @@ public class AppService : IDisposable
 
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        var fileName = $"{sourceName}.{version}.{language}{BlogPostFiles.MetadataExtension}";
+        var localI8NAssetsDir = GetLocalI8NAssetsDir();
+        var targetRoot = string.IsNullOrWhiteSpace(localI8NAssetsDir)
+            ? localAssetsDir
+            : Path.Combine(localI8NAssetsDir, language);
+        var fileName = string.IsNullOrWhiteSpace(localI8NAssetsDir)
+            ? $"{sourceName}.{version}.{language}{BlogPostFiles.MetadataExtension}"
+            : $"{sourceName}.{version}{BlogPostFiles.MetadataExtension}";
         return string.IsNullOrWhiteSpace(relativeDirectory)
-            ? Path.Combine(localAssetsDir, fileName)
-            : Path.Combine(localAssetsDir, relativeDirectory, fileName);
+            ? Path.Combine(targetRoot, fileName)
+            : Path.Combine(targetRoot, relativeDirectory, fileName);
     }
 
     private static void DeleteStaleLocalizedBlogPostMetadata(
@@ -2382,14 +2644,9 @@ public class AppService : IDisposable
         foreach (var candidate in candidates)
         {
             var fileName = Path.GetFileName(candidate);
-            var isCurrentLanguageSidecar = fileName.EndsWith($".{language}{BlogPostFiles.MetadataExtension}", StringComparison.OrdinalIgnoreCase)
-                || fileName.EndsWith($".{language}.meta.json", StringComparison.OrdinalIgnoreCase);
-            var isLegacyVersionSidecar = fileName.EndsWith(BlogPostFiles.MetadataExtension, StringComparison.OrdinalIgnoreCase)
-                && fileName.Contains($".{expectedVersion}", StringComparison.OrdinalIgnoreCase)
-                && !fileName.EndsWith($".{expectedVersion}.{language}{BlogPostFiles.MetadataExtension}", StringComparison.OrdinalIgnoreCase);
             if (string.Equals(fileName, expectedFileName, StringComparison.OrdinalIgnoreCase)
                 || !fileName.StartsWith($"{sourceName}.", StringComparison.OrdinalIgnoreCase)
-                || (!isCurrentLanguageSidecar && !isLegacyVersionSidecar))
+                || !IsStaleLocalizedBlogPostMetadataFile(fileName, sourceName, expectedVersion, language))
             {
                 continue;
             }
@@ -2401,6 +2658,33 @@ public class AppService : IDisposable
                 File.Delete(sidecarPath);
             }
         }
+    }
+
+    private static bool IsStaleLocalizedBlogPostMetadataFile(
+        string fileName,
+        string sourceName,
+        string expectedVersion,
+        string language)
+    {
+        var timestampMetadataMatch = Regex.Match(
+            fileName,
+            $"^{Regex.Escape(sourceName)}\\.(?<timestamp>\\d{{14}}){Regex.Escape(BlogPostFiles.MetadataExtension)}$",
+            RegexOptions.IgnoreCase);
+        if (timestampMetadataMatch.Success)
+        {
+            return !string.Equals(
+                timestampMetadataMatch.Groups["timestamp"].Value,
+                expectedVersion,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (fileName.EndsWith($".{language}{BlogPostFiles.MetadataExtension}", StringComparison.OrdinalIgnoreCase)
+            || fileName.EndsWith($".{language}.meta.json", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private static BlogPost ApplyLocalizedMetadata(BlogPost post, BlogPostMetadataTranslation metadata)
@@ -2449,10 +2733,16 @@ public class AppService : IDisposable
 
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
-        var fileName = $"{sourceName}.{version}.{language}.md";
+        var localI8NAssetsDir = GetLocalI8NAssetsDir();
+        var targetRoot = string.IsNullOrWhiteSpace(localI8NAssetsDir)
+            ? localAssetsDir
+            : Path.Combine(localI8NAssetsDir, language);
+        var fileName = string.IsNullOrWhiteSpace(localI8NAssetsDir)
+            ? $"{sourceName}.{version}.{language}.md"
+            : $"{sourceName}.{version}.md";
         return string.IsNullOrWhiteSpace(relativeDirectory)
-            ? Path.Combine(localAssetsDir, fileName)
-            : Path.Combine(localAssetsDir, relativeDirectory, fileName);
+            ? Path.Combine(targetRoot, fileName)
+            : Path.Combine(targetRoot, relativeDirectory, fileName);
     }
 
     private static void DeleteStaleLocalizedBlogPosts(

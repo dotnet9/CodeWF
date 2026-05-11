@@ -67,6 +67,13 @@ internal static class StructuredContentTranslation
     {
         return kind switch
         {
+            ContentTranslationKind.ArticleMetadata => await TranslateJsonResourceAsync(
+                source,
+                targetLanguage,
+                resource,
+                maxCharsPerRequest,
+                translateChunkAsync,
+                cancellationToken),
             ContentTranslationKind.JsonResource => await TranslateJsonResourceAsync(
                 source,
                 targetLanguage,
