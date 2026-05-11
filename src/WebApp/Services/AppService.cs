@@ -158,6 +158,7 @@ public class AppService : IDisposable
 
     private string? GetLocalI8NAssetsDir()
     {
+        // 翻译生成物放到独立目录，避免把英文/日文等缓存文件写回资源仓库。
         return ResolveConfiguredDirectory(siteOption.Value.LocalI8NAssetsDir);
     }
 
@@ -2257,6 +2258,7 @@ public class AppService : IDisposable
         var language = RequestLanguage.Normalize(RequestLanguage.CurrentLanguage) ?? RequestLanguage.DefaultLanguage;
         if (!RequestLanguage.IsDefaultLanguage(language) && materialized.Count > 1)
         {
+            // 列表页只需要标题、摘要、分类、标签等元数据，先批量生成 sidecar，避免逐篇触发翻译请求。
             var candidates = await GetBlogPostMetadataLocalizationCandidatesAsync(materialized, language);
             await EnsureLocalizedBlogPostMetadataBatchAsync(candidates, language);
         }
@@ -2297,6 +2299,7 @@ public class AppService : IDisposable
                 createMissingTranslation: false);
             if (!string.Equals(localizedArticlePath, sourcePath, StringComparison.OrdinalIgnoreCase))
             {
+                // 完整文章翻译已存在时直接复用文章本身的 metadata，不再额外生成轻量 sidecar。
                 continue;
             }
 
@@ -2391,6 +2394,7 @@ public class AppService : IDisposable
                 return;
             }
 
+            // 批量 payload 用稳定 Id 回填结果，翻译服务只处理人类可读字段，文件路径和版本由本地代码控制。
             var payload = new BlogPostMetadataBatchPayload(
                 pending.Select(static candidate => new BlogPostMetadataBatchItem(
                         candidate.Index.ToString(),
@@ -2614,6 +2618,8 @@ public class AppService : IDisposable
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
         var localI8NAssetsDir = GetLocalI8NAssetsDir();
+        // 新配置存在时采用 {LocalI8NAssetsDir}/{lang}/YYYY/MM/slug.{version}.yml；
+        // 未配置时保留旧的资源仓库同目录 slug.{version}.{lang}.yml 兼容路径。
         var targetRoot = string.IsNullOrWhiteSpace(localI8NAssetsDir)
             ? localAssetsDir
             : Path.Combine(localI8NAssetsDir, language);
@@ -2734,6 +2740,7 @@ public class AppService : IDisposable
         var relativeDirectory = Path.GetDirectoryName(relativePath);
         var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
         var localI8NAssetsDir = GetLocalI8NAssetsDir();
+        // 正文翻译与 metadata 使用同一套目录规则，便于按语言整体清理或迁移缓存。
         var targetRoot = string.IsNullOrWhiteSpace(localI8NAssetsDir)
             ? localAssetsDir
             : Path.Combine(localI8NAssetsDir, language);

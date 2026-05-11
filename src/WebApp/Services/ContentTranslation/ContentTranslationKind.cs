@@ -4,6 +4,5 @@ public enum ContentTranslationKind
 {
     MarkdownPage,
     MarkdownArticle,
-    ArticleMetadata,
-    JsonResource
+    ArticleMetadata
 }

@@ -84,6 +84,7 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
                 maxRetries);
             var client = CreateChatClient(option);
             var targetName = $"{targetLanguage.NativeName} ({targetLanguage.DotNetCulture})";
+            // 翻译是一次性任务，不带历史上下文；使用流式读取减少等待完整响应的时间。
             var translated = NormalizeResponse(await TranslateStreamingAsync(
                 client,
                 BuildStatelessTranslationMessages(kind, targetName, source),
@@ -137,6 +138,7 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
         CancellationToken cancellationToken)
     {
         var builder = new StringBuilder();
+        // 当前业务仍需完整文本落盘，这里只负责尽早消费服务端流式片段并拼回最终译文。
         await foreach (var update in client.GetStreamingResponseAsync(messages, options, cancellationToken))
         {
             if (!string.IsNullOrEmpty(update.Text))
@@ -160,6 +162,7 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
     private static ChatOptions CreateStatelessTranslationOptions(string source) =>
         new()
         {
+            // 不传 ConversationId，确保 provider 不复用任何会话状态。
             ConversationId = null,
             Temperature = 0.2f,
             MaxOutputTokens = EstimateMaxOutputTokens(source)
@@ -224,11 +227,6 @@ public sealed class OpenAiContentTranslationService : IContentTranslationService
                 Keep the metadata payload valid and preserve its property names.
                 Translate only article title, description, categories, albums, and tags values.
                 Do not translate slugs, dates, booleans, URLs, IDs, field names, or any other identifiers.
-                """,
-            ContentTranslationKind.JsonResource => basePrompt + """
-
-                Keep the JSON valid and preserve its original formatting as much as possible.
-                Translate only human-readable display strings. Do not translate keys, slugs, URLs, IDs, icon names, CSS classes, file paths, route paths, or search keywords.
                 """,
             _ => basePrompt + """
 

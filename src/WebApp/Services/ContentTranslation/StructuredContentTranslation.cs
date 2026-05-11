@@ -15,7 +15,7 @@ internal static class StructuredContentTranslation
     private static readonly Regex MarkdownLinePrefixRegex = new(@"^(?<prefix>\s*(?:#{1,6}\s+|[-*+]\s+|\d+\.\s+|>\s*)*)(?<text>.*)$", RegexOptions.Compiled);
     private static readonly Regex MarkdownTableSeparatorCellRegex = new(@"^:?-{3,}:?$", RegexOptions.Compiled);
 
-    // JSON 资源里不是所有字符串都该翻译，路由、CSS 类名、文件路径等字段必须原样保留。
+    // 结构化 JSON payload 里不是所有字符串都该翻译，路由、CSS 类名、文件路径等字段必须原样保留。
     private static readonly HashSet<string> JsonValueSkipNames = new(StringComparer.OrdinalIgnoreCase)
     {
         "slug",
@@ -67,14 +67,8 @@ internal static class StructuredContentTranslation
     {
         return kind switch
         {
-            ContentTranslationKind.ArticleMetadata => await TranslateJsonResourceAsync(
-                source,
-                targetLanguage,
-                resource,
-                maxCharsPerRequest,
-                translateChunkAsync,
-                cancellationToken),
-            ContentTranslationKind.JsonResource => await TranslateJsonResourceAsync(
+            // 文章 metadata 是结构化 JSON payload，只翻译标题、摘要、分类、专辑和标签等人类可读字段。
+            ContentTranslationKind.ArticleMetadata => await TranslateStructuredJsonPayloadAsync(
                 source,
                 targetLanguage,
                 resource,
@@ -100,7 +94,7 @@ internal static class StructuredContentTranslation
         };
     }
 
-    private static async Task<string?> TranslateJsonResourceAsync(
+    private static async Task<string?> TranslateStructuredJsonPayloadAsync(
         string source,
         LanguageInfo targetLanguage,
         string resource,
@@ -119,7 +113,7 @@ internal static class StructuredContentTranslation
             });
             var stringsToTranslate = new List<string>();
             CollectTranslatableJsonStrings(document.RootElement, null, stringsToTranslate);
-            var translations = await TranslateJsonStringsAsync(
+            var translations = await TranslateStructuredJsonStringsAsync(
                 stringsToTranslate,
                 targetLanguage,
                 resource,
@@ -187,7 +181,7 @@ internal static class StructuredContentTranslation
         }
     }
 
-    private static async Task<IReadOnlyDictionary<string, string>> TranslateJsonStringsAsync(
+    private static async Task<IReadOnlyDictionary<string, string>> TranslateStructuredJsonStringsAsync(
         IReadOnlyList<string> stringsToTranslate,
         LanguageInfo targetLanguage,
         string resource,
@@ -202,7 +196,7 @@ internal static class StructuredContentTranslation
             resource,
             maxCharsPerRequest,
             translateChunkAsync,
-            "JSON",
+            "article metadata JSON",
             cancellationToken);
     }
 
@@ -235,6 +229,7 @@ internal static class StructuredContentTranslation
         {
             return new Dictionary<string, string>(StringComparer.Ordinal)
             {
+                // 单条文本不走编号批量协议，降低翻译器误改序号或格式的概率。
                 [distinctSources[0]] = await TranslateRequiredAsync(
                     distinctSources[0],
                     targetLanguage,

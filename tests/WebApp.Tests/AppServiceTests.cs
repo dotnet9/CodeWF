@@ -349,7 +349,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task StructuredContentTranslation_BatchesJsonResourceStrings()
+    public async Task StructuredContentTranslation_BatchesArticleMetadataStrings()
     {
         var requests = new List<string>();
 
@@ -381,8 +381,8 @@ public sealed class AppServiceTests : IDisposable
             }
             """,
             RequestLanguage.GetLanguage("en"),
-            ContentTranslationKind.JsonResource,
-            "test.json",
+            ContentTranslationKind.ArticleMetadata,
+            "article-metadata.json",
             5999,
             TranslateChunkAsync,
             CancellationToken.None);
@@ -706,7 +706,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAllCategoryItemsAsync_FallsBackToSource_WithoutTranslatingJsonResource()
+    public async Task GetAllCategoryItemsAsync_FallsBackToSource_WithoutTranslatingJsonAsset()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         Directory.CreateDirectory(Path.Combine(_tempRoot, "i18n", "en", "site"));
@@ -751,7 +751,7 @@ public sealed class AppServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetAllCategoryItemsAsync_LoadsSiblingLocalizedJsonResource()
+    public async Task GetAllCategoryItemsAsync_LoadsSiblingLocalizedJsonAsset()
     {
         Directory.CreateDirectory(Path.Combine(_tempRoot, "site"));
         await File.WriteAllTextAsync(Path.Combine(_tempRoot, "site", "categories.json"), """
