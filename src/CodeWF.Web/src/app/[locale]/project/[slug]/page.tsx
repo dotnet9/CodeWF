@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { api } from "@/api";
+import { CodeHighlighter } from "@/components/CodeHighlighter";
 import { ContentToc, DocPager } from "@/components/ContentToc";
 import { HtmlContent } from "@/components/HtmlContent";
 
@@ -37,12 +38,15 @@ export default async function ProjectDetailPage({ params }: Props) {
                 </a>
               ) : null}
             </header>
-            <HtmlContent html={doc.htmlContent} />
+            <section className="article-body">
+              <HtmlContent html={doc.htmlContent} />
+            </section>
           </article>
           <DocPager locale={locale} previous={doc.previousDoc} next={doc.nextDoc} />
         </div>
         <ContentToc html={doc.htmlContent} />
       </div>
+      <CodeHighlighter />
     </main>
   );
 }

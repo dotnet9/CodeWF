@@ -667,6 +667,84 @@ img {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.tool-grid--compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tool-catalog {
+  display: grid;
+  gap: 18px;
+}
+
+.tool-catalog__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.tool-catalog__toolbar h1 {
+  margin: 0;
+}
+
+.tool-catalog__toolbar p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.tool-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: min(360px, 100%);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.tool-search input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.tool-card {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.tool-card strong {
+  line-height: 1.35;
+}
+
+.tool-card p,
+.tool-card small {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 103, 255, 0.28);
+  box-shadow: var(--shadow);
+}
+
 .post-card,
 .list-panel,
 .taxonomy-panel,
@@ -1079,6 +1157,37 @@ img {
   border-radius: 4px;
   background: rgba(15, 23, 42, 0.06);
   color: #0f172a;
+}
+
+.rich-content .hljs {
+  color: #e5e7eb;
+}
+
+.rich-content .hljs-keyword,
+.rich-content .hljs-selector-tag,
+.rich-content .hljs-title,
+.rich-content .hljs-section {
+  color: #93c5fd;
+}
+
+.rich-content .hljs-string,
+.rich-content .hljs-attr,
+.rich-content .hljs-meta,
+.rich-content .hljs-built_in {
+  color: #86efac;
+}
+
+.rich-content .hljs-number,
+.rich-content .hljs-literal,
+.rich-content .hljs-symbol,
+.rich-content .hljs-bullet {
+  color: #fca5a5;
+}
+
+.rich-content .hljs-comment,
+.rich-content .hljs-quote {
+  color: #94a3b8;
+  font-style: italic;
 }
 
 .rich-content img {
@@ -1733,5 +1842,9 @@ img {
   .doc-grid,
   .metric-row {
     grid-template-columns: 1fr;
+  }
+
+  .tool-search {
+    min-width: 100%;
   }
 }

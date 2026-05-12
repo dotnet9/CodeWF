@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "highlight.js": "^11.11.1",
     "lucide-react": "^0.468.0",
     "marked": "^15.0.6",
     "next": "16.3.0-canary.19",

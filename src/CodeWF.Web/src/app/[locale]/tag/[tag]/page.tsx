@@ -22,7 +22,7 @@ export default async function TagPage({ params, searchParams }: Props) {
       <div className="section-head">
         <h1>{t.tags}: {decoded}</h1>
       </div>
-      <div className="post-grid">
+      <div className="post-grid post-grid--three">
         {posts.data.map((post) => (
           <PostCard post={post} locale={locale} site={site} key={`${post.date}-${post.slug}`} />
         ))}
