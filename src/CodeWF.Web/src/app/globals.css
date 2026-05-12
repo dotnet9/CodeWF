@@ -603,6 +603,10 @@ img {
   gap: 18px;
 }
 
+.post-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .post-card,
 .list-panel,
 .taxonomy-panel,
@@ -653,12 +657,31 @@ img {
   margin: 10px 0 8px;
 }
 
+.post-card h3 {
+  min-width: 0;
+}
+
+.post-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
 .post-card p,
 .search-result p,
 .doc-list-item p,
 .tool-group p {
   color: var(--muted);
   line-height: 1.65;
+}
+
+.post-card__summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-height: calc(1.65em * 2);
 }
 
 .tag-row {

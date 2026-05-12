@@ -1,7 +1,6 @@
 import { api } from "@/api";
 import { Pagination } from "@/components/Pagination";
 import { PostCard } from "@/components/PostCard";
-import { dictionary } from "@/i18n";
 
 type Props = {
   params: Promise<{ locale: "zh-CN" | "en" | "ja" | "zh-TW"; slug: string }>;
@@ -17,7 +16,6 @@ export default async function AlbumPage({ params, searchParams }: Props) {
   const filter = album?.name ?? album?.slug ?? albumSlug;
   const posts = await api.posts(locale, { pageIndex, pageSize: 12, album: filter });
   const site = await api.site();
-  const t = dictionary(locale);
   const title = album?.name ?? albumSlug;
 
   return (

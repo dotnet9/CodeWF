@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
-import { dictionary, formatDate, withLocale } from "@/i18n";
+import { formatDate, withLocale } from "@/i18n";
 import { resolveAssetUrl } from "@/api";
 import type { BlogPostBrief, Locale, SiteInfo } from "@/types";
 
 export function PostCard({ post, locale, site }: { post: BlogPostBrief; locale: Locale; site: SiteInfo }) {
-  const t = dictionary(locale);
   const href = withLocale(locale, post.url ?? "/post");
   const cover = resolveAssetUrl(site, post.cover);
 
@@ -23,9 +22,11 @@ export function PostCard({ post, locale, site }: { post: BlogPostBrief; locale: 
           <time dateTime={post.date}>{formatDate(post.date, locale)}</time>
         </div>
         <h3>
-          <Link href={href}>{post.title ?? post.slug}</Link>
+          <Link href={href} className="post-card__title">
+            {post.title ?? post.slug}
+          </Link>
         </h3>
-        <p>{post.description}</p>
+        <p className="post-card__summary">{post.description}</p>
         <div className="tag-row">
           {(post.categories ?? []).slice(0, 3).map((item) => (
             <Link href={withLocale(locale, `/cat/${encodeURIComponent(item)}`)} key={item}>
@@ -33,9 +34,6 @@ export function PostCard({ post, locale, site }: { post: BlogPostBrief; locale: 
             </Link>
           ))}
         </div>
-        <Link href={href} className="text-link">
-          {t.readMore}
-        </Link>
       </div>
     </article>
   );
