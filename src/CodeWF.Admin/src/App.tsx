@@ -29,7 +29,7 @@ import {
   ReloadOutlined,
   SaveOutlined
 } from "@ant-design/icons";
-import { api, type BlogPost, type BlogPostBrief, type GitCommandResult, type ToolNode } from "./api";
+import { api, type BlogPost, type BlogPostBrief, type GitCommandResult, type HomePageData, type ToolNode } from "./api";
 
 const { Header, Content, Sider } = Layout;
 
@@ -62,7 +62,13 @@ export default function App() {
             <TokenInput />
           </Header>
           <Content className="admin-content">
-            {view === "dashboard" ? <Dashboard /> : null}
+            {view === "dashboard" ? (
+              <Dashboard
+                onOpenPosts={() => setView("posts")}
+                onOpenRepository={() => setView("repository")}
+                onOpenTools={() => setView("tools")}
+              />
+            ) : null}
             {view === "posts" ? <Posts /> : null}
             {view === "repository" ? <Repository /> : null}
             {view === "tools" ? <Tools /> : null}
@@ -75,6 +81,7 @@ export default function App() {
 
 function TokenInput() {
   const [value, setValue] = useState(api.getToken());
+
   return (
     <Space.Compact>
       <Input.Password placeholder="Admin API Key" value={value} onChange={(event) => setValue(event.target.value)} />
@@ -85,25 +92,103 @@ function TokenInput() {
   );
 }
 
-function Dashboard() {
-  const [counts, setCounts] = useState<Record<string, number>>({});
+function Dashboard({
+  onOpenPosts,
+  onOpenRepository,
+  onOpenTools
+}: {
+  onOpenPosts: () => void;
+  onOpenRepository: () => void;
+  onOpenTools: () => void;
+}) {
+  const [home, setHome] = useState<HomePageData | null>(null);
+
+  const refresh = () => api.home().then(setHome).catch(() => setHome(null));
 
   useEffect(() => {
-    api.home().then((data) => setCounts(data.counts)).catch(() => setCounts({}));
+    refresh();
   }, []);
 
+  const counts = home?.counts ?? {};
+  const bannerPosts = home?.bannerPosts ?? [];
+  const recentPosts = home?.recentPosts ?? [];
+
   return (
-    <div className="dashboard-grid">
-      {[
-        ["文章", counts.posts ?? 0],
-        ["工具", counts.tools ?? 0],
-        ["项目", counts.docs ?? 0],
-        ["分类", counts.categories ?? 0]
-      ].map(([label, value]) => (
-        <Card key={label}>
-          <Statistic title={label} value={value} />
+    <div className="dashboard-stack">
+      <div className="dashboard-grid">
+        {[
+          ["文章", counts.posts ?? 0],
+          ["工具", counts.tools ?? 0],
+          ["项目", counts.docs ?? 0],
+          ["分类", counts.categories ?? 0]
+        ].map(([label, value]) => (
+          <Card key={label}>
+            <Statistic title={label} value={value} />
+          </Card>
+        ))}
+      </div>
+
+      <div className="dashboard-panels">
+        <Card
+          title="首页运营"
+          extra={
+            <Space>
+              <Button onClick={onOpenPosts}>文章管理</Button>
+              <Button onClick={onOpenTools}>工具目录</Button>
+            </Space>
+          }
+        >
+          <div className="dashboard-preview">
+            <section>
+              <Typography.Title level={5}>Banner 文章</Typography.Title>
+              <div className="dashboard-list">
+                {bannerPosts.slice(0, 3).map((post) => (
+                  <article key={post.slug ?? post.title} className="dashboard-list-item">
+                    <strong>{post.title}</strong>
+                    <Typography.Text type="secondary">{post.description}</Typography.Text>
+                  </article>
+                ))}
+                {bannerPosts.length === 0 ? <Typography.Text type="secondary">暂无 Banner 文章</Typography.Text> : null}
+              </div>
+            </section>
+            <section>
+              <Typography.Title level={5}>最新文章</Typography.Title>
+              <div className="dashboard-list">
+                {recentPosts.slice(0, 3).map((post) => (
+                  <article key={post.slug ?? post.title} className="dashboard-list-item">
+                    <strong>{post.title}</strong>
+                    <Typography.Text type="secondary">{post.description}</Typography.Text>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
         </Card>
-      ))}
+
+        <Card
+          title="维护入口"
+          extra={
+            <Button icon={<AppstoreOutlined />} onClick={onOpenTools}>
+              查看工具
+            </Button>
+          }
+        >
+          <Space wrap>
+            <Button icon={<ReloadOutlined />} onClick={refresh}>
+              刷新概览
+            </Button>
+            <Button icon={<FileTextOutlined />} onClick={onOpenPosts}>
+              管理文章
+            </Button>
+            <Button icon={<BranchesOutlined />} onClick={onOpenRepository}>
+              仓库操作
+            </Button>
+          </Space>
+          <Typography.Paragraph className="dashboard-note">
+            现在后台先围绕文章、Banner、仓库和工具目录维护，继续沿用现有内容资源，不额外引入新的管理模型。
+          </Typography.Paragraph>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -232,7 +317,12 @@ function Posts() {
       title="文章管理"
       extra={
         <Space>
-          <Input.Search placeholder="标题、slug、标签" value={keyword} onChange={(event) => setKeyword(event.target.value)} onSearch={() => load(1)} />
+          <Input.Search
+            placeholder="标题、slug、标签"
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            onSearch={() => load(1)}
+          />
           <Button icon={<ReloadOutlined />} onClick={() => load()}>
             刷新
           </Button>
@@ -249,7 +339,17 @@ function Posts() {
         dataSource={posts}
         pagination={{ current: page, total, pageSize: 20, onChange: load }}
       />
-      <Drawer title={editing ? "编辑文章" : "新建文章"} open={drawerOpen} width={880} onClose={() => setDrawerOpen(false)} extra={<Button type="primary" onClick={save}>保存</Button>}>
+      <Drawer
+        title={editing ? "编辑文章" : "新建文章"}
+        open={drawerOpen}
+        width={880}
+        onClose={() => setDrawerOpen(false)}
+        extra={
+          <Button type="primary" onClick={save}>
+            保存
+          </Button>
+        }
+      >
         <Form form={form} layout="vertical">
           <Form.Item name="title" label="标题" rules={[{ required: true }]}>
             <Input />
@@ -362,7 +462,11 @@ function Repository() {
         {
           key: "log",
           label: "日志",
-          children: <Card><pre className="terminal">{log?.output || log?.error || "No log."}</pre></Card>
+          children: (
+            <Card>
+              <pre className="terminal">{log?.output || log?.error || "No log."}</pre>
+            </Card>
+          )
         }
       ]}
     />

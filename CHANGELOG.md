@@ -2,6 +2,11 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.7 (2026-05-12)
+
+- [Changed] Reworked the top-right "More" dropdown into a compact grouped panel with clearer page and external links.
+- [Changed] Expanded the admin dashboard into a homepage maintenance overview so editors can review banner posts, recent posts, and core maintenance entry points from existing content sources.
+
 V1.1.6 (2026-05-12)
 
 - [Changed] Refined the public site layout and motion system with cleaner card treatment, smoother hover states, and more intentional page hierarchy.

@@ -33,6 +33,31 @@ export type ToolNode = {
   children?: ToolNode[];
 };
 
+export type TaxonomyItem = {
+  sort: number;
+  name?: string;
+  memo?: string;
+  slug?: string;
+  postCount: number;
+};
+
+export type SiteInfo = {
+  appTitle: string;
+  domain: string;
+  memo: string;
+  owner: string;
+  ownerDesc?: string;
+  favicon?: string;
+  assetBaseUrl: string;
+  remoteAssetsRepository?: string;
+  startYear: number;
+  defaultCulture: string;
+  supportedCultures: string[];
+  baiAn?: string;
+  weChatName?: string;
+  weChatImg?: string;
+};
+
 export type GitCommandResult = {
   success: boolean;
   command: string;
@@ -42,6 +67,12 @@ export type GitCommandResult = {
 };
 
 export type HomePageData = {
+  site: SiteInfo;
+  recentPosts: BlogPostBrief[];
+  bannerPosts: BlogPostBrief[];
+  categories: TaxonomyItem[];
+  albums: TaxonomyItem[];
+  tools: ToolNode[];
   counts: Record<string, number>;
 };
 
