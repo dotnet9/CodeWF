@@ -9,21 +9,38 @@ on:
   pull_request:
 
 jobs:
-  webapp:
+  build:
     runs-on: windows-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 11 preview
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 11.0.x
-          dotnet-quality: preview
+          dotnet-version: 10.0.x
 
-      - name: Restore
-        run: dotnet restore src/WebApp/WebApp.csproj
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Build
-        run: dotnet build src/WebApp/WebApp.csproj --configuration Release --no-restore
+      - name: Restore .NET
+        run: dotnet restore CodeWF.slnx
+
+      - name: Install web dependencies
+        run: npm install
+
+      - name: Build API
+        run: dotnet build src/CodeWF.Api/CodeWF.Api.csproj --configuration Release --no-restore
+
+      - name: Test API
+        run: dotnet test tests/CodeWF.Api.Tests/CodeWF.Api.Tests.csproj --configuration Release --no-build
+
+      - name: Build frontend
+        run: npm run build --workspace @codewf/web
+
+      - name: Build admin
+        run: npm run build --workspace @codewf/admin

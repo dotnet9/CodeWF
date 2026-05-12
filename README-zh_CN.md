@@ -1,145 +1,70 @@
 # CodeWF
 
-CodeWF 是 `dotnet9.com` / `codewf.com` 的网站源代码仓库。
+CodeWF 已重构为前后端分离的博客 + 在线工具网站。
 
-English version: [README.md](./README.md)
-更新日志：[CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
+## 架构
 
-当前网站基于 ASP.NET Core Razor Pages 构建，并把同级仓库 `Assets.Dotnet9` 作为文件型内容仓库使用。文章、文档、时间线、工具元数据、图片以及站点级 Markdown 页面，都会在运行时从该仓库读取。
+- `src/CodeWF.Api`：ASP.NET Core Web API，负责读取文件型资源仓库、渲染 Markdown、提供前台内容接口、后台文章接口、RSS、sitemap 和资源仓库 Git 操作。
+- `src/CodeWF.Web`：Next.js 前台站点，负责 SEO 友好的文章、项目、搜索、时间线、i18n/l10n 页面，以及浏览器端在线工具。
+- `src/CodeWF.Admin`：React + Ant Design 后台管理，负责文章维护和资源仓库维护。
+- `docs`：架构说明、迁移清单和运维文档。
+- `tests/CodeWF.Api.Tests`：后端内容解析测试。
 
-## 仓库关系
-
-- 网站源码（本地）：`D:\github\owner\CodeWF`
-- 内容与资源（本地）：`D:\github\owner\Assets.Dotnet9`
-- 网站源码（GitHub）：[https://github.com/dotnet9/CodeWF](https://github.com/dotnet9/CodeWF)
-- 内容与资源（GitHub）：[https://github.com/dotnet9/Assets.Dotnet9](https://github.com/dotnet9/Assets.Dotnet9)
-
-## 技术栈
-
-- .NET 11
-- ASP.NET Core Razor Pages
-- Bootstrap
-- Markdig
-- 基于本地资源目录的文件型内容加载
-
-## 目录结构
+默认资源仓库目录：
 
 ```text
-src/WebApp/
-  Components/        视图组件
-  Controllers/       MVC 控制器
-  Models/            内容模型与页面模型
-  Pages/             Razor Pages 页面
-  Services/          内容加载、搜索与站点服务
-  wwwroot/           站点自身静态资源
-
-tests/WebApp.Tests/
-  AppServiceTests.cs 最小测试集
+D:\wwwroot\img1.dotnet9.com
 ```
 
-## 内容加载方式
+本地化资源会读取同级文件，例如 `about.en.md`、`tools.ja.json`、`navigation.zh-tw.json`，不存在时回退到默认中文内容。
 
-`AppService` 会从 `Site:LocalAssetsDir` 指向的本地资源目录读取内容。
+## 环境要求
 
-主要输入包括：
-
-- `site/albums.json`
-- `site/categories.json`
-- `site/friend-links.json`
-- `site/timelines.json`
-- `site/doc/navigation.json`
-- `site/tools/tools.json`
-- `site/search-keywords.json`
-- `site/blocked-search-keywords.json`
-- `site/about.md`
-- `site/pays/Donation.md`
-- `2019/` 到当前年份的文章 Markdown 目录，并使用同名 `.yml` 保存文章元数据
-
-当前前台常用路由包括：
-
-- `/post` 全部文章
-- `/project` 项目/文档中心
-- `/tool` 工具目录
-- `/s` 搜索页
-- `/blog` 旧文章入口兼容路由
-- `/search` 搜索兼容路由
-- `/doc` 文档兼容路由
-- `/sitemap` 和 `/sitemap.xml` 站点地图
+- .NET 10 SDK
+- Node.js 22+
+- Git 命令可用
 
 ## 本地开发
 
-1. 将两个仓库并排克隆到本地。
-2. 确认 `src/WebApp/appsettings.json` 中的 `Site:LocalAssetsDir` 指向本机的 `Assets.Dotnet9` 目录。
-3. 运行：
+安装依赖：
 
 ```powershell
-cd D:\github\owner\CodeWF\src\WebApp
-dotnet run
+npm install
+dotnet restore CodeWF.slnx
 ```
 
-## 开发体验
-
-开发环境下，`AppService` 会通过 `FileSystemWatcher` 监听内容仓库中的 Markdown、JSON 和常见图片资源变化，并自动失效内存缓存。
-
-这意味着：
-
-- 改文章不用手动重启站点
-- 改分类、专题、导航后刷新页面即可看到新结果
-- 改配图资源后也能快速验证页面效果
-
-说明：`site/search-keywords.json` 由搜索行为自动维护，不会触发整站缓存失效。
-
-## 测试与 CI
-
-仓库现在包含一套最小护栏：
-
-- GitHub Actions 构建检查：`.github/workflows/build.yml`
-- xUnit 最小测试集：`tests/WebApp.Tests`
-
-当前测试覆盖了这些基础场景：
-
-- 文章 sidecar 元数据解析
-- Markdown 转 HTML
-- 非法搜索关键词拦截
-
-本地执行：
+启动三个应用：
 
 ```powershell
-dotnet test D:\github\owner\CodeWF\CodeWF.slnx
+npm run dev:api
+npm run dev:frontend
+npm run dev:admin
 ```
 
-## 配置约定
+默认地址：
 
-不要把真实密钥提交到受版本控制的配置文件中。
+- API：`http://localhost:5100`
+- 前台：`http://localhost:3000`
+- 后台：`http://localhost:3001`
 
-推荐通过环境变量覆盖：
+## 配置
 
-- `OpenAI__Key`
-- `OpenAI__Endpoint`
-- `OpenAI__ChatModel`
-- `Site__LocalAssetsDir`
-- `Site__Domain`
-
-PowerShell 示例：
+关键后端配置在 `src/CodeWF.Api/appsettings.json`，也可以用环境变量覆盖：
 
 ```powershell
-$env:Site__LocalAssetsDir = "D:\github\owner\Assets.Dotnet9"
-$env:OpenAI__Key = "your-real-key"
-dotnet run --project D:\github\owner\CodeWF\src\WebApp
+$env:Site__LocalAssetsDir = "D:\wwwroot\img1.dotnet9.com"
+$env:Site__AssetBaseUrl = "https://img1.dotnet9.com"
+$env:Admin__ApiKey = "change-me"
 ```
 
-## 内容维护流程
+`Admin__ApiKey` 为空时后台接口默认开放，方便本地开发。生产环境应设置该值，并在后台页面填写相同密钥。
 
-1. 在 `Assets.Dotnet9` 中新增或更新 Markdown、图片和站点数据。
-2. 文章正文放在 `YYYY/MM/slug.md`，文章元数据放在同名 `YYYY/MM/slug.yml`。
-3. 保持文章元数据完整，至少包含 `title`、`slug`、`description`、`date`、`categories`、`cover`。
-4. 当分类、专题、文档、工具或友情链接发生变化时，同步更新 `site/*.json`。
-5. 本地运行站点，验证相关页面渲染是否正常。
+## 构建与测试
 
-## 更专业的仓库习惯
+```powershell
+dotnet test CodeWF.slnx
+npm run build:frontend
+npm run build:admin
+```
 
-- 让内容源仓库和应用源码仓库职责清晰分离。
-- 让受版本控制的配置文件不包含真实密钥。
-- 尽量依赖显式元数据，而不是隐式约定。
-- 在扩大协作前，先把内容结构文档化。
-- 每次内容变更后都验证首页、列表页和详情页。
+本分支不会自动提交或推送代码。

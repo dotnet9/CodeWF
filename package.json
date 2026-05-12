@@ -1,0 +1,18 @@
+{
+  "name": "codewf",
+  "private": true,
+  "version": "2.0.0",
+  "workspaces": [
+    "src/CodeWF.Web",
+    "src/CodeWF.Admin"
+  ],
+  "scripts": {
+    "dev:api": "dotnet run --project src/CodeWF.Api/CodeWF.Api.csproj --urls http://localhost:5100",
+    "dev:frontend": "npm run dev --workspace @codewf/web -- --port 3000",
+    "dev:admin": "npm run dev --workspace @codewf/admin -- --port 3001",
+    "build:api": "dotnet build src/CodeWF.Api/CodeWF.Api.csproj --configuration Release",
+    "build:frontend": "npm run build --workspace @codewf/web",
+    "build:admin": "npm run build --workspace @codewf/admin",
+    "test": "dotnet test CodeWF.slnx"
+  }
+}

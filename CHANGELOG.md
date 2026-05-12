@@ -2,6 +2,14 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.6 (2026-05-12)
+
+- [Changed] Refined the public site layout and motion system with cleaner card treatment, smoother hover states, and more intentional page hierarchy.
+- [Changed] Reworked article reading pages so images, code blocks, tables, and embedded media stay within the content column on narrow and mixed-content posts.
+- [Changed] Moved the article TOC sidebar into a fixed sticky rail on desktop and improved reading progress / sidebar rhythm.
+- [Fixed] Resolved category and album detail pages so slug-based routes map back to the stored taxonomy names before filtering posts.
+- [Fixed] Removed the top-right language switcher and kept language switching in the footer only.
+
 V1.1.5 (2026-05-10)
 
 - 😄 [Added] Added request-language detection, localized route prefixes, language switch APIs, and culture-aware date formatting for multilingual browsing.

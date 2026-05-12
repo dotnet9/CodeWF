@@ -1,0 +1,112 @@
+import Link from "next/link";
+import { ChevronDown, Code2 } from "lucide-react";
+import { dictionary, withLocale } from "@/i18n";
+import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
+import { GlobalSearch } from "./GlobalSearch";
+
+export function SiteHeader({
+  locale,
+  site,
+  categories,
+  albums,
+  latestPost
+}: {
+  locale: Locale;
+  site: SiteInfo;
+  categories: TaxonomyItem[];
+  albums: TaxonomyItem[];
+  latestPost?: BlogPostBrief;
+}) {
+  const t = dictionary(locale);
+  const topCategories = categories.slice(0, 8);
+  const topAlbums = albums.slice(0, 8);
+
+  return (
+    <header className="site-header">
+      <Link href={withLocale(locale)} className="brand" aria-label={site.appTitle}>
+        <Code2 size={24} />
+        <span>{site.appTitle}</span>
+      </Link>
+      <nav className="main-nav" aria-label="Primary navigation">
+        <Link href={withLocale(locale, "/")}>{t.home}</Link>
+        <div className="nav-item">
+          <button type="button" className="nav-trigger">
+            {t.blog}
+            <ChevronDown size={14} aria-hidden="true" />
+          </button>
+          <div className="nav-dropdown nav-mega">
+            <div className="nav-mega__header">
+              <div>
+                <span>Blog</span>
+                <strong>{t.blogLead}</strong>
+              </div>
+              <small>{topCategories.length + topAlbums.length} 项内容</small>
+            </div>
+            <div className="nav-mega__actions">
+              <Link href={withLocale(locale, "/post")}>{t.allPosts}</Link>
+              <Link href={withLocale(locale, "/album")}>{t.allAlbums}</Link>
+              <Link href={withLocale(locale, "/cat")}>{t.allCategories}</Link>
+              <Link href={withLocale(locale, "/tag")}>{t.allTags}</Link>
+            </div>
+            {latestPost ? (
+              <Link href={withLocale(locale, latestPost.url ?? "/post")} className="nav-feature">
+                <span>{t.latestPost}</span>
+                <strong>{latestPost.title}</strong>
+                <small>{latestPost.description}</small>
+              </Link>
+            ) : null}
+            <div className="nav-browse">
+              <section>
+                <h2>{t.albums}</h2>
+                {topAlbums.map((item) => (
+                  <Link href={withLocale(locale, `/album/${encodeURIComponent(item.slug ?? item.name ?? "")}`)} key={item.slug ?? item.name}>
+                    <span>{item.name}</span>
+                    <small>{item.postCount}</small>
+                  </Link>
+                ))}
+              </section>
+              <section>
+                <h2>{t.categories}</h2>
+                {topCategories.map((item) => (
+                  <Link href={withLocale(locale, `/cat/${encodeURIComponent(item.slug ?? item.name ?? "")}`)} key={item.slug ?? item.name}>
+                    <span>{item.name}</span>
+                    <small>{item.postCount}</small>
+                  </Link>
+                ))}
+              </section>
+            </div>
+          </div>
+        </div>
+        <Link href={withLocale(locale, "/project")}>{t.projects}</Link>
+        <Link href={withLocale(locale, "/tool")}>{t.tools}</Link>
+        <div className="nav-item">
+          <button type="button" className="nav-trigger">
+            {t.more}
+            <ChevronDown size={14} aria-hidden="true" />
+          </button>
+          <div className="nav-dropdown nav-dropdown--compact">
+            <Link href={withLocale(locale, "/about")}>{t.about}</Link>
+            <Link href={withLocale(locale, "/timeline")}>{t.timeline}</Link>
+            <Link href={withLocale(locale, "/donation")}>{t.donation}</Link>
+            <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
+            <a href="/rss" target="_blank" rel="noreferrer">
+              RSS
+            </a>
+            <a href="/sitemap" target="_blank" rel="noreferrer">
+              {t.sitemap}
+            </a>
+            <a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">
+              博客园
+            </a>
+            <a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">
+              B 站
+            </a>
+          </div>
+        </div>
+      </nav>
+      <div className="header-actions">
+        <GlobalSearch locale={locale} action={withLocale(locale, "/s")} placeholder={t.queryPlaceholder} label={t.search} />
+      </div>
+    </header>
+  );
+}

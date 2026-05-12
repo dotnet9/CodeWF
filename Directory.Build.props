@@ -1,13 +1,15 @@
 <Project>
   <PropertyGroup>
-    <Version>1.1.2</Version>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
-    <FileVersion>1.1.2.0</FileVersion>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
     <InformationalVersion>$(Version)</InformationalVersion>
-    <Authors>沙漠尽头的狼</Authors>
+    <Authors>dotnet9</Authors>
     <Company>dotnet9.com</Company>
     <Product>CodeWF</Product>
     <RepositoryUrl>https://github.com/dotnet9/CodeWF</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 </Project>

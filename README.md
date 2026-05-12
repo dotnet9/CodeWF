@@ -1,149 +1,70 @@
 # CodeWF
 
-CodeWF is the website source repository for `dotnet9.com` / `codewf.com`.
+CodeWF is now a separated frontend/backend blog and online tools platform.
 
-Chinese version: [README-zh_CN.md](./README-zh_CN.md)
-Changelog: [CHANGELOG.md](./CHANGELOG.md)
+## Architecture
 
-The site is built with ASP.NET Core Razor Pages and uses the sibling repository `Assets.Dotnet9` as a file-based content store. Articles, docs, timelines, tool metadata, images, and site-level markdown pages are all loaded from that repository at runtime.
+- `src/CodeWF.Api` - ASP.NET Core Web API. It reads the file-based content repository, renders Markdown, exposes public content APIs, admin article APIs, RSS, sitemap, and Git operations for the asset repository.
+- `src/CodeWF.Web` - Next.js public site. It renders SEO-friendly blog, project, search, timeline, i18n/l10n pages, and browser-side online tools.
+- `src/CodeWF.Admin` - React + Ant Design admin console for posts and asset repository maintenance.
+- `docs` - Architecture, migration notes, and operational documentation.
+- `tests/CodeWF.Api.Tests` - API content parsing tests.
 
-## Repositories
-
-- Website source (local): `D:\github\owner\CodeWF`
-- Content and assets (local): `D:\github\owner\Assets.Dotnet9`
-- Website source (GitHub): [https://github.com/dotnet9/CodeWF](https://github.com/dotnet9/CodeWF)
-- Content and assets (GitHub): [https://github.com/dotnet9/Assets.Dotnet9](https://github.com/dotnet9/Assets.Dotnet9)
-
-## Stack
-
-- .NET 11
-- ASP.NET Core Razor Pages
-- Bootstrap
-- Markdig
-- File-based content loading from local assets
-
-## Directory Layout
+The default asset repository path is:
 
 ```text
-src/WebApp/
-  Components/        View components
-  Controllers/       MVC controllers
-  Models/            Content and page models
-  Pages/             Razor Pages
-  Services/          Content loading, search, and site services
-  wwwroot/           Static assets for the app itself
-
-tests/WebApp.Tests/
-  AppServiceTests.cs Minimal regression tests
+D:\wwwroot\img1.dotnet9.com
 ```
 
-## How Content Is Loaded
+Localized content is loaded from sibling files such as `about.en.md`, `tools.ja.json`, and `navigation.zh-tw.json`, with fallback to the default Chinese content.
 
-`AppService` reads content from the local assets directory configured by `Site:LocalAssetsDir`.
-When `Site:LocalI8NAssetsDir` is configured, generated article translations are stored outside the assets repository under `Site:LocalI8NAssetsDir/{lang}/YYYY/MM/`.
+## Requirements
 
-Main inputs:
-
-- `site/albums.json`
-- `site/categories.json`
-- `site/friend-links.json`
-- `site/timelines.json`
-- `site/doc/navigation.json`
-- `site/tools/tools.json`
-- `site/search-keywords.json`
-- `site/blocked-search-keywords.json`
-- `site/about.md`
-- `site/pays/Donation.md`
-- `2019/` to current year article markdown trees, with matching `.yml` metadata sidecars
-
-Common public routes:
-
-- `/post` all posts
-- `/project` project/doc center
-- `/tool` tool directory
-- `/s` search
-- `/blog` legacy blog route
-- `/search` legacy search route
-- `/doc` legacy doc route
-- `/sitemap` and `/sitemap.xml` sitemap
+- .NET 10 SDK
+- Node.js 22+
+- Git available on `PATH`
 
 ## Local Development
 
-1. Clone both repositories side by side.
-2. Make sure `src/WebApp/appsettings.json` points `Site:LocalAssetsDir` to your local `Assets.Dotnet9` path and `Site:LocalI8NAssetsDir` to a separate local translation cache path.
-3. Run:
+Install dependencies:
 
 ```powershell
-cd D:\github\owner\CodeWF\src\WebApp
-dotnet run
+npm install
+dotnet restore CodeWF.slnx
 ```
 
-## Developer Workflow
-
-In development, `AppService` uses `FileSystemWatcher` to monitor markdown, JSON, and common image assets under the content repository and automatically invalidates in-memory caches.
-
-That means you can:
-
-- edit articles without restarting the app
-- tweak categories, docs, or navigation and refresh immediately
-- update content images and verify page output quickly
-
-Note: `site/search-keywords.json` is updated by live searches and intentionally does not invalidate all site caches.
-
-## Tests and CI
-
-The repository now includes a minimal safety net:
-
-- GitHub Actions build check: `.github/workflows/build.yml`
-- xUnit regression tests: `tests/WebApp.Tests`
-
-Current tests cover:
-
-- article sidecar metadata parsing
-- markdown-to-HTML conversion
-- blocked search keyword handling
-
-Run locally:
+Run the three apps:
 
 ```powershell
-dotnet test D:\github\owner\CodeWF\CodeWF.slnx
+npm run dev:api
+npm run dev:frontend
+npm run dev:admin
 ```
+
+Default URLs:
+
+- API: `http://localhost:5100`
+- Public site: `http://localhost:3000`
+- Admin: `http://localhost:3001`
 
 ## Configuration
 
-Do not commit real secrets into tracked config files.
-
-Recommended overrides:
-
-- `OpenAI__Key`
-- `OpenAI__Endpoint`
-- `OpenAI__ChatModel`
-- `Site__LocalAssetsDir`
-- `Site__LocalI8NAssetsDir`
-- `Site__Domain`
-
-Example PowerShell session:
+Important API settings live under `src/CodeWF.Api/appsettings.json` and can be overridden by environment variables:
 
 ```powershell
-$env:Site__LocalAssetsDir = "D:\github\owner\Assets.Dotnet9"
-$env:Site__LocalI8NAssetsDir = "D:\github\owner\Assets.Dotnet9.I8N"
-$env:OpenAI__Key = "your-real-key"
-dotnet run --project D:\github\owner\CodeWF\src\WebApp
+$env:Site__LocalAssetsDir = "D:\wwwroot\img1.dotnet9.com"
+$env:Site__AssetBaseUrl = "https://img1.dotnet9.com"
+$env:Admin__ApiKey = "change-me"
 ```
 
-## Content Workflow
+When `Admin__ApiKey` is empty, admin APIs are open for local development. In production, set it and enter the same value in the admin console.
 
-1. Add or update markdown/images in `Assets.Dotnet9`.
-2. Keep each article body in `YYYY/MM/slug.md` and its metadata in `YYYY/MM/slug.yml`.
-3. Keep article metadata complete: `title`, `slug`, `description`, `date`, `categories`, and `cover`.
-4. Update `site/*.json` when categories, albums, docs, tools, or friend links change.
-5. Do not maintain generated non-default article translations in the assets repository. They belong under `LocalI8NAssetsDir/{lang}/YYYY/MM/slug.{yyyyMMddHHmmss}.md` and `.yml`.
-6. Run the site locally and verify the related page renders correctly.
+## Build And Test
 
-## Professional Repo Checklist
+```powershell
+dotnet test CodeWF.slnx
+npm run build:frontend
+npm run build:admin
+```
 
-- Keep content source and app source responsibilities separate.
-- Keep tracked config files secret-free.
-- Prefer explicit metadata over implicit conventions.
-- Document content structure before scaling contributors.
-- Verify homepage, listing pages, and detail pages after content changes.
+No code is committed or pushed by this refactor branch.

@@ -1,11 +1,11 @@
 <Solution>
   <Folder Name="/Solution Items/">
-    <File Path="CHANGELOG-zh_CN.md" />
-    <File Path="CHANGELOG.md" />
+    <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
-    <File Path="README-zh_CN.md" />
     <File Path="README.md" />
+    <File Path="README-zh_CN.md" />
+    <File Path="package.json" />
   </Folder>
-  <Project Path="src\WebApp\WebApp.csproj" />
-  <Project Path="tests\WebApp.Tests\WebApp.Tests.csproj" />
+  <Project Path="src\CodeWF.Api\CodeWF.Api.csproj" />
+  <Project Path="tests\CodeWF.Api.Tests\CodeWF.Api.Tests.csproj" />
 </Solution>
