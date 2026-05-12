@@ -90,6 +90,22 @@ tags:
         Assert.Contains("hello", suggestions[0].MatchedSnippet ?? string.Empty, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task GetHomeAsync_UsesLastmodAndLimitsFeaturedContent()
+    {
+        var root = CreateTempRoot();
+        WriteHomePosts(root);
+        var repository = CreateRepository(root);
+
+        var home = await repository.GetHomeAsync("zh-CN", 3);
+
+        Assert.Equal(3, home.RecentPosts.Count);
+        Assert.Equal("updated-by-lastmod", home.RecentPosts[0].Slug);
+        Assert.Equal("banner-1", home.BannerPosts[0].Slug);
+        Assert.Equal(3, home.BannerPosts.Count);
+        Assert.DoesNotContain(home.BannerPosts, post => post.Slug == "banner-4");
+    }
+
     private static string CreateTempRoot()
     {
         var root = Path.Combine(Path.GetTempPath(), "codewf-tests", Guid.NewGuid().ToString("N"));
@@ -141,6 +157,63 @@ tags:
   }
 ]
 """);
+    }
+
+    private static void WriteHomePosts(string root)
+    {
+        WritePost(root, "2026", "01", "updated-by-lastmod", """
+title: "Updated by lastmod"
+slug: "updated-by-lastmod"
+description: "Should be the first recent post"
+date: 2026-01-01 10:00:00
+lastmod: 2026-05-12 09:00:00
+""");
+
+        WritePost(root, "2026", "05", "banner-1", """
+title: "Banner 1"
+slug: "banner-1"
+description: "Banner post 1"
+date: 2026-05-11 10:00:00
+lastmod: 2026-05-11 09:00:00
+banner: true
+""");
+
+        WritePost(root, "2026", "05", "banner-2", """
+title: "Banner 2"
+slug: "banner-2"
+description: "Banner post 2"
+date: 2026-05-10 10:00:00
+lastmod: 2026-05-10 09:00:00
+banner: true
+""");
+
+        WritePost(root, "2026", "05", "banner-3", """
+title: "Banner 3"
+slug: "banner-3"
+description: "Banner post 3"
+date: 2026-05-09 10:00:00
+lastmod: 2026-05-09 09:00:00
+banner: true
+""");
+
+        WritePost(root, "2026", "05", "banner-4", """
+title: "Banner 4"
+slug: "banner-4"
+description: "Banner post 4"
+date: 2026-05-08 10:00:00
+lastmod: 2026-05-08 09:00:00
+banner: true
+""");
+    }
+
+    private static void WritePost(string root, string year, string month, string slug, string metadata)
+    {
+        var directory = Path.Combine(root, year, month);
+        Directory.CreateDirectory(directory);
+
+        var markdown = Path.Combine(directory, $"{slug}.md");
+        File.WriteAllText(markdown, $"# {slug}\n\nBody");
+        File.WriteAllText(BlogPostFileService.GetMetadataPath(markdown), metadata);
     }
 
     private static ContentRepository CreateRepository(string root)

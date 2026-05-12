@@ -56,13 +56,20 @@ public sealed partial class ContentRepository
     public async Task<HomePageData> GetHomeAsync(string culture, int recent)
     {
         var posts = (await GetPostBriefsAsync(culture)).ToList();
+        var orderedPosts = posts
+            .OrderByDescending(static post => post.Lastmod ?? post.Date ?? DateTime.MinValue)
+            .ToList();
+        var bannerPosts = orderedPosts
+            .Where(static post => post.Banner)
+            .Take(3)
+            .ToList();
         var tools = await GetToolsAsync(culture);
         var categories = await GetCategoriesAsync(culture);
         var albums = await GetAlbumsAsync(culture);
         return new HomePageData(
             GetSiteInfo(),
-            posts.Take(Math.Clamp(recent, 1, 24)).ToList(),
-            posts.Where(static post => post.Banner).Take(6).ToList(),
+            orderedPosts.Take(Math.Clamp(recent, 1, 24)).ToList(),
+            bannerPosts,
             categories,
             albums,
             tools,

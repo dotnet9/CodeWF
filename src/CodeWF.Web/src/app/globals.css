@@ -792,6 +792,12 @@ img {
   gap: 18px;
 }
 
+.home-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .tool-tree {
   display: grid;
   gap: 18px;
@@ -861,6 +867,34 @@ img {
 
 .tool-links a:hover {
   transform: translateY(-2px);
+}
+
+.home-tool-card {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.home-tool-card strong {
+  line-height: 1.35;
+}
+
+.home-tool-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.home-tool-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 103, 255, 0.28);
+  box-shadow: var(--shadow);
 }
 
 .article-shell {
@@ -1612,6 +1646,7 @@ img {
 
   .post-grid,
   .tool-grid,
+  .home-tool-grid,
   .doc-grid,
   .metric-row {
     grid-template-columns: 1fr;

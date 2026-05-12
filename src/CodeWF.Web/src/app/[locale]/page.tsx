@@ -2,25 +2,18 @@ import Link from "next/link";
 import { api } from "@/api";
 import { PostCard } from "@/components/PostCard";
 import { dictionary, withLocale } from "@/i18n";
+import type { ToolNode } from "@/types";
 import type { LocalePageProps } from "./layout";
 
 export default async function HomePage({ params }: LocalePageProps) {
   const { locale } = await params;
-  const [home, postsPage] = await Promise.all([
-    api.home(locale),
-    api.posts(locale, { pageIndex: 1, pageSize: 24 })
-  ]);
+  const home = await api.home(locale);
   const t = dictionary(locale);
-  const topTools = home.tools.slice(0, 4);
-  const recentSlugs = new Set(home.recentPosts.map((post) => post.slug ?? post.url ?? ""));
-  const randomPosts = postsPage.data
-    .filter((post) => !recentSlugs.has(post.slug ?? post.url ?? ""))
-    .slice(0, 6)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
+  const featuredPosts = home.bannerPosts.slice(0, 3);
+  const recentPosts = home.recentPosts.slice(0, 3);
+  const recommendedTools = collectToolLeaves(home.tools).slice(0, 20);
   const gettingStartedLinks = buildGettingStartedLinks(home, t);
   const serialAlbums = home.albums.filter((album) => album.postCount > 0).slice(0, 4);
-  const featuredPosts = home.bannerPosts.slice(0, 3);
 
   return (
     <main className="page-wrap page-stack">
@@ -42,16 +35,18 @@ export default async function HomePage({ params }: LocalePageProps) {
           </div>
         </div>
 
-        <div className="home-hero__rail">
-          <span className="eyebrow eyebrow--subtle">{t.featuredPosts}</span>
-          {featuredPosts.map((post) => (
-            <Link className="home-feature" href={withLocale(locale, post.url ?? "/post")} key={`${post.date}-${post.slug}`}>
-              <span className="card-kicker">{post.contextLabel ?? "精选"}</span>
-              <strong>{post.title}</strong>
-              <p>{post.description}</p>
-            </Link>
-          ))}
-        </div>
+        {featuredPosts.length > 0 ? (
+          <div className="home-hero__rail">
+            <span className="eyebrow eyebrow--subtle">{t.featuredPosts}</span>
+            {featuredPosts.map((post) => (
+              <Link className="home-feature" href={withLocale(locale, post.url ?? "/post")} key={`${post.date}-${post.slug}`}>
+                <span className="card-kicker">{post.contextLabel ?? (locale === "zh-CN" ? "Banner 文章" : "Featured post")}</span>
+                <strong>{post.title}</strong>
+                <p>{post.description}</p>
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="metric-row" aria-label="Site metrics">
@@ -80,7 +75,7 @@ export default async function HomePage({ params }: LocalePageProps) {
             </Link>
           </div>
           <div className="post-grid">
-            {home.recentPosts.map((post) => (
+            {recentPosts.map((post) => (
               <PostCard post={post} locale={locale} site={home.site} key={`${post.date}-${post.slug}`} />
             ))}
           </div>
@@ -88,7 +83,7 @@ export default async function HomePage({ params }: LocalePageProps) {
 
         <aside className="side-stack">
           <section className="taxonomy-panel">
-            <h2>新用户起步路线</h2>
+            <h2>{locale === "zh-CN" ? "新手起步" : "Getting started"}</h2>
             <div className="discovery-link-list">
               {gettingStartedLinks.map((link) => (
                 <Link href={withLocale(locale, link.href)} className="discovery-link-card" key={link.href}>
@@ -101,7 +96,7 @@ export default async function HomePage({ params }: LocalePageProps) {
           </section>
 
           <section className="taxonomy-panel">
-            <h2>连续阅读</h2>
+            <h2>{locale === "zh-CN" ? "连续阅读" : "Read next"}</h2>
             <div className="sidebar-link-list">
               {serialAlbums.map((album) => (
                 <Link href={withLocale(locale, `/album/${encodeURIComponent(album.slug ?? album.name ?? "")}`)} className="sidebar-link" key={album.slug ?? album.name}>
@@ -113,22 +108,7 @@ export default async function HomePage({ params }: LocalePageProps) {
           </section>
 
           <section className="taxonomy-panel">
-            <h2>随机发现</h2>
-            <div className="discovery-post-list">
-              {randomPosts.map((post) => (
-                <article className="discovery-post-card" key={`${post.date}-${post.slug}`}>
-                  <span className="card-kicker">{post.categories?.[0] ?? "随机发现"}</span>
-                  <h3>
-                    <Link href={withLocale(locale, post.url ?? "/post")}>{post.title}</Link>
-                  </h3>
-                  <p>{post.description}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="taxonomy-panel">
-            <h2>{t.categories}</h2>
+            <h2>{locale === "zh-CN" ? "分类导航" : t.categories}</h2>
             <div className="taxonomy-list">
               {home.categories.slice(0, 12).map((item) => (
                 <Link href={withLocale(locale, `/cat/${encodeURIComponent(item.slug ?? item.name ?? "")}`)} key={item.slug ?? item.name}>
@@ -138,19 +118,31 @@ export default async function HomePage({ params }: LocalePageProps) {
               ))}
             </div>
           </section>
-
-          <section className="list-panel">
-            <h2>{t.toolCatalog}</h2>
-            <div className="tool-links">
-              {topTools.map((group) => (
-                <Link href={withLocale(locale, `/tool#${group.slug}`)} key={group.slug}>
-                  {group.name}
-                </Link>
-              ))}
-            </div>
-          </section>
         </aside>
       </div>
+
+      {recommendedTools.length > 0 ? (
+        <section className="taxonomy-panel home-tools-panel">
+          <div className="section-head">
+            <div>
+              <h2>{t.recommendedTools}</h2>
+              <p>{locale === "zh-CN" ? "首页展示 20 个常用工具入口" : "Twenty recommended tools from the catalog"}</p>
+            </div>
+            <Link className="text-link" href={withLocale(locale, "/tool")}>
+              {t.toolCatalog}
+            </Link>
+          </div>
+          <div className="home-tool-grid">
+            {recommendedTools.map((tool) => (
+              <Link className="home-tool-card" href={withLocale(locale, `/tool/${encodeURIComponent(tool.slug ?? "")}`)} key={tool.slug}>
+                <span className="card-kicker">{locale === "zh-CN" ? "工具推荐" : "Tool"}</span>
+                <strong>{tool.name}</strong>
+                {tool.memo ? <p>{tool.memo}</p> : null}
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }
@@ -175,30 +167,47 @@ function buildGettingStartedLinks(home: Awaited<ReturnType<typeof api.home>>, t:
 
   if (latestPost) {
     links.push({
-      eyebrow: "先看更新",
-      title: "从最新文章进入",
-      description: latestPost.title ?? t.posts,
+      eyebrow: "Latest",
+      title: latestPost.title ?? t.posts,
+      description: latestPost.description ?? "",
       href: latestPost.url ?? "/post"
     });
   }
 
   if (topCategory) {
     links.push({
-      eyebrow: "按主题看",
+      eyebrow: "Category",
       title: topCategory.name ?? t.categories,
-      description: `${topCategory.postCount} 篇文章`,
+      description: `${topCategory.postCount} posts`,
       href: `/cat/${encodeURIComponent(topCategory.slug ?? topCategory.name ?? "")}`
     });
   }
 
   if (topAlbum) {
     links.push({
-      eyebrow: "连续阅读",
+      eyebrow: "Album",
       title: topAlbum.name ?? t.albums,
-      description: `${topAlbum.postCount} 篇文章`,
+      description: `${topAlbum.postCount} posts`,
       href: `/album/${encodeURIComponent(topAlbum.slug ?? topAlbum.name ?? "")}`
     });
   }
 
   return links;
+}
+
+function collectToolLeaves(nodes: ToolNode[]) {
+  const results: ToolNode[] = [];
+
+  const visit = (items: ToolNode[]) => {
+    for (const node of items) {
+      if (node.children?.length) {
+        visit(node.children);
+      } else if (node.slug) {
+        results.push(node);
+      }
+    }
+  };
+
+  visit(nodes);
+  return results;
 }
