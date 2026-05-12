@@ -2,6 +2,12 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.9 (2026-05-13)
+
+- [Changed] Improved admin asset browsing with multi-select file deletion.
+- [Changed] Clarified tool-tree node labels and normalized visibility so parent groups stay visible when descendants are shown.
+- [Changed] Tightened tool-tree editing rules to keep public navigation consistent with saved visibility flags.
+
 V1.1.8 (2026-05-13)
 
 - [Changed] Added synchronized scrolling between Markdown editing and preview panes in the admin editor.

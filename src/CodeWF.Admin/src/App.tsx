@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type Key, type ReactNode } from "react";
 import {
   Alert,
   App as AntApp,
@@ -1137,7 +1137,7 @@ function ToolTreePreview({ culture }: { culture: string }) {
     setLoading(true);
     try {
       const data = await api.jsonResource("tools", culture);
-      const parsed = parseToolTree(data.json);
+      const parsed = normalizeToolTree(parseToolTree(data.json));
       setResource(data);
       setTree(buildEditableToolTree(parsed));
       setCheckedKeys(collectVisibleKeys(parsed));
@@ -1179,9 +1179,9 @@ function ToolTreePreview({ culture }: { culture: string }) {
   const onCheck = (keys: unknown) => {
     const next = Array.isArray(keys) ? keys : (keys as { checked?: unknown[] }).checked ?? [];
     const visibleKeys = next.map((value) => String(value));
-    setCheckedKeys(visibleKeys);
     const nextTree = applyToolVisibility(tree, new Set(visibleKeys));
     setTree(nextTree);
+    setCheckedKeys(collectVisibleKeys(nextTree));
     setPreview(formatToolTree(stripEditableToolTree(nextTree)));
   };
 
@@ -1281,11 +1281,17 @@ function stripEditableToolTree(nodes: EditableToolNode[]): ToolNode[] {
 }
 
 function applyToolVisibility(nodes: EditableToolNode[], visibleKeys: Set<string>): EditableToolNode[] {
-  return nodes.map((node) => ({
-    ...node,
-    hidden: !visibleKeys.has(node.key),
-    children: node.children?.length ? applyToolVisibility(node.children, visibleKeys) : undefined
-  }));
+  return nodes.map((node) => {
+    const children = node.children?.length ? applyToolVisibility(node.children, visibleKeys) : undefined;
+    const hasVisibleChild = children?.some((child) => !child.hidden) ?? false;
+    const selfVisible = visibleKeys.has(node.key);
+
+    return {
+      ...node,
+      hidden: !(selfVisible || hasVisibleChild),
+      children
+    };
+  });
 }
 
 function collectVisibleKeys(nodes: ToolNode[], prefix = ""): string[] {
@@ -1319,9 +1325,11 @@ function toTreeData(node: EditableToolNode): ToolTreeData {
     key: node.key,
     title: (
       <Space size={8}>
-        <span>{node.name ?? node.slug ?? "未命名工具"}</span>
+        <span>{node.name ?? node.slug ?? "未命名节点"}</span>
         {node.hidden ? <Tag color="default">隐藏</Tag> : <Tag color="green">显示</Tag>}
-        {node.repository ? <Typography.Text type="secondary">{node.repository}</Typography.Text> : null}
+        {!node.name && node.slug ? <Tag color="blue">Slug</Tag> : null}
+        {!node.name && !node.slug && node.repository ? <Typography.Text type="secondary">来源：{node.repository}</Typography.Text> : null}
+        {node.repository && node.name ? <Typography.Text type="secondary">{node.repository}</Typography.Text> : null}
       </Space>
     ),
     children: node.children?.map(toTreeData)
@@ -1332,6 +1340,18 @@ function formatToolTree(nodes: ToolNode[]) {
   return JSON.stringify(nodes, null, 2);
 }
 
+function normalizeToolTree(nodes: ToolNode[]): ToolNode[] {
+  return nodes.map((node) => {
+    const children = node.children?.length ? normalizeToolTree(node.children) : undefined;
+    const hasVisibleChild = children?.some((child) => !child.hidden) ?? false;
+    return {
+      ...node,
+      hidden: node.hidden && !hasVisibleChild ? true : false,
+      children
+    };
+  });
+}
+
 function AssetBrowser() {
   const { message } = AntApp.useApp();
   const [path, setPath] = useState("");
@@ -1339,6 +1359,7 @@ function AssetBrowser() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selected, setSelected] = useState<AssetEntry | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   const [preview, setPreview] = useState<GitFilePreviewResult | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
@@ -1349,6 +1370,7 @@ function AssetBrowser() {
       setData(directory);
       setPath(nextPath);
       setSelected(null);
+      setSelectedKeys([]);
       setPreview(null);
     } catch (error) {
       message.error(error instanceof Error ? error.message : "资源加载失败");
@@ -1410,6 +1432,11 @@ function AssetBrowser() {
     }
   ];
 
+  const selectedFiles = useMemo(
+    () => (data?.entries ?? []).filter((entry) => selectedKeys.includes(entry.path) && !entry.isDirectory),
+    [data?.entries, selectedKeys]
+  );
+
   return (
     <Row gutter={16}>
       <Col span={10}>
@@ -1422,6 +1449,37 @@ function AssetBrowser() {
               </Button>
               <Button icon={<ReloadOutlined />} onClick={() => loadDirectory(path)}>
                 刷新
+              </Button>
+              <Button
+                danger
+                disabled={selectedFiles.length === 0}
+                onClick={() =>
+                  Modal.confirm({
+                    title: "批量删除文件",
+                    content: `确定删除已选择的 ${selectedFiles.length} 个文件吗？此操作不可恢复。`,
+                    okButtonProps: { danger: true },
+                    onOk: async () => {
+                      setUploading(true);
+                      try {
+                        for (const file of selectedFiles) {
+                          const result = await api.deleteAsset(file.path);
+                          if (!result.success) {
+                            message.warning(result.message);
+                          }
+                        }
+                        message.success("删除完成");
+                        setSelectedKeys([]);
+                        await loadDirectory(path);
+                      } catch (error) {
+                        message.error(error instanceof Error ? error.message : "删除失败");
+                      } finally {
+                        setUploading(false);
+                      }
+                    }
+                  })
+                }
+              >
+                批量删除
               </Button>
               <label className="upload-trigger">
                 <input
@@ -1468,6 +1526,11 @@ function AssetBrowser() {
             dataSource={data?.entries ?? []}
             pagination={false}
             size="small"
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              getCheckboxProps: (record) => ({ disabled: record.isDirectory }),
+              onChange: (keys) => setSelectedKeys(keys)
+            }}
             onRow={(record) => ({ onClick: () => loadPreview(record) })}
           />
         </Card>

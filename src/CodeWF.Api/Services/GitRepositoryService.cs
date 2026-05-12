@@ -89,13 +89,14 @@ public sealed class GitRepositoryService
     public Task<GitFilePreviewResult> GetFilePreviewAsync(string relativePath)
     {
         var root = RepoRoot();
-        var fullPath = Path.GetFullPath(Path.Combine(root, relativePath ?? string.Empty));
+        var safeRelativePath = relativePath ?? string.Empty;
+        var fullPath = Path.GetFullPath(Path.Combine(root, safeRelativePath));
         if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
         {
-            return Task.FromResult(new GitFilePreviewResult(false, relativePath ?? string.Empty, Path.GetFileName(relativePath), "missing"));
+            return Task.FromResult(new GitFilePreviewResult(false, safeRelativePath, Path.GetFileName(safeRelativePath), "missing"));
         }
 
-        return Task.FromResult(CreateFilePreview(fullPath, relativePath));
+        return Task.FromResult(CreateFilePreview(fullPath, safeRelativePath));
     }
 
     private async Task<GitCommandResult> RunGitAsync(params string[] arguments)
