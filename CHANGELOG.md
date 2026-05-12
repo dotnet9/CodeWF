@@ -2,6 +2,13 @@
 
 Chinese version: [CHANGELOG-zh_CN.md](./CHANGELOG-zh_CN.md)
 
+V1.1.8 (2026-05-13)
+
+- [Changed] Added synchronized scrolling between Markdown editing and preview panes in the admin editor.
+- [Changed] Added tool-tree visibility toggles in the admin resource browser and filtered hidden tools from the public catalog.
+- [Changed] Expanded the admin resource browser into a tree-driven editor with JSON preview for tool configuration.
+- [Fixed] Reworked repository file preview and status browsing around the current API routes so file previews and change inspection stay reliable.
+
 V1.1.7 (2026-05-12)
 
 - [Changed] Reworked the top-right "More" dropdown into a compact grouped panel with clearer page and external links.

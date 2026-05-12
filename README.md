@@ -54,10 +54,11 @@ Important API settings live under `src/CodeWF.Api/appsettings.json` and can be o
 ```powershell
 $env:Site__LocalAssetsDir = "D:\wwwroot\img1.dotnet9.com"
 $env:Site__AssetBaseUrl = "https://img1.dotnet9.com"
-$env:Admin__ApiKey = "change-me"
+$env:Admin__UserName = "codewf"
+$env:Admin__Password = "codewf.com"
 ```
 
-When `Admin__ApiKey` is empty, admin APIs are open for local development. In production, set it and enter the same value in the admin console.
+The admin console uses username and password verification. The default credentials are `codewf` / `codewf.com`.
 
 ## Build And Test
 

@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using CodeWF.Api.Models;
 using CodeWF.Api.Options;
 using CodeWF.Api.Services;
@@ -53,6 +55,66 @@ var api = app.MapGroup("/api");
 api.MapGet("/health", () => Results.Ok(new { status = "ok", at = DateTimeOffset.UtcNow }));
 
 api.MapGet("/site", (ContentRepository repository) => Results.Ok(repository.GetSiteInfo()));
+
+api.MapGet("/site-settings", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(repository.GetSiteInfo());
+});
+
+var admin = api.MapGroup("/admin");
+
+admin.MapGet("/site-settings", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(repository.GetSiteInfo());
+});
+
+admin.MapPut("/site-settings", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    IHostEnvironment env,
+    SiteSettingsRequest request) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await UpdateSiteSettingsAsync(env.ContentRootPath, request, repository.GetSiteInfo());
+    return result.Success ? Results.Ok(result) : Results.BadRequest(result);
+});
+
+api.MapPut("/site-settings", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    IHostEnvironment env,
+    SiteSettingsRequest request) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await UpdateSiteSettingsAsync(env.ContentRootPath, request, repository.GetSiteInfo());
+    return result.Success ? Results.Ok(result) : Results.BadRequest(result);
+});
 
 api.MapGet("/localization", async (HttpRequest request, ContentRepository repository) =>
 {
@@ -175,8 +237,6 @@ app.MapGet("/sitemap.xml", async (ContentRepository repository) =>
 app.MapGet("/sitemap", async (ContentRepository repository) =>
     Results.Text(await repository.GetSitemapAsync(), "application/xml; charset=utf-8"));
 
-var admin = api.MapGroup("/admin");
-
 admin.MapGet("/posts", async (
     HttpContext context,
     IOptions<AdminOptions> adminOptions,
@@ -254,6 +314,124 @@ admin.MapDelete("/posts/{slug}", async (
     return deleted ? Results.NoContent() : Results.NotFound();
 });
 
+admin.MapGet("/content/markdown/{name}", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string name,
+    string? culture = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var (resourceName, path) = ResolveMarkdownResource(name);
+    var data = await repository.ReadMarkdownResourceAsync(culture ?? RequestCulture(context.Request), resourceName, path);
+    return Results.Ok(data);
+});
+
+admin.MapPut("/content/markdown/{name}", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string name,
+    ContentSaveRequest request,
+    string? culture = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var (resourceName, path) = ResolveMarkdownResource(name);
+    return Results.Ok(await repository.SaveMarkdownResourceAsync(culture ?? RequestCulture(context.Request), resourceName, request.Content, path));
+});
+
+admin.MapGet("/content/json/{name}", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string name,
+    string? culture = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var (resourceName, path) = ResolveJsonResource(name);
+    var data = await repository.ReadJsonResourceAsync(culture ?? RequestCulture(context.Request), resourceName, path);
+    return Results.Ok(data);
+});
+
+admin.MapPut("/content/json/{name}", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string name,
+    ContentSaveRequest request,
+    string? culture = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var (resourceName, path) = ResolveJsonResource(name);
+    return Results.Ok(await repository.SaveJsonResourceAsync(culture ?? RequestCulture(context.Request), resourceName, request.Content, path));
+});
+
+admin.MapGet("/assets", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string? path = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(await repository.GetAssetsAsync(path ?? string.Empty));
+});
+
+admin.MapPost("/assets", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string? path = null,
+    string? name = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        return Results.BadRequest(new AssetUploadResult(false, "File name is required."));
+    }
+
+    var result = await repository.SaveAssetAsync(path ?? string.Empty, name, context.Request.Body);
+    return result.Success ? Results.Ok(result) : Results.BadRequest(result);
+});
+
+admin.MapDelete("/assets", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    ContentRepository repository,
+    string? path = null) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await repository.DeleteAssetAsync(path ?? string.Empty);
+    return result.Success ? Results.Ok(result) : Results.NotFound(result);
+});
+
 admin.MapGet("/repository/status", async (
     HttpContext context,
     IOptions<AdminOptions> adminOptions,
@@ -265,6 +443,19 @@ admin.MapGet("/repository/status", async (
     }
 
     return Results.Ok(await git.GetStatusAsync());
+});
+
+admin.MapGet("/repository/status/details", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    GitRepositoryService git) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(await git.GetStatusDetailsAsync());
 });
 
 admin.MapGet("/repository/log", async (
@@ -279,6 +470,20 @@ admin.MapGet("/repository/log", async (
     }
 
     return Results.Ok(await git.GetLogAsync(count));
+});
+
+admin.MapGet("/repository/file", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    GitRepositoryService git,
+    string path) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(await git.GetFilePreviewAsync(path));
 });
 
 admin.MapPost("/repository/fetch", async (
@@ -337,6 +542,99 @@ static string RequestCulture(HttpRequest request)
 
     return request.Headers.AcceptLanguage.FirstOrDefault()?.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0]
            ?? SiteOptions.DefaultCultureName;
+}
+
+static (string Name, string[] Segments) ResolveMarkdownResource(string name) =>
+    name.ToLowerInvariant() switch
+    {
+        "about" => ("about", ["about.md"]),
+        "donation" => ("donation", ["pays", "Donation.md"]),
+        "privacy" => ("privacy", ["Privacy.md"]),
+        _ => (name, [$"{name}.md"])
+    };
+
+static (string Name, string[] Segments) ResolveJsonResource(string name) =>
+    name.ToLowerInvariant() switch
+    {
+        "tools" => ("tools", ["tools", "tools.json"]),
+        "navigation" or "doc-navigation" => ("navigation", ["doc", "navigation.json"]),
+        "friend-links" => ("friend-links", ["friend-links.json"]),
+        "timelines" => ("timelines", ["timelines.json"]),
+        "blocked-search-keywords" => ("blocked-search-keywords", ["blocked-search-keywords.json"]),
+        "lang" => ("lang", ["lang.json"]),
+        "categories" => ("categories", ["categories.json"]),
+        "albums" => ("albums", ["albums.json"]),
+        _ => (name, [$"{name}.json"])
+    };
+
+static async Task<SiteSettingsResult> UpdateSiteSettingsAsync(string contentRootPath, SiteSettingsRequest request, SiteInfo current)
+{
+    var appsettingsPath = Path.Combine(contentRootPath, "appsettings.json");
+    if (!File.Exists(appsettingsPath))
+    {
+        return new SiteSettingsResult(false, $"appsettings.json not found: {appsettingsPath}");
+    }
+
+    JsonNode? root;
+    try
+    {
+        root = JsonNode.Parse(await File.ReadAllTextAsync(appsettingsPath));
+    }
+    catch (Exception ex)
+    {
+        return new SiteSettingsResult(false, $"Unable to read appsettings.json: {ex.Message}");
+    }
+
+    if (root is not JsonObject rootObject)
+    {
+        return new SiteSettingsResult(false, "appsettings.json is not a JSON object.");
+    }
+
+    var site = new JsonObject
+    {
+        ["AppTitle"] = request.AppTitle ?? current.AppTitle,
+        ["Domain"] = request.Domain ?? current.Domain,
+        ["Memo"] = request.Memo ?? current.Memo,
+        ["Owner"] = request.Owner ?? current.Owner,
+        ["OwnerDesc"] = request.OwnerDesc ?? current.OwnerDesc,
+        ["Favicon"] = request.Favicon ?? current.Favicon,
+        ["LocalAssetsDir"] = request.LocalAssetsDir ?? current.LocalAssetsDir,
+        ["AssetBaseUrl"] = request.AssetBaseUrl ?? current.AssetBaseUrl,
+        ["RemoteAssetsRepository"] = request.RemoteAssetsRepository ?? current.RemoteAssetsRepository,
+        ["StartYear"] = request.StartYear == 0 ? current.StartYear : request.StartYear,
+        ["BaiAn"] = request.BaiAn ?? current.BaiAn,
+        ["WeChatName"] = request.WeChatName ?? current.WeChatName,
+        ["WeChatImg"] = request.WeChatImg ?? current.WeChatImg,
+        ["DefaultCulture"] = request.DefaultCulture ?? current.DefaultCulture,
+        ["SupportedCultures"] = JsonValue.Create(request.SupportedCultures is { Count: > 0 } ? request.SupportedCultures : current.SupportedCultures.ToList())
+    };
+
+    rootObject["Site"] = site;
+
+    try
+    {
+        await File.WriteAllTextAsync(appsettingsPath, rootObject.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + Environment.NewLine);
+        return new SiteSettingsResult(true, "Site settings saved.", new SiteInfo(
+            request.AppTitle ?? current.AppTitle,
+            request.Domain ?? current.Domain,
+            request.Memo ?? current.Memo,
+            request.Owner ?? current.Owner,
+            request.OwnerDesc ?? current.OwnerDesc,
+            request.Favicon ?? current.Favicon,
+            request.LocalAssetsDir ?? current.LocalAssetsDir,
+            request.AssetBaseUrl ?? current.AssetBaseUrl,
+            request.RemoteAssetsRepository ?? current.RemoteAssetsRepository,
+            request.StartYear == 0 ? current.StartYear : request.StartYear,
+            request.DefaultCulture ?? current.DefaultCulture,
+            request.SupportedCultures is { Count: > 0 } ? request.SupportedCultures : current.SupportedCultures.ToList(),
+            request.BaiAn ?? current.BaiAn,
+            request.WeChatName ?? current.WeChatName,
+            request.WeChatImg ?? current.WeChatImg));
+    }
+    catch (Exception ex)
+    {
+        return new SiteSettingsResult(false, $"Unable to write appsettings.json: {ex.Message}");
+    }
 }
 
 public partial class Program;

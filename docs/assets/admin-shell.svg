@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520">
+  <defs>
+    <style>
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 16; }
+      .sidebar { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; rx: 16; }
+      .header { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .content { fill: #eef2ff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .title { font: 700 22px "Segoe UI", Arial, sans-serif; fill: #0f172a; }
+      .text { font: 16px "Segoe UI", Arial, sans-serif; fill: #334155; }
+      .label { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #0f766e; }
+    </style>
+  </defs>
+
+  <rect class="panel" x="30" y="30" width="1220" height="460" />
+  <rect class="sidebar" x="55" y="60" width="250" height="400" />
+  <text class="title" x="80" y="105">左侧固定导航</text>
+  <text class="text" x="80" y="145">概览</text>
+  <text class="text" x="80" y="175">文章</text>
+  <text class="text" x="80" y="205">站点页</text>
+  <text class="text" x="80" y="235">资源仓库</text>
+  <text class="text" x="80" y="265">站点设置</text>
+  <text class="text" x="80" y="295">版本控制</text>
+
+  <rect class="header" x="330" y="60" width="890" height="80" />
+  <text class="title" x="360" y="105">顶部固定页头</text>
+  <text class="text" x="1040" y="105">语言 / 退出</text>
+
+  <rect class="content" x="330" y="160" width="890" height="300" />
+  <text class="title" x="360" y="205">右侧内容区独立滚动</text>
+  <text class="text" x="360" y="245">文章编辑、资源浏览、仓库状态都放在这里。</text>
+  <text class="text" x="360" y="275">左侧菜单和页头保持固定，避免长内容时丢失上下文。</text>
+  <text class="text" x="360" y="305">表单、预览和列表采用紧凑布局，不用多层浮卡片堆叠。</text>
+
+  <text class="label" x="80" y="405">固定</text>
+  <text class="label" x="360" y="370">滚动</text>
+</svg>

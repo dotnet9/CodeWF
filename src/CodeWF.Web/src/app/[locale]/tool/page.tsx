@@ -11,7 +11,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = dictionary(locale);
   return {
     title: t.toolCatalog,
-    description: locale === "zh-CN" ? "紧凑浏览站内工具目录，并支持标题和描述搜索。" : "Browse the tools catalog with compact cards and search."
+    description:
+      locale === "zh-CN"
+        ? "浏览站内工具目录，左侧按分组导航，右侧查看工具详情。"
+        : "Browse the tool catalog with grouped navigation and detailed listings."
   };
 }
 

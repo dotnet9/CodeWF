@@ -21,6 +21,7 @@ const emptySite: SiteInfo = {
   domain: "https://dotnet9.com",
   memo: "Articles and tools",
   owner: "dotnet9",
+  localAssetsDir: "D:\\wwwroot\\img1.dotnet9.com",
   assetBaseUrl: "https://img1.dotnet9.com",
   startYear: 2019,
   defaultCulture: "zh-CN",

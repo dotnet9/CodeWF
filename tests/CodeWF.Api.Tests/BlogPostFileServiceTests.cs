@@ -106,6 +106,51 @@ tags:
         Assert.DoesNotContain(home.BannerPosts, post => post.Slug == "banner-4");
     }
 
+    [Fact]
+    public async Task SaveMarkdownResourceAsync_WritesMarkdownPage()
+    {
+        var root = CreateTempRoot();
+        var repository = CreateRepository(root);
+
+        var result = await repository.SaveMarkdownResourceAsync("zh-CN", "about", "# About", "about.md");
+
+        Assert.True(result.Success);
+        Assert.Equal("# About", await File.ReadAllTextAsync(Path.Combine(root, "site", "about.md")));
+    }
+
+    [Fact]
+    public async Task SaveJsonResourceAsync_FormatsJson()
+    {
+        var root = CreateTempRoot();
+        var repository = CreateRepository(root);
+
+        var result = await repository.SaveJsonResourceAsync("zh-CN", "friend-links", "[{\"Title\":\"A\"}]", "friend-links.json");
+
+        Assert.True(result.Success);
+        var content = await File.ReadAllTextAsync(Path.Combine(root, "site", "friend-links.json"));
+        Assert.Contains("\n", content);
+        Assert.Contains("\"Title\": \"A\"", content);
+    }
+
+    [Fact]
+    public async Task SaveAssetAsync_WritesBinaryFileAndListAssets()
+    {
+        var root = CreateTempRoot();
+        var repository = CreateRepository(root);
+
+        await using (var stream = new MemoryStream([1, 2, 3]))
+        {
+            var result = await repository.SaveAssetAsync("images", "logo.bin", stream);
+            Assert.True(result.Success);
+        }
+
+        var assetPath = Path.Combine(root, "images", "logo.bin");
+        Assert.True(File.Exists(assetPath));
+
+        var directory = await repository.GetAssetsAsync("images");
+        Assert.Contains(directory.Entries, entry => entry.Path.EndsWith("images/logo.bin", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static string CreateTempRoot()
     {
         var root = Path.Combine(Path.GetTempPath(), "codewf-tests", Guid.NewGuid().ToString("N"));

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
+      .title { font: 700 22px "Segoe UI", Arial, sans-serif; fill: #0f172a; }
+      .text { font: 16px "Segoe UI", Arial, sans-serif; fill: #334155; }
+      .arrow { stroke: #0f766e; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .label { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #0f766e; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#0f766e" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="40" y="70" width="250" height="180" />
+  <text class="title" x="65" y="110">CodeWF.Web</text>
+  <text class="text" x="65" y="145">公开站点</text>
+  <text class="text" x="65" y="175">文章 / 专题 / 分类</text>
+  <text class="text" x="65" y="205">工具 / 搜索 / 页面</text>
+
+  <rect class="box" x="40" y="280" width="250" height="170" />
+  <text class="title" x="65" y="320">CodeWF.Admin</text>
+  <text class="text" x="65" y="355">后台工作台</text>
+  <text class="text" x="65" y="385">文章 / 资源 / 设置</text>
+  <text class="text" x="65" y="415">Git 状态 / 提交 / 拉取</text>
+
+  <rect class="box" x="470" y="135" width="260" height="220" />
+  <text class="title" x="500" y="175">CodeWF.Api</text>
+  <text class="text" x="500" y="210">统一内容读写</text>
+  <text class="text" x="500" y="240">Markdown / JSON / 文件</text>
+  <text class="text" x="500" y="270">Git 状态与文件预览</text>
+  <text class="text" x="500" y="300">站点配置更新</text>
+
+  <rect class="box" x="830" y="95" width="300" height="300" />
+  <text class="title" x="860" y="135">内容仓库</text>
+  <text class="text" x="860" y="170">文章 Markdown</text>
+  <text class="text" x="860" y="200">站点页 / JSON 资源</text>
+  <text class="text" x="860" y="230">工具目录 / 文档导航</text>
+  <text class="text" x="860" y="260">资源目录 / 图片文件</text>
+  <text class="text" x="860" y="290">Git 工作区</text>
+
+  <path class="arrow" d="M290 160 C360 160, 390 180, 470 200" />
+  <path class="arrow" d="M290 350 C360 330, 390 300, 470 260" />
+  <path class="arrow" d="M730 210 C785 210, 800 210, 830 210" />
+  <path class="arrow" d="M730 275 C785 275, 800 275, 830 275" />
+
+  <text class="label" x="350" y="150">页面请求</text>
+  <text class="label" x="350" y="330">管理请求</text>
+  <text class="label" x="760" y="200">读写文件</text>
+  <text class="label" x="760" y="265">Git 操作</text>
+</svg>

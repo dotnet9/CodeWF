@@ -43,6 +43,7 @@ public sealed partial class ContentRepository
             options.Owner,
             options.OwnerDesc,
             options.Favicon,
+            options.LocalAssetsDir,
             options.AssetBaseUrl.TrimEnd('/'),
             options.RemoteAssetsRepository,
             options.StartYear,
@@ -175,6 +176,143 @@ public sealed partial class ContentRepository
 
         var markdown = await File.ReadAllTextAsync(path, Encoding.UTF8);
         return new MarkdownPage(markdown, postFiles.RenderMarkdown(markdown, path, AssetsRoot(), siteOptions.CurrentValue.AssetBaseUrl));
+    }
+
+    public async Task<EditableMarkdownResource> ReadMarkdownResourceAsync(string culture, string name, params string[] relativeSegments)
+    {
+        var path = ResolveLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
+        if (path is null || !File.Exists(path))
+        {
+            return new EditableMarkdownResource(name, string.Empty, null, null);
+        }
+
+        var markdown = await File.ReadAllTextAsync(path, Encoding.UTF8);
+        return new EditableMarkdownResource(
+            name,
+            path,
+            markdown,
+            postFiles.RenderMarkdown(markdown, path, AssetsRoot(), siteOptions.CurrentValue.AssetBaseUrl));
+    }
+
+    public async Task<EditableJsonResource> ReadJsonResourceAsync(string culture, string name, params string[] relativeSegments)
+    {
+        var path = ResolveLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
+        if (path is null || !File.Exists(path))
+        {
+            return new EditableJsonResource(name, string.Empty, null);
+        }
+
+        var json = await File.ReadAllTextAsync(path, Encoding.UTF8);
+        return new EditableJsonResource(name, path, json);
+    }
+
+    public async Task<AdminMutationResult> SaveMarkdownResourceAsync(string culture, string name, string content, params string[] relativeSegments)
+    {
+        var path = GetWritableLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
+        if (path is null)
+        {
+            return new AdminMutationResult(false, $"Invalid markdown resource path: {name}");
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await File.WriteAllTextAsync(path, NormalizeTextContent(content), Encoding.UTF8);
+        Invalidate();
+        return new AdminMutationResult(true, $"Saved {name}.");
+    }
+
+    public async Task<AdminMutationResult> SaveJsonResourceAsync(string culture, string name, string content, params string[] relativeSegments)
+    {
+        var path = GetWritableLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
+        if (path is null)
+        {
+            return new AdminMutationResult(false, $"Invalid JSON resource path: {name}");
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(content);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            var formatted = JsonSerializer.Serialize(document.RootElement, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(path, formatted + Environment.NewLine, Encoding.UTF8);
+            Invalidate();
+            return new AdminMutationResult(true, $"Saved {name}.");
+        }
+        catch (JsonException ex)
+        {
+            return new AdminMutationResult(false, $"Invalid JSON for {name}: {ex.Message}");
+        }
+    }
+
+    public Task<AssetDirectoryData> GetAssetsAsync(string relativePath = "") =>
+        GetCachedAsync($"assets:{relativePath}", async () =>
+        {
+            var root = AssetsRoot();
+            if (!Directory.Exists(root))
+            {
+                return new AssetDirectoryData(root, string.Empty, []);
+            }
+
+            var fullPath = ResolveAssetDirectoryPath(relativePath);
+            if (fullPath is null || !Directory.Exists(fullPath))
+            {
+                return new AssetDirectoryData(root, string.Empty, []);
+            }
+
+            var entries = Directory.EnumerateFileSystemEntries(fullPath)
+                .Select(path =>
+                {
+                    var info = File.GetAttributes(path).HasFlag(FileAttributes.Directory)
+                        ? (FileSystemInfo)new DirectoryInfo(path)
+                        : new FileInfo(path);
+
+                    var relative = Path.GetRelativePath(root, path).Replace('\\', '/');
+                    return new AssetEntry(
+                        info.Name,
+                        relative,
+                        (info.Attributes & FileAttributes.Directory) != 0,
+                        info is FileInfo fileInfo ? fileInfo.Length : null,
+                        info.LastWriteTimeUtc);
+                })
+                .OrderByDescending(entry => entry.IsDirectory)
+                .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return new AssetDirectoryData(root, GetRelativeAssetPath(fullPath), entries);
+        });
+
+    public async Task<AssetUploadResult> SaveAssetAsync(string relativePath, string fileName, Stream content)
+    {
+        var directory = ResolveAssetDirectoryPath(relativePath);
+        if (directory is null)
+        {
+            return new AssetUploadResult(false, "Invalid asset path.");
+        }
+
+        Directory.CreateDirectory(directory);
+        var target = Path.GetFullPath(Path.Combine(directory, Path.GetFileName(fileName)));
+        var root = AssetsRoot();
+        if (!target.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+        {
+            return new AssetUploadResult(false, "Invalid asset target path.");
+        }
+
+        await using var fileStream = File.Create(target);
+        await content.CopyToAsync(fileStream);
+        Invalidate();
+        return new AssetUploadResult(true, "Uploaded.", GetRelativeAssetPath(target));
+    }
+
+    public Task<AssetUploadResult> DeleteAssetAsync(string relativePath)
+    {
+        var fullPath = ResolveAssetPath(relativePath);
+        if (fullPath is null || !File.Exists(fullPath))
+        {
+            return Task.FromResult(new AssetUploadResult(false, "Asset not found."));
+        }
+
+        File.Delete(fullPath);
+        Invalidate();
+        return Task.FromResult(new AssetUploadResult(true, "Deleted.", GetRelativeAssetPath(fullPath)));
     }
 
     public async Task<IReadOnlyList<BlogPostBrief>> GetPostBriefsAsync(
@@ -584,12 +722,64 @@ public sealed partial class ContentRepository
         return File.Exists(defaultPath) ? defaultPath : null;
     }
 
+    private string? GetWritableLocalizedPath(string culture, string relativePath)
+    {
+        var root = AssetsRoot();
+        var defaultPath = Path.GetFullPath(Path.Combine(root, relativePath));
+        if (!defaultPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        var normalized = NormalizeCulture(culture);
+        var suffix = CultureSuffix(normalized);
+        if (suffix is null)
+        {
+            return defaultPath;
+        }
+
+        var directory = Path.GetDirectoryName(defaultPath);
+        if (string.IsNullOrWhiteSpace(directory))
+        {
+            return null;
+        }
+
+        var extension = Path.GetExtension(defaultPath);
+        var fileName = Path.GetFileNameWithoutExtension(defaultPath);
+        return Path.Combine(directory, $"{fileName}.{suffix}{extension}");
+    }
+
+    private static string NormalizeTextContent(string content) =>
+        content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+
     private string AssetsRoot()
     {
         var configured = siteOptions.CurrentValue.LocalAssetsDir;
         var expanded = Environment.ExpandEnvironmentVariables(configured);
         return Path.GetFullPath(expanded);
     }
+
+    private string? ResolveAssetPath(string relativePath)
+    {
+        var root = AssetsRoot();
+        var fullPath = Path.GetFullPath(Path.Combine(root, relativePath ?? string.Empty));
+        return fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? fullPath : null;
+    }
+
+    private string? ResolveAssetDirectoryPath(string relativePath)
+    {
+        var root = AssetsRoot();
+        var fullPath = Path.GetFullPath(Path.Combine(root, relativePath ?? string.Empty));
+        if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return fullPath;
+    }
+
+    private string GetRelativeAssetPath(string fullPath) =>
+        Path.GetRelativePath(AssetsRoot(), fullPath).Replace('\\', '/');
 
     private Task<T> GetCachedAsync<T>(string key, Func<Task<T>> factory) =>
         cache.GetOrCreateAsync($"{cacheVersion}:{key}", entry =>
@@ -846,6 +1036,11 @@ public sealed partial class ContentRepository
     {
         foreach (var node in nodes)
         {
+            if (node.Hidden)
+            {
+                continue;
+            }
+
             if (!string.IsNullOrWhiteSpace(node.Slug))
             {
                 yield return node;

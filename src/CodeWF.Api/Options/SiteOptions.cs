@@ -26,7 +26,8 @@ public sealed class AdminOptions
 {
     public const string SectionName = "Admin";
 
-    public string? ApiKey { get; set; }
+    public string UserName { get; set; } = "codewf";
+    public string Password { get; set; } = "codewf.com";
 }
 
 public sealed class CorsOptions

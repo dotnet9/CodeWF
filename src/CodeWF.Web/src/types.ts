@@ -43,6 +43,7 @@ export type ToolNode = {
   memo?: string;
   slug?: string;
   repository?: string;
+  hidden?: boolean;
   children?: ToolNode[];
 };
 
@@ -73,6 +74,7 @@ export type SiteInfo = {
   owner: string;
   ownerDesc?: string;
   favicon?: string;
+  localAssetsDir: string;
   assetBaseUrl: string;
   remoteAssetsRepository?: string;
   startYear: number;

@@ -30,6 +30,7 @@ export type ToolNode = {
   memo?: string;
   slug?: string;
   repository?: string;
+  hidden?: boolean;
   children?: ToolNode[];
 };
 
@@ -48,6 +49,7 @@ export type SiteInfo = {
   owner: string;
   ownerDesc?: string;
   favicon?: string;
+  localAssetsDir: string;
   assetBaseUrl: string;
   remoteAssetsRepository?: string;
   startYear: number;
@@ -66,6 +68,29 @@ export type GitCommandResult = {
   exitCode: number;
 };
 
+export type GitChangeEntry = {
+  status: string;
+  path: string;
+  originalPath?: string | null;
+};
+
+export type GitRepositoryStatusData = {
+  branch: string;
+  changes: GitChangeEntry[];
+  changeCount: number;
+};
+
+export type GitFilePreviewResult = {
+  success: boolean;
+  path: string;
+  name: string;
+  kind: "text" | "image" | "binary" | "missing";
+  textContent?: string | null;
+  dataUrl?: string | null;
+  mimeType?: string | null;
+  size?: number | null;
+};
+
 export type HomePageData = {
   site: SiteInfo;
   recentPosts: BlogPostBrief[];
@@ -76,17 +101,93 @@ export type HomePageData = {
   counts: Record<string, number>;
 };
 
+export type EditableMarkdownResource = {
+  name: string;
+  path: string;
+  markdown: string | null;
+  htmlContent: string | null;
+};
+
+export type EditableJsonResource = {
+  name: string;
+  path: string;
+  json: string | null;
+};
+
+export type ContentSaveResult = {
+  success: boolean;
+  message?: string | null;
+  post?: BlogPostBrief | null;
+};
+
+export type AssetEntry = {
+  name: string;
+  path: string;
+  isDirectory: boolean;
+  size: number | null;
+  lastModified: string | null;
+};
+
+export type AssetDirectoryData = {
+  root: string;
+  path: string;
+  entries: AssetEntry[];
+};
+
+export type AssetUploadResult = {
+  success: boolean;
+  message: string;
+  path?: string | null;
+};
+
+export type AdminCredentials = {
+  userName: string;
+  password: string;
+};
+
+export type SiteSettings = SiteInfo;
+
+export type SiteSettingsRequest = {
+  appTitle?: string;
+  domain?: string;
+  memo?: string;
+  owner?: string;
+  ownerDesc?: string;
+  favicon?: string;
+  localAssetsDir?: string;
+  assetBaseUrl?: string;
+  remoteAssetsRepository?: string;
+  startYear?: number;
+  baiAn?: string;
+  weChatName?: string;
+  weChatImg?: string;
+  defaultCulture?: string;
+  supportedCultures?: string[];
+};
+
+export type SiteSettingsResult = {
+  success: boolean;
+  message: string;
+  site?: SiteSettings | null;
+};
+
 const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/$/, "");
 
-function token() {
-  return localStorage.getItem("codewf-admin-token") ?? "";
+function credentials(): AdminCredentials {
+  return {
+    userName: localStorage.getItem("codewf-admin-user") ?? "",
+    password: localStorage.getItem("codewf-admin-password") ?? ""
+  };
 }
 
 function headers(json = false): HeadersInit {
   const value: HeadersInit = {};
-  const adminToken = token();
-  if (adminToken) {
-    value["X-CodeWF-Admin-Key"] = adminToken;
+  const auth = credentials();
+  if (auth.userName) {
+    value["X-CodeWF-Admin-User"] = auth.userName;
+  }
+  if (auth.password) {
+    value["X-CodeWF-Admin-Password"] = auth.password;
   }
   if (json) {
     value["Content-Type"] = "application/json";
@@ -111,12 +212,33 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+async function upload<T>(path: string, body: BodyInit): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    body,
+    headers: headers(false)
+  });
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+  if (response.status === 204) {
+    return undefined as T;
+  }
+  return (await response.json()) as T;
+}
+
 export const api = {
-  setToken(value: string) {
-    localStorage.setItem("codewf-admin-token", value);
+  setCredentials(value: AdminCredentials) {
+    localStorage.setItem("codewf-admin-user", value.userName);
+    localStorage.setItem("codewf-admin-password", value.password);
   },
-  getToken: token,
-  home: () => request<HomePageData>("/home?culture=zh-CN"),
+  getCredentials: credentials,
+  clearCredentials() {
+    localStorage.removeItem("codewf-admin-user");
+    localStorage.removeItem("codewf-admin-password");
+  },
+  verify: () => request<GitCommandResult>("/admin/repository/status"),
+  home: (culture = "zh-CN") => request<HomePageData>(`/home?culture=${encodeURIComponent(culture)}`),
   posts: (pageIndex = 1, keyword = "") =>
     request<PagedResult<BlogPostBrief>>(`/admin/posts?pageIndex=${pageIndex}&pageSize=20&keyword=${encodeURIComponent(keyword)}`),
   post: (slug: string) => request<BlogPost>(`/admin/posts/${slug}`),
@@ -134,9 +256,35 @@ export const api = {
     request(`/admin/posts/${slug}`, {
       method: "DELETE"
     }),
-  tools: () => request<ToolNode[]>("/tools?culture=zh-CN"),
+  siteSettings: () => request<SiteSettings>("/site-settings"),
+  saveSiteSettings: (payload: SiteSettingsRequest) =>
+    request<SiteSettingsResult>("/site-settings", {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    }),
+  markdownResource: (name: string, culture = "zh-CN") =>
+    request<EditableMarkdownResource>(`/admin/content/markdown/${encodeURIComponent(name)}?culture=${encodeURIComponent(culture)}`),
+  saveMarkdownResource: (name: string, content: string, culture = "zh-CN") =>
+    request<ContentSaveResult>(`/admin/content/markdown/${encodeURIComponent(name)}?culture=${encodeURIComponent(culture)}`, {
+      method: "PUT",
+      body: JSON.stringify({ content })
+    }),
+  jsonResource: (name: string, culture = "zh-CN") =>
+    request<EditableJsonResource>(`/admin/content/json/${encodeURIComponent(name)}?culture=${encodeURIComponent(culture)}`),
+  saveJsonResource: (name: string, content: string, culture = "zh-CN") =>
+    request<ContentSaveResult>(`/admin/content/json/${encodeURIComponent(name)}?culture=${encodeURIComponent(culture)}`, {
+      method: "PUT",
+      body: JSON.stringify({ content })
+    }),
+  assets: (path = "") => request<AssetDirectoryData>(`/admin/assets?path=${encodeURIComponent(path)}`),
+  uploadAsset: (path: string, name: string, file: File) =>
+    upload<AssetUploadResult>(`/admin/assets?path=${encodeURIComponent(path)}&name=${encodeURIComponent(name)}`, file),
+  deleteAsset: (path: string) => request<AssetUploadResult>(`/admin/assets?path=${encodeURIComponent(path)}`, { method: "DELETE" }),
+  tools: (culture = "zh-CN") => request<ToolNode[]>(`/tools?culture=${encodeURIComponent(culture)}`),
   gitStatus: () => request<GitCommandResult>("/admin/repository/status"),
+  gitStatusDetails: () => request<GitRepositoryStatusData>("/admin/repository/status/details"),
   gitLog: () => request<GitCommandResult>("/admin/repository/log?count=20"),
+  gitFile: (path: string) => request<GitFilePreviewResult>(`/admin/repository/file?path=${encodeURIComponent(path)}`),
   gitFetch: () => request<GitCommandResult>("/admin/repository/fetch", { method: "POST" }),
   gitPull: () => request<GitCommandResult>("/admin/repository/pull", { method: "POST" }),
   gitCommit: (message: string) =>

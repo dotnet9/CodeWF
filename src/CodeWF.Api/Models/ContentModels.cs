@@ -65,6 +65,7 @@ public sealed class ToolNode
     public string? Memo { get; set; }
     public string? Slug { get; set; }
     public string? Repository { get; set; }
+    public bool Hidden { get; set; }
     public List<ToolNode>? Children { get; set; }
 }
 
@@ -99,6 +100,47 @@ public sealed class TimelineItem
 
 public sealed record MarkdownPage(string? Markdown, string? HtmlContent);
 
+public sealed record EditableMarkdownResource(string Name, string Path, string? Markdown, string? HtmlContent);
+
+public sealed record EditableJsonResource(string Name, string Path, string? Json);
+
+public sealed record ContentSaveRequest(string Content);
+
+public sealed record AssetEntry(
+    string Name,
+    string Path,
+    bool IsDirectory,
+    long? Size,
+    DateTimeOffset? LastModified);
+
+public sealed record AssetDirectoryData(
+    string Root,
+    string Path,
+    IReadOnlyList<AssetEntry> Entries);
+
+public sealed record AssetUploadResult(bool Success, string Message, string? Path = null);
+
+public sealed class SiteSettingsRequest
+{
+    public string? AppTitle { get; set; }
+    public string? Domain { get; set; }
+    public string? Memo { get; set; }
+    public string? Owner { get; set; }
+    public string? OwnerDesc { get; set; }
+    public string? Favicon { get; set; }
+    public string? LocalAssetsDir { get; set; }
+    public string? AssetBaseUrl { get; set; }
+    public string? RemoteAssetsRepository { get; set; }
+    public int StartYear { get; set; }
+    public string? BaiAn { get; set; }
+    public string? WeChatName { get; set; }
+    public string? WeChatImg { get; set; }
+    public string? DefaultCulture { get; set; }
+    public List<string>? SupportedCultures { get; set; }
+}
+
+public sealed record SiteSettingsResult(bool Success, string Message, SiteInfo? Site = null);
+
 public sealed record SiteInfo(
     string AppTitle,
     string Domain,
@@ -106,6 +148,7 @@ public sealed record SiteInfo(
     string Owner,
     string? OwnerDesc,
     string? Favicon,
+    string LocalAssetsDir,
     string AssetBaseUrl,
     string? RemoteAssetsRepository,
     int StartYear,
@@ -183,5 +226,25 @@ public sealed class AdminPostRequest
 public sealed record AdminMutationResult(bool Success, string? Message, BlogPostBrief? Post = null);
 
 public sealed record GitCommandResult(bool Success, string Command, string Output, string Error, int ExitCode);
+
+public sealed record GitChangeEntry(
+    string Status,
+    string Path,
+    string? OriginalPath = null);
+
+public sealed record GitRepositoryStatusData(
+    string Branch,
+    IReadOnlyList<GitChangeEntry> Changes,
+    int ChangeCount);
+
+public sealed record GitFilePreviewResult(
+    bool Success,
+    string Path,
+    string Name,
+    string Kind,
+    string? TextContent = null,
+    string? DataUrl = null,
+    string? MimeType = null,
+    long? Size = null);
 
 public sealed record GitCommitRequest(string Message);
