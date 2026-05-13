@@ -13,7 +13,9 @@ export function PostCard({ post, locale, site }: { post: BlogPostBrief; locale: 
     <article className="post-card">
       {cover ? (
         <Link href={href} className="post-cover" aria-label={post.title}>
-          <Image src={cover} alt="" fill sizes="(max-width: 720px) 100vw, 360px" />
+          <Image className="post-cover__image" src={cover} alt="" fill sizes="(max-width: 720px) 100vw, 360px" />
+          <span className="post-cover__shine" aria-hidden="true" />
+          <span className="post-cover__glow" aria-hidden="true" />
         </Link>
       ) : null}
       <div className="post-card-body">

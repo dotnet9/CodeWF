@@ -1,19 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useMemo } from "react";
 import {
   ArrowUpRight,
   BookOpenText,
   ChevronDown,
   Clock3,
-  Code2,
   HeartHandshake,
   MapPinned,
   Rss,
   ShieldCheck,
   Tv2
 } from "lucide-react";
-import { dictionary, withLocale } from "@/i18n";
+import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
 import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
+
+const API_ORIGIN = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:5100/api")
+  .replace(/\/$/, "")
+  .replace(/\/api$/, "");
+const SITE_ICON_URL = `${API_ORIGIN}/site/favicon/logo.ico?v=20260513`;
 
 export function SiteHeader({
   locale,
@@ -29,13 +37,23 @@ export function SiteHeader({
   latestPost?: BlogPostBrief;
 }) {
   const t = dictionary(locale);
+  const pathname = usePathname();
+  const router = useRouter();
   const topCategories = categories.slice(0, 8);
   const topAlbums = albums.slice(0, 8);
+  const localeOptions = useMemo(() => locales.map((item) => ({ value: item, label: localeLabels[item] })), []);
+
+  const switchLocale = (nextLocale: Locale) => {
+    const current = pathname ?? withLocale(locale);
+    const suffix = typeof window === "undefined" ? "" : `${window.location.search}${window.location.hash}`;
+    const nextPath = current.replace(/^\/(zh-CN|zh-TW|en|ja)(?=\/|$)/i, `/${nextLocale}`);
+    router.push((nextPath === current ? withLocale(nextLocale) : nextPath) + suffix);
+  };
 
   return (
     <header className="site-header">
       <Link href={withLocale(locale)} className="brand" aria-label={site.appTitle}>
-        <Code2 size={24} />
+        <img className="brand-icon" src={SITE_ICON_URL} alt="" />
         <span>{site.appTitle}</span>
       </Link>
 
@@ -150,6 +168,16 @@ export function SiteHeader({
 
       <div className="header-actions">
         <GlobalSearch locale={locale} action={withLocale(locale, "/s")} placeholder={t.queryPlaceholder} label={t.search} />
+        <label className="header-locale-switch" aria-label={locale === "zh-CN" ? "切换语言" : "Switch language"}>
+          <span aria-hidden="true">A</span>
+          <select value={locale} onChange={(event) => switchLocale(event.target.value as Locale)}>
+            {localeOptions.map((item) => (
+              <option value={item.value} key={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </header>
   );

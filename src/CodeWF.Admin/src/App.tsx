@@ -26,6 +26,9 @@ import {
   Tooltip,
   Typography
 } from "antd";
+import { ConfigProvider } from "antd";
+import enUS from "antd/locale/en_US";
+import zhCN from "antd/locale/zh_CN";
 import type { ColumnsType } from "antd/es/table";
 import {
   AppstoreOutlined,
@@ -40,7 +43,6 @@ import {
   PlusOutlined,
   ReloadOutlined,
   SaveOutlined,
-  SecurityScanOutlined,
   SyncOutlined
 } from "@ant-design/icons";
 import {
@@ -63,13 +65,123 @@ import {
 } from "./api";
 
 const { Header, Content, Sider } = Layout;
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/$/, "");
+const API_ORIGIN = API_BASE.replace(/\/api$/, "");
+const SITE_LOGO_URL = `${API_ORIGIN}/site/favicon/logo.ico`;
+
+type AdminLocale = "zh-CN" | "en";
 
 const CULTURES = [
   { label: "简体中文", value: "zh-CN" },
-  { label: "英文", value: "en" },
-  { label: "日文", value: "ja" },
-  { label: "繁体中文", value: "zh-TW" }
+  { label: "English", value: "en" }
 ] as const;
+
+const ADMIN_TEXT: Record<
+  AdminLocale,
+  {
+    workspaceTitle: string;
+    workspaceSubtitle: string;
+    overview: string;
+    posts: string;
+    pages: string;
+    resources: string;
+    site: string;
+    repository: string;
+    logout: string;
+    contentShortcuts: string;
+    refresh: string;
+    articleManagement: string;
+    sitePages: string;
+    resourceRepo: string;
+    versionControl: string;
+    sitePreview: string;
+    defaultCulture: string;
+    siteTitle: string;
+    assetsDir: string;
+    record: string;
+    recentPosts: string;
+    bannerPosts: string;
+    recommendedTools: string;
+    noPosts: string;
+    noTools: string;
+    loginTitle: string;
+    loginSubtitle: string;
+    usernamePlaceholder: string;
+    passwordPlaceholder: string;
+    loginButton: string;
+    defaultAccount: string;
+    failedAuth: string;
+  }
+> = {
+  "zh-CN": {
+    workspaceTitle: "后台工作台",
+    workspaceSubtitle: "文件型内容仓库维护面板",
+    overview: "概览",
+    posts: "文章",
+    pages: "站点页",
+    resources: "资源仓库",
+    site: "站点设置",
+    repository: "版本控制",
+    logout: "退出",
+    contentShortcuts: "内容快捷入口",
+    refresh: "刷新",
+    articleManagement: "文章管理",
+    sitePages: "站点页",
+    resourceRepo: "资源仓库",
+    versionControl: "版本控制",
+    sitePreview: "站点结构预览",
+    defaultCulture: "默认语言",
+    siteTitle: "站点标题",
+    assetsDir: "资源目录",
+    record: "备案号",
+    recentPosts: "最新文章",
+    bannerPosts: "置顶文章",
+    recommendedTools: "工具推荐",
+    noPosts: "暂无文章",
+    noTools: "暂无工具",
+    loginTitle: "CodeWF 后台",
+    loginSubtitle: "进入工作台前需要先完成账号验证。",
+    usernamePlaceholder: "用户名",
+    passwordPlaceholder: "密码",
+    loginButton: "验证并进入",
+    defaultAccount: "默认账号：codewf / codewf.com",
+    failedAuth: "验证失败"
+  },
+  en: {
+    workspaceTitle: "Admin Workspace",
+    workspaceSubtitle: "File-based content repository console",
+    overview: "Overview",
+    posts: "Posts",
+    pages: "Pages",
+    resources: "Repository",
+    site: "Site Settings",
+    repository: "Git",
+    logout: "Sign out",
+    contentShortcuts: "Content shortcuts",
+    refresh: "Refresh",
+    articleManagement: "Post management",
+    sitePages: "Site pages",
+    resourceRepo: "Resource repo",
+    versionControl: "Version control",
+    sitePreview: "Site preview",
+    defaultCulture: "Default locale",
+    siteTitle: "Site title",
+    assetsDir: "Assets directory",
+    record: "备案号",
+    recentPosts: "Recent posts",
+    bannerPosts: "Featured posts",
+    recommendedTools: "Recommended tools",
+    noPosts: "No posts",
+    noTools: "No tools",
+    loginTitle: "CodeWF Admin",
+    loginSubtitle: "Verify your account before entering the workspace.",
+    usernamePlaceholder: "Username",
+    passwordPlaceholder: "Password",
+    loginButton: "Verify and enter",
+    defaultAccount: "Default account: codewf / codewf.com",
+    failedAuth: "Verification failed"
+  }
+};
 
 type ViewKey = "overview" | "posts" | "pages" | "resources" | "site" | "repository";
 type LoginState = "checking" | "locked" | "ready";
@@ -114,19 +226,47 @@ const JSON_RESOURCES: EditorSpec[] = [
   { name: "albums", label: "专题", description: "专题定义。", pathHint: "site/albums.json" }
 ];
 
+const ADMIN_LOCALE_STORAGE_KEY = "codewf.admin.locale";
+
+function readAdminLocale(): AdminLocale {
+  if (typeof window === "undefined") {
+    return "zh-CN";
+  }
+
+  const stored = window.localStorage.getItem(ADMIN_LOCALE_STORAGE_KEY);
+  return stored === "en" ? "en" : "zh-CN";
+}
+
 export default function App() {
+  const [culture, setCulture] = useState<AdminLocale>(readAdminLocale);
+  const antdLocale = culture === "en" ? enUS : zhCN;
+
+  useEffect(() => {
+    window.localStorage.setItem(ADMIN_LOCALE_STORAGE_KEY, culture);
+    document.title = culture === "en" ? "CodeWF Admin" : "CodeWF 后台";
+  }, [culture]);
+
   return (
-    <AntApp>
-      <AuthGate />
-    </AntApp>
+    <ConfigProvider locale={antdLocale} theme={{ token: { colorPrimary: "#0f766e", borderRadius: 8 } }}>
+      <AntApp>
+        <AuthGate culture={culture} onCultureChange={setCulture} />
+      </AntApp>
+    </ConfigProvider>
   );
 }
 
-function AuthGate() {
+function AuthGate({
+  culture,
+  onCultureChange
+}: {
+  culture: AdminLocale;
+  onCultureChange: (value: AdminLocale) => void;
+}) {
   const [state, setState] = useState<LoginState>("checking");
   const [credentials, setCredentials] = useState<AdminCredentials>(api.getCredentials());
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const text = ADMIN_TEXT[culture];
 
   useEffect(() => {
     if (!credentials.userName || !credentials.password) {
@@ -149,7 +289,7 @@ function AuthGate() {
       api.clearCredentials();
       setCredentials({ userName: "", password: "" });
       setState("locked");
-      setError(err instanceof Error ? err.message : "验证失败");
+      setError(err instanceof Error ? err.message : text.failedAuth);
     } finally {
       setPending(false);
     }
@@ -157,7 +297,7 @@ function AuthGate() {
 
   if (state === "checking") {
     return (
-      <CenteredShell>
+      <CenteredShell culture={culture} onCultureChange={onCultureChange}>
         <Spin size="large" />
       </CenteredShell>
     );
@@ -165,14 +305,22 @@ function AuthGate() {
 
   if (state === "locked") {
     return (
-      <CenteredShell>
-        <LoginPanel pending={pending} error={error} defaultValue={credentials} onSubmit={verify} />
+      <CenteredShell culture={culture} onCultureChange={onCultureChange}>
+        <LoginPanel
+          culture={culture}
+          pending={pending}
+          error={error}
+          defaultValue={credentials}
+          onSubmit={verify}
+        />
       </CenteredShell>
     );
   }
 
   return (
     <Workspace
+      culture={culture}
+      onCultureChange={onCultureChange}
       onLogout={() => {
         api.clearCredentials();
         setCredentials({ userName: "", password: "" });
@@ -182,105 +330,134 @@ function AuthGate() {
   );
 }
 
-function CenteredShell({ children }: { children: ReactNode }) {
+function CenteredShell({
+  children,
+  culture,
+  onCultureChange
+}: {
+  children: ReactNode;
+  culture: AdminLocale;
+  onCultureChange: (value: AdminLocale) => void;
+}) {
   return (
     <Layout className="login-shell">
-      <Card className="login-card">{children}</Card>
+      <Card className="login-card">
+        <div className="login-shell__locale">
+          <Select
+            value={culture}
+            onChange={onCultureChange}
+            className="culture-select"
+            options={CULTURES.map((item) => ({ label: item.label, value: item.value }))}
+          />
+        </div>
+        {children}
+      </Card>
     </Layout>
   );
 }
 
 function LoginPanel({
+  culture,
   pending,
   error,
   defaultValue,
   onSubmit
 }: {
+  culture: AdminLocale;
   pending: boolean;
   error: string | null;
   defaultValue: AdminCredentials;
   onSubmit: (value: AdminCredentials) => Promise<void>;
 }) {
   const [value, setValue] = useState<AdminCredentials>(defaultValue);
+  const text = ADMIN_TEXT[culture];
 
   return (
     <div className="login-panel">
       <div className="login-brand">
-        <SecurityScanOutlined />
+        <img className="brand-icon" src={SITE_LOGO_URL} alt="" />
         <div>
-          <Typography.Title level={3}>CodeWF 后台</Typography.Title>
-          <Typography.Paragraph type="secondary">进入工作台前需要先完成账号验证。</Typography.Paragraph>
+          <Typography.Title level={3}>{text.loginTitle}</Typography.Title>
+          <Typography.Paragraph type="secondary">{text.loginSubtitle}</Typography.Paragraph>
         </div>
       </div>
-      {error ? <Alert type="error" showIcon message="验证失败" description={error} /> : null}
+      {error ? <Alert type="error" showIcon message={text.failedAuth} description={error} /> : null}
       <Space direction="vertical" className="wide" size={12}>
         <Input
           value={value.userName}
           onChange={(event) => setValue((current) => ({ ...current, userName: event.target.value }))}
           onPressEnter={() => onSubmit(value)}
-          placeholder="用户名"
+          placeholder={text.usernamePlaceholder}
         />
         <Input.Password
           value={value.password}
           onChange={(event) => setValue((current) => ({ ...current, password: event.target.value }))}
           onPressEnter={() => onSubmit(value)}
-          placeholder="密码"
+          placeholder={text.passwordPlaceholder}
         />
         <Button type="primary" loading={pending} onClick={() => onSubmit(value)}>
-          验证并进入
+          {text.loginButton}
         </Button>
       </Space>
-      <Typography.Text type="secondary">默认账号：codewf / codewf.com</Typography.Text>
+      <Typography.Text type="secondary">{text.defaultAccount}</Typography.Text>
     </div>
   );
 }
 
-function Workspace({ onLogout }: { onLogout: () => void }) {
+function Workspace({
+  culture,
+  onCultureChange,
+  onLogout
+}: {
+  culture: AdminLocale;
+  onCultureChange: (value: AdminLocale) => void;
+  onLogout: () => void;
+}) {
   const [view, setView] = useState<ViewKey>("overview");
   const [collapsed, setCollapsed] = useState(false);
-  const [culture, setCulture] = useState("zh-CN");
+  const text = ADMIN_TEXT[culture];
 
   return (
     <Layout className="admin-shell">
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} theme="light" width={252} className="admin-sider">
         <div className="admin-brand">
-          <FolderOpenOutlined />
-          <span>{collapsed ? "CW" : "CodeWF 后台"}</span>
+          <img className="brand-icon" src={SITE_LOGO_URL} alt="" />
+          <span>{collapsed ? "CW" : text.workspaceTitle}</span>
         </div>
         <Menu
           mode="inline"
           selectedKeys={[view]}
           onClick={(event) => setView(event.key as ViewKey)}
           items={[
-            { key: "overview", icon: <DashboardOutlined />, label: "概览" },
-            { key: "posts", icon: <FileTextOutlined />, label: "文章" },
-            { key: "pages", icon: <BookOutlined />, label: "站点页" },
-            { key: "resources", icon: <AppstoreOutlined />, label: "资源仓库" },
-            { key: "site", icon: <DashboardOutlined />, label: "站点设置" },
-            { key: "repository", icon: <BranchesOutlined />, label: "版本控制" }
+            { key: "overview", icon: <DashboardOutlined />, label: text.overview },
+            { key: "posts", icon: <FileTextOutlined />, label: text.posts },
+            { key: "pages", icon: <BookOutlined />, label: text.pages },
+            { key: "resources", icon: <AppstoreOutlined />, label: text.resources },
+            { key: "site", icon: <DashboardOutlined />, label: text.site },
+            { key: "repository", icon: <BranchesOutlined />, label: text.repository }
           ]}
         />
       </Sider>
       <Layout className="admin-main">
         <Header className="admin-header">
           <div className="admin-header__title">
-            <Typography.Title level={4}>后台工作台</Typography.Title>
-            <Typography.Text type="secondary">文件型内容仓库维护面板</Typography.Text>
+            <Typography.Title level={4}>{text.workspaceTitle}</Typography.Title>
+            <Typography.Text type="secondary">{text.workspaceSubtitle}</Typography.Text>
           </div>
           <Space wrap>
             <Select
               value={culture}
-              onChange={setCulture}
+              onChange={onCultureChange}
               className="culture-select"
               options={CULTURES.map((item) => ({ label: item.label, value: item.value }))}
             />
             <Button icon={<LogoutOutlined />} onClick={onLogout}>
-              退出
+              {text.logout}
             </Button>
           </Space>
         </Header>
         <Content className="admin-content">
-          <div className="admin-content-scroll">
+          <div className="admin-content-scroll" key={view}>
             {view === "overview" ? <Overview culture={culture} onJump={setView} /> : null}
             {view === "posts" ? <Posts /> : null}
             {view === "pages" ? <MarkdownPages culture={culture} /> : null}
@@ -294,15 +471,16 @@ function Workspace({ onLogout }: { onLogout: () => void }) {
   );
 }
 
-function Overview({ culture, onJump }: { culture: string; onJump: (view: ViewKey) => void }) {
+function Overview({ culture, onJump }: { culture: AdminLocale; onJump: (view: ViewKey) => void }) {
   const [home, setHome] = useState<HomePageData | null>(null);
   const { message } = AntApp.useApp();
+  const text = ADMIN_TEXT[culture];
 
   const refresh = async () => {
     try {
       setHome(await api.home(culture));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "概览加载失败");
+      message.error(error instanceof Error ? error.message : `${text.overview} ${culture === "en" ? "load failed" : "加载失败"}`);
       setHome(null);
     }
   };
@@ -331,35 +509,37 @@ function Overview({ culture, onJump }: { culture: string; onJump: (view: ViewKey
 
       <Row gutter={[16, 16]}>
         <Col span={12}>
-          <Card title="内容快捷入口" extra={<Button icon={<ReloadOutlined />} onClick={refresh}>刷新</Button>}>
+          <Card title={text.contentShortcuts} extra={<Button icon={<ReloadOutlined />} onClick={refresh}>{text.refresh}</Button>}>
             <Space wrap>
-              <Button onClick={() => onJump("posts")}>文章管理</Button>
-              <Button onClick={() => onJump("pages")}>站点页</Button>
-              <Button onClick={() => onJump("resources")}>资源仓库</Button>
-              <Button onClick={() => onJump("repository")}>版本控制</Button>
+              <Button onClick={() => onJump("posts")}>{text.articleManagement}</Button>
+              <Button onClick={() => onJump("pages")}>{text.sitePages}</Button>
+              <Button onClick={() => onJump("resources")}>{text.resourceRepo}</Button>
+              <Button onClick={() => onJump("repository")}>{text.versionControl}</Button>
             </Space>
             <Typography.Paragraph type="secondary" className="section-note">
-              这里展示站点内容的最近状态，便于快速确认首页内容是否更新。
+              {culture === "en"
+                ? "This shows the latest site state so you can verify the homepage content quickly."
+                : "这里展示站点内容的最近状态，便于快速确认首页内容是否更新。"}
             </Typography.Paragraph>
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="站点结构预览">
+          <Card title={text.sitePreview}>
             <div className="summary-grid">
               <div>
-                <Typography.Text type="secondary">默认语言</Typography.Text>
+                <Typography.Text type="secondary">{text.defaultCulture}</Typography.Text>
                 <div>{home?.site.defaultCulture ?? culture}</div>
               </div>
               <div>
-                <Typography.Text type="secondary">站点标题</Typography.Text>
+                <Typography.Text type="secondary">{text.siteTitle}</Typography.Text>
                 <div>{home?.site.appTitle ?? "-"}</div>
               </div>
               <div>
-                <Typography.Text type="secondary">资源目录</Typography.Text>
+                <Typography.Text type="secondary">{text.assetsDir}</Typography.Text>
                 <div>{home?.site.localAssetsDir ?? "-"}</div>
               </div>
               <div>
-                <Typography.Text type="secondary">备案号</Typography.Text>
+                <Typography.Text type="secondary">{text.record}</Typography.Text>
                 <div>{home?.site.baiAn ?? "-"}</div>
               </div>
             </div>
@@ -367,25 +547,25 @@ function Overview({ culture, onJump }: { culture: string; onJump: (view: ViewKey
         </Col>
       </Row>
 
-      <Card title="最近文章" extra={<Tag color="blue">{(home?.recentPosts ?? []).length} 篇</Tag>}>
-        <CompactPostGrid items={home?.recentPosts ?? []} />
+      <Card title={text.recentPosts} extra={<Tag color="blue">{(home?.recentPosts ?? []).length} 篇</Tag>}>
+        <CompactPostGrid culture={culture} items={home?.recentPosts ?? []} />
       </Card>
 
-      <Card title="置顶文章" extra={<Tag color="cyan">{(home?.bannerPosts ?? []).length} 篇</Tag>}>
-        <CompactPostGrid items={home?.bannerPosts ?? []} />
+      <Card title={text.bannerPosts} extra={<Tag color="cyan">{(home?.bannerPosts ?? []).length} 篇</Tag>}>
+        <CompactPostGrid culture={culture} items={home?.bannerPosts ?? []} />
       </Card>
 
-      <Card title="工具推荐">
-        <ToolGrid tools={home?.tools ?? []} />
+      <Card title={text.recommendedTools}>
+        <ToolGrid culture={culture} tools={home?.tools ?? []} />
       </Card>
     </div>
   );
 }
 
-function CompactPostGrid({ items }: { items: BlogPostBrief[] }) {
+function CompactPostGrid({ culture, items }: { culture: AdminLocale; items: BlogPostBrief[] }) {
   const list = items.slice(0, 3);
   if (list.length === 0) {
-    return <Empty description="暂无文章" />;
+    return <Empty description={ADMIN_TEXT[culture].noPosts} />;
   }
 
   return (
@@ -409,10 +589,10 @@ function CompactPostGrid({ items }: { items: BlogPostBrief[] }) {
   );
 }
 
-function ToolGrid({ tools }: { tools: ToolNode[] }) {
+function ToolGrid({ culture, tools }: { culture: AdminLocale; tools: ToolNode[] }) {
   const flattened = useMemo(() => flattenTools(tools).slice(0, 12), [tools]);
   if (flattened.length === 0) {
-    return <Empty description="暂无工具" />;
+    return <Empty description={ADMIN_TEXT[culture].noTools} />;
   }
 
   return (

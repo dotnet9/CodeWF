@@ -50,6 +50,18 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePages();
 app.UseCors("frontend");
 
+app.MapGet("/site/favicon/logo.ico", (IOptionsMonitor<SiteOptions> siteOptions) =>
+{
+    var root = Environment.ExpandEnvironmentVariables(siteOptions.CurrentValue.LocalAssetsDir);
+    var path = Path.GetFullPath(Path.Combine(root, "site", "favicon", "logo.ico"));
+    if (!File.Exists(path))
+    {
+        return Results.NotFound();
+    }
+
+    return Results.File(path, "image/x-icon");
+});
+
 var api = app.MapGroup("/api");
 
 api.MapGet("/health", () => Results.Ok(new { status = "ok", at = DateTimeOffset.UtcNow }));

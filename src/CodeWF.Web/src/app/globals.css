@@ -140,11 +140,57 @@ img {
   letter-spacing: -0.01em;
 }
 
+.brand-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  padding: 2px;
+  object-fit: contain;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
 .main-nav,
 .header-actions {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.header-locale-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 10px 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(24, 32, 47, 0.05);
+  color: var(--muted);
+}
+
+.header-locale-switch span {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.header-locale-switch select {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
 }
 
 .main-nav {
@@ -513,6 +559,29 @@ img {
   padding: 32px 0 56px;
   flex: 1;
   animation: page-rise 360ms ease both;
+}
+
+.route-transition-shell {
+  position: relative;
+}
+
+.route-transition-frame {
+  animation: route-enter 240ms ease both;
+}
+
+.route-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(244, 247, 251, 0.26);
+  backdrop-filter: blur(1px);
+  transition: opacity 160ms ease;
+}
+
+.route-transition-shell.is-navigating .route-transition-overlay {
+  opacity: 1;
 }
 
 .page-stack {
@@ -924,11 +993,48 @@ img {
   position: relative;
   display: block;
   height: 176px;
-  background: var(--soft);
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(14, 118, 103, 0.16), rgba(255, 255, 255, 0) 60%),
+    var(--soft);
 }
 
-.post-cover img {
+.post-cover__image {
   object-fit: cover;
+  transform: scale(1);
+  transition: transform 320ms ease;
+}
+
+.post-cover:hover .post-cover__image {
+  transform: scale(1.05);
+}
+
+.post-cover::before,
+.post-cover::after,
+.post-cover__shine,
+.post-cover__glow {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.post-cover::before {
+  background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.3) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: cover-sheen 7s ease-in-out infinite;
+}
+
+.post-cover::after {
+  background: linear-gradient(180deg, transparent 55%, rgba(6, 16, 31, 0.18));
+}
+
+.post-cover__shine {
+  background: radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.24), transparent 42%);
+}
+
+.post-cover__glow {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 28%);
 }
 
 .post-card-body {
@@ -1743,6 +1849,29 @@ img {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cover-sheen {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
   }
 }
 
