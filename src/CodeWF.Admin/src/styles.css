@@ -26,31 +26,137 @@ body {
 }
 
 .admin-sider {
+  background: #fff;
   border-right: 1px solid #e5e7eb;
 }
 
 .admin-brand {
-  height: 56px;
+  min-height: 72px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 18px;
-  color: #0f766e;
-  font-size: 17px;
-  font-weight: 800;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  color: #0f172a;
   border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
 }
 
 .brand-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-  flex: 0 0 24px;
-  padding: 2px;
-  border-radius: 6px;
+  flex: 0 0 32px;
+  padding: 3px;
+  border-radius: 8px;
   background: #fff;
   border: 1px solid #dbe2ea;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.admin-brand__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-brand__copy strong {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.admin-brand__copy span {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.admin-brand__abbr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #e11d48;
+  font-weight: 800;
+}
+
+.admin-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.admin-menu {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 8px 16px;
+  border-inline-end: 0 !important;
+}
+
+.admin-menu .ant-menu-item,
+.admin-menu .ant-menu-submenu-title {
+  width: auto;
+  height: 42px;
+  line-height: 42px;
+  margin: 4px 6px;
+  border-radius: 8px;
+}
+
+.admin-menu .ant-menu-item-group-title {
+  padding: 18px 16px 8px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-menu .ant-menu-item-selected {
+  background: rgba(244, 63, 94, 0.12) !important;
+  color: #e11d48 !important;
+}
+
+.admin-menu .ant-menu-item-selected::after {
+  border-right-width: 0;
+}
+
+.admin-menu .ant-menu-title-content {
+  min-width: 0;
+}
+
+.admin-menu .ant-menu-item .anticon,
+.admin-menu .ant-menu-submenu-title .anticon {
+  font-size: 16px;
+}
+
+.admin-menu-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.admin-menu-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #e11d48;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ant-layout-sider-collapsed .admin-menu .ant-menu-item-group-title {
+  display: none;
 }
 
 .admin-main {

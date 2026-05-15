@@ -42,6 +42,27 @@ export type TaxonomyItem = {
   postCount: number;
 };
 
+export type FriendLinkItem = {
+  Index: number;
+  Title?: string;
+  Description?: string;
+  Link?: string;
+  Logo?: string;
+};
+
+export type TimelineItem = {
+  Time?: string;
+  Title?: string;
+  Content?: string;
+};
+
+export type SearchBlockedKeywordGroup = {
+  Sort: number;
+  Name?: string;
+  Memo?: string;
+  Keywords?: string[];
+};
+
 export type SiteInfo = {
   appTitle: string;
   domain: string;

@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Github, Rss } from "lucide-react";
+import { ArrowUpRight, Github, Rss } from "lucide-react";
 import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
+
+const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3001").replace(/\/$/, "");
 
 export function SiteFooter({
   locale,
@@ -89,6 +91,9 @@ export function SiteFooter({
             </a>
             <a href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">
               {t.feedback}
+            </a>
+            <a href={ADMIN_URL} target="_blank" rel="noreferrer">
+              <ArrowUpRight size={15} /> {locale === "zh-CN" ? "后台" : "Admin"}
             </a>
             {site.remoteAssetsRepository ? (
               <a href={site.remoteAssetsRepository} target="_blank" rel="noreferrer">
