@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "antd": "^5.22.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

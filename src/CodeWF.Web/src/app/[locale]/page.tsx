@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { api } from "@/api";
+import type { CSSProperties } from "react";
+import { api, resolveAssetUrl } from "@/api";
 import { PostCard } from "@/components/PostCard";
 import { dictionary, withLocale } from "@/i18n";
 import type { ToolNode } from "@/types";
@@ -10,12 +11,23 @@ export default async function HomePage({ params }: LocalePageProps) {
   const home = await api.home(locale);
   const t = dictionary(locale);
   const featuredPosts = home.bannerPosts.slice(0, 3);
-  const recentPosts = home.recentPosts.slice(0, 3);
+  const featuredKeys = new Set(featuredPosts.map((post) => post.slug ?? post.url ?? post.title).filter(Boolean));
+  const recentPosts = home.recentPosts
+    .filter((post) => !featuredKeys.has(post.slug ?? post.url ?? post.title))
+    .slice(0, 3);
   const recommendedTools = shuffle(collectToolLeaves(home.tools)).slice(0, 12);
+  const heroImage = resolveAssetUrl(home.site, "site/banners/banner.jpg");
+  const heroStyle = heroImage ? ({ "--hero-image": `url("${heroImage}")` } as CSSProperties) : undefined;
+  const metrics = [
+    { value: home.counts.posts ?? 0, label: t.posts },
+    { value: home.counts.tools ?? 0, label: t.tools },
+    { value: home.counts.docs ?? 0, label: t.projects },
+    { value: home.counts.categories ?? 0, label: t.categories }
+  ];
 
   return (
     <main className="page-wrap page-stack">
-      <section className="home-hero surface-panel">
+      <section className="home-hero" style={heroStyle}>
         <div className="home-hero__content">
           <span className="eyebrow">CodeWF</span>
           <h1>{home.site.appTitle}</h1>
@@ -32,18 +44,31 @@ export default async function HomePage({ params }: LocalePageProps) {
             </Link>
           </div>
         </div>
+        <div className="home-hero__rail" aria-label="C# example">
+          <div className="home-code-card">
+            <div className="home-code-card__bar">
+              <span>C#</span>
+              <small>.NET / Markdown / Tools</small>
+            </div>
+            <pre>
+              <code>{`var home = await CodeWF
+    .LoadAsync(locale);
+
+var posts = home.Posts
+    .Published()
+    .Latest(3);
+
+return home.WithTools(12);`}</code>
+            </pre>
+          </div>
+        </div>
       </section>
 
       <section className="metric-row" aria-label="Site metrics">
-        {[
-          [home.counts.posts ?? 0, t.posts],
-          [home.counts.tools ?? 0, t.tools],
-          [home.counts.docs ?? 0, t.projects],
-          [home.counts.categories ?? 0, t.categories]
-        ].map(([value, label]) => (
-          <div className="metric" key={label}>
-            <strong>{value}</strong>
-            <span>{label}</span>
+        {metrics.map((item) => (
+          <div className="metric" key={item.label}>
+            <strong>{item.value}</strong>
+            <span>{item.label}</span>
           </div>
         ))}
       </section>
@@ -59,9 +84,11 @@ export default async function HomePage({ params }: LocalePageProps) {
           </Link>
         </div>
         <div className="post-grid post-grid--three">
-          {featuredPosts.map((post) => (
-            <PostCard post={post} locale={locale} site={home.site} key={`${post.date}-${post.slug}`} />
-          ))}
+          {featuredPosts.length > 0 ? (
+            featuredPosts.map((post) => <PostCard post={post} locale={locale} site={home.site} key={`${post.date}-${post.slug}`} />)
+          ) : (
+            <div className="empty-state">{t.empty}</div>
+          )}
         </div>
       </section>
 
@@ -76,13 +103,15 @@ export default async function HomePage({ params }: LocalePageProps) {
           </Link>
         </div>
         <div className="post-grid post-grid--three">
-          {recentPosts.map((post) => (
-            <PostCard post={post} locale={locale} site={home.site} key={`${post.date}-${post.slug}`} />
-          ))}
+          {recentPosts.length > 0 ? (
+            recentPosts.map((post) => <PostCard post={post} locale={locale} site={home.site} key={`${post.date}-${post.slug}`} />)
+          ) : (
+            <div className="empty-state">{t.empty}</div>
+          )}
         </div>
       </section>
 
-      <section className="home-section taxonomy-panel home-tools-panel">
+      <section className="home-section home-tools-panel">
         <div className="section-head">
           <div>
             <h2>{t.recommendedTools}</h2>
@@ -93,13 +122,17 @@ export default async function HomePage({ params }: LocalePageProps) {
           </Link>
         </div>
         <div className="home-tool-grid">
-          {recommendedTools.map((tool) => (
-            <Link className="home-tool-card" href={withLocale(locale, `/tool/${encodeURIComponent(tool.slug ?? "")}`)} key={tool.slug}>
-              <span className="card-kicker">{locale === "zh-CN" ? "工具推荐" : "Tool"}</span>
-              <strong>{tool.name}</strong>
-              {tool.memo ? <p>{tool.memo}</p> : null}
-            </Link>
-          ))}
+          {recommendedTools.length > 0 ? (
+            recommendedTools.map((tool) => (
+              <Link className="home-tool-card" href={withLocale(locale, `/tool/${encodeURIComponent(tool.slug ?? "")}`)} key={tool.slug}>
+                <span className="card-kicker">{locale === "zh-CN" ? "工具推荐" : "Tool"}</span>
+                <strong>{tool.name}</strong>
+                {tool.memo ? <p>{tool.memo}</p> : null}
+              </Link>
+            ))
+          ) : (
+            <div className="empty-state empty-state--compact">{t.empty}</div>
+          )}
         </div>
       </section>
     </main>

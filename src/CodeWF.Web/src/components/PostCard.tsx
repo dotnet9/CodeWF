@@ -8,16 +8,21 @@ import type { BlogPostBrief, Locale, SiteInfo } from "@/types";
 export function PostCard({ post, locale, site }: { post: BlogPostBrief; locale: Locale; site: SiteInfo }) {
   const href = withLocale(locale, post.url ?? "/post");
   const cover = resolveAssetUrl(site, post.cover);
+  const fallbackLabel = post.categories?.[0] ?? site.appTitle;
 
   return (
     <article className="post-card">
-      {cover ? (
-        <Link href={href} className="post-cover" aria-label={post.title}>
+      <Link href={href} className={cover ? "post-cover" : "post-cover post-cover--placeholder"} aria-label={post.title}>
+        {cover ? (
           <Image className="post-cover__image" src={cover} alt="" fill sizes="(max-width: 720px) 100vw, 360px" />
-          <span className="post-cover__shine" aria-hidden="true" />
-          <span className="post-cover__glow" aria-hidden="true" />
-        </Link>
-      ) : null}
+        ) : (
+          <span className="post-cover__placeholder">
+            <span>{fallbackLabel}</span>
+          </span>
+        )}
+        <span className="post-cover__shine" aria-hidden="true" />
+        <span className="post-cover__glow" aria-hidden="true" />
+      </Link>
       <div className="post-card-body">
         <div className="post-meta">
           <CalendarDays size={15} />

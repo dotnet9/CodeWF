@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState, type Key, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type Key, type ReactNode } from "react";
 import {
   Alert,
   App as AntApp,
@@ -81,6 +81,13 @@ type AdminLocale = "zh-CN" | "en";
 const CULTURES = [
   { label: "简体中文", value: "zh-CN" },
   { label: "English", value: "en" }
+] as const;
+
+const SITE_CULTURES = [
+  { label: "简体中文", value: "zh-CN" },
+  { label: "English", value: "en" },
+  { label: "日本語", value: "ja" },
+  { label: "繁體中文", value: "zh-TW" }
 ] as const;
 
 const ADMIN_TEXT: Record<
@@ -269,11 +276,11 @@ export default function App() {
 
   useEffect(() => {
     window.localStorage.setItem(ADMIN_LOCALE_STORAGE_KEY, culture);
-    document.title = culture === "en" ? "CodeWF Admin" : "CodeWF 鍚庡彴";
+    document.title = culture === "en" ? "CodeWF Admin" : "CodeWF 后台";
   }, [culture]);
 
   return (
-    <ConfigProvider locale={antdLocale} theme={{ token: { colorPrimary: "#f43f5e", borderRadius: 8 } }}>
+    <ConfigProvider locale={antdLocale} theme={{ token: { colorPrimary: "#0e7667", borderRadius: 8 } }}>
       <AntApp>
         <AuthGate culture={culture} onCultureChange={setCulture} />
       </AntApp>
@@ -516,7 +523,7 @@ function buildAdminMenuItems(culture: AdminLocale, text: AdminText): MenuProps["
         {
           key: "content-pages",
           icon: <BookOutlined />,
-          label: menuLabel(culture === "en" ? "Site pages" : "绔欑偣椤甸潰", MARKDOWN_PAGES.length),
+          label: menuLabel(culture === "en" ? "Site pages" : "站点页面", MARKDOWN_PAGES.length),
           children: MARKDOWN_PAGES.map((item) => ({
             key: `page:${item.name}`,
             label: item.label
@@ -525,7 +532,7 @@ function buildAdminMenuItems(culture: AdminLocale, text: AdminText): MenuProps["
         {
           key: "content-taxonomy",
           icon: <TagsOutlined />,
-          label: menuLabel(culture === "en" ? "Taxonomy" : "鏍忕洰涓撻", taxonomyResources.length),
+          label: menuLabel(culture === "en" ? "Taxonomy" : "栏目专题", taxonomyResources.length),
           children: taxonomyResources.map((item) => ({
             key: `json:${item.name}`,
             label: item.label
@@ -540,10 +547,10 @@ function buildAdminMenuItems(culture: AdminLocale, text: AdminText): MenuProps["
         {
           key: "data-json",
           icon: <DatabaseOutlined />,
-          label: menuLabel(culture === "en" ? "Config data" : "閰嶇疆鏁版嵁", dataResources.length),
+          label: menuLabel(culture === "en" ? "Config data" : "配置数据", dataResources.length),
           children: dataResources.map((item) => ({
             key: `json:${item.name}`,
-            label: item.name === "tools" ? (culture === "en" ? "Tools JSON" : "宸ュ叿 JSON") : item.label
+            label: item.name === "tools" ? (culture === "en" ? "Tools JSON" : "工具 JSON") : item.label
           }))
         },
         { key: "assets", icon: <FolderOpenOutlined />, label: text.resourceRepo }
@@ -649,7 +656,7 @@ function Overview({ culture, onJump }: { culture: AdminLocale; onJump: (view: Vi
     try {
       setHome(await api.home(culture));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : `${text.overview} ${culture === "en" ? "load failed" : "鍔犺浇澶辫触"}`);
+      message.error(error instanceof Error ? error.message : `${text.overview} ${culture === "en" ? "load failed" : "加载失败"}`);
       setHome(null);
     }
   };
@@ -664,11 +671,11 @@ function Overview({ culture, onJump }: { culture: AdminLocale; onJump: (view: Vi
     <div className="workspace-stack">
       <div className="stat-grid">
         {[
-          ["鏂囩珷", counts.posts ?? 0],
-          ["宸ュ叿", counts.tools ?? 0],
-          ["鏂囨。", counts.docs ?? 0],
-          ["鍒嗙被", counts.categories ?? 0],
-          ["涓撻", counts.albums ?? 0]
+          ["文章", counts.posts ?? 0],
+          ["工具", counts.tools ?? 0],
+          ["文档", counts.docs ?? 0],
+          ["分类", counts.categories ?? 0],
+          ["专题", counts.albums ?? 0]
         ].map(([label, value]) => (
           <Card key={label as string}>
             <Statistic title={label as string} value={value as number} />
@@ -742,7 +749,7 @@ function CompactPostGrid({ culture, items }: { culture: AdminLocale; items: Blog
       {list.map((item) => (
         <article key={item.slug ?? item.title} className="post-tile">
           <Space size={6} wrap>
-            {item.banner ? <Tag color="cyan">缃《</Tag> : null}
+            {item.banner ? <Tag color="cyan">置顶</Tag> : null}
             {item.draft ? <Tag color="orange">草稿</Tag> : <Tag color="green">已发布</Tag>}
           </Space>
           <Typography.Title level={5} ellipsis={{ rows: 1, tooltip: item.title }}>
@@ -775,7 +782,7 @@ function ToolGrid({ culture, tools }: { culture: AdminLocale; tools: ToolNode[] 
             <Tag>{item.group}</Tag>
           </div>
           <Typography.Paragraph className="tool-tile__desc" ellipsis={{ rows: 2, tooltip: item.memo }}>
-            {item.memo || "鏆傛棤璇存槑"}
+            {item.memo || "暂无说明"}
           </Typography.Paragraph>
         </article>
       ))}
@@ -790,7 +797,7 @@ type FlatTool = {
   memo: string;
 };
 
-function flattenTools(nodes: ToolNode[], group = "宸ュ叿") {
+function flattenTools(nodes: ToolNode[], group = "工具") {
   const items: FlatTool[] = [];
   for (const node of nodes) {
     if (node.hidden) {
@@ -832,7 +839,7 @@ function Posts() {
       setTotal(result.total);
       setPage(result.pageIndex);
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "鏂囩珷鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "文章加载失败");
     } finally {
       setLoading(false);
     }
@@ -844,7 +851,7 @@ function Posts() {
 
   const columns: ColumnsType<BlogPostBrief> = [
     {
-      title: "鏍囬",
+      title: "标题",
       dataIndex: "title",
       render: (value, record) => (
         <Space direction="vertical" size={0}>
@@ -854,7 +861,7 @@ function Posts() {
       )
     },
     {
-      title: "鏇存柊",
+      title: "更新",
       width: 132,
       render: (_, record) => formatDate(record.lastmod ?? record.date)
     },
@@ -863,17 +870,17 @@ function Posts() {
       width: 150,
       render: (_, record) => (
         <Space wrap size={4}>
-          {record.banner ? <Tag color="cyan">缃《</Tag> : null}
+          {record.banner ? <Tag color="cyan">置顶</Tag> : null}
           {record.draft ? <Tag color="orange">草稿</Tag> : <Tag color="green">已发布</Tag>}
         </Space>
       )
     },
     {
-      title: "鎿嶄綔",
+      title: "操作",
       width: 120,
       render: (_, record) => (
         <Button icon={<EditOutlined />} onClick={() => openEdit(record.slug)}>
-          缂栬緫
+          编辑
         </Button>
       )
     }
@@ -918,7 +925,7 @@ function Posts() {
     } else {
       await api.createPost(payload);
     }
-    message.success("淇濆瓨鎴愬姛");
+    message.success("保存成功");
     setEditorOpen(false);
     load();
   }
@@ -929,7 +936,7 @@ function Posts() {
     }
 
     Modal.confirm({
-      title: "鍒犻櫎鏂囩珷",
+      title: "删除文章",
       content: slug,
       okButtonProps: { danger: true },
       onOk: async () => {
@@ -954,10 +961,10 @@ function Posts() {
             style={{ width: 300 }}
           />
           <Button icon={<ReloadOutlined />} onClick={() => load()}>
-            鍒锋柊
+            刷新
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-            鏂板缓
+            新建
           </Button>
         </Space>
       }
@@ -970,16 +977,17 @@ function Posts() {
         pagination={{ current: page, total, pageSize: 20, onChange: load, showSizeChanger: false }}
       />
       <Modal
-        title={editing ? "缂栬緫鏂囩珷" : "鏂板缓鏂囩珷"}
+        title={editing ? "编辑文章" : "新建文章"}
         open={editorOpen}
         width={1280}
         onCancel={() => setEditorOpen(false)}
+        forceRender
         destroyOnClose
         footer={
           <Space>
-            <Button onClick={() => setEditorOpen(false)}>鍙栨秷</Button>
+            <Button onClick={() => setEditorOpen(false)}>取消</Button>
             <Button type="primary" icon={<SaveOutlined />} onClick={save}>
-              淇濆瓨
+              保存
             </Button>
           </Space>
         }
@@ -1040,15 +1048,15 @@ function Posts() {
           <Form.Item name="albumsText" label="专题">
             <Input placeholder="用逗号分隔" />
           </Form.Item>
-          <Form.Item name="tagsText" label="鏍囩">
-            <Input placeholder="鐢ㄩ€楀彿鍒嗛殧" />
+          <Form.Item name="tagsText" label="标签">
+            <Input placeholder="用逗号分隔" />
           </Form.Item>
-          <Form.Item name="content" label="Markdown 姝ｆ枃">
+          <Form.Item name="content" label="Markdown 正文">
             <Input.TextArea rows={22} className="code-area" />
           </Form.Item>
           <Typography.Text type="secondary">文章编辑采用弹窗而不是右侧抽屉，避免长文内容被截断。</Typography.Text>
           <Button danger onClick={() => remove(editing?.slug)} className="post-delete-btn">
-            鍒犻櫎褰撳墠鏂囩珷
+            删除当前文章
           </Button>
         </Form>
       </Modal>
@@ -1086,7 +1094,7 @@ function SiteSettingsEditor() {
         supportedCultures: data.supportedCultures
       });
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "绔欑偣璁剧疆鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "站点设置加载失败");
       setSettings(null);
     } finally {
       setLoading(false);
@@ -1118,30 +1126,28 @@ function SiteSettingsEditor() {
 
   return (
     <Card
-      title="绔欑偣璁剧疆"
+      title="站点设置"
       extra={
         <Space>
           <Button icon={<ReloadOutlined />} onClick={load}>
-            鍒锋柊
+            刷新
           </Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>
-            淇濆瓨
+            保存
           </Button>
         </Space>
       }
     >
-      {loading ? (
-        <Spin />
-      ) : (
-        <Form form={form} layout="vertical">
+      {loading ? <Spin /> : null}
+      <Form form={form} layout="vertical" className={loading ? "admin-form-hidden" : undefined}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="appTitle" label="绔欑偣鏍囬">
+              <Form.Item name="appTitle" label="站点标题">
                 <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="domain" label="绔欑偣鍩熷悕">
+              <Form.Item name="domain" label="站点域名">
                 <Input />
               </Form.Item>
             </Col>
@@ -1193,12 +1199,12 @@ function SiteSettingsEditor() {
             </Col>
             <Col span={8}>
               <Form.Item name="defaultCulture" label="默认语言">
-                <Select options={CULTURES.map((item) => ({ label: item.label, value: item.value }))} />
+                <Select options={SITE_CULTURES.map((item) => ({ label: item.label, value: item.value }))} />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item name="supportedCultures" label="支持语言">
-                <Select mode="multiple" options={CULTURES.map((item) => ({ label: item.label, value: item.value }))} />
+                <Select mode="multiple" options={SITE_CULTURES.map((item) => ({ label: item.label, value: item.value }))} />
               </Form.Item>
             </Col>
           </Row>
@@ -1221,8 +1227,7 @@ function SiteSettingsEditor() {
             保存后会直接更新 `appsettings.json` 中的 `Site` 节点。
           </Typography.Paragraph>
           {settings ? <Typography.Text type="secondary">当前标题：{settings.appTitle}</Typography.Text> : null}
-        </Form>
-      )}
+      </Form>
     </Card>
   );
 }
@@ -1244,7 +1249,7 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
       setResource(data);
       setDraft(data.markdown ?? "");
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "璧勬簮鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "璧勬簮加载失败");
       setResource(null);
       setDraft("");
     } finally {
@@ -1285,10 +1290,10 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
     try {
       const result = await api.saveMarkdownResource(spec.name, draft, culture);
       if (!result.success) {
-        message.error(result.message ?? "淇濆瓨澶辫触");
+        message.error(result.message ?? "保存失败");
         return;
       }
-      message.success(result.message ?? "淇濆瓨鎴愬姛");
+      message.success(result.message ?? "保存成功");
       await load();
     } finally {
       setSaving(false);
@@ -1304,10 +1309,10 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
             <Tag>{culture}</Tag>
           </Tooltip>
           <Button icon={<ReloadOutlined />} onClick={load}>
-            鍒锋柊
+            刷新
           </Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>
-            淇濆瓨
+            保存
           </Button>
         </Space>
       }
@@ -1325,7 +1330,7 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
           />
         </Col>
         <Col span={12}>
-          <Card size="small" title="棰勮" className="preview-card">
+          <Card size="small" title="预览" className="preview-card">
             {loading ? (
               <Spin />
             ) : (
@@ -1365,7 +1370,7 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
       setResource(data);
       setRows(normalizeFlatRows(spec, parseFlatJsonRows(spec, data.json)));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "JSON 鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "JSON 加载失败");
       setResource(null);
       setRows([]);
     } finally {
@@ -1383,11 +1388,11 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
       const payload = JSON.stringify(serializeFlatRows(spec, normalizeFlatRows(spec, nextRows)), null, 2);
       const result = await api.saveJsonResource(spec.name, payload, culture);
       if (!result.success) {
-        message.error(result.message ?? "淇濆瓨澶辫触");
+        message.error(result.message ?? "保存失败");
         return;
       }
 
-      message.success(result.message ?? "淇濆瓨鎴愬姛");
+      message.success(result.message ?? "保存成功");
       await load();
     } finally {
       setSaving(false);
@@ -1428,10 +1433,10 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
         <Space>
           <Tag>{spec.pathHint}</Tag>
           <Button icon={<ReloadOutlined />} onClick={load}>
-            鍒锋柊
+            刷新
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-            鏂板
+            新增
           </Button>
         </Space>
       }
@@ -1451,9 +1456,10 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
       {resource ? <Typography.Text type="secondary">资源文件：{resource.path}</Typography.Text> : null}
       <Modal
         open={modalOpen}
-        title={editingIndex === null ? "鏂板" : "缂栬緫"}
+        title={editingIndex === null ? "新增" : "编辑"}
         onCancel={() => setModalOpen(false)}
         onOk={submit}
+        forceRender
         destroyOnClose
       >
         <Form form={form} layout="vertical">
@@ -1485,7 +1491,7 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
       setNodes(parsed);
       setExpandedKeys(collectEditableTreeKeys(parsed));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "JSON 鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "JSON 加载失败");
       setResource(null);
       setNodes([]);
       setExpandedKeys([]);
@@ -1504,11 +1510,11 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
       const payload = JSON.stringify(stripEditableTree(nextNodes, spec.allowHidden ?? false), null, 2);
       const result = await api.saveJsonResource(spec.name, payload, culture);
       if (!result.success) {
-        message.error(result.message ?? "淇濆瓨澶辫触");
+        message.error(result.message ?? "保存失败");
         return;
       }
 
-      message.success(result.message ?? "淇濆瓨鎴愬姛");
+      message.success(result.message ?? "保存成功");
       await load();
     } finally {
       setSaving(false);
@@ -1574,12 +1580,13 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
         <Space>
           <Tag>{spec.pathHint}</Tag>
           <Button icon={<ReloadOutlined />} onClick={load}>
-            鍒锋柊
+            刷新
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreateRoot}>
-            鏂板鏍硅妭鐐?          </Button>
+            新增根节点
+          </Button>
           <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={() => save()}>
-            淇濆瓨
+            保存
           </Button>
         </Space>
       }
@@ -1608,9 +1615,10 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
       {resource ? <Typography.Text type="secondary">资源文件：{resource.path}</Typography.Text> : null}
       <Modal
         open={modalOpen}
-        title={editingKey ? "缂栬緫鑺傜偣" : "鏂板鑺傜偣"}
+        title={editingKey ? "编辑节点" : "新增节点"}
         onCancel={() => setModalOpen(false)}
         onOk={submit}
+        forceRender
         destroyOnClose
       >
         <Form form={form} layout="vertical">
@@ -1620,14 +1628,14 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
           <Form.Item name="slug" label="Slug">
             <Input />
           </Form.Item>
-          <Form.Item name="memo" label="璇存槑">
+          <Form.Item name="memo" label="说明">
             <Input.TextArea rows={3} />
           </Form.Item>
-          <Form.Item name="repository" label="鏉ユ簮/浠撳簱">
+          <Form.Item name="repository" label="来源/仓库">
             <Input />
           </Form.Item>
           {spec.allowHidden ? (
-            <Form.Item name="hidden" label="闅愯棌" valuePropName="checked">
+            <Form.Item name="hidden" label="隐藏" valuePropName="checked">
               <Switch />
             </Form.Item>
           ) : null}
@@ -1876,15 +1884,15 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
       { title: "说明", dataIndex: "memo", render: (_, record) => (record as TaxonomyItem).memo ?? "-" },
       { title: "文章数", width: 96, render: (_, record) => (record as TaxonomyItem).postCount ?? 0 },
       {
-        title: "鎿嶄綔",
+        title: "操作",
         width: 160,
         render: (_, __, index) => (
           <Space>
             <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
-              缂栬緫
+              编辑
             </Button>
             <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
-              鍒犻櫎
+              删除
             </Button>
           </Space>
         )
@@ -1894,21 +1902,21 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
 
   if (spec.kind === "links") {
     return [
-      { title: "鎺掑簭", width: 90, render: (_, record) => (record as FriendLinkItem).Index ?? 0 },
-      { title: "鏍囬", render: (_, record) => (record as FriendLinkItem).Title ?? "-" },
-      { title: "鍦板潃", render: (_, record) => (record as FriendLinkItem).Link ?? "-" },
+      { title: "排序", width: 90, render: (_, record) => (record as FriendLinkItem).Index ?? 0 },
+      { title: "标题", render: (_, record) => (record as FriendLinkItem).Title ?? "-" },
+      { title: "地址", render: (_, record) => (record as FriendLinkItem).Link ?? "-" },
       { title: "LOGO", render: (_, record) => (record as FriendLinkItem).Logo ?? "-" },
-      { title: "璇存槑", render: (_, record) => (record as FriendLinkItem).Description ?? "-" },
+      { title: "说明", render: (_, record) => (record as FriendLinkItem).Description ?? "-" },
       {
-        title: "鎿嶄綔",
+        title: "操作",
         width: 160,
         render: (_, __, index) => (
           <Space>
             <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
-              缂栬緫
+              编辑
             </Button>
             <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
-              鍒犻櫎
+              删除
             </Button>
           </Space>
         )
@@ -1918,19 +1926,19 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
 
   if (spec.kind === "timeline") {
     return [
-      { title: "鏃堕棿", width: 180, render: (_, record) => formatDateTime((record as TimelineItem).Time) },
-      { title: "鏍囬", render: (_, record) => (record as TimelineItem).Title ?? "-" },
-      { title: "鍐呭", render: (_, record) => (record as TimelineItem).Content ?? "-" },
+      { title: "时间", width: 180, render: (_, record) => formatDateTime((record as TimelineItem).Time) },
+      { title: "标题", render: (_, record) => (record as TimelineItem).Title ?? "-" },
+      { title: "内容", render: (_, record) => (record as TimelineItem).Content ?? "-" },
       {
-        title: "鎿嶄綔",
+        title: "操作",
         width: 160,
         render: (_, __, index) => (
           <Space>
             <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
-              缂栬緫
+              编辑
             </Button>
             <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
-              鍒犻櫎
+              删除
             </Button>
           </Space>
         )
@@ -1944,15 +1952,15 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
     { title: "说明", render: (_, record) => (record as SearchBlockedKeywordGroup).Memo ?? "-" },
     { title: "关键词", render: (_, record) => ((record as SearchBlockedKeywordGroup).Keywords ?? []).join(", ") || "-" },
     {
-      title: "鎿嶄綔",
+      title: "操作",
       width: 160,
       render: (_, __, index) => (
         <Space>
           <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
-            缂栬緫
+            编辑
           </Button>
           <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
-            鍒犻櫎
+            删除
           </Button>
         </Space>
       )
@@ -1970,7 +1978,7 @@ function flatFormFields(spec: JsonEditorSpec) {
         <Form.Item name="name" label="名称" rules={[{ required: true, message: "请输入名称" }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="slug" label="Slug" rules={[{ required: true, message: "璇疯緭鍏?Slug" }]}>
+        <Form.Item name="slug" label="Slug" rules={[{ required: true, message: "请输入 Slug" }]}>
           <Input />
         </Form.Item>
         <Form.Item name="memo" label="说明">
@@ -2005,13 +2013,13 @@ function flatFormFields(spec: JsonEditorSpec) {
   if (spec.kind === "timeline") {
     return (
       <>
-        <Form.Item name="time" label="鏃堕棿">
+        <Form.Item name="time" label="时间">
           <Input placeholder="2026-05-13T08:00:00Z" />
         </Form.Item>
         <Form.Item name="title" label="标题" rules={[{ required: true, message: "请输入标题" }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="content" label="鍐呭">
+        <Form.Item name="content" label="内容">
           <Input.TextArea rows={4} />
         </Form.Item>
       </>
@@ -2030,7 +2038,7 @@ function flatFormFields(spec: JsonEditorSpec) {
         <Input.TextArea rows={3} />
       </Form.Item>
       <Form.Item name="keywordsText" label="关键词">
-        <Input.TextArea rows={4} placeholder="姣忚涓€涓紝鎴栫敤閫楀彿鍒嗛殧" />
+        <Input.TextArea rows={4} placeholder="每行一个，或用逗号分隔" />
       </Form.Item>
     </>
   );
@@ -2140,11 +2148,11 @@ function treeColumns(
 ): ColumnsType<EditableTreeNode> {
   return [
     {
-      title: "鍚嶇О",
+      title: "名称",
       render: (_, record) => (
         <Space size={8}>
           <strong>{record.name ?? record.slug ?? "未命名节点"}</strong>
-          {spec.allowHidden ? (record.hidden ? <Tag color="default">闅愯棌</Tag> : <Tag color="green">鏄剧ず</Tag>) : null}
+          {spec.allowHidden ? (record.hidden ? <Tag color="default">隐藏</Tag> : <Tag color="green">显示</Tag>) : null}
         </Space>
       )
     },
@@ -2154,27 +2162,27 @@ function treeColumns(
       render: (_, record) => record.slug ?? "-"
     },
     {
-      title: "鏉ユ簮/浠撳簱",
+      title: "来源/仓库",
       width: 220,
       render: (_, record) => record.repository ?? "-"
     },
     {
-      title: "璇存槑",
+      title: "说明",
       render: (_, record) => record.memo ?? "-"
     },
     {
-      title: "鎿嶄綔",
+      title: "操作",
       width: 210,
       render: (_, record) => (
         <Space>
           <Button icon={<PlusOutlined />} onClick={() => onCreateChild(record.key)}>
-            瀛愰」
+            子项
           </Button>
           <Button icon={<EditOutlined />} onClick={() => onEdit(record.key)}>
-            缂栬緫
+            编辑
           </Button>
           <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(record.key)}>
-            鍒犻櫎
+            删除
           </Button>
         </Space>
       )
@@ -2235,7 +2243,7 @@ function AssetBrowser() {
       setSelectedKeys([]);
       setPreview(null);
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "璧勬簮鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "璧勬簮加载失败");
       setData(null);
     } finally {
       setLoading(false);
@@ -2253,7 +2261,7 @@ function AssetBrowser() {
     try {
       setPreview(await api.gitFile(entry.path));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "鏂囦欢棰勮澶辫触");
+      message.error(error instanceof Error ? error.message : "文件预览失败");
       setPreview(null);
     } finally {
       setPreviewLoading(false);
@@ -2266,7 +2274,7 @@ function AssetBrowser() {
 
   const columns: ColumnsType<AssetEntry> = [
     {
-      title: "鍚嶇О",
+      title: "名称",
       dataIndex: "name",
       render: (value, record) => (
         <Button type="link" style={{ padding: 0 }} onClick={() => loadPreview(record)}>
@@ -2278,17 +2286,17 @@ function AssetBrowser() {
       )
     },
     {
-      title: "绫诲瀷",
+      title: "类型",
       width: 96,
-      render: (_, record) => <Tag color={record.isDirectory ? "blue" : "default"}>{record.isDirectory ? "鐩綍" : "鏂囦欢"}</Tag>
+      render: (_, record) => <Tag color={record.isDirectory ? "blue" : "default"}>{record.isDirectory ? "目录" : "文件"}</Tag>
     },
     {
-      title: "澶у皬",
+      title: "大小",
       width: 100,
       render: (_, record) => (record.isDirectory ? "-" : formatBytes(record.size))
     },
     {
-      title: "鏇存柊鏃堕棿",
+      title: "更新时间",
       width: 180,
       render: (_, record) => (record.lastModified ? new Date(record.lastModified).toLocaleString() : "-")
     }
@@ -2303,21 +2311,21 @@ function AssetBrowser() {
     <Row gutter={16}>
       <Col span={10}>
         <Card
-          title="鏂囦欢娴忚"
+          title="文件浏览"
           extra={
             <Space wrap>
               <Button disabled={!path} onClick={() => loadDirectory(parentPath(path))}>
                 上一级
               </Button>
               <Button icon={<ReloadOutlined />} onClick={() => loadDirectory(path)}>
-                鍒锋柊
+                刷新
               </Button>
               <Button
                 danger
                 disabled={selectedFiles.length === 0}
                 onClick={() =>
                   Modal.confirm({
-                    title: "鎵归噺鍒犻櫎鏂囦欢",
+                    title: "批量删除文件",
                     content: `确定删除已选择的 ${selectedFiles.length} 个文件吗？此操作不可恢复。`,
                     okButtonProps: { danger: true },
                     onOk: async () => {
@@ -2329,11 +2337,11 @@ function AssetBrowser() {
                             message.warning(result.message);
                           }
                         }
-                        message.success("鍒犻櫎瀹屾垚");
+                        message.success("删除完成");
                         setSelectedKeys([]);
                         await loadDirectory(path);
                       } catch (error) {
-                        message.error(error instanceof Error ? error.message : "鍒犻櫎澶辫触");
+                        message.error(error instanceof Error ? error.message : "删除失败");
                       } finally {
                         setUploading(false);
                       }
@@ -2341,7 +2349,7 @@ function AssetBrowser() {
                   })
                 }
               >
-                鎵归噺鍒犻櫎
+                批量删除
               </Button>
               <label className="upload-trigger">
                 <input
@@ -2361,10 +2369,10 @@ function AssetBrowser() {
                           message.warning(result.message);
                         }
                       }
-                      message.success("涓婁紶瀹屾垚");
+                      message.success("上传完成");
                       await loadDirectory(path);
                     } catch (error) {
-                      message.error(error instanceof Error ? error.message : "涓婁紶澶辫触");
+                      message.error(error instanceof Error ? error.message : "上传失败");
                     } finally {
                       setUploading(false);
                       event.currentTarget.value = "";
@@ -2372,7 +2380,7 @@ function AssetBrowser() {
                   }}
                 />
                 <Button type="primary" loading={uploading} icon={<PlusOutlined />}>
-                  涓婁紶
+                  上传
                 </Button>
               </label>
             </Space>
@@ -2398,7 +2406,7 @@ function AssetBrowser() {
         </Card>
       </Col>
       <Col span={14}>
-        <Card title="鏂囦欢棰勮" className="preview-card">
+        <Card title="文件预览" className="preview-card">
           {previewLoading ? <Spin /> : <AssetPreviewPane entry={selected} preview={preview} />}
         </Card>
       </Col>
@@ -2414,15 +2422,15 @@ function AssetPreviewPane({
   preview: GitFilePreviewResult | null;
 }) {
   if (!entry) {
-    return <Empty description="璇烽€夋嫨鏂囦欢" />;
+    return <Empty description="请选择文件" />;
   }
 
   if (entry.isDirectory) {
-    return <Empty description="鐩綍娌℃湁棰勮鍐呭" />;
+    return <Empty description="目录没有预览内容" />;
   }
 
   if (!preview) {
-    return <Empty description="鏆傛棤棰勮缁撴灉" />;
+    return <Empty description="暂无预览结果" />;
   }
 
   if (preview.kind === "image" && preview.dataUrl) {
@@ -2449,7 +2457,7 @@ function AssetPreviewPane({
     return <Alert type="info" showIcon message="二进制文件" description={`大小：${formatBytes(preview.size ?? null)}`} />;
   }
 
-  return <Empty description="鏂囦欢涓嶅瓨鍦ㄦ垨鏃犳硶棰勮" />;
+  return <Empty description="文件不存在或无法预览" />;
 }
 
 function Repository() {
@@ -2474,7 +2482,7 @@ function Repository() {
         setPreview(null);
       }
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "鐗堟湰鎺у埗鍔犺浇澶辫触");
+      message.error(error instanceof Error ? error.message : "版本控制加载失败");
     }
   };
 
@@ -2483,7 +2491,7 @@ function Repository() {
     try {
       setPreview(await api.gitFile(path));
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "鏂囦欢棰勮澶辫触");
+      message.error(error instanceof Error ? error.message : "文件预览失败");
       setPreview(null);
     } finally {
       setPreviewLoading(false);
@@ -2494,13 +2502,13 @@ function Repository() {
     try {
       const result = await action();
       if (result.success) {
-        message.success("鎿嶄綔瀹屾垚");
+        message.success("操作完成");
       } else {
-        message.warning(result.error || "鍛戒护澶辫触");
+        message.warning(result.error || "命令失败");
       }
       await load();
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "鍛戒护澶辫触");
+      message.error(error instanceof Error ? error.message : "命令失败");
     }
   };
 
@@ -2515,7 +2523,7 @@ function Repository() {
       render: (_, record) => <Tag color={statusColor(record.status)}>{record.status}</Tag>
     },
     {
-      title: "鏂囦欢",
+      title: "文件",
       dataIndex: "path",
       render: (value, record) => (
         <Button type="link" style={{ padding: 0 }} onClick={() => { setSelected(record); loadPreview(record.path); }}>
@@ -2544,13 +2552,13 @@ function Repository() {
                   extra={
                     <Space>
                       <Button icon={<ReloadOutlined />} onClick={load}>
-                        鍒锋柊
+                        刷新
                       </Button>
                       <Button icon={<CloudDownloadOutlined />} onClick={() => run(api.gitFetch)}>
-                        鎶撳彇
+                        抓取
                       </Button>
                       <Button icon={<SyncOutlined />} onClick={() => run(api.gitPull)}>
-                        鎷夊彇
+                        拉取
                       </Button>
                     </Space>
                   }

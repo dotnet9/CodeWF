@@ -22,9 +22,11 @@ export default async function PostsPage({ params, searchParams }: LocalePageProp
         </div>
       </div>
       <div className="post-grid post-grid--three">
-        {posts.data.map((post) => (
-          <PostCard post={post} locale={locale} site={site} key={`${post.date}-${post.slug}`} />
-        ))}
+        {posts.data.length > 0 ? (
+          posts.data.map((post) => <PostCard post={post} locale={locale} site={site} key={`${post.date}-${post.slug}`} />)
+        ) : (
+          <div className="empty-state">{t.empty}</div>
+        )}
       </div>
       <Pagination locale={locale} pageIndex={posts.pageIndex} pageSize={posts.pageSize} total={posts.total} basePath="/post" query={{ keyword }} />
     </main>

@@ -5,10 +5,26 @@ body,
   margin: 0;
 }
 
+:root {
+  --admin-bg: #eef3f6;
+  --admin-panel: #ffffff;
+  --admin-text: #16202d;
+  --admin-muted: #64748b;
+  --admin-line: #d9e2ec;
+  --admin-brand: #0e7667;
+  --admin-brand-strong: #0b5f53;
+  --admin-accent: #b42318;
+  --admin-soft: #e9f6f4;
+  --admin-warning-soft: #fff1f0;
+  --admin-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+}
+
 body {
   overflow: hidden;
-  background: #eef2f7;
-  color: #16202d;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(238, 243, 246, 0.94)),
+    var(--admin-bg);
+  color: var(--admin-text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
 }
@@ -23,11 +39,15 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(14, 118, 103, 0.12), transparent 38%),
+    linear-gradient(180deg, #ffffff 0%, var(--admin-bg) 100%);
 }
 
 .admin-sider {
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
+  background: var(--admin-panel);
+  border-right: 1px solid var(--admin-line);
+  box-shadow: 10px 0 32px rgba(15, 23, 42, 0.04);
 }
 
 .admin-brand {
@@ -37,8 +57,8 @@ body {
   gap: 12px;
   padding: 14px 18px;
   color: #0f172a;
-  border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  border-bottom: 1px solid var(--admin-line);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfb 100%);
 }
 
 .brand-icon {
@@ -65,7 +85,7 @@ body {
 }
 
 .admin-brand__copy span {
-  color: #64748b;
+  color: var(--admin-muted);
   font-size: 12px;
   line-height: 1.35;
 }
@@ -77,8 +97,8 @@ body {
   min-width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #fee2e2;
-  color: #e11d48;
+  background: var(--admin-soft);
+  color: var(--admin-brand-strong);
   font-weight: 800;
 }
 
@@ -107,16 +127,16 @@ body {
 
 .admin-menu .ant-menu-item-group-title {
   padding: 18px 16px 8px;
-  color: #64748b;
+  color: var(--admin-muted);
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .admin-menu .ant-menu-item-selected {
-  background: rgba(244, 63, 94, 0.12) !important;
-  color: #e11d48 !important;
+  background: var(--admin-soft) !important;
+  color: var(--admin-brand-strong) !important;
 }
 
 .admin-menu .ant-menu-item-selected::after {
@@ -148,8 +168,8 @@ body {
   height: 22px;
   padding: 0 6px;
   border-radius: 999px;
-  background: #fee2e2;
-  color: #e11d48;
+  background: var(--admin-soft);
+  color: var(--admin-brand-strong);
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
@@ -171,8 +191,9 @@ body {
   gap: 16px;
   min-height: 72px;
   padding: 0 24px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--admin-line);
+  backdrop-filter: blur(12px);
 }
 
 .admin-header__title {
@@ -188,7 +209,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 16px;
+  padding: 20px;
   overflow: hidden;
 }
 
@@ -196,8 +217,24 @@ body {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: 6px;
   animation: admin-panel-rise 220ms ease both;
+}
+
+.admin-content-scroll::-webkit-scrollbar,
+.admin-menu::-webkit-scrollbar,
+.markdown-preview-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.admin-content-scroll::-webkit-scrollbar-thumb,
+.admin-menu::-webkit-scrollbar-thumb,
+.markdown-preview-scroll::-webkit-scrollbar-thumb {
+  background: #c8d3df;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
 }
 
 .culture-select {
@@ -208,6 +245,10 @@ body {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 12px;
+}
+
+.admin-form-hidden {
+  display: none;
 }
 
 .workspace-stack {
@@ -249,9 +290,9 @@ body {
   display: grid;
   gap: 10px;
   padding: 14px 16px;
-  border: 1px solid #dde3ea;
+  border: 1px solid var(--admin-line);
   border-radius: 8px;
-  background: #f8fafc;
+  background: linear-gradient(180deg, #ffffff, #f8fbfb);
 }
 
 .post-tile__desc,
@@ -326,7 +367,7 @@ body {
 .terminal--light {
   color: #0f172a;
   background: #f8fafc;
-  border: 1px solid #dde3ea;
+  border: 1px solid var(--admin-line);
 }
 
 .code-area {
@@ -339,8 +380,8 @@ body {
 
 .login-card {
   width: min(560px, calc(100vw - 32px));
-  border: 1px solid #dbe2ea;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--admin-line);
+  box-shadow: var(--admin-shadow);
 }
 
 .login-panel {
@@ -370,6 +411,54 @@ body {
   border-radius: 6px;
   background: #fff;
   border: 1px solid #edf1f5;
+}
+
+.admin-content-scroll .ant-card {
+  border-color: var(--admin-line);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.admin-content-scroll .ant-card-head {
+  border-bottom-color: var(--admin-line);
+}
+
+.stat-grid .ant-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 251, 0.96)),
+    var(--admin-panel);
+}
+
+.stat-grid .ant-statistic-title {
+  color: var(--admin-muted);
+  font-weight: 700;
+}
+
+.stat-grid .ant-statistic-content {
+  color: var(--admin-brand-strong);
+  font-weight: 800;
+}
+
+.admin-content-scroll .ant-table-wrapper {
+  overflow-x: auto;
+}
+
+.admin-content-scroll .ant-table {
+  min-width: 720px;
+}
+
+.admin-content-scroll .ant-table-thead > tr > th {
+  background: #f5f8fa;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-content-scroll .ant-btn-primary {
+  box-shadow: 0 8px 20px rgba(14, 118, 103, 0.18);
+}
+
+.admin-content-scroll .ant-tag {
+  border-radius: 999px;
 }
 
 @keyframes admin-panel-rise {
@@ -422,5 +511,22 @@ body {
     align-items: flex-start;
     flex-direction: column;
     padding: 16px;
+  }
+
+  .admin-content {
+    padding: 12px;
+  }
+
+  .admin-content-scroll .ant-col-6,
+  .admin-content-scroll .ant-col-8,
+  .admin-content-scroll .ant-col-10,
+  .admin-content-scroll .ant-col-12,
+  .admin-content-scroll .ant-col-14 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .login-card {
+    width: min(100%, 520px);
   }
 }

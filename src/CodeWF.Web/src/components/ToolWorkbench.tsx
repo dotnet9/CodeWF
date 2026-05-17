@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { marked } from "marked";
+import { Clipboard, Play, RotateCcw } from "lucide-react";
 import type { Locale } from "@/types";
 import type { ToolNode } from "@/types";
 
@@ -76,12 +77,16 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
   const [output, setOutput] = useState("");
   const [qr, setQr] = useState("");
   const [keyInfo, setKeyInfo] = useState("");
+  const [copied, setCopied] = useState(false);
   const ui = locale === "zh-CN"
     ? {
         input: "输入",
         secondInput: "选项 / 第二输入",
         output: "输出",
         run: "运行",
+        clear: "清空",
+        copy: "复制",
+        copied: "已复制",
         ready: "就绪。",
         keyHint: "按下任意键，当前页面聚焦时会显示按键信息。",
         regexPlaceholder: "正则表达式",
@@ -92,6 +97,9 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
         secondInput: "Option / second input",
         output: "Output",
         run: "Run",
+        clear: "Clear",
+        copy: "Copy",
+        copied: "Copied",
         ready: "Ready.",
         keyHint: "Press any key while this page is focused.",
         regexPlaceholder: "Regular expression",
@@ -128,6 +136,7 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
 
   async function run() {
     setQr("");
+    setCopied(false);
     try {
       switch (mode) {
         case "json-pretty":
@@ -151,9 +160,12 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
         case "jwt":
           setOutput(parseJwt(input));
           break;
-        case "base64":
-          setOutput(`Encoded:\n${btoa(unescape(encodeURIComponent(input)))}\n\nDecoded:\n${decodeURIComponent(escape(atob(input)))}`);
+        case "base64": {
+          const encoded = btoa(unescape(encodeURIComponent(input)));
+          const decoded = tryDecodeBase64(input);
+          setOutput(`Encoded:\n${encoded}\n\nDecoded:\n${decoded ?? (locale === "zh-CN" ? "输入不是有效 Base64。" : "Input is not valid Base64.")}`);
           break;
+        }
         case "case":
           setOutput(convertCases(input));
           break;
@@ -249,6 +261,24 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
     }
   }
 
+  function clear() {
+    setInput("");
+    setSecondInput("");
+    setOutput("");
+    setQr("");
+    setCopied(false);
+  }
+
+  async function copyOutput() {
+    const value = output || qr;
+    if (!value) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+  }
+
   return (
     <section className="tool-workbench">
       <div className="tool-panel">
@@ -266,12 +296,25 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
             <textarea value={secondInput} onChange={(event) => setSecondInput(event.target.value)} rows={4} placeholder={secondPlaceholder(mode, ui)} />
           </label>
         ) : null}
-        <button type="button" onClick={run}>
-          {ui.run}
-        </button>
+        <div className="tool-actions">
+          <button type="button" className="tool-run-button" onClick={run}>
+            <Play size={16} aria-hidden="true" />
+            {ui.run}
+          </button>
+          <button type="button" className="tool-secondary-button" onClick={clear}>
+            <RotateCcw size={16} aria-hidden="true" />
+            {ui.clear}
+          </button>
+        </div>
       </div>
       <div className="tool-panel output-panel">
-        <h2>{ui.output}</h2>
+        <div className="tool-output-head">
+          <h2>{ui.output}</h2>
+          <button type="button" className="tool-secondary-button" onClick={copyOutput} disabled={!output && !qr}>
+            <Clipboard size={16} aria-hidden="true" />
+            {copied ? ui.copied : ui.copy}
+          </button>
+        </div>
         {qr ? <img src={qr} alt="QR code" className="qr-output" /> : null}
         {mode === "markdown" && output.startsWith("<") ? (
           <div className="rich-content" dangerouslySetInnerHTML={{ __html: output }} />
@@ -342,6 +385,20 @@ function parseJwt(value: string) {
     .slice(0, 2)
     .map((part, index) => `${index === 0 ? "Header" : "Payload"}:\n${JSON.stringify(JSON.parse(atob(part.replace(/-/g, "+").replace(/_/g, "/"))), null, 2)}`)
     .join("\n\n");
+}
+
+function tryDecodeBase64(value: string) {
+  const normalized = value.trim();
+  if (!normalized || !/^[A-Za-z0-9+/=_-]+$/.test(normalized)) {
+    return null;
+  }
+
+  try {
+    const padded = normalized.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return decodeURIComponent(escape(atob(padded)));
+  } catch {
+    return null;
+  }
 }
 
 function convertCases(value: string) {

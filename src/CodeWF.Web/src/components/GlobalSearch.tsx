@@ -41,8 +41,8 @@ export function GlobalSearch({
           return;
         }
 
-        const data = (await response.json()) as { data?: SearchResultItem[] };
-        setItems(data.data ?? []);
+        const data = (await response.json()) as SearchResultItem[] | { data?: SearchResultItem[] };
+        setItems(Array.isArray(data) ? data : data.data ?? []);
       } catch {
         setItems([]);
       }

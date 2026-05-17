@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { api } from "@/api";
 import { dictionary, withLocale } from "@/i18n";
-import type { DocNode } from "@/types";
+import type { DocNode, Locale } from "@/types";
 import type { LocalePageProps } from "../layout";
 import type { ReactNode } from "react";
 
@@ -36,23 +36,25 @@ export default async function ProjectPage({ params }: LocalePageProps) {
   );
 }
 
-function renderNode(group: DocNode, locale: "zh-CN" | "en" | "ja" | "zh-TW", depth: number): ReactNode {
+function renderNode(group: DocNode, locale: Locale, depth: number): ReactNode {
   const children = group.children ?? [];
   const isLeaf = children.length === 0 && Boolean(group.slug);
+  const repoLabel = locale === "zh-CN" ? "仓库链接" : "Repository";
+  const itemLabel = locale === "zh-CN" ? (depth === 0 ? "项目" : "子项目") : depth === 0 ? "Project" : "Subproject";
 
   if (isLeaf) {
     return (
       <article className="doc-list-item" key={group.slug}>
         <div className="doc-list-item__head">
-          <span className="card-kicker">{depth === 0 ? "项目" : "子项目"}</span>
+          <span className="card-kicker">{itemLabel}</span>
           <h2>
             <Link href={withLocale(locale, `/project/${group.slug}`)}>{group.name}</Link>
           </h2>
         </div>
         <p>{group.memo}</p>
         {group.repository ? (
-          <a className="text-link" href={group.repository} target="_blank" rel="noreferrer">
-            仓库链接
+          <a className="repo-link" href={group.repository} target="_blank" rel="noreferrer">
+            {repoLabel}
           </a>
         ) : null}
       </article>

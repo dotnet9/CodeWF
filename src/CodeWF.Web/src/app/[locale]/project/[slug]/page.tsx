@@ -33,8 +33,8 @@ export default async function ProjectDetailPage({ params }: Props) {
               <h1>{doc.name}</h1>
               <p>{doc.memo}</p>
               {doc.repository ? (
-                <a className="text-link" href={doc.repository} target="_blank" rel="noreferrer">
-                  相关仓库
+                <a className="repo-link" href={doc.repository} target="_blank" rel="noreferrer">
+                  {locale === "zh-CN" ? "相关仓库" : "Repository"}
                 </a>
               ) : null}
             </header>
