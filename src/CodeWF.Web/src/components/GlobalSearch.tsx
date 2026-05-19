@@ -25,6 +25,7 @@ export function GlobalSearch({
   const panelRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       const keyword = query.trim();
       if (keyword.length < 2) {
@@ -34,7 +35,8 @@ export function GlobalSearch({
 
       try {
         const response = await fetch(`${apiBase}/search/suggest?culture=${encodeURIComponent(locale)}&q=${encodeURIComponent(keyword)}&take=5`, {
-          cache: "no-store"
+          cache: "no-store",
+          signal: controller.signal
         });
         if (!response.ok) {
           setItems([]);
@@ -44,11 +46,17 @@ export function GlobalSearch({
         const data = (await response.json()) as SearchResultItem[] | { data?: SearchResultItem[] };
         setItems(Array.isArray(data) ? data : data.data ?? []);
       } catch {
+        if (controller.signal.aborted) {
+          return;
+        }
         setItems([]);
       }
     }, 220);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
   }, [locale, query]);
 
   useEffect(() => {

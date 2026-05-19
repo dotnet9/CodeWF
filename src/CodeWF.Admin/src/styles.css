@@ -6,27 +6,45 @@ body,
 }
 
 :root {
-  --admin-bg: #eef3f6;
-  --admin-panel: #ffffff;
-  --admin-text: #16202d;
-  --admin-muted: #64748b;
-  --admin-line: #d9e2ec;
-  --admin-brand: #0e7667;
-  --admin-brand-strong: #0b5f53;
-  --admin-accent: #b42318;
-  --admin-soft: #e9f6f4;
-  --admin-warning-soft: #fff1f0;
-  --admin-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+  --admin-bg: #f5f8f6;
+  --admin-panel: #fffefd;
+  --admin-text: #182520;
+  --admin-muted: #65756f;
+  --admin-line: #dfe9e3;
+  --admin-brand: #0f766e;
+  --admin-brand-strong: #0a5d56;
+  --admin-accent: #bd4b38;
+  --admin-soft: #e9f6f1;
+  --admin-warning-soft: #fff3ea;
+  --admin-shadow: 0 12px 32px rgba(24, 37, 32, 0.07);
+  --admin-shadow-hover: 0 18px 42px rgba(24, 37, 32, 0.11);
 }
 
 body {
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(238, 243, 246, 0.94)),
+    linear-gradient(180deg, rgba(255, 254, 252, 0.88), rgba(245, 248, 246, 0.96)),
     var(--admin-bg);
   color: var(--admin-text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
+}
+
+button,
+input,
+textarea,
+.ant-card,
+.ant-btn,
+.ant-menu-item,
+.ant-menu-submenu-title,
+.post-tile,
+.tool-tile {
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease,
+    color 180ms ease;
 }
 
 .login-shell,
@@ -40,14 +58,14 @@ body {
   justify-content: center;
   padding: 24px;
   background:
-    linear-gradient(135deg, rgba(14, 118, 103, 0.12), transparent 38%),
-    linear-gradient(180deg, #ffffff 0%, var(--admin-bg) 100%);
+    linear-gradient(135deg, rgba(15, 118, 110, 0.1), transparent 42%),
+    linear-gradient(180deg, #fffefd 0%, var(--admin-bg) 100%);
 }
 
 .admin-sider {
   background: var(--admin-panel);
-  border-right: 1px solid var(--admin-line);
-  box-shadow: 10px 0 32px rgba(15, 23, 42, 0.04);
+  border-right: 1px solid rgba(223, 233, 227, 0.9);
+  box-shadow: 10px 0 30px rgba(24, 37, 32, 0.045);
 }
 
 .admin-brand {
@@ -57,8 +75,8 @@ body {
   gap: 12px;
   padding: 14px 18px;
   color: #0f172a;
-  border-bottom: 1px solid var(--admin-line);
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbfb 100%);
+  border-bottom: 1px solid rgba(223, 233, 227, 0.9);
+  background: linear-gradient(180deg, #fffefd 0%, #f8fbf8 100%);
 }
 
 .brand-icon {
@@ -69,8 +87,8 @@ body {
   padding: 3px;
   border-radius: 8px;
   background: #fff;
-  border: 1px solid #dbe2ea;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(223, 233, 227, 0.9);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.1);
 }
 
 .admin-brand__copy {
@@ -125,6 +143,13 @@ body {
   border-radius: 8px;
 }
 
+.admin-menu .ant-menu-item:hover,
+.admin-menu .ant-menu-submenu-title:hover {
+  background: rgba(15, 118, 110, 0.07) !important;
+  color: var(--admin-brand-strong) !important;
+  transform: translateX(2px);
+}
+
 .admin-menu .ant-menu-item-group-title {
   padding: 18px 16px 8px;
   color: var(--admin-muted);
@@ -137,6 +162,7 @@ body {
 .admin-menu .ant-menu-item-selected {
   background: var(--admin-soft) !important;
   color: var(--admin-brand-strong) !important;
+  box-shadow: inset 3px 0 0 var(--admin-brand);
 }
 
 .admin-menu .ant-menu-item-selected::after {
@@ -191,9 +217,9 @@ body {
   gap: 16px;
   min-height: 72px;
   padding: 0 24px;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid var(--admin-line);
-  backdrop-filter: blur(12px);
+  background: rgba(255, 254, 253, 0.88);
+  border-bottom: 1px solid rgba(223, 233, 227, 0.9);
+  backdrop-filter: blur(16px) saturate(1.08);
 }
 
 .admin-header__title {
@@ -209,7 +235,7 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 20px;
+  padding: 22px;
   overflow: hidden;
 }
 
@@ -218,7 +244,7 @@ body {
   min-height: 0;
   overflow: auto;
   padding-right: 6px;
-  animation: admin-panel-rise 220ms ease both;
+  animation: admin-panel-rise 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .admin-content-scroll::-webkit-scrollbar,
@@ -290,9 +316,17 @@ body {
   display: grid;
   gap: 10px;
   padding: 14px 16px;
-  border: 1px solid var(--admin-line);
+  border: 1px solid rgba(223, 233, 227, 0.92);
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff, #f8fbfb);
+  background: linear-gradient(180deg, #fffefd, #f8fbf8);
+  box-shadow: 0 8px 22px rgba(24, 37, 32, 0.045);
+}
+
+.post-tile:hover,
+.tool-tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 118, 110, 0.24);
+  box-shadow: var(--admin-shadow);
 }
 
 .post-tile__desc,
@@ -380,8 +414,10 @@ body {
 
 .login-card {
   width: min(560px, calc(100vw - 32px));
-  border: 1px solid var(--admin-line);
+  border: 1px solid rgba(223, 233, 227, 0.9);
   box-shadow: var(--admin-shadow);
+  background: rgba(255, 254, 253, 0.96);
+  backdrop-filter: blur(10px);
 }
 
 .login-panel {
@@ -409,13 +445,18 @@ body {
   gap: 4px;
   padding: 8px 10px;
   border-radius: 6px;
-  background: #fff;
-  border: 1px solid #edf1f5;
+  background: #fffefd;
+  border: 1px solid #edf4ef;
 }
 
 .admin-content-scroll .ant-card {
-  border-color: var(--admin-line);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  border-color: rgba(223, 233, 227, 0.92);
+  box-shadow: var(--admin-shadow);
+  background: rgba(255, 254, 253, 0.96);
+}
+
+.admin-content-scroll .ant-card:hover {
+  box-shadow: var(--admin-shadow-hover);
 }
 
 .admin-content-scroll .ant-card-head {
@@ -424,7 +465,7 @@ body {
 
 .stat-grid .ant-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 251, 0.96)),
+    linear-gradient(180deg, rgba(255, 254, 253, 0.98), rgba(248, 252, 250, 0.96)),
     var(--admin-panel);
 }
 
@@ -447,18 +488,37 @@ body {
 }
 
 .admin-content-scroll .ant-table-thead > tr > th {
-  background: #f5f8fa;
-  color: #344054;
+  background: #f5f8f6;
+  color: #42534d;
   font-size: 12px;
   font-weight: 800;
 }
 
+.admin-content-scroll .ant-table-tbody > tr > td {
+  border-bottom-color: rgba(223, 233, 227, 0.72);
+}
+
+.admin-content-scroll .ant-table-tbody > tr:hover > td {
+  background: rgba(15, 118, 110, 0.045) !important;
+}
+
 .admin-content-scroll .ant-btn-primary {
-  box-shadow: 0 8px 20px rgba(14, 118, 103, 0.18);
+  box-shadow: 0 10px 22px rgba(15, 118, 110, 0.2);
+}
+
+.admin-content-scroll .ant-btn:hover,
+.login-card .ant-btn:hover {
+  transform: translateY(-1px);
 }
 
 .admin-content-scroll .ant-tag {
   border-radius: 999px;
+}
+
+.ant-modal-content,
+.ant-popover-inner {
+  border: 1px solid rgba(223, 233, 227, 0.9);
+  box-shadow: var(--admin-shadow-hover);
 }
 
 @keyframes admin-panel-rise {
@@ -470,6 +530,16 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 

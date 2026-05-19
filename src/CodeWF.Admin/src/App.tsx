@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type Key, type ReactNode } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type Key, type ReactNode } from "react";
 import {
   Alert,
   App as AntApp,
@@ -280,7 +280,47 @@ export default function App() {
   }, [culture]);
 
   return (
-    <ConfigProvider locale={antdLocale} theme={{ token: { colorPrimary: "#0e7667", borderRadius: 8 } }}>
+    <ConfigProvider
+      locale={antdLocale}
+      theme={{
+        token: {
+          colorPrimary: "#0f766e",
+          colorInfo: "#33759f",
+          colorSuccess: "#2f855a",
+          colorWarning: "#b98223",
+          colorError: "#ba3f31",
+          colorText: "#182520",
+          colorTextSecondary: "#65756f",
+          colorBorder: "#dfe9e3",
+          borderRadius: 8,
+          controlHeight: 36,
+          fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        },
+        components: {
+          Button: {
+            borderRadius: 8,
+            primaryShadow: "0 10px 22px rgba(15, 118, 110, 0.2)"
+          },
+          Card: {
+            borderRadiusLG: 8,
+            headerBg: "rgba(255, 254, 253, 0.86)"
+          },
+          Layout: {
+            headerBg: "rgba(255, 254, 253, 0.9)",
+            siderBg: "#fffefd"
+          },
+          Menu: {
+            itemBorderRadius: 8,
+            itemSelectedBg: "#e9f6f1",
+            itemSelectedColor: "#0a5d56"
+          },
+          Table: {
+            headerBg: "#f5f8f6",
+            headerColor: "#42534d"
+          }
+        }
+      }}
+    >
       <AntApp>
         <AuthGate culture={culture} onCultureChange={setCulture} />
       </AntApp>
@@ -1240,7 +1280,8 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
   const [draft, setDraft] = useState("");
   const editorRef = useRef<any>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
-  const previewHtml = useMemo(() => renderMarkdownPreview(draft), [draft]);
+  const deferredDraft = useDeferredValue(draft);
+  const previewHtml = useMemo(() => renderMarkdownPreview(deferredDraft), [deferredDraft]);
 
   const load = async () => {
     setLoading(true);

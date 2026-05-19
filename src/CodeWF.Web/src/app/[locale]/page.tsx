@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import Image from "next/image";
 import { api, resolveAssetUrl } from "@/api";
 import { PostCard } from "@/components/PostCard";
 import { dictionary, withLocale } from "@/i18n";
@@ -15,9 +15,8 @@ export default async function HomePage({ params }: LocalePageProps) {
   const recentPosts = home.recentPosts
     .filter((post) => !featuredKeys.has(post.slug ?? post.url ?? post.title))
     .slice(0, 3);
-  const recommendedTools = shuffle(collectToolLeaves(home.tools)).slice(0, 12);
+  const recommendedTools = collectToolLeaves(home.tools).slice(0, 12);
   const heroImage = resolveAssetUrl(home.site, "site/banners/banner.jpg");
-  const heroStyle = heroImage ? ({ "--hero-image": `url("${heroImage}")` } as CSSProperties) : undefined;
   const metrics = [
     { value: home.counts.posts ?? 0, label: t.posts },
     { value: home.counts.tools ?? 0, label: t.tools },
@@ -27,7 +26,17 @@ export default async function HomePage({ params }: LocalePageProps) {
 
   return (
     <main className="page-wrap page-stack">
-      <section className="home-hero" style={heroStyle}>
+      <section className="home-hero">
+        {heroImage ? (
+          <Image
+            className="home-hero__image"
+            src={heroImage}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+          />
+        ) : null}
         <div className="home-hero__content">
           <span className="eyebrow">CodeWF</span>
           <h1>{home.site.appTitle}</h1>
@@ -115,7 +124,7 @@ return home.WithTools(12);`}</code>
         <div className="section-head">
           <div>
             <h2>{t.recommendedTools}</h2>
-            <p>{locale === "zh-CN" ? "随机展示 12 个常用工具" : "Twelve random tools from the catalog"}</p>
+            <p>{locale === "zh-CN" ? "精选展示常用工具入口，方便快速回访" : "Stable quick access to frequently used tools"}</p>
           </div>
           <Link className="text-link" href={withLocale(locale, "/tool")}>
             {t.toolCatalog}
@@ -154,13 +163,4 @@ function collectToolLeaves(nodes: ToolNode[]) {
 
   visit(nodes);
   return results;
-}
-
-function shuffle<T>(items: T[]) {
-  const output = [...items];
-  for (let index = output.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [output[index], output[swapIndex]] = [output[swapIndex], output[index]];
-  }
-  return output;
 }
