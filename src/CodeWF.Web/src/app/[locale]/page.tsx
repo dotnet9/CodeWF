@@ -29,6 +29,7 @@ export default async function HomePage({ params }: LocalePageProps) {
   ];
   const startCards = buildStartCards({
     locale,
+    copy,
     latestPost: home.recentPosts[0],
     album: topAlbum,
     category: topCategory,
@@ -93,6 +94,7 @@ export default async function HomePage({ params }: LocalePageProps) {
         <div className="home-start-grid">
           {startCards.map((item) => (
             <Link className="home-start-card" href={item.href} key={item.href}>
+              <span className="card-kicker">{item.kicker}</span>
               <strong>{item.title}</strong>
             </Link>
           ))}
@@ -200,12 +202,14 @@ type HomeCopy = ReturnType<typeof homeCopy>;
 
 function buildStartCards({
   locale,
+  copy,
   latestPost,
   album,
   category,
   projectsLabel
 }: {
   locale: Locale;
+  copy: HomeCopy;
   latestPost?: BlogPostBrief;
   album?: TaxonomyItem;
   category?: TaxonomyItem;
@@ -214,23 +218,27 @@ function buildStartCards({
   return [
     latestPost
       ? {
+          kicker: copy.latestKicker,
           title: latestPost.title ?? latestPost.slug ?? projectsLabel,
           href: withLocale(locale, latestPost.url ?? "/post")
         }
       : null,
     album
       ? {
+          kicker: copy.albumKicker,
           title: album.name ?? album.slug ?? projectsLabel,
           href: withLocale(locale, `/album/${encodeURIComponent(album.slug ?? album.name ?? "")}`)
         }
       : null,
     category
       ? {
+          kicker: copy.categoryKicker,
           title: category.name ?? category.slug ?? projectsLabel,
           href: withLocale(locale, `/cat/${encodeURIComponent(category.slug ?? category.name ?? "")}`)
         }
       : null,
     {
+      kicker: copy.projectKicker,
       title: projectsLabel,
       href: withLocale(locale, "/project")
     }
@@ -255,16 +263,16 @@ function homeCopy(locale: Locale) {
       startEyebrow: "Start here",
       startTitle: "A smoother route for first-time visitors",
       startDescription: "Pick the path that matches your intent: read the latest update, follow a topic, filter by category, or jump into projects.",
-      latestKicker: "Latest",
+      latestKicker: "Latest article",
       latestFallback: "Latest post",
       latestDescription: "Start with the newest content.",
-      albumKicker: "Series",
+      albumKicker: "Theme",
       albumTitle: (name?: string) => `Read ${name ?? "a topic"} as a series`,
       albumDescription: (count: number) => `${count} posts for continuous reading`,
       categoryKicker: "Category",
       categoryTitle: (name?: string) => `Browse ${name ?? "a category"}`,
       categoryDescription: (count: number) => `${count} posts around one technical direction`,
-      projectKicker: "Project index",
+      projectKicker: "Project",
       projectTitle: "Explore open-source projects",
       projectDescription: "Find repositories, packages, and usage notes in one place.",
       projectMeta: "Reusable entries",
@@ -289,16 +297,16 @@ function homeCopy(locale: Locale) {
       startEyebrow: "ここから開始",
       startTitle: "初めての訪問者向けルート",
       startDescription: "最新記事、連載、カテゴリ、プロジェクトから目的に合う入口を選べます。",
-      latestKicker: "最新",
+      latestKicker: "最新文章",
       latestFallback: "最新記事",
       latestDescription: "新しい内容から読み始めます。",
-      albumKicker: "特集",
+      albumKicker: "主题",
       albumTitle: (name?: string) => `${name ?? "特集"}を連続で読む`,
       albumDescription: (count: number) => `${count} 本の記事を連続して読めます`,
-      categoryKicker: "カテゴリ",
+      categoryKicker: "分类",
       categoryTitle: (name?: string) => `${name ?? "カテゴリ"}を見る`,
       categoryDescription: (count: number) => `${count} 本の記事を技術方向で整理`,
-      projectKicker: "プロジェクト",
+      projectKicker: "项目",
       projectTitle: "オープンソースを見る",
       projectDescription: "リポジトリ、パッケージ、利用メモをまとめています。",
       projectMeta: "再利用しやすい入口",
@@ -323,16 +331,16 @@ function homeCopy(locale: Locale) {
       startEyebrow: "從這裡開始",
       startTitle: "新訪客起步路線",
       startDescription: "按你的目的選入口：先看最新更新、跟著專題連讀、按分類篩選，或直接進入專案索引。",
-      latestKicker: "最新",
+      latestKicker: "最新文章",
       latestFallback: "最新文章",
       latestDescription: "從最近更新的內容開始。",
-      albumKicker: "專題連讀",
+      albumKicker: "主題",
       albumTitle: (name?: string) => `跟著專題讀 ${name ?? "內容"}`,
       albumDescription: (count: number) => `${count} 篇文章，適合連續閱讀`,
-      categoryKicker: "按主題看",
+      categoryKicker: "分類",
       categoryTitle: (name?: string) => `先逛 ${name ?? "分類"}`,
       categoryDescription: (count: number) => `${count} 篇文章，快速熟悉內容結構`,
-      projectKicker: "專案索引",
+      projectKicker: "專案",
       projectTitle: "看看開源專案",
       projectDescription: "整理開源專案、NuGet 套件和對應使用說明。",
       projectMeta: "便於快速複用",
@@ -356,16 +364,16 @@ function homeCopy(locale: Locale) {
     startEyebrow: "从这里开始",
     startTitle: "新用户起步路线",
     startDescription: "按你的目的选入口：先看最新更新、跟着专题连读、按分类筛选，或直接进入项目索引。",
-    latestKicker: "先看更新",
+    latestKicker: "最新文章",
     latestFallback: "最新文章",
     latestDescription: "从最近更新的内容开始。",
-    albumKicker: "连续阅读",
+    albumKicker: "主题",
     albumTitle: (name?: string) => `跟着专题读 ${name ?? "内容"}`,
     albumDescription: (count: number) => `${count} 篇文章，适合连续阅读`,
-    categoryKicker: "按主题看",
+    categoryKicker: "分类",
     categoryTitle: (name?: string) => `先逛 ${name ?? "分类"}`,
     categoryDescription: (count: number) => `${count} 篇文章，快速熟悉内容结构`,
-    projectKicker: "项目索引",
+    projectKicker: "项目",
     projectTitle: "看看开源项目",
     projectDescription: "整理开源项目、NuGet 包和对应使用说明。",
     projectMeta: "便于快速复用",

@@ -2348,9 +2348,9 @@ img {
 }
 
 .home-start-card {
-  align-content: center;
-  gap: 0;
-  min-height: 86px;
+  align-content: start;
+  gap: 6px;
+  min-height: 88px;
   padding: 16px 18px;
 }
 
