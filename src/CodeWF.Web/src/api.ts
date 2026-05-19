@@ -58,7 +58,7 @@ function query(locale: Locale, values?: Record<string, string | number | undefin
 export const api = {
   site: () => getJson<SiteInfo>("/site", emptySite),
   home: (locale: Locale) =>
-    getJson<HomePageData>(`/home?${query(locale, { recent: 3 })}`, {
+    getJson<HomePageData>(`/home?${query(locale, { recent: 6 })}`, {
       site: emptySite,
       recentPosts: [],
       bannerPosts: [],

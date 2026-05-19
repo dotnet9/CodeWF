@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 type Props = {
@@ -11,8 +11,13 @@ type Props = {
 export function RouteTransitionShell({ children }: Props) {
   const pathname = usePathname();
   const [navigating, setNavigating] = useState(false);
+  const pendingTimer = useRef<number | null>(null);
 
   useEffect(() => {
+    if (pendingTimer.current !== null) {
+      window.clearTimeout(pendingTimer.current);
+      pendingTimer.current = null;
+    }
     setNavigating(false);
   }, [pathname]);
 
@@ -44,14 +49,25 @@ export function RouteTransitionShell({ children }: Props) {
         if (url.pathname === window.location.pathname && url.hash === window.location.hash) {
           return;
         }
-        setNavigating(true);
+        if (pendingTimer.current !== null) {
+          window.clearTimeout(pendingTimer.current);
+        }
+        pendingTimer.current = window.setTimeout(() => {
+          setNavigating(true);
+          pendingTimer.current = null;
+        }, 180);
       } catch {
         return;
       }
     };
 
     window.addEventListener("click", onPointerDown, true);
-    return () => window.removeEventListener("click", onPointerDown, true);
+    return () => {
+      if (pendingTimer.current !== null) {
+        window.clearTimeout(pendingTimer.current);
+      }
+      window.removeEventListener("click", onPointerDown, true);
+    };
   }, []);
 
   const frameKey = useMemo(() => pathname ?? "root", [pathname]);
