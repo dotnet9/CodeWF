@@ -29,10 +29,10 @@ export default async function HomePage({ params }: LocalePageProps) {
   ];
   const startCards = buildStartCards({
     locale,
-    copy,
     latestPost: home.recentPosts[0],
     album: topAlbum,
-    category: topCategory
+    category: topCategory,
+    projectsLabel: t.projects
   });
 
   return (
@@ -92,10 +92,8 @@ export default async function HomePage({ params }: LocalePageProps) {
       <section className="home-start-panel">
         <div className="home-start-grid">
           {startCards.map((item) => (
-            <Link className="home-start-card" href={item.href} key={item.title}>
-              <span className="card-kicker">{item.kicker}</span>
+            <Link className="home-start-card" href={item.href} key={item.href}>
               <strong>{item.title}</strong>
-              <small>{item.meta}</small>
             </Link>
           ))}
         </div>
@@ -202,47 +200,39 @@ type HomeCopy = ReturnType<typeof homeCopy>;
 
 function buildStartCards({
   locale,
-  copy,
   latestPost,
   album,
-  category
+  category,
+  projectsLabel
 }: {
   locale: Locale;
-  copy: HomeCopy;
   latestPost?: BlogPostBrief;
   album?: TaxonomyItem;
   category?: TaxonomyItem;
+  projectsLabel: string;
 }) {
   return [
     latestPost
       ? {
-          kicker: copy.latestKicker,
-          title: latestPost.title ?? copy.latestFallback,
-          href: withLocale(locale, latestPost.url ?? "/post"),
-          meta: formatDate(latestPost.lastmod ?? latestPost.date, locale)
+          title: latestPost.title ?? latestPost.slug ?? projectsLabel,
+          href: withLocale(locale, latestPost.url ?? "/post")
         }
       : null,
     album
       ? {
-          kicker: copy.albumKicker,
-          title: copy.albumTitle(album.name),
-          href: withLocale(locale, `/album/${encodeURIComponent(album.slug ?? album.name ?? "")}`),
-          meta: copy.postCount(album.postCount)
+          title: album.name ?? album.slug ?? projectsLabel,
+          href: withLocale(locale, `/album/${encodeURIComponent(album.slug ?? album.name ?? "")}`)
         }
       : null,
     category
       ? {
-          kicker: copy.categoryKicker,
-          title: copy.categoryTitle(category.name),
-          href: withLocale(locale, `/cat/${encodeURIComponent(category.slug ?? category.name ?? "")}`),
-          meta: copy.postCount(category.postCount)
+          title: category.name ?? category.slug ?? projectsLabel,
+          href: withLocale(locale, `/cat/${encodeURIComponent(category.slug ?? category.name ?? "")}`)
         }
       : null,
     {
-      kicker: copy.projectKicker,
-      title: copy.projectTitle,
-      href: withLocale(locale, "/project"),
-      meta: copy.projectMeta
+      title: projectsLabel,
+      href: withLocale(locale, "/project")
     }
   ].filter((item): item is Exclude<typeof item, null> => item !== null);
 }

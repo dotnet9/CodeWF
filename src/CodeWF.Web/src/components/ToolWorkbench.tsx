@@ -6,6 +6,7 @@ import { marked } from "marked";
 import { Clipboard, Play, RotateCcw } from "lucide-react";
 import type { Locale } from "@/types";
 import type { ToolNode } from "@/types";
+import { HtmlContent } from "./HtmlContent";
 
 const nato: Record<string, string> = {
   a: "Alpha",
@@ -317,7 +318,7 @@ export function ToolWorkbench({ tool, locale }: { tool: ToolNode; locale: Locale
         </div>
         {qr ? <img src={qr} alt="QR code" className="qr-output" /> : null}
         {mode === "markdown" && output.startsWith("<") ? (
-          <div className="rich-content" dangerouslySetInnerHTML={{ __html: output }} />
+          <HtmlContent html={output} />
         ) : (
           <pre>{output || ui.ready}</pre>
         )}
