@@ -90,19 +90,11 @@ export default async function HomePage({ params }: LocalePageProps) {
       </section>
 
       <section className="home-start-panel">
-        <div className="section-head section-head--compact">
-          <div>
-            <span className="eyebrow eyebrow--subtle">{copy.startEyebrow}</span>
-            <h2>{copy.startTitle}</h2>
-            <p>{copy.startDescription}</p>
-          </div>
-        </div>
         <div className="home-start-grid">
           {startCards.map((item) => (
             <Link className="home-start-card" href={item.href} key={item.title}>
               <span className="card-kicker">{item.kicker}</span>
               <strong>{item.title}</strong>
-              <p>{item.description}</p>
               <small>{item.meta}</small>
             </Link>
           ))}
@@ -113,7 +105,6 @@ export default async function HomePage({ params }: LocalePageProps) {
         <div className="section-head">
           <div>
             <h2>{t.featuredPosts}</h2>
-            <p>{locale === "zh-CN" ? "首页置顶的 Banner 文章" : "Featured banner posts"}</p>
           </div>
           <Link className="text-link" href={withLocale(locale, "/post")}>
             {t.posts}
@@ -139,7 +130,6 @@ export default async function HomePage({ params }: LocalePageProps) {
         <div className="section-head">
           <div>
             <h2>{t.recentPosts}</h2>
-            <p>{home.site.ownerDesc ?? home.site.memo}</p>
           </div>
           <Link className="text-link" href={withLocale(locale, "/post")}>
             {t.posts}
@@ -158,7 +148,6 @@ export default async function HomePage({ params }: LocalePageProps) {
         <div className="section-head">
           <div>
             <h2>{t.recommendedTools}</h2>
-            <p>{locale === "zh-CN" ? "精选展示常用工具入口，方便快速回访" : "Stable quick access to frequently used tools"}</p>
           </div>
           <Link className="text-link" href={withLocale(locale, "/tool")}>
             {t.toolCatalog}
@@ -229,7 +218,6 @@ function buildStartCards({
       ? {
           kicker: copy.latestKicker,
           title: latestPost.title ?? copy.latestFallback,
-          description: latestPost.description ?? copy.latestDescription,
           href: withLocale(locale, latestPost.url ?? "/post"),
           meta: formatDate(latestPost.lastmod ?? latestPost.date, locale)
         }
@@ -238,7 +226,6 @@ function buildStartCards({
       ? {
           kicker: copy.albumKicker,
           title: copy.albumTitle(album.name),
-          description: album.memo || copy.albumDescription(album.postCount),
           href: withLocale(locale, `/album/${encodeURIComponent(album.slug ?? album.name ?? "")}`),
           meta: copy.postCount(album.postCount)
         }
@@ -247,7 +234,6 @@ function buildStartCards({
       ? {
           kicker: copy.categoryKicker,
           title: copy.categoryTitle(category.name),
-          description: category.memo || copy.categoryDescription(category.postCount),
           href: withLocale(locale, `/cat/${encodeURIComponent(category.slug ?? category.name ?? "")}`),
           meta: copy.postCount(category.postCount)
         }
@@ -255,7 +241,6 @@ function buildStartCards({
     {
       kicker: copy.projectKicker,
       title: copy.projectTitle,
-      description: copy.projectDescription,
       href: withLocale(locale, "/project"),
       meta: copy.projectMeta
     }
