@@ -7,6 +7,14 @@ Changelog: [CHANGELOG.md](./CHANGELOG.md)
 
 The site is built with ASP.NET Core Razor Pages and uses the sibling repository `Assets.Dotnet9` as a file-based content store. Articles, docs, timelines, tool metadata, images, and site-level markdown pages are all loaded from that repository at runtime.
 
+## Logo
+
+![CodeWF Logo](./logo.png)
+
+The logo is built around a C-shaped site mark: the heavy white `C` directly echoes the CodeWF brand initial, the deep ink-green base represents long-lived technical content, and the yellow block acts as a bookmark accent to keep the reading identity of the blog. The shape deliberately avoids extra detail so 16px browser tabs and bookmarks still keep three clear blocks: the dark base, white C, and yellow bookmark.
+
+The root-level `logo.svg`, `logo.png`, and `logo.ico` files are the single source for logo maintenance. Runtime `/logo.svg`, `/logo.png`, and `/logo.ico` are served from those files, while legacy `/favicon.ico` and `/favicon.png` URLs remain compatible redirects to the new logo.
+
 ## Repositories
 
 - Website source (local): `D:\github\owner\CodeWF`

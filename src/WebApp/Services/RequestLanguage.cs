@@ -34,6 +34,9 @@ public static class RequestLanguage
         "favicon.png",
         "img",
         "lib",
+        "logo.ico",
+        "logo.png",
+        "logo.svg",
         "post",
         "privacy",
         "project",
@@ -203,6 +206,9 @@ public static class RequestLanguage
 
         if (value.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase)
             || value.Equals("/favicon.png", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("/logo.ico", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("/logo.png", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("/logo.svg", StringComparison.OrdinalIgnoreCase)
             || value.Equals("/robots.txt", StringComparison.OrdinalIgnoreCase))
         {
             return true;

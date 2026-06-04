@@ -126,6 +126,12 @@ app.UseOutputCache();
 
 app.UseAuthorization();
 
+app.MapGet("/logo.svg", (HttpContext context) => ServeLogoFile(context, app.Environment, "logo.svg", "image/svg+xml"));
+app.MapGet("/logo.png", (HttpContext context) => ServeLogoFile(context, app.Environment, "logo.png", "image/png"));
+app.MapGet("/logo.ico", (HttpContext context) => ServeLogoFile(context, app.Environment, "logo.ico", "image/x-icon"));
+app.MapGet("/favicon.ico", () => Results.Redirect("/logo.ico"));
+app.MapGet("/favicon.png", () => Results.Redirect("/logo.png"));
+
 app.MapRazorPages();
 app.MapControllers();
 
@@ -163,4 +169,31 @@ static string GetOutputCacheLanguage(HttpContext context)
     }
 
     return RequestLanguage.CurrentLanguage;
+}
+
+static IResult ServeLogoFile(HttpContext context, IWebHostEnvironment environment, string fileName, string contentType)
+{
+    var filePath = ResolveLogoFile(environment, fileName);
+    if (!File.Exists(filePath))
+    {
+        return Results.NotFound();
+    }
+
+    if (!environment.IsDevelopment())
+    {
+        context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=604800";
+    }
+
+    return Results.File(filePath, contentType);
+}
+
+static string ResolveLogoFile(IWebHostEnvironment environment, string fileName)
+{
+    var contentRootFile = Path.Combine(environment.ContentRootPath, fileName);
+    if (File.Exists(contentRootFile))
+    {
+        return contentRootFile;
+    }
+
+    return Path.GetFullPath(Path.Combine(environment.ContentRootPath, "..", "..", fileName));
 }

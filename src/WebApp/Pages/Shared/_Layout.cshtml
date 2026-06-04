@@ -57,7 +57,7 @@
     }
 
     var canonicalUrl = ToAbsoluteUrl(ViewData["CanonicalUrl"] as string ?? canonicalPath);
-    var ogImage = ToAbsoluteUrl(ViewData["OgImage"] as string ?? site.Favicon ?? "/favicon.png");
+    var ogImage = ToAbsoluteUrl(ViewData["OgImage"] as string ?? site.Favicon ?? "/logo.png");
     var ogType = ViewData["OgType"] as string ?? "website";
     // 搜索结果页不参与索引，但允许爬虫继续跟随结果链接抓正文。
     var robots = ViewData["Robots"] as string
@@ -119,7 +119,9 @@
     </noscript>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Head", required: false)
-    <link rel="icon" type="image/png" href="~/favicon.png" asp-append-version="true" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="shortcut icon" href="/logo.ico" />
     @if (!HostEnvironment.IsDevelopment())
     {
         <script>

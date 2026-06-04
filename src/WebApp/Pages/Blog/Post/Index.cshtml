@@ -30,7 +30,7 @@
 
         var articleUrl = $"{siteDomain}{ConstantUtil.GetPostUrl(Model.Post)}";
         var articleImage = string.IsNullOrWhiteSpace(Model.Post.Cover)
-            ? AbsoluteUrl(site.Favicon ?? "/favicon.png")
+            ? AbsoluteUrl(site.Favicon ?? "/logo.png")
             : AbsoluteUrl(Model.Post.Cover);
         var keywords = (Model.Post.Tags ?? [])
             .Concat(Model.Post.Categories ?? [])
@@ -75,7 +75,7 @@
                 ["logo"] = new Dictionary<string, string>
                 {
                     ["@type"] = "ImageObject",
-                    ["url"] = AbsoluteUrl(site.Favicon ?? "/favicon.png")
+                    ["url"] = AbsoluteUrl(site.Favicon ?? "/logo.png")
                 }
             },
             ["keywords"] = keywords

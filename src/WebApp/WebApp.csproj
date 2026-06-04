@@ -21,4 +21,10 @@
 		<InternalsVisibleTo Include="WebApp.Tests" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Content Include="..\..\logo.svg" Link="logo.svg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+		<Content Include="..\..\logo.png" Link="logo.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+		<Content Include="..\..\logo.ico" Link="logo.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>

@@ -7,6 +7,14 @@ English version: [README.md](./README.md)
 
 当前网站基于 ASP.NET Core Razor Pages 构建，并把同级仓库 `Assets.Dotnet9` 作为文件型内容仓库使用。文章、文档、时间线、工具元数据、图片以及站点级 Markdown 页面，都会在运行时从该仓库读取。
 
+## Logo
+
+![CodeWF Logo](./logo.png)
+
+Logo 的图形思路是“C 形站点标记”：粗白色 `C` 直接呼应 CodeWF / 码坊 的品牌首字母，深墨绿底代表长期沉淀的技术内容，右上角黄块作为书签记忆点，保留博客网站的阅读属性。图形刻意减少细节，让浏览器标签页和收藏夹里的 16px 小图标仍能留下深色底、白色 C 和黄色书签三个清晰块。
+
+根目录的 `logo.svg`、`logo.png`、`logo.ico` 是统一维护入口，站点运行时的 `/logo.svg`、`/logo.png`、`/logo.ico` 均来自这组文件；历史 `/favicon.ico` 和 `/favicon.png` 继续兼容跳转到新 Logo。
+
 ## 仓库关系
 
 - 网站源码（本地）：`D:\github\owner\CodeWF`
