@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CodeWF logo">
+  <defs>
+    <linearGradient id="codewf-bg" x1="80" y1="48" x2="432" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#123047"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+  </defs>
+  <rect x="32" y="32" width="448" height="448" rx="104" fill="url(#codewf-bg)"/>
+  <rect x="352" y="74" width="62" height="106" rx="24" fill="#F6B13D"/>
+  <path d="M350 165A132 132 0 1 0 350 347" fill="none" stroke="#FFFFFF" stroke-width="82" stroke-linecap="round"/>
+</svg>
