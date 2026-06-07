@@ -15,6 +15,7 @@ export default defineConfig({
     }
   },
   server: {
+    allowedHosts: ["dotnet9.com", "codewf.com"],
     port: 5001,
     strictPort: false
   }
