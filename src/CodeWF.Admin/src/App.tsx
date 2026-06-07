@@ -293,8 +293,8 @@ export default function App() {
       locale={antdLocale}
       theme={{
         token: {
-          colorPrimary: "#0d7ab8",
-          colorInfo: "#2693d2",
+          colorPrimary: "#ff3f6c",
+          colorInfo: "#6d5dfc",
           colorSuccess: "#1f7a5f",
           colorWarning: "#c58d20",
           colorError: "#c04c35",
@@ -308,7 +308,7 @@ export default function App() {
         components: {
           Button: {
             borderRadius: 8,
-            primaryShadow: "0 10px 22px rgba(13, 122, 184, 0.2)"
+            primaryShadow: "0 10px 22px rgba(255, 63, 108, 0.22)"
           },
           Card: {
             borderRadiusLG: 8,
@@ -320,8 +320,8 @@ export default function App() {
           },
           Menu: {
             itemBorderRadius: 8,
-            itemSelectedBg: "#e7f4ff",
-            itemSelectedColor: "#0a4f7d"
+            itemSelectedBg: "#fff0f4",
+            itemSelectedColor: "#dc244f"
           },
           Table: {
             headerBg: "#f5f9fd",

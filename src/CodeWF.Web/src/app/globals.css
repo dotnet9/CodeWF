@@ -4,15 +4,17 @@
   --text: #151a23;
   --muted: #647184;
   --line: #e4e9f1;
-  --brand: #5f83e7;
-  --brand-strong: #3f5fc9;
-  --accent: #7b6eea;
-  --accent-strong: #5b4fc7;
-  --amber: #d8864a;
-  --blue: #4f78dc;
-  --violet: #8b72f0;
-  --soft: #eef3ff;
-  --soft-2: #f7f1ff;
+  --brand: #ff3f6c;
+  --brand-strong: #dc244f;
+  --accent: #6d5dfc;
+  --accent-strong: #4f46e5;
+  --amber: #ffb84d;
+  --blue: #2563eb;
+  --violet: #7c3aed;
+  --brand-glow: rgba(255, 63, 108, 0.24);
+  --accent-glow: rgba(109, 93, 252, 0.18);
+  --soft: #fff0f4;
+  --soft-2: #f1efff;
   --soft-3: #f3f7fb;
   --shadow: 0 16px 44px rgba(21, 26, 35, 0.07);
   --shadow-hover: 0 26px 68px rgba(21, 26, 35, 0.12);
@@ -27,9 +29,9 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(circle at 44% 98px, rgba(95, 131, 231, 0.15), transparent 340px),
-    radial-gradient(circle at 62% 116px, rgba(123, 110, 234, 0.11), transparent 300px),
-    radial-gradient(circle at 78% 132px, rgba(216, 134, 74, 0.08), transparent 280px),
+    radial-gradient(circle at 44% 98px, rgba(255, 63, 108, 0.12), transparent 340px),
+    radial-gradient(circle at 62% 116px, rgba(109, 93, 252, 0.11), transparent 300px),
+    radial-gradient(circle at 78% 132px, rgba(255, 184, 77, 0.08), transparent 280px),
     linear-gradient(180deg, #ffffff 0%, #ffffff 34%, #f7f9fc 78%, #ffffff 100%),
     var(--bg);
   font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Segoe UI", sans-serif;
@@ -47,7 +49,7 @@ body::before {
   height: 420px;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(118deg, rgba(95, 131, 231, 0.12), rgba(123, 110, 234, 0.08) 48%, rgba(216, 134, 74, 0.08) 88%);
+  background: linear-gradient(118deg, rgba(255, 63, 108, 0.12), rgba(109, 93, 252, 0.08) 48%, rgba(255, 184, 77, 0.07) 88%);
   opacity: 0.64;
 }
 
@@ -58,8 +60,8 @@ body::after {
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(13, 122, 184, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 122, 184, 0.012) 1px, transparent 1px);
+    linear-gradient(rgba(255, 63, 108, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(109, 93, 252, 0.012) 1px, transparent 1px);
   background-size: 100% 42px, 42px 100%;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0));
   opacity: 0.28;
@@ -110,7 +112,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid rgba(13, 122, 184, 0.36);
+  outline: 2px solid rgba(255, 63, 108, 0.34);
   outline-offset: 2px;
 }
 
@@ -167,8 +169,8 @@ img {
   object-fit: contain;
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(95, 131, 231, 0.24);
-  box-shadow: 0 8px 18px rgba(95, 131, 231, 0.14);
+  border: 1px solid rgba(255, 63, 108, 0.22);
+  box-shadow: 0 10px 22px rgba(255, 63, 108, 0.14);
 }
 
 .main-nav,
@@ -504,7 +506,7 @@ img {
   border: 0;
   border-radius: 999px;
   padding: 6px 10px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+  background: linear-gradient(135deg, var(--brand) 0%, #f43f5e 45%, var(--accent) 115%);
   color: #fff;
   font-weight: 800;
   cursor: pointer;
@@ -2878,16 +2880,21 @@ img {
   box-shadow: none;
   color: var(--text);
   background:
-    radial-gradient(circle at 42% 36%, rgba(95, 131, 231, 0.18), transparent 320px),
-    radial-gradient(circle at 60% 42%, rgba(123, 110, 234, 0.13), transparent 290px),
-    radial-gradient(circle at 74% 48%, rgba(216, 134, 74, 0.1), transparent 270px),
+    linear-gradient(180deg, rgba(255, 244, 247, 0.68), rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 50% 44%, rgba(255, 63, 108, 0.18), transparent 300px),
+    radial-gradient(circle at 62% 48%, rgba(109, 93, 252, 0.15), transparent 310px),
+    radial-gradient(circle at 38% 42%, rgba(255, 184, 77, 0.08), transparent 270px),
     #fff;
 }
 
 .home-hero::before {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.94)),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.7));
+    linear-gradient(rgba(255, 63, 108, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(109, 93, 252, 0.022) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.92)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72));
+  background-size: 48px 48px, 48px 48px, auto, auto;
+  mask-image: radial-gradient(circle at 50% 42%, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.18) 58%, transparent 82%);
 }
 
 .home-hero::after {
@@ -2896,8 +2903,8 @@ img {
 }
 
 .home-hero__image {
-  opacity: 0.16;
-  filter: saturate(1.05) contrast(1.02);
+  opacity: 0.13;
+  filter: saturate(1.22) contrast(1.05);
 }
 
 .home-hero__content {
@@ -2933,8 +2940,8 @@ img {
 }
 
 .primary-action {
-  background: linear-gradient(135deg, #5f83e7 0%, #7b6eea 58%, #d8864a 130%);
-  box-shadow: 0 16px 34px rgba(95, 131, 231, 0.26);
+  background: linear-gradient(135deg, var(--brand) 0%, #ef3f7a 42%, var(--accent) 110%);
+  box-shadow: 0 16px 34px rgba(255, 63, 108, 0.25), 0 8px 18px rgba(109, 93, 252, 0.13);
 }
 
 .secondary-action {
@@ -2956,7 +2963,7 @@ img {
 }
 
 .home-hero__trustline strong {
-  color: var(--brand);
+  color: var(--brand-strong);
 }
 
 .home-hero__rail {
@@ -3011,7 +3018,7 @@ img {
 .post-card:hover,
 .compact-post-link:hover {
   transform: translateY(-4px);
-  border-color: rgba(123, 110, 234, 0.3);
+  border-color: rgba(255, 63, 108, 0.28);
   box-shadow: 0 24px 64px rgba(21, 26, 35, 0.11);
 }
 
@@ -3021,7 +3028,7 @@ img {
 
 .section-head::after {
   width: 64px;
-  background: var(--brand);
+  background: linear-gradient(90deg, var(--brand), var(--accent));
 }
 
 .section-head h1,
@@ -3037,8 +3044,28 @@ img {
 }
 
 .eyebrow {
-  border: 1px solid rgba(95, 131, 231, 0.24);
+  border: 1px solid rgba(255, 63, 108, 0.22);
   background: rgba(255, 255, 255, 0.72);
+}
+
+.text-link,
+.post-card h3 a,
+.rich-content a,
+.taxonomy-list a:hover,
+.friend-links__grid a:hover,
+.site-footer a:hover {
+  color: var(--brand-strong);
+}
+
+.rich-content a {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 63, 108, 0.28);
+  text-underline-offset: 3px;
+}
+
+.text-link:hover,
+.rich-content a:hover {
+  color: var(--accent-strong);
 }
 
 .post-cover::before,
@@ -3051,7 +3078,7 @@ img {
 .home-tool-card::before,
 .tool-card::before,
 .metric::before {
-  background: var(--brand);
+  background: linear-gradient(180deg, var(--brand), var(--accent));
 }
 
 .home-tool-card {

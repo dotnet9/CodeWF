@@ -11,11 +11,11 @@ body,
   --admin-text: #171b22;
   --admin-muted: #667085;
   --admin-line: #e3e8ef;
-  --admin-brand: #5f83e7;
-  --admin-brand-strong: #3f5fc9;
-  --admin-accent: #7b6eea;
-  --admin-soft: #eef3ff;
-  --admin-warning-soft: #f7f1ff;
+  --admin-brand: #ff3f6c;
+  --admin-brand-strong: #dc244f;
+  --admin-accent: #6d5dfc;
+  --admin-soft: #fff0f4;
+  --admin-warning-soft: #f1efff;
   --admin-shadow: 0 16px 42px rgba(21, 26, 35, 0.07);
   --admin-shadow-hover: 0 24px 64px rgba(21, 26, 35, 0.11);
 }
@@ -23,9 +23,9 @@ body,
 body {
   overflow: hidden;
   background:
-    radial-gradient(circle at 70% 0, rgba(95, 131, 231, 0.12), transparent 320px),
-    radial-gradient(circle at 84% 16%, rgba(123, 110, 234, 0.1), transparent 280px),
-    radial-gradient(circle at 92% 22%, rgba(216, 134, 74, 0.07), transparent 260px),
+    radial-gradient(circle at 70% 0, rgba(255, 63, 108, 0.12), transparent 320px),
+    radial-gradient(circle at 84% 16%, rgba(109, 93, 252, 0.1), transparent 280px),
+    radial-gradient(circle at 92% 22%, rgba(255, 184, 77, 0.07), transparent 260px),
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 248, 251, 0.98)),
     var(--admin-bg);
   color: var(--admin-text);
@@ -61,9 +61,9 @@ textarea,
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 46% 22%, rgba(95, 131, 231, 0.14), transparent 320px),
-    radial-gradient(circle at 60% 28%, rgba(123, 110, 234, 0.11), transparent 270px),
-    radial-gradient(circle at 74% 32%, rgba(216, 134, 74, 0.08), transparent 250px),
+    radial-gradient(circle at 46% 22%, rgba(255, 63, 108, 0.14), transparent 320px),
+    radial-gradient(circle at 60% 28%, rgba(109, 93, 252, 0.11), transparent 270px),
+    radial-gradient(circle at 74% 32%, rgba(255, 184, 77, 0.08), transparent 250px),
     linear-gradient(180deg, #ffffff 0%, var(--admin-bg) 100%);
 }
 
@@ -662,7 +662,8 @@ textarea,
 }
 
 .admin-content-scroll .ant-btn-primary {
-  box-shadow: 0 10px 22px rgba(95, 131, 231, 0.22);
+  background: linear-gradient(135deg, var(--admin-brand), var(--admin-accent));
+  box-shadow: 0 10px 22px rgba(255, 63, 108, 0.22);
 }
 
 .admin-content-scroll .ant-btn:hover,
