@@ -192,7 +192,7 @@ export type SiteSettingsResult = {
   site?: SiteSettings | null;
 };
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5002/api").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "/api").replace(/\/$/, "");
 
 function credentials(): AdminCredentials {
   return {
