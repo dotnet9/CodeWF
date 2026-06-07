@@ -42,22 +42,15 @@ where dotnet >nul 2>nul || (
 
 call :ensure_node_modules || goto :error
 
-if not exist "%WEB_OUT%\package.json" (
-  echo [CodeWF] Missing published frontend: %WEB_OUT%
-  echo [CodeWF] Run publish.bat manually first. run.bat does not publish automatically.
-  exit /b 1
-)
+if not exist "%WEB_OUT%\package.json" set "NEED_PUBLISH=1"
+if not exist "%API_OUT%\" set "NEED_PUBLISH=1"
+if not exist "%ADMIN_OUT%\index.html" set "NEED_PUBLISH=1"
 
-if not exist "%API_OUT%\" (
-  echo [CodeWF] Missing published API: %API_OUT%
-  echo [CodeWF] Run publish.bat manually first. run.bat does not publish automatically.
-  exit /b 1
-)
-
-if not exist "%ADMIN_OUT%\index.html" (
-  echo [CodeWF] Missing published admin frontend: %ADMIN_OUT%
-  echo [CodeWF] Run publish.bat manually first. run.bat does not publish automatically.
-  exit /b 1
+if defined NEED_PUBLISH (
+  echo [CodeWF] Published output is missing. Running publish.bat...
+  call "%ROOT%publish.bat" || goto :error
+) else (
+  echo [CodeWF] Existing publish output found. Skipping publish.
 )
 
 if not exist "%WEB_OUT%\node_modules\next\" (
@@ -132,8 +125,9 @@ exit /b 0
 echo Usage:
 echo   run.bat
 echo.
-echo Run publish.bat manually before run.bat. If publish folders already exist,
-echo run.bat starts them directly and never republishes.
+echo If publish output exists, run.bat starts it directly.
+echo If publish output is missing, run.bat runs publish.bat first.
+echo Delete the publish folder before run.bat when you want a fresh publish.
 echo.
 echo Environment overrides:
 echo   WEB_PORT=5000
