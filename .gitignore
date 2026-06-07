@@ -14,6 +14,7 @@ out/
 coverage/
 *.tsbuildinfo
 .logs/
+publish/
 
 src/CodeWF.Api/**/appsettings.Development.json
 src/CodeWF.Api/**/appsettings.Production.json

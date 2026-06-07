@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "dev:api": "dotnet run --project src/CodeWF.Api/CodeWF.Api.csproj --urls http://localhost:5002",
-    "dev:frontend": "npm run dev --workspace @codewf/web -- --port 5000",
-    "dev:admin": "npm run dev --workspace @codewf/admin -- --port 5001",
+    "dev:frontend": "npm run dev --workspace @codewf/web",
+    "dev:admin": "npm run dev --workspace @codewf/admin",
     "build:api": "dotnet build src/CodeWF.Api/CodeWF.Api.csproj --configuration Release",
     "build:frontend": "npm run build --workspace @codewf/web",
     "build:admin": "npm run build --workspace @codewf/admin",
