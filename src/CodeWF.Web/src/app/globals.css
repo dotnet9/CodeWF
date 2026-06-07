@@ -136,8 +136,9 @@ img {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 22px;
-  padding: 14px clamp(18px, 4vw, 56px);
+  gap: 18px;
+  padding-block: 14px;
+  padding-inline: max(18px, calc((100vw - 1180px) / 2));
   background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid rgba(21, 26, 35, 0.08);
   backdrop-filter: blur(18px) saturate(1.06);
@@ -171,7 +172,7 @@ img {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .header-locale-switch {
@@ -209,7 +210,11 @@ img {
 }
 
 .main-nav {
-  flex: 1;
+  flex: 0 1 auto;
+}
+
+.header-actions {
+  margin-left: auto;
 }
 
 .main-nav a,
@@ -475,7 +480,7 @@ img {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: min(360px, 30vw);
+  width: clamp(260px, 24vw, 340px);
   padding: 7px 8px 7px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
