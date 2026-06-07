@@ -10,6 +10,15 @@ export const localeLabels: Record<Locale, string> = {
   "zh-TW": "繁體中文"
 };
 
+type LocaleInput = Locale | string | undefined | null;
+
+const dateFormatLocales: Record<Locale, string> = {
+  "zh-CN": "zh-CN",
+  en: "en",
+  ja: "ja",
+  "zh-TW": "zh-TW"
+};
+
 const dictionaries = {
   "zh-CN": {
     home: "首页",
@@ -161,32 +170,40 @@ const dictionaries = {
   }
 } as const;
 
-export function normalizeLocale(value?: string): Locale {
-  const match = locales.find((locale) => locale.toLowerCase() === value?.toLowerCase());
+export function normalizeLocale(value?: string | null): Locale {
+  const normalizedValue = value?.trim().replace(/_/g, "-");
+  const match = locales.find((locale) => locale.toLowerCase() === normalizedValue?.toLowerCase());
   return match ?? defaultLocale;
 }
 
-export function isLocale(value?: string): value is Locale {
-  return locales.some((locale) => locale.toLowerCase() === value?.toLowerCase());
+export function isLocale(value?: string): boolean {
+  const normalizedValue = value?.trim().replace(/_/g, "-");
+  return locales.some((locale) => locale.toLowerCase() === normalizedValue?.toLowerCase());
 }
 
-export function dictionary(locale: Locale) {
-  return dictionaries[locale] ?? dictionaries[defaultLocale];
+export function dictionary(locale: LocaleInput) {
+  return dictionaries[normalizeLocale(locale)];
 }
 
-export function withLocale(locale: Locale, path = "/") {
+export function withLocale(locale: LocaleInput, path = "/") {
+  const normalizedLocale = normalizeLocale(locale);
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `/${locale}${normalized === "/" ? "" : normalized}`;
+  return `/${normalizedLocale}${normalized === "/" ? "" : normalized}`;
 }
 
-export function formatDate(value: string | undefined, locale: Locale) {
+export function formatDate(value: string | undefined, locale: LocaleInput) {
   if (!value) {
     return "";
   }
 
-  return new Intl.DateTimeFormat(locale, {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(dateFormatLocales[normalizeLocale(locale)] ?? dateFormatLocales[defaultLocale], {
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
-  }).format(new Date(value));
+  }).format(date);
 }

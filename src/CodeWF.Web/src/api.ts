@@ -13,6 +13,7 @@ import type {
   TaxonomyItem,
   ToolNode
 } from "./types";
+import { normalizeLocale } from "./i18n";
 
 const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5002/api").replace(/\/$/, "");
 
@@ -45,8 +46,10 @@ async function getJson<T>(path: string, fallback: T, init?: RequestInit & { next
   }
 }
 
-function query(locale: Locale, values?: Record<string, string | number | undefined>) {
-  const params = new URLSearchParams({ culture: locale });
+type LocaleInput = Locale | string | undefined | null;
+
+function query(locale: LocaleInput, values?: Record<string, string | number | undefined>) {
+  const params = new URLSearchParams({ culture: normalizeLocale(locale) });
   Object.entries(values ?? {}).forEach(([key, value]) => {
     if (value !== undefined && value !== "") {
       params.set(key, String(value));
@@ -57,7 +60,7 @@ function query(locale: Locale, values?: Record<string, string | number | undefin
 
 export const api = {
   site: () => getJson<SiteInfo>("/site", emptySite),
-  home: (locale: Locale) =>
+  home: (locale: LocaleInput) =>
     getJson<HomePageData>(`/home?${query(locale, { recent: 6 })}`, {
       site: emptySite,
       recentPosts: [],
@@ -67,27 +70,27 @@ export const api = {
       tools: [],
       counts: {}
     }),
-  posts: (locale: Locale, values?: Record<string, string | number | undefined>) =>
+  posts: (locale: LocaleInput, values?: Record<string, string | number | undefined>) =>
     getJson<PagedResult<BlogPostBrief>>(`/posts?${query(locale, values)}`, {
       pageIndex: 1,
       pageSize: 12,
       total: 0,
       data: []
     }),
-  post: (locale: Locale, year: string, month: string, slug: string) =>
+  post: (locale: LocaleInput, year: string, month: string, slug: string) =>
     getJson<BlogPost | null>(`/posts/${year}/${month}/${slug}?${query(locale)}`, null),
-  categories: (locale: Locale) => getJson<TaxonomyItem[]>(`/categories?${query(locale)}`, []),
-  albums: (locale: Locale) => getJson<TaxonomyItem[]>(`/albums?${query(locale)}`, []),
-  tags: (locale: Locale) => getJson<{ name: string; postCount: number }[]>(`/tags?${query(locale)}`, []),
-  tools: (locale: Locale) => getJson<ToolNode[]>(`/tools?${query(locale)}`, []),
-  tool: (locale: Locale, slug: string) => getJson<ToolNode | null>(`/tools/${slug}?${query(locale)}`, null),
-  docs: (locale: Locale) => getJson<DocNode[]>(`/docs?${query(locale)}`, []),
-  doc: (locale: Locale, slug: string) => getJson<DocNode | null>(`/docs/${slug}?${query(locale)}`, null),
-  markdownPage: (locale: Locale, name: "about" | "donation" | "privacy") =>
+  categories: (locale: LocaleInput) => getJson<TaxonomyItem[]>(`/categories?${query(locale)}`, []),
+  albums: (locale: LocaleInput) => getJson<TaxonomyItem[]>(`/albums?${query(locale)}`, []),
+  tags: (locale: LocaleInput) => getJson<{ name: string; postCount: number }[]>(`/tags?${query(locale)}`, []),
+  tools: (locale: LocaleInput) => getJson<ToolNode[]>(`/tools?${query(locale)}`, []),
+  tool: (locale: LocaleInput, slug: string) => getJson<ToolNode | null>(`/tools/${slug}?${query(locale)}`, null),
+  docs: (locale: LocaleInput) => getJson<DocNode[]>(`/docs?${query(locale)}`, []),
+  doc: (locale: LocaleInput, slug: string) => getJson<DocNode | null>(`/docs/${slug}?${query(locale)}`, null),
+  markdownPage: (locale: LocaleInput, name: "about" | "donation" | "privacy") =>
     getJson<MarkdownPage>(`/pages/${name}?${query(locale)}`, {}),
-  friendLinks: (locale: Locale) => getJson<FriendLinkItem[]>(`/friend-links?${query(locale)}`, []),
-  timelines: (locale: Locale) => getJson<{ time?: string; title?: string; content?: string }[]>(`/timelines?${query(locale)}`, []),
-  search: (locale: Locale, values?: Record<string, string | number | undefined>) =>
+  friendLinks: (locale: LocaleInput) => getJson<FriendLinkItem[]>(`/friend-links?${query(locale)}`, []),
+  timelines: (locale: LocaleInput) => getJson<{ time?: string; title?: string; content?: string }[]>(`/timelines?${query(locale)}`, []),
+  search: (locale: LocaleInput, values?: Record<string, string | number | undefined>) =>
     getJson<SearchResultPageData>(`/search?${query(locale, values)}`, {
       pageIndex: 1,
       pageSize: 10,
@@ -98,7 +101,7 @@ export const api = {
       docCount: 0,
       isBlocked: false
     }),
-  searchSuggestions: (locale: Locale, q: string, take = 10) =>
+  searchSuggestions: (locale: LocaleInput, q: string, take = 10) =>
     getJson<SearchResultItem[]>(`/search/suggest?${query(locale, { q, take })}`, [])
 };
 

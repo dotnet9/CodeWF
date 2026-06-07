@@ -9,7 +9,7 @@ import { HtmlContent } from "@/components/HtmlContent";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { dictionary, formatDate, withLocale } from "@/i18n";
+import { dictionary, formatDate, normalizeLocale, withLocale } from "@/i18n";
 import type { BlogPost, FriendLinkItem, HomePageData, SiteInfo } from "@/types";
 import type { Locale } from "@/types";
 
@@ -152,8 +152,3 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
 };
 
 export default PostPage;
-
-function normalizeLocale(value?: string): Locale {
-  const match = ["zh-CN", "en", "ja", "zh-TW"].find((item) => item.toLowerCase() === value?.toLowerCase());
-  return (match as Locale | undefined) ?? "zh-CN";
-}
