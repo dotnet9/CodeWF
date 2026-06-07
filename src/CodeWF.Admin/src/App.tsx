@@ -82,7 +82,7 @@ import {
 } from "./api";
 
 const { Header, Content, Sider } = Layout;
-const SITE_LOGO_URL = "/admin/logo.svg";
+const SITE_LOGO_URL = `${import.meta.env.BASE_URL}logo.svg`;
 
 type AdminLocale = "zh-CN" | "en";
 
