@@ -14,7 +14,7 @@ import type {
   ToolNode
 } from "./types";
 
-const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/$/, "");
+const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5002/api").replace(/\/$/, "");
 
 const emptySite: SiteInfo = {
   appTitle: "CodeWF",

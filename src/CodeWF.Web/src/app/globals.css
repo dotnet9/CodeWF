@@ -4,15 +4,16 @@
   --text: #151a23;
   --muted: #647184;
   --line: #e4e9f1;
-  --brand: #e60023;
-  --brand-strong: #b5001b;
-  --accent: #ff6a2a;
-  --accent-strong: #d94614;
-  --amber: #d59a19;
-  --blue: #2f80ed;
-  --soft: #fff0f2;
-  --soft-2: #fff5ec;
-  --soft-3: #f4f7fb;
+  --brand: #5f83e7;
+  --brand-strong: #3f5fc9;
+  --accent: #7b6eea;
+  --accent-strong: #5b4fc7;
+  --amber: #d8864a;
+  --blue: #4f78dc;
+  --violet: #8b72f0;
+  --soft: #eef3ff;
+  --soft-2: #f7f1ff;
+  --soft-3: #f3f7fb;
   --shadow: 0 16px 44px rgba(21, 26, 35, 0.07);
   --shadow-hover: 0 26px 68px rgba(21, 26, 35, 0.12);
   --radius: 8px;
@@ -26,7 +27,9 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(circle at 50% 110px, rgba(230, 0, 35, 0.08), transparent 320px),
+    radial-gradient(circle at 44% 98px, rgba(95, 131, 231, 0.15), transparent 340px),
+    radial-gradient(circle at 62% 116px, rgba(123, 110, 234, 0.11), transparent 300px),
+    radial-gradient(circle at 78% 132px, rgba(216, 134, 74, 0.08), transparent 280px),
     linear-gradient(180deg, #ffffff 0%, #ffffff 34%, #f7f9fc 78%, #ffffff 100%),
     var(--bg);
   font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Segoe UI", sans-serif;
@@ -44,7 +47,7 @@ body::before {
   height: 420px;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(118deg, rgba(230, 0, 35, 0.08), rgba(47, 128, 237, 0.06) 46%, rgba(255, 106, 42, 0.06) 86%);
+  background: linear-gradient(118deg, rgba(95, 131, 231, 0.12), rgba(123, 110, 234, 0.08) 48%, rgba(216, 134, 74, 0.08) 88%);
   opacity: 0.64;
 }
 
@@ -164,8 +167,8 @@ img {
   object-fit: contain;
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(230, 0, 35, 0.18);
-  box-shadow: 0 8px 18px rgba(230, 0, 35, 0.1);
+  border: 1px solid rgba(95, 131, 231, 0.24);
+  box-shadow: 0 8px 18px rgba(95, 131, 231, 0.14);
 }
 
 .main-nav,
@@ -2875,8 +2878,9 @@ img {
   box-shadow: none;
   color: var(--text);
   background:
-    radial-gradient(circle at 52% 38%, rgba(230, 0, 35, 0.1), transparent 310px),
-    radial-gradient(circle at 66% 45%, rgba(47, 128, 237, 0.08), transparent 270px),
+    radial-gradient(circle at 42% 36%, rgba(95, 131, 231, 0.18), transparent 320px),
+    radial-gradient(circle at 60% 42%, rgba(123, 110, 234, 0.13), transparent 290px),
+    radial-gradient(circle at 74% 48%, rgba(216, 134, 74, 0.1), transparent 270px),
     #fff;
 }
 
@@ -2929,8 +2933,8 @@ img {
 }
 
 .primary-action {
-  background: linear-gradient(135deg, #f33c55, var(--brand));
-  box-shadow: 0 16px 34px rgba(230, 0, 35, 0.22);
+  background: linear-gradient(135deg, #5f83e7 0%, #7b6eea 58%, #d8864a 130%);
+  box-shadow: 0 16px 34px rgba(95, 131, 231, 0.26);
 }
 
 .secondary-action {
@@ -3007,7 +3011,7 @@ img {
 .post-card:hover,
 .compact-post-link:hover {
   transform: translateY(-4px);
-  border-color: rgba(230, 0, 35, 0.22);
+  border-color: rgba(123, 110, 234, 0.3);
   box-shadow: 0 24px 64px rgba(21, 26, 35, 0.11);
 }
 
@@ -3033,7 +3037,7 @@ img {
 }
 
 .eyebrow {
-  border: 1px solid rgba(230, 0, 35, 0.14);
+  border: 1px solid rgba(95, 131, 231, 0.24);
   background: rgba(255, 255, 255, 0.72);
 }
 

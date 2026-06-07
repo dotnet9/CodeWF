@@ -43,9 +43,9 @@ npm run dev:admin
 
 默认地址：
 
-- API：`http://localhost:5100`
-- 前台：`http://localhost:3000`
-- 后台：`http://localhost:3001`
+- 前台：`http://localhost:5000`
+- 后台前端：`http://localhost:5001`
+- 后台后端 API：`http://localhost:5002`
 
 ## 配置
 

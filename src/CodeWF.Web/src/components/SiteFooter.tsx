@@ -3,7 +3,7 @@ import { ArrowUpRight, Github, Rss } from "lucide-react";
 import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
 
-const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3001").replace(/\/$/, "");
+const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:5001").replace(/\/$/, "");
 
 export function SiteFooter({
   locale,

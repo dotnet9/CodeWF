@@ -1,4 +1,4 @@
-const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/api$/, "");
+const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5002/api").replace(/\/api$/, "");
 
 export async function GET() {
   const response = await fetch(`${apiBase}/rss.xml`, { next: { revalidate: 120 } });

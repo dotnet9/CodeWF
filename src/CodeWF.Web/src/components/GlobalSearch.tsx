@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { withLocale } from "@/i18n";
 import type { Locale, SearchResultItem } from "@/types";
 
-const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/$/, "");
+const apiBase = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5002/api").replace(/\/$/, "");
 
 export function GlobalSearch({
   locale,

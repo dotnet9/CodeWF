@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = normalizeLocale(rawLocale);
   const home = await api.home(locale);
   const site = home.site;
-  const apiOrigin = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:5100/api")
+  const apiOrigin = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:5002/api")
     .replace(/\/$/, "")
     .replace(/\/api$/, "");
   const iconUrl = `${apiOrigin}/site/favicon/logo.ico?v=20260513`;
