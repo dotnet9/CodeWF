@@ -81,9 +81,7 @@ import {
 } from "./api";
 
 const { Header, Content, Sider } = Layout;
-const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5100/api").replace(/\/$/, "");
-const API_ORIGIN = API_BASE.replace(/\/api$/, "");
-const SITE_LOGO_URL = `${API_ORIGIN}/site/favicon/logo.ico`;
+const SITE_LOGO_URL = "/logo.svg";
 
 type AdminLocale = "zh-CN" | "en";
 

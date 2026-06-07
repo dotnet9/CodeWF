@@ -29,3 +29,5 @@ pnpm-debug.log*
 
 .codex-*.log
 .codex-*.png
+/src/CodeWF.Admin/public
+/src/CodeWF.Web/public

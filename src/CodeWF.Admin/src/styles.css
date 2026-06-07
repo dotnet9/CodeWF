@@ -6,24 +6,25 @@ body,
 }
 
 :root {
-  --admin-bg: #f3f7fb;
+  --admin-bg: #f6f8fb;
   --admin-panel: #ffffff;
-  --admin-text: #101826;
-  --admin-muted: #5d6978;
-  --admin-line: #d8e1ec;
-  --admin-brand: #0d7ab8;
-  --admin-brand-strong: #0a4f7d;
-  --admin-accent: #d9633d;
-  --admin-soft: #e7f4ff;
-  --admin-warning-soft: #fff1e8;
-  --admin-shadow: 0 12px 32px rgba(16, 24, 38, 0.07);
-  --admin-shadow-hover: 0 18px 42px rgba(16, 24, 38, 0.11);
+  --admin-text: #171b22;
+  --admin-muted: #667085;
+  --admin-line: #e3e8ef;
+  --admin-brand: #e60023;
+  --admin-brand-strong: #b5001b;
+  --admin-accent: #ff6a2a;
+  --admin-soft: #fff0f2;
+  --admin-warning-soft: #fff5ec;
+  --admin-shadow: 0 16px 42px rgba(21, 26, 35, 0.07);
+  --admin-shadow-hover: 0 24px 64px rgba(21, 26, 35, 0.11);
 }
 
 body {
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 247, 251, 0.96)),
+    radial-gradient(circle at 72% 0, rgba(230, 0, 35, 0.08), transparent 320px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 248, 251, 0.98)),
     var(--admin-bg);
   color: var(--admin-text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -58,14 +59,14 @@ textarea,
   justify-content: center;
   padding: 24px;
   background:
-    linear-gradient(135deg, rgba(13, 122, 184, 0.12), transparent 42%),
+    radial-gradient(circle at 50% 22%, rgba(230, 0, 35, 0.1), transparent 320px),
     linear-gradient(180deg, #ffffff 0%, var(--admin-bg) 100%);
 }
 
 .admin-sider {
   background: var(--admin-panel);
-  border-right: 1px solid rgba(13, 122, 184, 0.12);
-  box-shadow: 10px 0 30px rgba(13, 122, 184, 0.045);
+  border-right: 1px solid rgba(21, 26, 35, 0.08);
+  box-shadow: 10px 0 30px rgba(21, 26, 35, 0.035);
 }
 
 .admin-brand {
@@ -75,8 +76,8 @@ textarea,
   gap: 12px;
   padding: 14px 18px;
   color: #0f172a;
-  border-bottom: 1px solid rgba(13, 122, 184, 0.12);
-  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  border-bottom: 1px solid rgba(21, 26, 35, 0.08);
+  background: #fff;
 }
 
 .brand-icon {
@@ -87,8 +88,8 @@ textarea,
   padding: 3px;
   border-radius: 8px;
   background: #fff;
-  border: 1px solid rgba(13, 122, 184, 0.16);
-  box-shadow: 0 8px 18px rgba(13, 122, 184, 0.1);
+  border: 1px solid rgba(230, 0, 35, 0.16);
+  box-shadow: 0 8px 18px rgba(230, 0, 35, 0.1);
 }
 
 .admin-brand__copy {
@@ -145,7 +146,7 @@ textarea,
 
 .admin-menu .ant-menu-item:hover,
 .admin-menu .ant-menu-submenu-title:hover {
-  background: rgba(13, 122, 184, 0.07) !important;
+  background: rgba(230, 0, 35, 0.055) !important;
   color: var(--admin-brand-strong) !important;
   transform: translateX(2px);
 }
@@ -217,8 +218,8 @@ textarea,
   gap: 16px;
   min-height: 72px;
   padding: 0 24px;
-  background: rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid rgba(13, 122, 184, 0.12);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(21, 26, 35, 0.08);
   backdrop-filter: blur(16px) saturate(1.08);
 }
 
@@ -316,16 +317,16 @@ textarea,
   display: grid;
   gap: 10px;
   padding: 14px 16px;
-  border: 1px solid rgba(13, 122, 184, 0.12);
+  border: 1px solid rgba(21, 26, 35, 0.1);
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff, #f7fbff);
-  box-shadow: 0 8px 22px rgba(13, 122, 184, 0.045);
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(21, 26, 35, 0.045);
 }
 
 .post-tile:hover,
 .tool-tile:hover {
   transform: translateY(-2px);
-  border-color: rgba(13, 122, 184, 0.24);
+  border-color: rgba(230, 0, 35, 0.22);
   box-shadow: var(--admin-shadow);
 }
 
@@ -570,7 +571,7 @@ textarea,
 
 .login-card {
   width: min(560px, calc(100vw - 32px));
-  border: 1px solid rgba(13, 122, 184, 0.12);
+  border: 1px solid rgba(21, 26, 35, 0.1);
   box-shadow: var(--admin-shadow);
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
@@ -606,7 +607,7 @@ textarea,
 }
 
 .admin-content-scroll .ant-card {
-  border-color: rgba(13, 122, 184, 0.12);
+  border-color: rgba(21, 26, 35, 0.09);
   box-shadow: var(--admin-shadow);
   background: rgba(255, 255, 255, 0.96);
 }
@@ -620,9 +621,7 @@ textarea,
 }
 
 .stat-grid .ant-card {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.96)),
-    var(--admin-panel);
+  background: var(--admin-panel);
 }
 
 .stat-grid .ant-statistic-title {
@@ -644,22 +643,22 @@ textarea,
 }
 
 .admin-content-scroll .ant-table-thead > tr > th {
-  background: #f5f9fd;
-  color: #40536a;
+  background: #f7f8fb;
+  color: #4b5565;
   font-size: 12px;
   font-weight: 800;
 }
 
 .admin-content-scroll .ant-table-tbody > tr > td {
-  border-bottom-color: rgba(13, 122, 184, 0.12);
+  border-bottom-color: rgba(21, 26, 35, 0.08);
 }
 
 .admin-content-scroll .ant-table-tbody > tr:hover > td {
-  background: rgba(13, 122, 184, 0.045) !important;
+  background: rgba(230, 0, 35, 0.035) !important;
 }
 
 .admin-content-scroll .ant-btn-primary {
-  box-shadow: 0 10px 22px rgba(13, 122, 184, 0.2);
+  box-shadow: 0 10px 22px rgba(230, 0, 35, 0.18);
 }
 
 .admin-content-scroll .ant-btn:hover,

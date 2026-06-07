@@ -52,7 +52,7 @@ npm run dev:admin
 关键后端配置在 `src/CodeWF.Api/appsettings.json`，也可以用环境变量覆盖：
 
 ```powershell
-$env:Site__LocalAssetsDir = "D:\wwwroot\img1.dotnet9.com"
+$env:Site__LocalAssetsDir = "D:\github\apps\Assets.Dotnet9"
 $env:Site__AssetBaseUrl = "https://img1.dotnet9.com"
 $env:Admin__ApiKey = "change-me"
 ```

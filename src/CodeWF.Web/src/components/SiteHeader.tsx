@@ -18,10 +18,7 @@ import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
 import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
 
-const API_ORIGIN = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:5100/api")
-  .replace(/\/$/, "")
-  .replace(/\/api$/, "");
-const SITE_ICON_URL = `${API_ORIGIN}/site/favicon/logo.ico?v=20260513`;
+const SITE_ICON_URL = "/logo.svg";
 
 export function SiteHeader({
   locale,

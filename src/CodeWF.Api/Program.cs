@@ -16,6 +16,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<BlogPostFileService>();
 builder.Services.AddSingleton<ContentRepository>();
 builder.Services.AddSingleton<GitRepositoryService>();
+builder.Services.AddScoped<AdminAuthorizationEndpointFilter>();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -81,7 +82,8 @@ api.MapGet("/site-settings", async (
     return Results.Ok(repository.GetSiteInfo());
 });
 
-var admin = api.MapGroup("/admin");
+var admin = api.MapGroup("/admin")
+    .AddEndpointFilter<AdminAuthorizationEndpointFilter>();
 
 admin.MapGet("/site-settings", async (
     HttpContext context,
