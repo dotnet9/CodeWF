@@ -60,6 +60,7 @@ import {
 import {
   api,
   type AdminCredentials,
+  type AdminSession,
   type AssetDirectoryData,
   type AssetEntry,
   type BlogPost,
@@ -165,7 +166,7 @@ const ADMIN_TEXT: Record<
     usernamePlaceholder: "用户名",
     passwordPlaceholder: "密码",
     loginButton: "验证并进入",
-    defaultAccount: "默认账号：codewf / codewf.com",
+    defaultAccount: "默认账号：codewf / codewf.com（只读权限）",
     failedAuth: "验证失败"
   },
   en: {
@@ -199,7 +200,7 @@ const ADMIN_TEXT: Record<
     usernamePlaceholder: "Username",
     passwordPlaceholder: "Password",
     loginButton: "Verify and enter",
-    defaultAccount: "Default account: codewf / codewf.com",
+    defaultAccount: "Default account: codewf / codewf.com (read-only)",
     failedAuth: "Verification failed"
   }
 };
@@ -215,6 +216,7 @@ type ViewKey =
   | `page:${string}`
   | `json:${string}`;
 type LoginState = "checking" | "locked" | "ready";
+type AdminAccess = Pick<AdminSession, "role" | "canWrite">;
 
 type PostFormValues = {
   title?: string;
@@ -344,6 +346,7 @@ function AuthGate({
 }) {
   const [state, setState] = useState<LoginState>("checking");
   const [credentials, setCredentials] = useState<AdminCredentials>(api.getCredentials());
+  const [access, setAccess] = useState<AdminAccess | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const text = ADMIN_TEXT[culture];
@@ -362,12 +365,14 @@ function AuthGate({
     setError(null);
     try {
       api.setCredentials(value);
-      await api.verify();
+      const session = await api.verify();
       setCredentials(value);
+      setAccess(session);
       setState("ready");
     } catch (err) {
       api.clearCredentials();
       setCredentials({ userName: "", password: "" });
+      setAccess(null);
       setState("locked");
       setError(err instanceof Error ? err.message : text.failedAuth);
     } finally {
@@ -404,8 +409,10 @@ function AuthGate({
       onLogout={() => {
         api.clearCredentials();
         setCredentials({ userName: "", password: "" });
+        setAccess(null);
         setState("locked");
       }}
+      access={access ?? { role: "reader", canWrite: false }}
     />
   );
 }
@@ -487,17 +494,19 @@ function LoginPanel({
 function Workspace({
   culture,
   onCultureChange,
-  onLogout
+  onLogout,
+  access
 }: {
   culture: AdminLocale;
   onCultureChange: (value: AdminLocale) => void;
   onLogout: () => void;
+  access: AdminAccess;
 }) {
   const [view, setView] = useState<ViewKey>("overview");
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState<string[]>(DEFAULT_MENU_OPEN_KEYS);
   const text = ADMIN_TEXT[culture];
-  const menuItems = useMemo(() => buildAdminMenuItems(culture, text), [culture, text]);
+  const menuItems = useMemo(() => buildAdminMenuItems(culture, text, access), [culture, text, access]);
   const activeTitle = getWorkspaceViewTitle(view, culture);
 
   return (
@@ -544,7 +553,7 @@ function Workspace({
         </Header>
         <Content className="admin-content">
           <div className="admin-content-scroll" key={view}>
-            {renderWorkspaceView(view, culture, setView)}
+            {renderWorkspaceView(view, culture, setView, access)}
           </div>
         </Content>
       </Layout>
@@ -552,11 +561,11 @@ function Workspace({
   );
 }
 
-function buildAdminMenuItems(culture: AdminLocale, text: AdminText): MenuProps["items"] {
+function buildAdminMenuItems(culture: AdminLocale, text: AdminText, access: AdminAccess): MenuProps["items"] {
   const taxonomyResources = JSON_RESOURCES.filter((item) => TAXONOMY_RESOURCE_NAMES.has(item.name));
   const dataResources = JSON_RESOURCES.filter((item) => !TAXONOMY_RESOURCE_NAMES.has(item.name));
 
-  return [
+  const items: MenuProps["items"] = [
     {
       type: "group",
       label: "CORE",
@@ -602,16 +611,21 @@ function buildAdminMenuItems(culture: AdminLocale, text: AdminText): MenuProps["
         },
         { key: "assets", icon: <FolderOpenOutlined />, label: text.resourceRepo }
       ]
-    },
-    {
+    }
+  ];
+
+  if (access.canWrite) {
+    items.push({
       type: "group",
       label: "SYSTEM",
       children: [
         { key: "site", icon: <SettingOutlined />, label: text.site },
         { key: "repository", icon: <BranchesOutlined />, label: text.repository }
       ]
-    }
-  ];
+    });
+  }
+
+  return items;
 }
 
 function menuLabel(label: string, badge?: number | string) {
@@ -646,38 +660,44 @@ function getWorkspaceViewTitle(view: ViewKey, culture: AdminLocale) {
   return getMarkdownSpec(view)?.label ?? getJsonSpec(view)?.label ?? text.workspaceTitle;
 }
 
-function renderWorkspaceView(view: ViewKey, culture: AdminLocale, onJump: (view: ViewKey) => void) {
+function renderWorkspaceView(view: ViewKey, culture: AdminLocale, onJump: (view: ViewKey) => void, access: AdminAccess) {
   if (view === "overview") {
-    return <Overview culture={culture} onJump={onJump} />;
+    return <Overview culture={culture} onJump={onJump} canWrite={access.canWrite} />;
   }
   if (view === "posts") {
-    return <Posts />;
+    return <Posts canWrite={access.canWrite} />;
   }
   if (view === "tools") {
     const spec = JSON_RESOURCES.find((item) => item.name === "tools");
-    return spec ? <JsonEditor culture={culture} spec={spec} /> : <Overview culture={culture} onJump={onJump} />;
+    return spec ? <JsonEditor culture={culture} spec={spec} canWrite={access.canWrite} /> : <Overview culture={culture} onJump={onJump} canWrite={access.canWrite} />;
   }
 
   const markdownSpec = getMarkdownSpec(view);
   if (markdownSpec) {
-    return <MarkdownEditor culture={culture} spec={markdownSpec} />;
+    return <MarkdownEditor culture={culture} spec={markdownSpec} canWrite={access.canWrite} />;
   }
 
   const jsonSpec = getJsonSpec(view);
   if (jsonSpec) {
-    return <JsonEditor culture={culture} spec={jsonSpec} />;
+    return <JsonEditor culture={culture} spec={jsonSpec} canWrite={access.canWrite} />;
   }
   if (view === "assets") {
-    return <AssetBrowser />;
+    return <AssetBrowser canWrite={access.canWrite} />;
   }
   if (view === "site") {
-    return <SiteSettingsEditor />;
+    if (!access.canWrite) {
+      return <Overview culture={culture} onJump={onJump} canWrite={access.canWrite} />;
+    }
+    return <SiteSettingsEditor canWrite={access.canWrite} />;
   }
   if (view === "repository") {
-    return <Repository />;
+    if (!access.canWrite) {
+      return <Overview culture={culture} onJump={onJump} canWrite={access.canWrite} />;
+    }
+    return <Repository canWrite={access.canWrite} />;
   }
 
-  return <Overview culture={culture} onJump={onJump} />;
+  return <Overview culture={culture} onJump={onJump} canWrite={access.canWrite} />;
 }
 
 function getMarkdownSpec(view: ViewKey) {
@@ -694,7 +714,7 @@ function getJsonSpec(view: ViewKey) {
   return JSON_RESOURCES.find((item) => item.name === view.slice("json:".length)) ?? null;
 }
 
-function Overview({ culture, onJump }: { culture: AdminLocale; onJump: (view: ViewKey) => void }) {
+function Overview({ culture, onJump, canWrite }: { culture: AdminLocale; onJump: (view: ViewKey) => void; canWrite: boolean }) {
   const [home, setHome] = useState<HomePageData | null>(null);
   const { message } = AntApp.useApp();
   const text = ADMIN_TEXT[culture];
@@ -737,7 +757,7 @@ function Overview({ culture, onJump }: { culture: AdminLocale; onJump: (view: Vi
               <Button onClick={() => onJump("posts")}>{text.articleManagement}</Button>
               <Button onClick={() => onJump("page:about")}>{text.sitePages}</Button>
               <Button onClick={() => onJump("assets")}>{text.resourceRepo}</Button>
-              <Button onClick={() => onJump("repository")}>{text.versionControl}</Button>
+              {canWrite ? <Button onClick={() => onJump("repository")}>{text.versionControl}</Button> : null}
             </Space>
             <Typography.Paragraph type="secondary" className="section-note">
               {culture === "en"
@@ -867,7 +887,7 @@ function flattenTools(nodes: ToolNode[], group = "工具") {
   return items;
 }
 
-function Posts() {
+function Posts({ canWrite }: { canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
@@ -1010,7 +1030,7 @@ function Posts() {
           <Button icon={<ReloadOutlined />} onClick={() => load()}>
             刷新
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate} disabled={!canWrite}>
             新建
           </Button>
         </Space>
@@ -1033,7 +1053,7 @@ function Posts() {
         footer={
           <Space>
             <Button onClick={() => setEditorOpen(false)}>取消</Button>
-            <Button type="primary" icon={<SaveOutlined />} onClick={save}>
+            <Button type="primary" icon={<SaveOutlined />} onClick={save} disabled={!canWrite}>
               保存
             </Button>
           </Space>
@@ -1102,7 +1122,7 @@ function Posts() {
             <Input.TextArea rows={22} className="code-area" />
           </Form.Item>
           <Typography.Text type="secondary">文章编辑采用弹窗而不是右侧抽屉，避免长文内容被截断。</Typography.Text>
-          <Button danger onClick={() => remove(editing?.slug)} className="post-delete-btn">
+          <Button danger onClick={() => remove(editing?.slug)} className="post-delete-btn" disabled={!canWrite}>
             删除当前文章
           </Button>
         </Form>
@@ -1111,7 +1131,7 @@ function Posts() {
   );
 }
 
-function SiteSettingsEditor() {
+function SiteSettingsEditor({ canWrite }: { canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1179,7 +1199,7 @@ function SiteSettingsEditor() {
           <Button icon={<ReloadOutlined />} onClick={load}>
             刷新
           </Button>
-          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>
+          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save} disabled={!canWrite}>
             保存
           </Button>
         </Space>
@@ -1279,7 +1299,7 @@ function SiteSettingsEditor() {
   );
 }
 
-function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEditorSpec }) {
+function MarkdownEditor({ culture, spec, canWrite }: { culture: string; spec: MarkdownEditorSpec; canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1359,7 +1379,7 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
           <Button icon={<ReloadOutlined />} onClick={load}>
             刷新
           </Button>
-          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save}>
+          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={save} disabled={!canWrite}>
             保存
           </Button>
         </Space>
@@ -1393,15 +1413,15 @@ function MarkdownEditor({ culture, spec }: { culture: string; spec: MarkdownEdit
   );
 }
 
-function JsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSpec }) {
+function JsonEditor({ culture, spec, canWrite }: { culture: string; spec: JsonEditorSpec; canWrite: boolean }) {
   if (spec.kind === "tree") {
-    return <TreeJsonEditor culture={culture} spec={spec} />;
+    return <TreeJsonEditor culture={culture} spec={spec} canWrite={canWrite} />;
   }
 
-  return <TableJsonEditor culture={culture} spec={spec} />;
+  return <TableJsonEditor culture={culture} spec={spec} canWrite={canWrite} />;
 }
 
-function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSpec }) {
+function TableJsonEditor({ culture, spec, canWrite }: { culture: string; spec: JsonEditorSpec; canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1483,7 +1503,7 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
           <Button icon={<ReloadOutlined />} onClick={load}>
             刷新
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate} disabled={!canWrite}>
             新增
           </Button>
         </Space>
@@ -1498,7 +1518,7 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
           dataSource={rows}
           pagination={false}
           size="small"
-          columns={flatColumns(spec, openEdit, remove)}
+          columns={flatColumns(spec, openEdit, remove, canWrite)}
         />
       )}
       {resource ? <Typography.Text type="secondary">资源文件：{resource.path}</Typography.Text> : null}
@@ -1518,7 +1538,7 @@ function TableJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorS
   );
 }
 
-function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSpec }) {
+function TreeJsonEditor({ culture, spec, canWrite }: { culture: string; spec: JsonEditorSpec; canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -1630,10 +1650,10 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
           <Button icon={<ReloadOutlined />} onClick={load}>
             刷新
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateRoot}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateRoot} disabled={!canWrite}>
             新增根节点
           </Button>
-          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={() => save()}>
+          <Button type="primary" icon={<SaveOutlined />} loading={saving} onClick={() => save()} disabled={!canWrite}>
             保存
           </Button>
         </Space>
@@ -1657,7 +1677,7 @@ function TreeJsonEditor({ culture, spec }: { culture: string; spec: JsonEditorSp
             onExpandedRowsChange: (keys) => setExpandedKeys(keys.map((value) => String(value))),
             childrenColumnName: "children"
           }}
-          columns={treeColumns(spec, openCreateChild, openEdit, remove)}
+          columns={treeColumns(spec, openCreateChild, openEdit, remove, canWrite)}
         />
       )}
       {resource ? <Typography.Text type="secondary">资源文件：{resource.path}</Typography.Text> : null}
@@ -1923,7 +1943,12 @@ function flatFormValuesToRow(spec: JsonEditorSpec, values: Record<string, unknow
   } as SearchBlockedKeywordGroup;
 }
 
-function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDelete: (index: number) => void): ColumnsType<FlatJsonRow> {
+function flatColumns(
+  spec: JsonEditorSpec,
+  onEdit: (index: number) => void,
+  onDelete: (index: number) => void,
+  canWrite: boolean
+): ColumnsType<FlatJsonRow> {
   if (spec.kind === "taxonomy") {
     return [
       { title: "排序", width: 90, render: (_, record) => (record as TaxonomyItem).sort ?? 0 },
@@ -1936,10 +1961,10 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
         width: 160,
         render: (_, __, index) => (
           <Space>
-            <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
+            <Button icon={<EditOutlined />} onClick={() => onEdit(index)} disabled={!canWrite}>
               编辑
             </Button>
-            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
+            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} disabled={!canWrite}>
               删除
             </Button>
           </Space>
@@ -1960,10 +1985,10 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
         width: 160,
         render: (_, __, index) => (
           <Space>
-            <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
+            <Button icon={<EditOutlined />} onClick={() => onEdit(index)} disabled={!canWrite}>
               编辑
             </Button>
-            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
+            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} disabled={!canWrite}>
               删除
             </Button>
           </Space>
@@ -1982,10 +2007,10 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
         width: 160,
         render: (_, __, index) => (
           <Space>
-            <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
+            <Button icon={<EditOutlined />} onClick={() => onEdit(index)} disabled={!canWrite}>
               编辑
             </Button>
-            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
+            <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} disabled={!canWrite}>
               删除
             </Button>
           </Space>
@@ -2004,10 +2029,10 @@ function flatColumns(spec: JsonEditorSpec, onEdit: (index: number) => void, onDe
       width: 160,
       render: (_, __, index) => (
         <Space>
-          <Button icon={<EditOutlined />} onClick={() => onEdit(index)}>
+          <Button icon={<EditOutlined />} onClick={() => onEdit(index)} disabled={!canWrite}>
             编辑
           </Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)}>
+          <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(index)} disabled={!canWrite}>
             删除
           </Button>
         </Space>
@@ -2192,7 +2217,8 @@ function treeColumns(
   spec: JsonEditorSpec,
   onCreateChild: (key: string) => void,
   onEdit: (key: string) => void,
-  onDelete: (key: string) => void
+  onDelete: (key: string) => void,
+  canWrite: boolean
 ): ColumnsType<EditableTreeNode> {
   return [
     {
@@ -2223,13 +2249,13 @@ function treeColumns(
       width: 210,
       render: (_, record) => (
         <Space>
-          <Button icon={<PlusOutlined />} onClick={() => onCreateChild(record.key)}>
+          <Button icon={<PlusOutlined />} onClick={() => onCreateChild(record.key)} disabled={!canWrite}>
             子项
           </Button>
-          <Button icon={<EditOutlined />} onClick={() => onEdit(record.key)}>
+          <Button icon={<EditOutlined />} onClick={() => onEdit(record.key)} disabled={!canWrite}>
             编辑
           </Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(record.key)}>
+          <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(record.key)} disabled={!canWrite}>
             删除
           </Button>
         </Space>
@@ -2270,7 +2296,7 @@ function emptyTreeRow(spec: JsonEditorSpec): EditableTreeNode {
   };
 }
 
-function AssetBrowser() {
+function AssetBrowser({ canWrite }: { canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [path, setPath] = useState("");
   const [data, setData] = useState<AssetDirectoryData | null>(null);
@@ -2307,7 +2333,7 @@ function AssetBrowser() {
 
     setPreviewLoading(true);
     try {
-      setPreview(await api.gitFile(entry.path));
+      setPreview(await api.assetFile(entry.path));
     } catch (error) {
       message.error(error instanceof Error ? error.message : "文件预览失败");
       setPreview(null);
@@ -2370,7 +2396,7 @@ function AssetBrowser() {
               </Button>
               <Button
                 danger
-                disabled={selectedFiles.length === 0}
+                disabled={!canWrite || selectedFiles.length === 0}
                 onClick={() =>
                   Modal.confirm({
                     title: "批量删除文件",
@@ -2399,7 +2425,7 @@ function AssetBrowser() {
               >
                 批量删除
               </Button>
-              <label className="upload-trigger">
+              <label className="upload-trigger" style={{ display: canWrite ? undefined : "none" }}>
                 <input
                   type="file"
                   multiple
@@ -2444,11 +2470,15 @@ function AssetBrowser() {
             dataSource={data?.entries ?? []}
             pagination={false}
             size="small"
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              getCheckboxProps: (record) => ({ disabled: record.isDirectory }),
-              onChange: (keys) => setSelectedKeys(keys)
-            }}
+            rowSelection={
+              canWrite
+                ? {
+                    selectedRowKeys: selectedKeys,
+                    getCheckboxProps: (record) => ({ disabled: record.isDirectory }),
+                    onChange: (keys) => setSelectedKeys(keys)
+                  }
+                : undefined
+            }
             onRow={(record) => ({ onClick: () => loadPreview(record) })}
           />
         </Card>
@@ -2508,7 +2538,7 @@ function AssetPreviewPane({
   return <Empty description="文件不存在或无法预览" />;
 }
 
-function Repository() {
+function Repository({ canWrite }: { canWrite: boolean }) {
   const { message } = AntApp.useApp();
   const [status, setStatus] = useState<GitRepositoryStatusData | null>(null);
   const [log, setLog] = useState<GitCommandResult | null>(null);
@@ -2602,10 +2632,10 @@ function Repository() {
                       <Button icon={<ReloadOutlined />} onClick={load}>
                         刷新
                       </Button>
-                      <Button icon={<CloudDownloadOutlined />} onClick={() => run(api.gitFetch)}>
+                      <Button icon={<CloudDownloadOutlined />} onClick={() => run(api.gitFetch)} disabled={!canWrite}>
                         抓取
                       </Button>
-                      <Button icon={<SyncOutlined />} onClick={() => run(api.gitPull)}>
+                      <Button icon={<SyncOutlined />} onClick={() => run(api.gitPull)} disabled={!canWrite}>
                         拉取
                       </Button>
                     </Space>
@@ -2645,7 +2675,7 @@ function Repository() {
             <Card title="提交变更">
               <Space.Compact className="wide">
                 <Input value={commitMessage} onChange={(event) => setCommitMessage(event.target.value)} placeholder="提交说明" />
-                <Button type="primary" onClick={() => run(() => api.gitCommit(commitMessage))}>
+                <Button type="primary" onClick={() => run(() => api.gitCommit(commitMessage))} disabled={!canWrite}>
                   提交
                 </Button>
               </Space.Compact>

@@ -26,6 +26,12 @@ public sealed class AdminOptions
 {
     public const string SectionName = "Admin";
 
+    public List<AdminAccountOptions> Read { get; set; } = [new()];
+    public List<AdminAccountOptions> Super { get; set; } = [new() { UserName = "admin" }];
+}
+
+public sealed class AdminAccountOptions
+{
     public string UserName { get; set; } = "codewf";
     public string Password { get; set; } = "codewf.com";
 }

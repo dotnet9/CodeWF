@@ -69,14 +69,24 @@ api.MapGet("/health", () => Results.Ok(new { status = "ok", at = DateTimeOffset.
 
 api.MapGet("/site", (ContentRepository repository) => Results.Ok(repository.GetSiteInfo()));
 
+api.MapGet("/admin/session", (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions) =>
+{
+    var role = AdminGuard.GetRole(context, adminOptions.Value);
+    return role is null
+        ? Results.Unauthorized()
+        : Results.Ok(new { role, canWrite = string.Equals(role, "super-admin", StringComparison.Ordinal) });
+});
+
 api.MapGet("/site-settings", async (
     HttpContext context,
     IOptions<AdminOptions> adminOptions,
     ContentRepository repository) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(repository.GetSiteInfo());
@@ -90,9 +100,9 @@ admin.MapGet("/site-settings", async (
     IOptions<AdminOptions> adminOptions,
     ContentRepository repository) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(repository.GetSiteInfo());
@@ -105,9 +115,9 @@ admin.MapPut("/site-settings", async (
     IHostEnvironment env,
     SiteSettingsRequest request) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await UpdateSiteSettingsAsync(env.ContentRootPath, request, repository.GetSiteInfo());
@@ -121,9 +131,9 @@ api.MapPut("/site-settings", async (
     IHostEnvironment env,
     SiteSettingsRequest request) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await UpdateSiteSettingsAsync(env.ContentRootPath, request, repository.GetSiteInfo());
@@ -288,9 +298,9 @@ admin.MapPost("/posts", async (
     ContentRepository repository,
     AdminPostRequest request) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await repository.UpsertPostAsync(request);
@@ -304,9 +314,9 @@ admin.MapPut("/posts/{slug}", async (
     string slug,
     AdminPostRequest request) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await repository.UpsertPostAsync(request, slug);
@@ -319,9 +329,9 @@ admin.MapDelete("/posts/{slug}", async (
     ContentRepository repository,
     string slug) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var deleted = await repository.DeletePostAsync(slug);
@@ -353,9 +363,9 @@ admin.MapPut("/content/markdown/{name}", async (
     ContentSaveRequest request,
     string? culture = null) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var (resourceName, path) = ResolveMarkdownResource(name);
@@ -387,9 +397,9 @@ admin.MapPut("/content/json/{name}", async (
     ContentSaveRequest request,
     string? culture = null) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var (resourceName, path) = ResolveJsonResource(name);
@@ -410,6 +420,20 @@ admin.MapGet("/assets", async (
     return Results.Ok(await repository.GetAssetsAsync(path ?? string.Empty));
 });
 
+admin.MapGet("/assets/file", async (
+    HttpContext context,
+    IOptions<AdminOptions> adminOptions,
+    GitRepositoryService git,
+    string path) =>
+{
+    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    {
+        return Results.Unauthorized();
+    }
+
+    return Results.Ok(await git.GetFilePreviewAsync(path));
+});
+
 admin.MapPost("/assets", async (
     HttpContext context,
     IOptions<AdminOptions> adminOptions,
@@ -417,9 +441,9 @@ admin.MapPost("/assets", async (
     string? path = null,
     string? name = null) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     if (string.IsNullOrWhiteSpace(name))
@@ -437,9 +461,9 @@ admin.MapDelete("/assets", async (
     ContentRepository repository,
     string? path = null) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     var result = await repository.DeleteAssetAsync(path ?? string.Empty);
@@ -451,9 +475,9 @@ admin.MapGet("/repository/status", async (
     IOptions<AdminOptions> adminOptions,
     GitRepositoryService git) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.GetStatusAsync());
@@ -464,9 +488,9 @@ admin.MapGet("/repository/status/details", async (
     IOptions<AdminOptions> adminOptions,
     GitRepositoryService git) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.GetStatusDetailsAsync());
@@ -478,9 +502,9 @@ admin.MapGet("/repository/log", async (
     GitRepositoryService git,
     int count = 20) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.GetLogAsync(count));
@@ -492,9 +516,9 @@ admin.MapGet("/repository/file", async (
     GitRepositoryService git,
     string path) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.GetFilePreviewAsync(path));
@@ -505,9 +529,9 @@ admin.MapPost("/repository/fetch", async (
     IOptions<AdminOptions> adminOptions,
     GitRepositoryService git) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.FetchAsync());
@@ -518,9 +542,9 @@ admin.MapPost("/repository/pull", async (
     IOptions<AdminOptions> adminOptions,
     GitRepositoryService git) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.PullAsync());
@@ -532,9 +556,9 @@ admin.MapPost("/repository/commit", async (
     GitRepositoryService git,
     GitCommitRequest request) =>
 {
-    if (!AdminGuard.IsAuthorized(context, adminOptions.Value))
+    if (!AdminGuard.IsSuperAdmin(context, adminOptions.Value))
     {
-        return Results.Unauthorized();
+        return Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     return Results.Ok(await git.CommitAsync(request.Message));

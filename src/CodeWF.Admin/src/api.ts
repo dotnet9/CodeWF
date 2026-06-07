@@ -166,6 +166,11 @@ export type AdminCredentials = {
   password: string;
 };
 
+export type AdminSession = {
+  role: "reader" | "super-admin";
+  canWrite: boolean;
+};
+
 export type SiteSettings = SiteInfo;
 
 export type SiteSettingsRequest = {
@@ -258,7 +263,7 @@ export const api = {
     localStorage.removeItem("codewf-admin-user");
     localStorage.removeItem("codewf-admin-password");
   },
-  verify: () => request<GitCommandResult>("/admin/repository/status"),
+  verify: () => request<AdminSession>("/admin/session"),
   home: (culture = "zh-CN") => request<HomePageData>(`/home?culture=${encodeURIComponent(culture)}`),
   posts: (pageIndex = 1, keyword = "") =>
     request<PagedResult<BlogPostBrief>>(`/admin/posts?pageIndex=${pageIndex}&pageSize=20&keyword=${encodeURIComponent(keyword)}`),
@@ -298,6 +303,7 @@ export const api = {
       body: JSON.stringify({ content })
     }),
   assets: (path = "") => request<AssetDirectoryData>(`/admin/assets?path=${encodeURIComponent(path)}`),
+  assetFile: (path: string) => request<GitFilePreviewResult>(`/admin/assets/file?path=${encodeURIComponent(path)}`),
   uploadAsset: (path: string, name: string, file: File) =>
     upload<AssetUploadResult>(`/admin/assets?path=${encodeURIComponent(path)}&name=${encodeURIComponent(name)}`, file),
   deleteAsset: (path: string) => request<AssetUploadResult>(`/admin/assets?path=${encodeURIComponent(path)}`, { method: "DELETE" }),

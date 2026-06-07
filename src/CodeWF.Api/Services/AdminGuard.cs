@@ -5,14 +5,39 @@ namespace CodeWF.Api.Services;
 public static class AdminGuard
 {
     public static bool IsAuthorized(HttpContext context, AdminOptions options)
+        => GetRole(context, options) is not null;
+
+    public static bool IsSuperAdmin(HttpContext context, AdminOptions options)
+        => string.Equals(GetRole(context, options), "super-admin", StringComparison.Ordinal);
+
+    public static string? GetRole(HttpContext context, AdminOptions options)
     {
         if (TryReadCredentials(context, out var userName, out var password))
         {
-            return string.Equals(userName, options.UserName, StringComparison.Ordinal)
-                   && string.Equals(password, options.Password, StringComparison.Ordinal);
+            if (Matches(options.Super, userName, password))
+            {
+                return "super-admin";
+            }
+
+            if (Matches(options.Read, userName, password))
+            {
+                return "reader";
+            }
         }
 
-        return false;
+        return null;
+    }
+
+    private static bool Matches(IEnumerable<AdminAccountOptions> accounts, string userName, string password) =>
+        accounts.Any(account =>
+            string.Equals(userName, account.UserName, StringComparison.Ordinal)
+            && string.Equals(password, account.Password, StringComparison.Ordinal));
+
+    public static IResult RequireSuperAdmin(HttpContext context, AdminOptions options)
+    {
+        return IsSuperAdmin(context, options)
+            ? Results.Ok()
+            : Results.Problem("Super administrator permission is required.", statusCode: StatusCodes.Status403Forbidden);
     }
 
     public static bool TryReadCredentials(HttpContext context, out string userName, out string password)
