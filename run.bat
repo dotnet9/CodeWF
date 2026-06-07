@@ -52,6 +52,7 @@ if defined NEED_PUBLISH (
   call "%ROOT%publish.bat" || goto :error
 ) else (
   echo [CodeWF] Existing publish output found. Skipping publish.
+  call :sync_published_logo || goto :error
 )
 
 if not exist "%WEB_OUT%\node_modules\next\" (
@@ -133,6 +134,25 @@ for %%f in (logo.svg logo.png logo.ico) do (
   )
   copy /Y "%ROOT%%%f" "%WEB_PROJECT%\public\%%f" >nul || exit /b 1
   copy /Y "%ROOT%%%f" "%ADMIN_PROJECT%\public\%%f" >nul || exit /b 1
+)
+copy /Y "%ROOT%logo.ico" "%WEB_PROJECT%\public\favicon.ico" >nul || exit /b 1
+copy /Y "%ROOT%logo.ico" "%ADMIN_PROJECT%\public\favicon.ico" >nul || exit /b 1
+exit /b 0
+
+:sync_published_logo
+echo [CodeWF] Syncing root logo files to published output...
+if exist "%WEB_OUT%\" (
+  if not exist "%WEB_OUT%\public" mkdir "%WEB_OUT%\public" || exit /b 1
+  for %%f in (logo.svg logo.png logo.ico) do (
+    copy /Y "%ROOT%%%f" "%WEB_OUT%\public\%%f" >nul || exit /b 1
+  )
+  copy /Y "%ROOT%logo.ico" "%WEB_OUT%\public\favicon.ico" >nul || exit /b 1
+)
+if exist "%ADMIN_OUT%\" (
+  for %%f in (logo.svg logo.png logo.ico) do (
+    copy /Y "%ROOT%%%f" "%ADMIN_OUT%\%%f" >nul || exit /b 1
+  )
+  copy /Y "%ROOT%logo.ico" "%ADMIN_OUT%\favicon.ico" >nul || exit /b 1
 )
 exit /b 0
 

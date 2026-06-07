@@ -1,9 +1,5 @@
-import type { Metadata } from "next";
 import "./globals.css";
-
-const API_ORIGIN = (process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL ?? "http://localhost:5002/api")
-  .replace(/\/$/, "")
-  .replace(/\/api$/, "");
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
@@ -12,9 +8,9 @@ export const metadata: Metadata = {
   },
   description: "CodeWF articles, projects, and online tools",
   icons: {
-    icon: `${API_ORIGIN}/site/favicon/logo.ico?v=20260513`,
-    shortcut: `${API_ORIGIN}/site/favicon/logo.ico?v=20260513`,
-    apple: `${API_ORIGIN}/site/favicon/logo.ico?v=20260513`
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico"
   }
 };
 
