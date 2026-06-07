@@ -41,6 +41,7 @@ where dotnet >nul 2>nul || (
 )
 
 call :ensure_node_modules || goto :error
+call :sync_logo || goto :error
 
 if not exist "%WEB_OUT%\package.json" set "NEED_PUBLISH=1"
 if not exist "%API_OUT%\" set "NEED_PUBLISH=1"
@@ -118,6 +119,20 @@ if not exist "%ROOT%node_modules\" (
   pushd "%ROOT%" || exit /b 1
   call npm install || (popd & exit /b 1)
   popd
+)
+exit /b 0
+
+:sync_logo
+echo [CodeWF] Syncing root logo files to frontend public folders...
+if not exist "%WEB_PROJECT%\public" mkdir "%WEB_PROJECT%\public" || exit /b 1
+if not exist "%ADMIN_PROJECT%\public" mkdir "%ADMIN_PROJECT%\public" || exit /b 1
+for %%f in (logo.svg logo.png logo.ico) do (
+  if not exist "%ROOT%%%f" (
+    echo [CodeWF] Missing root logo file: %ROOT%%%f
+    exit /b 1
+  )
+  copy /Y "%ROOT%%%f" "%WEB_PROJECT%\public\%%f" >nul || exit /b 1
+  copy /Y "%ROOT%%%f" "%ADMIN_PROJECT%\public\%%f" >nul || exit /b 1
 )
 exit /b 0
 
