@@ -106,6 +106,8 @@ public sealed record EditableJsonResource(string Name, string Path, string? Json
 
 public sealed record ContentSaveRequest(string Content);
 
+public sealed record AdminLoginRequest(string UserName, string Password);
+
 public sealed record AssetEntry(
     string Name,
     string Path,

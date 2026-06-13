@@ -10,28 +10,49 @@ public static class AdminGuard
     public static bool IsSuperAdmin(HttpContext context, AdminOptions options)
         => string.Equals(GetRole(context, options), "super-admin", StringComparison.Ordinal);
 
-    public static string? GetRole(HttpContext context, AdminOptions options)
+    public static string? GetRole(HttpContext context, AdminOptions options, AdminSessionService? session = null)
     {
-        if (TryReadCredentials(context, out var userName, out var password))
+        session ??= context.RequestServices.GetService<AdminSessionService>();
+        var cookieRole = session?.GetRole(context);
+        if (cookieRole is not null)
         {
-            if (Matches(options.Super, userName, password))
-            {
-                return "super-admin";
-            }
-
-            if (Matches(options.Read, userName, password))
-            {
-                return "reader";
-            }
+            return cookieRole;
         }
 
-        return null;
+        return TryReadCredentials(context, out var userName, out var password)
+            ? GetRole(options, userName, password)
+            : null;
+    }
+
+    public static string? GetRole(AdminOptions options, string userName, string password)
+    {
+        if (Matches(options.Super, userName, password))
+        {
+            return "super-admin";
+        }
+
+        return Matches(options.Read, userName, password) ? "reader" : null;
     }
 
     private static bool Matches(IEnumerable<AdminAccountOptions> accounts, string userName, string password) =>
         accounts.Any(account =>
             string.Equals(userName, account.UserName, StringComparison.Ordinal)
             && string.Equals(password, account.Password, StringComparison.Ordinal));
+
+    public static bool HasUserWithRole(AdminOptions options, string userName, string role) =>
+        string.Equals(role, "super-admin", StringComparison.Ordinal)
+            ? options.Super.Any(account => string.Equals(account.UserName, userName, StringComparison.Ordinal))
+            : string.Equals(role, "reader", StringComparison.Ordinal)
+              && options.Read.Any(account => string.Equals(account.UserName, userName, StringComparison.Ordinal));
+
+    public static bool HasUnsafeDefaultCredentials(AdminOptions options) =>
+        options.Read.Any(account => MatchesDevelopmentDefault(account, "codewf", "codewf.com"))
+        || options.Super.Any(account => MatchesDevelopmentDefault(account, "admin", "111111"))
+        || options.Super.Any(account => MatchesDevelopmentDefault(account, "admin", "change-me"));
+
+    private static bool MatchesDevelopmentDefault(AdminAccountOptions account, string userName, string password) =>
+        string.Equals(account.UserName, userName, StringComparison.Ordinal)
+        && string.Equals(account.Password, password, StringComparison.Ordinal);
 
     public static IResult RequireSuperAdmin(HttpContext context, AdminOptions options)
     {

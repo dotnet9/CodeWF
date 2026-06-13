@@ -3,12 +3,14 @@ using Microsoft.Extensions.Options;
 
 namespace CodeWF.Api.Services;
 
-public sealed class AdminAuthorizationEndpointFilter(IOptions<AdminOptions> adminOptions) : IEndpointFilter
+public sealed class AdminAuthorizationEndpointFilter(
+    IOptions<AdminOptions> adminOptions,
+    AdminSessionService session) : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         var httpContext = context.HttpContext;
-        if (!AdminGuard.IsAuthorized(httpContext, adminOptions.Value))
+        if (AdminGuard.GetRole(httpContext, adminOptions.Value, session) is null)
         {
             return Results.Unauthorized();
         }

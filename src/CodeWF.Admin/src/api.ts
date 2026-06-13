@@ -201,20 +201,13 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? "/api").replace(/\/$/, ""
 
 function credentials(): AdminCredentials {
   return {
-    userName: localStorage.getItem("codewf-admin-user") ?? "",
-    password: localStorage.getItem("codewf-admin-password") ?? ""
+    userName: "",
+    password: ""
   };
 }
 
 function headers(json = false): HeadersInit {
   const value: HeadersInit = {};
-  const auth = credentials();
-  if (auth.userName) {
-    value["X-CodeWF-Admin-User"] = auth.userName;
-  }
-  if (auth.password) {
-    value["X-CodeWF-Admin-Password"] = auth.password;
-  }
   if (json) {
     value["Content-Type"] = "application/json";
   }
@@ -224,6 +217,7 @@ function headers(json = false): HeadersInit {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       ...headers(Boolean(init?.body)),
       ...(init?.headers ?? {})
@@ -242,6 +236,7 @@ async function upload<T>(path: string, body: BodyInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     body,
+    credentials: "include",
     headers: headers(false)
   });
   if (!response.ok) {
@@ -254,16 +249,15 @@ async function upload<T>(path: string, body: BodyInit): Promise<T> {
 }
 
 export const api = {
-  setCredentials(value: AdminCredentials) {
-    localStorage.setItem("codewf-admin-user", value.userName);
-    localStorage.setItem("codewf-admin-password", value.password);
-  },
+  setCredentials(_value: AdminCredentials) {},
   getCredentials: credentials,
-  clearCredentials() {
-    localStorage.removeItem("codewf-admin-user");
-    localStorage.removeItem("codewf-admin-password");
-  },
+  clearCredentials: () => request<void>("/admin/session", { method: "DELETE" }).catch(() => undefined),
   verify: () => request<AdminSession>("/admin/session"),
+  login: (value: AdminCredentials) =>
+    request<AdminSession>("/admin/session", {
+      method: "POST",
+      body: JSON.stringify(value)
+    }),
   home: (culture = "zh-CN") => request<HomePageData>(`/home?culture=${encodeURIComponent(culture)}`),
   posts: (pageIndex = 1, keyword = "") =>
     request<PagedResult<BlogPostBrief>>(`/admin/posts?pageIndex=${pageIndex}&pageSize=20&keyword=${encodeURIComponent(keyword)}`),
@@ -282,9 +276,9 @@ export const api = {
     request(`/admin/posts/${slug}`, {
       method: "DELETE"
     }),
-  siteSettings: () => request<SiteSettings>("/site-settings"),
+  siteSettings: () => request<SiteSettings>("/admin/site-settings"),
   saveSiteSettings: (payload: SiteSettingsRequest) =>
-    request<SiteSettingsResult>("/site-settings", {
+    request<SiteSettingsResult>("/admin/site-settings", {
       method: "PUT",
       body: JSON.stringify(payload)
     }),
