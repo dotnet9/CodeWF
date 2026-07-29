@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useMemo } from "react";
 import {
   ArrowUpRight,
   BookOpenText,
@@ -14,7 +12,7 @@ import {
   ShieldCheck,
   Tv2
 } from "lucide-react";
-import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
+import { dictionary, withLocale } from "@/i18n";
 import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
 
@@ -34,18 +32,8 @@ export function SiteHeader({
   latestPost?: BlogPostBrief;
 }) {
   const t = dictionary(locale);
-  const pathname = usePathname();
-  const router = useRouter();
   const topCategories = categories.slice(0, 8);
   const topAlbums = albums.slice(0, 8);
-  const localeOptions = useMemo(() => locales.map((item) => ({ value: item, label: localeLabels[item] })), []);
-
-  const switchLocale = (nextLocale: Locale) => {
-    const current = pathname ?? withLocale(locale);
-    const suffix = typeof window === "undefined" ? "" : `${window.location.search}${window.location.hash}`;
-    const nextPath = current.replace(/^\/(zh-CN|zh-TW|en|ja)(?=\/|$)/i, `/${nextLocale}`);
-    router.push((nextPath === current ? withLocale(nextLocale) : nextPath) + suffix);
-  };
 
   return (
     <header className="site-header">
@@ -107,6 +95,7 @@ export function SiteHeader({
         </div>
 
         <Link href={withLocale(locale, "/project")}>{t.projects}</Link>
+        <Link href={withLocale(locale, "/album")}>{t.albums}</Link>
         <Link href={withLocale(locale, "/tool")}>{t.tools}</Link>
 
         <div className="nav-item">
@@ -117,7 +106,7 @@ export function SiteHeader({
           <div className="nav-dropdown nav-dropdown--compact nav-more">
             <div className="nav-more__header">
               <span>{t.more}</span>
-              <strong>{locale === "zh-CN" ? "站点入口" : "Site links"}</strong>
+              <strong>{locale === "zh-CN" ? "更多内容" : "Site links"}</strong>
             </div>
             <div className="nav-more__grid">
               <section>
@@ -165,16 +154,6 @@ export function SiteHeader({
 
       <div className="header-actions">
         <GlobalSearch locale={locale} action={withLocale(locale, "/s")} placeholder={t.queryPlaceholder} label={t.search} />
-        <label className="header-locale-switch" aria-label={locale === "zh-CN" ? "切换语言" : "Switch language"}>
-          <span aria-hidden="true">A</span>
-          <select value={locale} onChange={(event) => switchLocale(event.target.value as Locale)}>
-            {localeOptions.map((item) => (
-              <option value={item.value} key={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </label>
       </div>
     </header>
   );

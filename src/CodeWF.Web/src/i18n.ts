@@ -1,6 +1,7 @@
 import type { Locale } from "./types";
 
-export const locales: Locale[] = ["zh-CN", "en", "ja", "zh-TW"];
+export const locales: Locale[] = ["zh-CN"];
+export const knownLocales: Locale[] = ["zh-CN", "en", "ja", "zh-TW"];
 export const defaultLocale: Locale = "zh-CN";
 
 export const localeLabels: Record<Locale, string> = {
@@ -27,7 +28,7 @@ const dictionaries = {
     more: "更多",
     posts: "文章",
     tools: "工具",
-    projects: "项目",
+    projects: "开源项目",
     search: "搜索",
     about: "关于",
     timeline: "时间线",
@@ -36,7 +37,7 @@ const dictionaries = {
     featuredPosts: "精选内容",
     toolCatalog: "在线工具",
     recommendedTools: "推荐工具",
-    projectCatalog: "项目中心",
+    projectCatalog: "开源项目",
     categories: "分类",
     albums: "专题",
     tags: "标签",
@@ -179,6 +180,11 @@ export function normalizeLocale(value?: string | null): Locale {
 export function isLocale(value?: string): boolean {
   const normalizedValue = value?.trim().replace(/_/g, "-");
   return locales.some((locale) => locale.toLowerCase() === normalizedValue?.toLowerCase());
+}
+
+export function isKnownLocale(value?: string): boolean {
+  const normalizedValue = value?.trim().replace(/_/g, "-");
+  return knownLocales.some((locale) => locale.toLowerCase() === normalizedValue?.toLowerCase());
 }
 
 export function dictionary(locale: LocaleInput) {

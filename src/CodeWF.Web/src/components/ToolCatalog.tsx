@@ -35,7 +35,7 @@ export function ToolCatalog({ locale, tools, title }: { locale: Locale; tools: T
       <div className="tool-catalog__toolbar">
         <div>
           <h1>{title}</h1>
-          <p>{locale === "zh-CN" ? `共 ${total} 个工具` : `${total} tools total`}</p>
+          <p>{locale === "zh-CN" ? `共 ${total} 个工具，打开就能处理常见开发小任务` : `${total} tools total`}</p>
         </div>
         <label className="tool-search" aria-label={locale === "zh-CN" ? "搜索工具" : "Search tools"}>
           <Search size={16} aria-hidden="true" />

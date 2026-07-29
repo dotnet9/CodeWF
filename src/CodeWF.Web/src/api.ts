@@ -20,13 +20,13 @@ const apiBase = (process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_UR
 const emptySite: SiteInfo = {
   appTitle: "CodeWF",
   domain: "https://dotnet9.com",
-  memo: "Articles and tools",
+  memo: ".NET 文章与在线工具",
   owner: "dotnet9",
   localAssetsDir: "D:\\wwwroot\\img1.dotnet9.com",
   assetBaseUrl: "https://img1.dotnet9.com",
   startYear: 2019,
   defaultCulture: "zh-CN",
-  supportedCultures: ["zh-CN", "en", "ja", "zh-TW"]
+  supportedCultures: ["zh-CN"]
 };
 
 async function getJson<T>(path: string, fallback: T, init?: RequestInit & { next?: { revalidate?: number } }): Promise<T> {

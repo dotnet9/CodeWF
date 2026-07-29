@@ -7,7 +7,7 @@ public sealed class SiteOptions
 
     public string AppTitle { get; set; } = "CodeWF";
     public string Domain { get; set; } = "https://dotnet9.com";
-    public string Memo { get; set; } = "Articles and tools";
+    public string Memo { get; set; } = ".NET articles and tools";
     public string Owner { get; set; } = "dotnet9";
     public string? OwnerDesc { get; set; }
     public string? Favicon { get; set; }
@@ -19,7 +19,7 @@ public sealed class SiteOptions
     public string? WeChatName { get; set; }
     public string? WeChatImg { get; set; }
     public string DefaultCulture { get; set; } = DefaultCultureName;
-    public List<string> SupportedCultures { get; set; } = ["zh-CN", "en", "ja", "zh-TW"];
+    public List<string> SupportedCultures { get; set; } = ["zh-CN"];
 }
 
 public sealed class AdminOptions

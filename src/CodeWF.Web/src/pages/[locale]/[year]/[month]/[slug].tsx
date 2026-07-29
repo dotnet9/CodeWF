@@ -64,6 +64,12 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
   const albumLinks = (post.albums ?? []).map((item) => ({ label: item, href: `/album/${encodeURIComponent(item)}` }));
   const tagLinks = (post.tags ?? []).map((item) => ({ label: item, href: `/tag/${encodeURIComponent(item)}` }));
   const topicLinks = [...categoryLinks, ...albumLinks, ...tagLinks].slice(0, 12);
+  const readingPathLinks = albumLinks.length > 0 ? albumLinks.slice(0, 3) : categoryLinks.slice(0, 3);
+  const readingPathTitle = albumLinks.length > 0 ? "继续阅读这个专题" : "继续看同类内容";
+  const readingPathDescription =
+    albumLinks.length > 0
+      ? "这篇文章已经放进专题路线，适合顺着同一主题继续读。"
+      : "这篇文章暂未归入专题，可以先从相关分类继续浏览。";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -132,6 +138,22 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
                       </Link>
                     ))}
                   </div>
+                  {readingPathLinks.length > 0 ? (
+                    <section className="article-series-panel" aria-label={readingPathTitle}>
+                      <div>
+                        <span className="card-kicker">连续阅读</span>
+                        <h2>{readingPathTitle}</h2>
+                        <p>{readingPathDescription}</p>
+                      </div>
+                      <div className="article-series-panel__links">
+                        {readingPathLinks.map((item) => (
+                          <Link href={withLocale(locale, item.href)} key={`${item.href}-${item.label}`}>
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
                 </header>
                 <section className="article-body" itemProp="articleBody">
                   <HtmlContent html={post.htmlContent} />

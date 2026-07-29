@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = dictionary(locale);
   return {
     title: t.projectCatalog,
-    description: locale === "zh-CN" ? "浏览项目、文档和开源仓库索引。" : "Browse project docs and open-source repository index."
+    description: locale === "zh-CN" ? "浏览码坊的开源项目、组件库和使用说明。" : "Browse project docs and open-source repository index."
   };
 }
 
@@ -28,7 +28,7 @@ export default async function ProjectPage({ params }: LocalePageProps) {
       <div className="section-head">
         <div>
           <h1>{t.projectCatalog}</h1>
-          <p>{locale === "zh-CN" ? `${count} 篇项目文档` : `${count} project docs across the repository tree`}</p>
+          <p>{locale === "zh-CN" ? `${count} 个项目，包含组件库、工具和使用说明` : `${count} project docs across the repository tree`}</p>
         </div>
       </div>
       <div className="project-tree">{docs.map((group) => renderNode(group, locale, 0))}</div>

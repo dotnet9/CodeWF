@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Github, Rss } from "lucide-react";
-import { dictionary, localeLabels, locales, withLocale } from "@/i18n";
+import { dictionary, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
 
 const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:5001").replace(/\/$/, "");
@@ -76,7 +76,7 @@ export function SiteFooter({
           </nav>
 
           <nav aria-label="Entries">
-            <h2>入口</h2>
+            <h2>更多</h2>
             <Link href={withLocale(locale, "/about")}>{t.about}</Link>
             <Link href={withLocale(locale, "/donation")}>{t.donation}</Link>
             <Link href={withLocale(locale, "/privacy")}>{t.privacy}</Link>
@@ -102,15 +102,9 @@ export function SiteFooter({
             ) : null}
           </nav>
 
-          <div className="footer-language">
-            <h2>语言</h2>
-            <div className="footer-language__links">
-              {locales.map((item) => (
-                <Link href={`/${item}`} key={item} aria-current={item === locale ? "page" : undefined}>
-                  {localeLabels[item]}
-                </Link>
-              ))}
-            </div>
+          <div className="footer-note">
+            <h2>中文主站</h2>
+            <p>中文内容会优先更新；英文、日文等旧内容会保留，但不会强行同步翻译。</p>
           </div>
 
           <div className="footer-qr">

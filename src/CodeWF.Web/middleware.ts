@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { defaultLocale, isLocale } from "./src/i18n";
+import { defaultLocale, isKnownLocale, isLocale } from "./src/i18n";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,6 +23,12 @@ export function middleware(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone();
+  if (isKnownLocale(segment)) {
+    const rest = pathname.split("/").slice(2).join("/");
+    url.pathname = `/${defaultLocale}${rest ? `/${rest}` : ""}`;
+    return NextResponse.redirect(url);
+  }
+
   url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
   return NextResponse.redirect(url);
 }
