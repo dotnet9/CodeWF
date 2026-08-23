@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间戳转换 · 工具 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.tool-wrap { padding: 30px 34px; margin-top: 4px; }
+.tool-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.tool-head .ico { width: 46px; height: 46px; border-radius: 14px; background: var(--neon-soft); border: 1px solid rgba(81,43,212,.3); color: var(--neon); display: flex; align-items: center; justify-content: center; font-size: 21px; box-shadow: var(--glow-neon); }
+.tool-head h1 { font-size: 22px; }
+.tool-head .slug { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+.tool-desc { color: var(--text-2); font-size: 13.5px; margin-bottom: 24px; max-width: 720px; }
+.panel { border-radius: 14px; border: 1px solid rgba(19,40,34,.6); background: var(--ink-panel); padding: 24px 28px; box-shadow: 0 10px 30px rgba(13,20,24,.25); }
+.row { display: flex; gap: 14px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+.field { display: flex; align-items: center; gap: 11px; }
+.field label { font-family: var(--mono); font-size: 12.5px; color: #93a8a0; white-space: nowrap; }
+.field input {
+  width: 330px; padding: 11px 17px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.14); background: #0a1114;
+  font-family: var(--mono); font-size: 14px; color: #00c98d; box-shadow: inset 0 2px 8px rgba(0,0,0,.5);
+}
+.seg { display: flex; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 3px; }
+.seg span { padding: 7px 18px; border-radius: 8px; font-family: var(--mono); font-size: 12.5px; color: #7d938c; }
+.seg span.cur { background: rgba(0,201,141,.15); color: #00c98d; font-weight: 700; box-shadow: inset 0 0 0 1px rgba(0,201,141,.5); }
+.result { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+.result .item { background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.16); border-radius: 12px; padding: 15px 19px; }
+.result .item i { font-style: normal; font-family: var(--mono); font-size: 11.5px; color: #7d938c; display: flex; align-items: center; gap: 7px; }
+.result .item i .dot { background: #00c98d; box-shadow: 0 0 8px #00c98d; }
+.result .item i .dot.amber { background: #ffb340; box-shadow: 0 0 8px #ffb340; }
+.result .item b { display: block; margin-top: 7px; font-family: var(--mono); font-size: 18px; color: #00c98d; word-break: break-all; text-shadow: 0 0 18px rgba(0,201,141,.5); }
+.result .item small { color: #7d938c; font-size: 11px; font-family: var(--mono); }
+.tips { margin-top: 22px; padding: 14px 19px; border-radius: 10px; background: rgba(255,179,64,.09); border: 1px dashed rgba(192,123,18,.4); color: #96660f; font-size: 13px; }
+.related { margin-top: 44px; }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.mini { padding: 14px 17px; display: flex; align-items: center; gap: 11px; font-size: 13.5px; }
+.mini .ico { width: 33px; height: 33px; border-radius: 10px; background: var(--neon-soft); border: 1px solid rgba(81,43,212,.25); color: var(--neon); display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item active" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="breadcrumb">~/tool/dev <span>/</span> <b>timestamp</b></div>
+
+  <div class="card flat tool-wrap">
+    <div class="tool-head">
+      <span class="ico">⏱</span>
+      <div><h1>时间戳转换</h1><span class="slug">runs 100% in your browser · no network calls</span></div>
+      <a class="btn ghost" style="margin-left:auto" href="#">查看源码 ↗</a>
+    </div>
+    <p class="tool-desc">Unix 时间戳与日期时间互转，支持秒/毫秒精度与本地时区显示，结果可一键复制。</p>
+
+    <div class="panel">
+      <div class="row">
+        <div class="field"><label>timestamp</label><input value="1755955200" readonly></div>
+        <div class="seg"><span>sec</span><span class="cur">ms</span></div>
+        <a class="btn" href="#">convert ⏎</a>
+        <a class="btn ghost" href="#">now()</a>
+        <a class="btn ghost" href="#">clear</a>
+      </div>
+      <div class="row">
+        <div class="field"><label>datetime</label><input value="2026-08-23 08:00:00" readonly></div>
+        <div class="seg"><span class="cur">UTC+8 local</span><span>UTC</span></div>
+      </div>
+
+      <div class="result">
+        <div class="item"><i><span class="dot"></span>ms_timestamp</i><b>1755955200000</b><small>click to copy</small></div>
+        <div class="item"><i><span class="dot"></span>s_timestamp</i><b>1755955200</b><small>click to copy</small></div>
+        <div class="item"><i><span class="dot amber"></span>iso_8601</i><b>2026-08-23T00:00:00Z</b><small>click to copy</small></div>
+      </div>
+
+      <div class="tips">💡 自动识别 10 位（秒）/ 13 位（毫秒）时间戳；日期输入支持 2026-08-23、2026/08/23 08:00 等常见格式。</div>
+    </div>
+  </div>
+
+  <section class="related">
+    <div class="section-title">相关工具</div>
+    <div class="grid">
+      <a class="card mini" href="#"><span class="ico">📅</span>日期计算器</a>
+      <a class="card mini" href="#"><span class="ico">{ }</span>JSON 格式化</a>
+      <a class="card mini" href="#"><span class="ico">🔤</span>Base64 编解码</a>
+      <a class="card mini" href="#"><span class="ico">#</span>Slugify 字符串</a>
+      <a class="card mini" href="#"><span class="ico">📐</span>进制转换器</a>
+    </div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

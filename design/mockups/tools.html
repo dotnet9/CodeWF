@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线工具 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.hero-search { margin: 40px auto 30px; text-align: center; max-width: 720px; }
+.hero-search h1 { font-size: 34px; }
+.hero-search h1 .grad { background: linear-gradient(92deg, var(--neon), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-search p { color: var(--text-2); margin: 10px 0 24px; font-size: 14px; }
+.searchbox {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--glass); border: 1px solid var(--line);
+  border-radius: 999px; padding: 15px 26px; font-size: 14.5px;
+  color: var(--text-3); box-shadow: var(--glow-pop);
+}
+.searchbox kbd { margin-left: auto; font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: rgba(0,0,0,.35); }
+.privacy { display: inline-flex; gap: 7px; align-items: center; margin-top: 16px; font-family: var(--mono); font-size: 12px; color: var(--neon); background: var(--neon-soft); border: 1px solid rgba(81,43,212,.3); border-radius: 999px; padding: 5px 15px; }
+.cats { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 34px; }
+.cats .chip { padding: 8px 18px; border-radius: 8px; font-family: var(--mono); font-size: 12.5px; color: var(--text-2); border: 1px solid var(--line); background: var(--glass); }
+.cats .chip.cur { color: var(--neon); border-color: rgba(81,43,212,.5); background: var(--neon-soft); font-weight: 700; }
+.cat-sec { margin-bottom: 38px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.tool { padding: 20px 22px; }
+.tool .head { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+.tool .ico {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  background: var(--neon-soft); border: 1px solid rgba(81,43,212,.25); color: var(--neon);
+}
+.tool:nth-child(4n+2) .ico { background: rgba(191,95,0,.1); border-color: rgba(255,179,64,.25); color: var(--amber); }
+.tool:nth-child(4n+3) .ico { background: rgba(0,120,212,.1); border-color: rgba(0,120,212,.25); color: var(--cyan); }
+.tool:nth-child(4n+4) .ico { background: rgba(139,92,246,.12); border-color: rgba(139,92,246,.3); color: var(--violet); }
+.tool h4 { font-size: 14.5px; }
+.tool .slug { font-size: 11px; color: var(--text-3); font-family: var(--mono); }
+.tool p { font-size: 12.5px; color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 42px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item active" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero-search">
+    <h1><span class="grad">91</span> 个工具，全部本地运行</h1>
+    <p>转换器 · 加密安全 · 开发利器 · 图像网络 —— 打开即用，数据永不上传</p>
+    <div class="searchbox">⌕ 搜索工具，如 hash、qrcode、timestamp…<kbd>Enter ↵</kbd></div>
+    <div class="privacy"><span class="dot"></span>100% client-side · 无追踪 · 无上传</div>
+  </div>
+
+  <div class="cats">
+    <span class="chip cur">all: 91</span>
+    <span class="chip">转换器 21</span><span class="chip">网页工具 17</span><span class="chip">开发工具 14</span>
+    <span class="chip">加密与安全 11</span><span class="chip">文本工具 7</span><span class="chip">图像与视频 6</span>
+    <span class="chip">网络工具 6</span><span class="chip">数学工具 4</span><span class="chip">计量工具 3</span><span class="chip">数据工具 2</span>
+  </div>
+
+  <section class="cat-sec">
+    <div class="section-title">开发工具<a class="more">--count 14</a></div>
+    <div class="grid">
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">⏱</span><div><h4>时间戳转换</h4><span class="slug">timestamp</span></div></div>
+        <p>Unix 时间戳与日期时间互转，支持秒/毫秒与本地时区。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">#</span><div><h4>Slugify 字符串</h4><span class="slug">slugify-string</span></div></div>
+        <p>将任意文本转为 URL 友好的 slug，支持中文拼音转换。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">{ }</span><div><h4>JSON 格式化</h4><span class="slug">json-format</span></div></div>
+        <p>JSON 格式化、压缩、校验与转义，支持大文件。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🔤</span><div><h4>Base64 编解码</h4><span class="slug">base64</span></div></div>
+        <p>文本与 Base64 互转，支持 UTF-8 与 URL 安全变体。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🎨</span><div><h4>颜色转换器</h4><span class="slug">color-converter</span></div></div>
+        <p>HEX / RGB / HSL 互转，附对比度检查。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🔑</span><div><h4>JWT 解码器</h4><span class="slug">jwt-decoder</span></div></div>
+        <p>解析 JWT Header 与 Payload，并检查过期时间。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">📄</span><div><h4>正则测试</h4><span class="slug">regex-tester</span></div></div>
+        <p>在线编写与测试正则表达式，高亮匹配结果。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🌍</span><div><h4>URL 编解码</h4><span class="slug">url-encoder</span></div></div>
+        <p>对 URL 或查询参数进行编码与解码。</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat-sec">
+    <div class="section-title">加密与安全<a class="more">--count 11</a></div>
+    <div class="grid">
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🔐</span><div><h4>文本哈希计算</h4><span class="slug">hash-text</span></div></div>
+        <p>计算 MD5、SHA1、SHA256、SHA3、RIPEMD160 等哈希值。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🎲</span><div><h4>随机 Token 生成器</h4><span class="slug">token-generator</span></div></div>
+        <p>按指定长度和字符集生成随机字符串。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🆔</span><div><h4>UUID 生成器</h4><span class="slug">uuid-generator</span></div></div>
+        <p>生成 UUID v4 或 Nil UUID，适合测试数据与分布式 ID。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🔒</span><div><h4>Bcrypt 哈希</h4><span class="slug">bcrypt</span></div></div>
+        <p>使用 bcrypt 对文本哈希，并可与已有哈希值校验。</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat-sec">
+    <div class="section-title">转换与图像<a class="more">more categories →</a></div>
+    <div class="grid">
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">📐</span><div><h4>进制转换器</h4><span class="slug">base-converter</span></div></div>
+        <p>二进制、八进制、十进制、十六进制互转。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">📅</span><div><h4>日期计算器</h4><span class="slug">date-converter</span></div></div>
+        <p>日期间隔、工作日计算与农历查询。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🔲</span><div><h4>二维码生成器</h4><span class="slug">qrcode-generator</span></div></div>
+        <p>将文本或链接生成二维码，可自定义颜色与尺寸。</p>
+      </a>
+      <a class="card tool" href="tool-detail.html">
+        <div class="head"><span class="ico">🖼</span><div><h4>图片压缩</h4><span class="slug">image-compress</span></div></div>
+        <p>浏览器本地压缩图片，无上传、保隐私。</p>
+      </a>
+    </div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

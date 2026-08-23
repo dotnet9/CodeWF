@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜索 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.search-hero { margin: 44px auto 30px; max-width: 860px; }
+.searchbox {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid var(--brand-line);
+  border-radius: 9px; padding: 16px 28px; font-size: 15px;
+  color: var(--text); box-shadow: var(--glow-pop), 0 0 0 3px rgba(81,43,212,.10);
+}
+.searchbox .q { color: var(--text); font-family: var(--mono); }
+.searchbox .caret { width: 9px; height: 18px; background: var(--brand); box-shadow: 0 0 10px rgba(81,43,212,.6); animation: blink 1.1s infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+.searchbox kbd { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text-3); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; }
+.results { max-width: 860px; margin: 0 auto; }
+.r-head { font-family: var(--mono); font-size: 13px; color: var(--text-3); margin-bottom: 18px; }
+.r-head b { color: var(--neon); }
+.hit { padding: 18px 22px; margin-bottom: 12px; }
+.hit h3 { font-size: 15.5px; margin: 8px 0; }
+.hit h3 a:hover { color: var(--neon); }
+.hit p { font-size: 13px; color: var(--text-2); }
+.hit p mark { background: rgba(81,43,212,.18); color: var(--neon); border-radius: 4px; padding: 0 4px; font-family: var(--mono); }
+.hit .meta { margin-top: 9px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="search-hero">
+    <div class="searchbox">⌕ <span class="q">avalonia datagrid</span><span class="caret"></span><kbd>ESC</kbd></div>
+  </div>
+
+  <div class="results">
+    <div class="r-head">found <b>23</b> results in <b>0.03s</b> · sort: relevance</div>
+
+    <article class="card hit">
+      <span class="tag cyan">.NET</span> <span class="tag">Avalonia UI</span>
+      <h3><a href="post.html">Avalonia 剪贴板和 <mark>DataGrid</mark> 的问题</a></h3>
+      <p>记录最近 Avalonia 桌面软件开发解决的两个问题：剪贴板复制崩溃、Tab 切换 <mark>DataGrid</mark> 卡顿，分析根因并给出解决方案……</p>
+      <div class="meta"><span>2026-01-11</span><span>reads 5143</span><span>slug: issues-with-avalonia-clipboard-and-datagrid</span></div>
+    </article>
+
+    <article class="card hit">
+      <span class="tag cyan">.NET</span> <span class="tag plain">性能优化</span>
+      <h3><a href="#">万行 <mark>DataGrid</mark> 虚拟化性能对比：WPF vs Avalonia</a></h3>
+      <p>在 WPF 与 Avalonia 中分别绑定 10 万行数据，对比虚拟化策略下的滚动帧率与内存占用……</p>
+      <div class="meta"><span>2025-11-02</span><span>reads 3.1k</span></div>
+    </article>
+
+    <article class="card hit">
+      <span class="tag">Avalonia UI</span> <span class="tag violet">控件</span>
+      <h3><a href="#">Avalonia <mark>DataGrid</mark> 单元格合并与冻结列实践</a></h3>
+      <p>基于附加属性实现 <mark>DataGrid</mark> 的跨行合并与冻结列，附可复用的行为类源码……</p>
+      <div class="meta"><span>2025-09-18</span><span>reads 2.4k</span></div>
+    </article>
+
+    <article class="card hit">
+      <span class="tag plain">专题</span> <span class="tag cyan">Avalonia UI</span>
+      <h3><a href="album.html">Avalonia UI 控件库（专题 · 14 篇）</a></h3>
+      <p>整理 Avalonia 控件库使用与界面开发，包含 <mark>DataGrid</mark> 定制样式等章节……</p>
+      <div class="meta"><span>album: avalonia-ui-control-library</span></div>
+    </article>
+
+    <div class="pagination"><span>‹</span><span class="cur">1</span><span>2</span><span>3</span><span>›</span></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

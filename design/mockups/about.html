@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.hero { margin: 48px 0 40px; text-align: center; }
+.hero .logo {
+  width: 84px; height: 84px; border-radius: 20px; margin: 0 auto 22px;
+  background: linear-gradient(135deg, #512bd4, #7a5af8); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 900;
+  box-shadow: 0 12px 40px rgba(81, 43, 212, .35);
+  animation: float-y 4.5s ease-in-out infinite;
+}
+.hero h1 { font-size: 36px; }
+.hero h1 .grad { background: linear-gradient(92deg, #512bd4, #0078d4, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--text-2); max-width: 560px; margin: 16px auto 0; }
+.badges { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+.badges span { font-family: var(--mono); font-size: 12px; color: var(--text-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; background: var(--glass); }
+.cols { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+.panel { padding: 26px 30px; }
+.panel h3 { font-size: 15.5px; margin-bottom: 14px; display: flex; align-items: center; gap: 9px; }
+.panel p, .panel li { font-size: 13.5px; color: var(--text-2); }
+.panel ul li { padding: 7px 0; border-bottom: 1px dashed var(--line); display: flex; gap: 9px; }
+.panel ul li:last-child { border: none; }
+.panel li .k { font-family: var(--mono); color: var(--neon); white-space: nowrap; }
+.qr { display: flex; gap: 18px; margin-top: 16px; }
+.qr .box { flex: 1; text-align: center; }
+.qr .img-ph { width: 100%; height: 150px; margin-bottom: 9px; }
+.qr small { font-family: var(--mono); color: var(--text-3); font-size: 12px; }
+.stack { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item active" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <section class="hero">
+    <div class="logo">码</div>
+    <h1>CodeWF <span class="grad">码坊</span></h1>
+    <p>一个以中文内容为主的技术站点，分享 .NET 技术文章、开源项目说明和常用在线工具，一直在开发和整理中……</p>
+    <div class="badges">
+      <span>.NET 10</span><span>ASP.NET Core</span><span>Next.js</span><span>Avalonia</span>
+      <span>QQ 交流群</span><span>GitHub · dotnet9/CodeWF</span><span>Gitee · dotnet9/CodeWF</span>
+    </div>
+  </section>
+
+  <div class="cols">
+    <div class="card flat panel">
+      <h3><span class="dot"></span>站长是谁</h3>
+      <p>我是 Dotnet9，一名 .NET 全栈开发者，专注于 WPF / Avalonia 桌面开发与 Web 内容工程。白天写代码，晚上写博客，周末造开源轮子——Vex、CodeWF.Markdown、CodeWF Toolbox 都是这个站的副产品。</p>
+      <p style="margin-top:12px">本站内容以文件仓库方式维护（Assets.Dotnet9），前后端分离：Web API 负责内容与渲染，Next.js 前台展示，React 后台管理。所有在线工具均在浏览器本地运行。</p>
+      <div class="stack" style="margin-top:18px">
+        <span class="tag">C#</span><span class="tag cyan">Avalonia</span><span class="tag">WPF</span>
+        <span class="tag violet">Blazor</span><span class="tag amber">Next.js</span><span class="tag plain">TypeScript</span>
+      </div>
+    </div>
+
+    <div class="card flat panel">
+      <h3><span class="dot amber"></span>联系与交流</h3>
+      <ul>
+        <li><span class="k">QQ 群</span>Dotnet9 软件技术交流群</li>
+        <li><span class="k">GitHub</span>github.com/dotnet9/CodeWF</li>
+        <li><span class="k">邮箱</span>admin@dotnet9.com</li>
+        <li><span class="k">RSS</span>codewf.com/rss.xml</li>
+      </ul>
+    </div>
+
+    <div class="card flat panel" style="grid-column: span 2; background: linear-gradient(140deg, rgba(191,95,0,.08), rgba(139,92,246,.05))">
+      <h3><span class="dot amber"></span>赞助与捐赠</h3>
+      <p>如果本站文章或工具帮到了你，欢迎请站长喝一杯咖啡，这是持续更新的最大动力 ☕</p>
+      <div class="qr">
+        <div class="box"><div class="img-ph">wechat pay qr</div><small>WeChat Pay</small></div>
+        <div class="box"><div class="img-ph">alipay qr</div><small>Alipay</small></div>
+        <div class="box"><div class="img-ph">sponsor list</div><small>捐赠榜单 →</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com · <a href="#">隐私政策</a></span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div>
+  </div>
+</footer>
+</body>
+</html>

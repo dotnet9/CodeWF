@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.page-head { margin: 36px 0 24px; display: flex; align-items: baseline; gap: 16px; }
+.page-head h1 { font-size: 30px; }
+.page-head .path { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+.layout { display: flex; gap: 26px; }
+.list { flex: 1; min-width: 0; }
+.toolbar { display: flex; align-items: center; gap: 9px; margin-bottom: 18px; flex-wrap: wrap; }
+.toolbar .chip {
+  padding: 7px 17px; border-radius: 8px; font-family: var(--mono); font-size: 12.5px;
+  color: var(--text-2); border: 1px solid var(--line); background: var(--glass);
+}
+.toolbar .chip:hover { color: var(--text); border-color: var(--line-glow); }
+.toolbar .chip.cur { color: var(--neon); border-color: rgba(81,43,212,.5); background: var(--neon-soft); font-weight: 700; }
+.toolbar .sort { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--text-3); }
+.toolbar .sort b { color: var(--neon); }
+.post { display: flex; gap: 18px; padding: 19px 22px; margin-bottom: 13px; }
+.post .img-ph { width: 185px; height: 116px; flex-shrink: 0; }
+.post h3 { font-size: 16.5px; margin: 8px 0; }
+.post h3 a:hover { color: var(--neon); }
+.post p { color: var(--text-2); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post .meta { margin-top: 10px; }
+.aside { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 18px; }
+.aside .card { padding: 20px 22px; }
+.aside h3 { font-size: 14px; margin-bottom: 13px; display: flex; align-items: center; gap: 9px; font-family: var(--mono); }
+.cat-item { display: flex; align-items: center; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-family: var(--mono); color: var(--text-2); }
+.cat-item:hover { background: var(--glass); color: var(--neon); }
+.cat-item .cnt { margin-left: auto; color: var(--text-3); font-size: 11.5px; }
+.cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.cloud .tag.big { font-size: 13px; padding: 5px 13px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item active" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-head">
+    <h1>文章</h1>
+    <span class="path">~/blog?cat=dotnet · 486 posts</span>
+  </div>
+
+  <div class="layout">
+    <section class="list">
+      <div class="toolbar">
+        <span class="chip">all</span>
+        <span class="chip cur">dotnet</span>
+        <span class="chip">wpf</span>
+        <span class="chip">blazor</span>
+        <span class="chip">avalonia</span>
+        <span class="chip">asp-net-core</span>
+        <span class="chip">open-source</span>
+        <div class="sort">sort: <b>latest</b> · popular</div>
+      </div>
+
+      <article class="card post">
+        <a class="img-ph">cover_05.png</a>
+        <div>
+          <span class="tag cyan">ASP.NET Core</span> <span class="tag violet">AI</span>
+          <h3><a href="post.html">AI 重构 Razor Pages 网站完成</a></h3>
+          <p>AI 辅助开发，网站回归传统 Razor Pages，觉得更适合内容展示型网站。本文记录重构思路、过程与上线效果……</p>
+          <div class="meta"><span>2026-04-16</span><span>Dotnet9</span><span>reads 3.8k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_07.png</a>
+        <div>
+          <span class="tag cyan">.NET</span> <span class="tag">Avalonia UI</span>
+          <h3><a href="post.html">CodeWF.Markdown：一个基于 Avalonia 12 的 Markdown 渲染控件</a></h3>
+          <p>PDF 文本可复制、图片可嵌入，复制到公众号/知乎/掘金不再显示 HTML 源码。介绍控件的设计目标与实现细节……</p>
+          <div class="meta"><span>2026-05-20</span><span>Dotnet9</span><span>reads 6.9k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_08.png</a>
+        <div>
+          <span class="tag">.NET</span> <span class="tag">Avalonia UI</span>
+          <h3><a href="post.html">CodeWF.AvaloniaControls 新增 Guide 引导控件：从 AtomUI Tour 到 Vex 落地</a></h3>
+          <p>参考 AtomUI 的 Tour 实现，为 CodeWF.AvaloniaControls 增加新手引导控件，并已在 Vex 编辑器中落地使用……</p>
+          <div class="meta"><span>2026-06-02</span><span>Dotnet9</span><span>reads 2.7k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_01.png</a>
+        <div>
+          <span class="tag cyan">.NET</span> <span class="tag amber">转载</span>
+          <h3><a href="post.html">写给所有 .NET 开发者的 2025 年度总结</a></h3>
+          <p>系统梳理 2025 年 .NET 开发者最应该关注的技术趋势和重要事件，涵盖 AI 发展、.NET 演进及两者融合的最新动态……</p>
+          <div class="meta"><span>2026-01-05</span><span>圣杰|向AI而行</span><span>reads 12.4k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_02.png</a>
+        <div>
+          <span class="tag violet">C#</span>
+          <h3><a href="post.html">2025 年度语言：C#</a></h3>
+          <p>TIOBE 官宣 2025 年度编程语言为 C#，本文回顾 C# 这一年在语言特性、生态与社区上的高光时刻……</p>
+          <div class="meta"><span>2026-01-08</span><span>Dotnet9</span><span>reads 4.2k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_04.png</a>
+        <div>
+          <span class="tag cyan">.NET</span> <span class="tag plain">实战</span>
+          <h3><a href="post.html">.NET 跨平台本地库引入实战</a></h3>
+          <p>以真实项目为例，讲解在 .NET 中引入 C/C++ 本地库的跨平台实践，覆盖 Windows/Linux/macOS 三端……</p>
+          <div class="meta"><span>2026-01-15</span><span>Dotnet9</span><span>reads 3.3k</span></div>
+        </div>
+      </article>
+
+      <div class="pagination"><span>‹</span><span class="cur">1</span><span>2</span><span>3</span><span>…</span><span>28</span><span>›</span></div>
+    </section>
+
+    <aside class="aside">
+      <div class="card">
+        <h3><span class="dot"></span>categories</h3>
+        <a class="cat-item">dotnet<span class="cnt">486</span></a>
+        <a class="cat-item">wpf<span class="cnt">322</span></a>
+        <a class="cat-item">blazor<span class="cnt">208</span></a>
+        <a class="cat-item">avalonia<span class="cnt">176</span></a>
+        <a class="cat-item">asp-net-core<span class="cnt">154</span></a>
+        <a class="cat-item">open-source<span class="cnt">132</span></a>
+      </div>
+      <div class="card">
+        <h3><span class="dot amber"></span>tags</h3>
+        <div class="cloud">
+          <span class="tag big">C#</span><span class="tag">.NET</span><span class="tag big">Avalonia</span>
+          <span class="tag cyan">WPF</span><span class="tag">Blazor</span><span class="tag violet big">AI</span>
+          <span class="tag">Prism</span><span class="tag amber">Markdown</span><span class="tag plain">Razor</span>
+          <span class="tag">开源</span><span class="tag cyan">跨平台</span><span class="tag plain">XAML</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="dot"></span>archive</h3>
+        <a class="cat-item">2026<span class="cnt">46</span></a>
+        <a class="cat-item">2025<span class="cnt">212</span></a>
+        <a class="cat-item">2024<span class="cnt">188</span></a>
+        <a class="cat-item">2023<span class="cnt">204</span></a>
+        <a class="cat-item">2022<span class="cnt">316</span></a>
+        <a class="cat-item">2019-2021<span class="cnt">714</span></a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

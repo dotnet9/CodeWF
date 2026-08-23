@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间线 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.wrap { max-width: 880px; margin: 0 auto; }
+.page-head { margin: 36px 0 30px; display: flex; align-items: baseline; gap: 16px; }
+.page-head h1 { font-size: 30px; }
+.page-head .path { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+/* 极光时间轴 */
+.tl { position: relative; padding-left: 34px; }
+.tl::before {
+  content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px;
+  background: linear-gradient(180deg, var(--neon), var(--cyan) 45%, var(--violet));
+  box-shadow: 0 0 14px rgba(81,43,212,.5); border-radius: 2px;
+}
+.event { position: relative; padding: 0 0 34px 26px; }
+.event::before {
+  content: ""; position: absolute; left: -31px; top: 6px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--bg); border: 2.5px solid var(--neon);
+  box-shadow: 0 0 12px rgba(81,43,212,.7);
+}
+.event:nth-child(3n)::before { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,120,212,.7); }
+.event:nth-child(3n+1)::before { border-color: var(--violet); box-shadow: 0 0 12px rgba(139,92,246,.7); }
+.event .time { font-family: var(--mono); font-size: 12.5px; color: var(--neon); }
+.event h3 { font-size: 17px; margin: 7px 0; }
+.event p { font-size: 13.5px; color: var(--text-2); max-width: 640px; }
+.event .card { display: inline-block; margin-top: 12px; padding: 13px 18px; font-size: 12.5px; font-family: var(--mono); color: var(--text-3); }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item active" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="wrap">
+    <div class="page-head"><h1>建站时间线</h1><span class="path">git log --graph · since 2019</span></div>
+
+    <div class="tl">
+      <div class="event">
+        <span class="time">2026-04-16</span>
+        <h3>使用 Razor Pages 重构网站</h3>
+        <p>AI 辅助开发，网站回归传统 Razor Pages，觉得更适合内容展示型网站。</p>
+      </div>
+      <div class="event">
+        <span class="time">2024-10-09</span>
+        <h3>使用 KnownCMS 重构网站</h3>
+        <p>感谢 KnownCMS 开源项目，前台是 Antd 风格，符合官网和博客网站。Blazor 还是最顺手，10 月 26 日基本完成改造并部署上线。</p>
+      </div>
+      <div class="event">
+        <span class="time">2024-08-12</span>
+        <h3>尝试使用 Fluent Blazor 重构网站</h3>
+        <p>使用 Fluent Blazor 风格重构。</p>
+      </div>
+      <div class="event">
+        <span class="time">2024-07-12</span>
+        <h3>又一轮使用 Masa Blazor 重构开始</h3>
+        <p>先使用了几天 Ant Blazor，现在使用 Masa Blazor 文档站源码进行修改。老思路：集文章浏览和工具使用的一体站。</p>
+      </div>
+      <div class="event">
+        <span class="time">2023-11-01</span>
+        <h3>Dotnet9 重构完成上线</h3>
+        <p>Dotnet9 重构完成上线，可以在此基础上慢慢优化了。</p>
+        <span class="card flat">🚀 deploy: production · v1.0</span>
+      </div>
+      <div class="event">
+        <span class="time">2023-10-21</span>
+        <h3>重构 Dotnet9 博客网站</h3>
+        <p>参考开源项目 easy-admin 及其在线博客网站重构 Dotnet9 博客网站。</p>
+      </div>
+      <div class="event">
+        <span class="time">2019</span>
+        <h3>initial commit</h3>
+        <p>域名注册，第一篇博客上线，一切都从这儿开始。</p>
+        <span class="card flat">✨ feat: hello world</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文档 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.page-head { margin: 36px 0 24px; display: flex; align-items: baseline; gap: 16px; }
+.page-head h1 { font-size: 30px; }
+.page-head .path { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+.layout { display: flex; gap: 26px; }
+.toc-panel { width: 290px; flex-shrink: 0; padding: 22px 14px; position: sticky; top: 90px; align-self: start; }
+.toc-panel h3 { font-family: var(--mono); font-size: 13px; color: var(--text-3); padding: 0 14px 10px; }
+.toc-panel .grp { font-family: var(--mono); font-size: 12px; color: var(--neon); padding: 14px 14px 6px; }
+.toc-panel li { padding: 7px 14px; border-radius: 9px; font-size: 13.5px; color: var(--text-2); }
+.toc-panel li:hover { background: var(--glass); color: var(--text); }
+.toc-panel li.cur { background: var(--neon-soft); color: var(--neon); font-weight: 600; box-shadow: inset 0 0 0 1px rgba(81,43,212,.35); }
+.doc { flex: 1; padding: 36px 44px; min-width: 0; }
+.doc h1 { font-size: 27px; margin-bottom: 6px; }
+.doc .path { font-family: var(--mono); font-size: 12.5px; color: var(--text-3); margin-bottom: 24px; }
+.doc h2 { font-size: 19px; margin: 30px 0 12px; display: flex; gap: 11px; align-items: center; }
+.doc h2::before { content: "##"; font-family: var(--mono); font-size: 14px; color: var(--neon); opacity: .75; }
+.doc p { color: var(--text-2); margin: 12px 0; }
+.doc pre { background: #06090c; border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; font-family: var(--mono); font-size: 13px; color: #c9e8dc; margin: 16px 0; }
+.doc code.i { background: rgba(81,43,212,.1); border: 1px solid rgba(81,43,212,.22); border-radius: 6px; padding: 2px 8px; font-family: var(--mono); font-size: 12.5px; color: var(--neon); }
+.doc .img-ph { width: 100%; height: 230px; margin: 16px 0; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item active" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="page-head"><h1>文档中心</h1><span class="path">~/docs · guides &amp; manuals</span></div>
+
+  <div class="layout">
+    <aside class="card flat toc-panel">
+      <h3>TABLE OF CONTENTS</h3>
+      <div class="grp">/ 快速开始</div>
+      <ul>
+        <li class="cur">项目简介</li>
+        <li>环境要求</li>
+        <li>本地运行</li>
+      </ul>
+      <div class="grp">/ 内容维护</div>
+      <ul>
+        <li>目录结构</li>
+        <li>文章规范 (slug/元数据)</li>
+        <li>多语言文件 (about.en.md)</li>
+      </ul>
+      <div class="grp">/ 部署</div>
+      <ul>
+        <li>配置说明</li>
+        <li>Nginx 反代</li>
+        <li>RSS 与 Sitemap</li>
+      </ul>
+    </aside>
+
+    <article class="card flat doc">
+      <h1>项目简介</h1>
+      <div class="path">site/doc/getting-started/intro.md</div>
+
+      <p>CodeWF 是一个前后端分离的博客与在线工具网站：Web API 负责读取文件型内容仓库并渲染 Markdown，Next.js 前台提供文章、专题、文档、工具与多语言内容，React + Ant Design 后台负责内容维护。</p>
+
+      <h2>本地运行</h2>
+      <p>安装依赖并启动三个子应用：</p>
+      <pre>npm install
+dotnet restore CodeWF.slnx
+
+npm run dev:api        # 后端  http://localhost:5002
+npm run dev:frontend   # 前台  http://localhost:5000
+npm run dev:admin      # 后台  http://localhost:5001</pre>
+
+      <h2>内容仓库</h2>
+      <p>默认资源仓库路径为 <code class="i">Site:LocalAssetsDir</code>，文章正文存放于 <code class="i">YYYY/MM/slug.md</code>，元数据使用同名 <code class="i">.yml</code> sidecar 文件：</p>
+      <div class="img-ph">directory tree · Assets.Dotnet9</div>
+
+      <h2>多语言</h2>
+      <p>多语言资源通过同名后缀文件加载，例如 <code class="i">about.en.md</code>、<code class="i">tools.ja.json</code>。缺少对应语言文件时，回退到默认中文内容。</p>
+    </article>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首页 · CodeWF 码坊</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── Hero：巨型渐变标题 + 终端窗口 ── */
+.hero { display: flex; gap: 28px; align-items: stretch; margin-top: 44px; }
+.hero .left { flex: 1.15; padding-top: 26px; }
+.hero .pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 12.5px; color: var(--neon);
+  border: 1px solid rgba(81,43,212,.35); border-radius: 999px;
+  padding: 6px 16px; background: var(--neon-soft); margin-bottom: 26px;
+}
+.hero .pill .blink { width: 7px; height: 7px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 10px var(--neon); animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.hero h1 { font-size: 52px; line-height: 1.28; font-weight: 800; letter-spacing: -1px; }
+.hero h1 .grad {
+  background: linear-gradient(92deg, #512bd4 10%, #0078d4 60%, #8b5cf6 95%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.term .body div { animation: term-in .25s ease; }
+@keyframes term-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.hero p.sub { margin-top: 20px; color: var(--text-2); font-size: 15.5px; max-width: 520px; }
+.hero .cta { margin-top: 34px; display: flex; gap: 16px; align-items: center; }
+.hero .stats { display: flex; gap: 40px; margin-top: 44px; }
+.hero .stats b { font-family: var(--mono); font-size: 30px; color: var(--text); display: block; }
+.hero .stats b i { font-style: normal; color: var(--neon); }
+.hero .stats span { font-size: 12.5px; color: var(--text-3); font-family: var(--mono); }
+
+/* 终端窗口卡片 */
+.term {
+  flex: 1; border-radius: 18px; overflow: hidden; align-self: stretch;
+  border: 1px solid rgba(81,43,212,.45); background: rgba(8,12,16,.92);
+  box-shadow: 0 20px 60px rgba(30, 27, 46, .5), 0 0 40px rgba(81,43,212,.18); display: flex; flex-direction: column;
+  min-height: 430px;
+}
+.term .bar {
+  display: flex; align-items: center; gap: 8px; padding: 13px 18px;
+  border-bottom: 1px solid var(--line); background: rgba(255,255,255,.03);
+}
+.term .bar i { width: 12px; height: 12px; border-radius: 50%; }
+.term .bar .r { background: #ff5f57; } .term .bar .y { background: #febc2e; } .term .bar .g { background: #28c840; }
+.term .bar .title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+.term .body { padding: 22px 26px; font-family: var(--mono); font-size: 14px; line-height: 2.15; }
+.term .c { color: #93a8a0; } .term .k { color: #00e5a0; } .term .s { color: #ffc766; } .term .v { color: #6fc6ff; }
+.term .cursor { display: inline-block; width: 9px; height: 17px; background: #00e5a0; vertical-align: -3px; box-shadow: 0 0 10px #00e5a0; animation: blink 1.1s infinite; }
+.type-caret { color: var(--brand); animation: blink 1s steps(1) infinite; margin-left: 4px; }
+
+/* ── Bento 区：分类 / 热榜 / 工具 ── */
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; margin-top: 54px; }
+.b-post { grid-column: span 5; padding: 24px 26px; }
+.b-hot { grid-column: span 4; padding: 24px 26px; }
+.b-tool { grid-column: span 3; padding: 24px 26px; }
+.bento h3 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 9px; }
+.bento h3 .more { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-3); font-weight: 400; }
+
+.post-line { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px dashed var(--line); }
+.post-line:last-child { border: none; }
+.post-line .idx { font-family: var(--mono); font-size: 13px; color: var(--neon); width: 22px; padding-top: 2px; }
+.post-line h4 { font-size: 14.5px; line-height: 1.5; }
+.post-line h4 a:hover { color: var(--neon); }
+.post-line .meta { margin-top: 5px; }
+.post-line .thumb { width: 92px; height: 62px; flex-shrink: 0; }
+
+.hot li { display: flex; gap: 10px; padding: 9px 0; font-size: 13.5px; border-bottom: 1px dashed var(--line); align-items: baseline; }
+.hot li:last-child { border: none; }
+.hot .rank { font-family: var(--mono); font-weight: 700; color: var(--amber); width: 18px; }
+.hot li:nth-child(n+4) .rank { color: var(--text-3); }
+.hot .vw { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-3); white-space: nowrap; }
+
+.tool-strip { display: flex; flex-direction: column; gap: 9px; }
+.tool-strip a {
+  display: flex; align-items: center; gap: 11px; padding: 9px 12px;
+  border-radius: 11px; font-size: 13.5px; border: 1px solid transparent;
+}
+.tool-strip a:hover { background: var(--glass); border-color: var(--line); }
+.tool-strip .ico { width: 32px; height: 32px; border-radius: 10px; background: var(--neon-soft); border: 1px solid rgba(81,43,212,.25); color: var(--neon); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.tool-strip .all { color: var(--neon); font-family: var(--mono); font-size: 12.5px; }
+
+/* ── 文章瀑布 + 侧栏 ── */
+.main { display: flex; gap: 26px; margin-top: 56px; }
+.main .list { flex: 1; }
+.feature {
+  display: flex; gap: 22px; padding: 22px; margin-bottom: 18px;
+  background: linear-gradient(120deg, rgba(81,43,212,.07), transparent 45%);
+}
+.feature .img-ph { width: 300px; height: 186px; flex-shrink: 0; }
+.feature h3 { font-size: 20px; margin: 10px 0 10px; }
+.feature p { color: var(--text-2); font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.feature .meta { margin-top: 14px; }
+.post { display: flex; gap: 18px; padding: 19px 22px; margin-bottom: 14px; }
+.post .img-ph { width: 180px; height: 114px; flex-shrink: 0; }
+.post h3 { font-size: 16px; margin: 8px 0; }
+.post h3 a:hover { color: var(--neon); }
+.post p { color: var(--text-2); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post .meta { margin-top: 10px; }
+.aside { width: 310px; flex-shrink: 0; display: flex; flex-direction: column; gap: 18px; }
+.aside .card { padding: 20px 22px; }
+.aside h3 { font-size: 14.5px; margin-bottom: 14px; display: flex; align-items: center; gap: 9px; }
+.cat-item { display: flex; align-items: center; padding: 8px 12px; border-radius: 10px; font-size: 13.5px; font-family: var(--mono); color: var(--text-2); }
+.cat-item:hover { background: var(--glass); color: var(--neon); }
+.cat-item .cnt { margin-left: auto; color: var(--text-3); font-size: 12px; }
+.proj { padding: 20px 22px; background: linear-gradient(140deg, rgba(139,92,246,.12), rgba(0,120,212,.06)); }
+.proj .stars { font-family: var(--mono); color: var(--amber); font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item active" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="left">
+      <span class="pill"><span class="blink"></span>SYSTEM ONLINE · 更新于 2026-08-23</span>
+      <h1>.NET 开发者的<br><span class="grad" id="typed"></span><span class="type-caret">▌</span></h1>
+      <p class="sub">1680+ 篇深度文章、91 个浏览器本地运行的在线工具、30+ 专题系列——WPF / Avalonia / Blazor / AI，一个都不少。</p>
+      <div class="cta">
+        <a class="btn" href="blog.html">开始阅读 →</a>
+        <a class="btn ghost" href="tools.html">打开工具箱</a>
+      </div>
+      <div class="stats">
+        <div><b>1680<i>+</i></b><span>ARTICLES</span></div>
+        <div><b>91</b><span>TOOLS</span></div>
+        <div><b>30<i>+</i></b><span>ALBUMS</span></div>
+        <div><b>7<i>yrs</i></b><span>SINCE 2019</span></div>
+      </div>
+    </div>
+    <div class="term">
+      <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="title">codewf — 站点情报 · live</span></div>
+      <div class="body" id="termBody"></div>
+    </div>
+  </section>
+
+  <!-- 关键词跑马灯 -->
+  <div class="ticker">
+    <div class="track">
+      <span><b>#.NET 10</b> 已发布</span><span><b>#C# 13</b> 新特性</span><span><b>#Avalonia 12</b> 跨平台桌面</span><span><b>#Blazor</b> 全栈 Web UI</span><span><b>#AI 辅助开发</b> 实战录</span><span><b>#WPF</b> 企业级桌面</span><span><b>#Vex</b> 开源 Markdown 编辑器</span><span><b>#91</b> 在线工具免上传</span><span><b>#CodeWF</b> 前后端分离</span>
+      <span><b>#.NET 10</b> 已发布</span><span><b>#C# 13</b> 新特性</span><span><b>#Avalonia 12</b> 跨平台桌面</span><span><b>#Blazor</b> 全栈 Web UI</span><span><b>#AI 辅助开发</b> 实战录</span><span><b>#WPF</b> 企业级桌面</span><span><b>#Vex</b> 开源 Markdown 编辑器</span><span><b>#91</b> 在线工具免上传</span><span><b>#CodeWF</b> 前后端分离</span>
+    </div>
+  </div>
+
+  <!-- Bento -->
+  <section class="bento">
+    <div class="card b-post">
+      <h3><span class="dot"></span>最新文章<a class="more" href="blog.html">查看全部 →</a></h3>
+      <div class="post-line">
+        <span class="idx">01</span>
+        <div>
+          <h4><a href="post.html">CodeWF.Markdown：一个基于 Avalonia 12 的 Markdown 渲染控件</a></h4>
+          <div class="meta"><span>2026-05-20</span><span>.NET / Avalonia UI</span></div>
+        </div>
+        <span class="img-ph thumb">cover</span>
+      </div>
+      <div class="post-line">
+        <span class="idx">02</span>
+        <div>
+          <h4><a href="post.html">AI 重构 Razor Pages 网站完成</a></h4>
+          <div class="meta"><span>2026-04-16</span><span>ASP.NET Core / AI</span></div>
+        </div>
+        <span class="img-ph thumb">cover</span>
+      </div>
+      <div class="post-line">
+        <span class="idx">03</span>
+        <div>
+          <h4><a href="post.html">CodeWF.AvaloniaControls 新增 Guide 引导控件</a></h4>
+          <div class="meta"><span>2026-06-02</span><span>.NET / Avalonia UI</span></div>
+        </div>
+        <span class="img-ph thumb">cover</span>
+      </div>
+    </div>
+
+    <div class="card b-hot">
+      <h3><span class="dot amber"></span>本周热榜</h3>
+      <ul class="hot">
+        <li><span class="rank">1</span>写给所有 .NET 开发者的 2025 年度总结<span class="vw">12.4k</span></li>
+        <li><span class="rank">2</span>我宣布：这个网站，终于被我用 AI 重构成了<span class="vw">9.8k</span></li>
+        <li><span class="rank">3</span>Vex 1.1.0：免费开源的跨平台 Markdown 编辑器<span class="vw">7.2k</span></li>
+        <li><span class="rank">4</span>CodeWF Toolbox：Avalonia + Prism 开发者工具箱<span class="vw">6.5k</span></li>
+        <li><span class="rank">5</span>Avalonia 剪贴板和 DataGrid 的问题<span class="vw">5.1k</span></li>
+        <li><span class="rank">6</span>枝见 Zhijian：Markdown 脑图编辑器<span class="vw">4.0k</span></li>
+      </ul>
+    </div>
+
+    <div class="card b-tool">
+      <h3><span class="dot"></span>常用工具</h3>
+      <div class="tool-strip">
+        <a href="tool-detail.html"><span class="ico">⏱</span>时间戳转换</a>
+        <a href="tool-detail.html"><span class="ico">#</span>Slugify 字符串</a>
+        <a href="tool-detail.html"><span class="ico">🔐</span>文本哈希计算</a>
+        <a href="tool-detail.html"><span class="ico">🔲</span>二维码生成器</a>
+        <a class="all" href="tools.html">./all-tools --count 91 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 文章流 + 侧栏 -->
+  <div class="main">
+    <section class="list">
+      <div class="section-title">精选文章<a class="more" href="blog.html">archive →</a></div>
+
+      <article class="card feature">
+        <a class="img-ph" href="post.html">cover_01.png · img1.dotnet9.com</a>
+        <div>
+          <span class="tag">.NET</span> <span class="tag amber">转载</span> <span class="tag plain">年度总结</span>
+          <h3><a href="post.html">写给所有 .NET 开发者的 2025 年度总结</a></h3>
+          <p>相信今年大家没少看到《抱歉，C# 已经跌出第一梯队》类似的文章，.NET 生态到底如何？本文系统梳理 2025 年 .NET 开发者最应该关注的技术趋势和重要事件，涵盖 AI 发展、.NET 演进及两者融合的最新动态。</p>
+          <div class="meta"><span>圣杰|向AI而行</span><span>2026-01-05</span><span>reads 12.4k</span><span>comments 36</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_03.png</a>
+        <div>
+          <span class="tag">.NET</span> <span class="tag cyan">Avalonia UI</span>
+          <h3><a href="post.html">Avalonia 剪贴板和 DataGrid 的问题</a></h3>
+          <p>记录最近 Avalonia 桌面软件开发解决的两个问题：剪贴板复制崩溃、Tab 切换 DataGrid 卡顿，分析根因并给出解决方案。</p>
+          <div class="meta"><span>2026-01-11</span><span>.NET / C#</span><span>reads 5.1k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_02.png</a>
+        <div>
+          <span class="tag violet">C#</span>
+          <h3><a href="post.html">2025 年度语言：C#</a></h3>
+          <p>TIOBE 官宣 2025 年度编程语言为 C#，回顾 C# 这一年在语言特性、生态与社区上的高光时刻。</p>
+          <div class="meta"><span>2026-01-08</span><span>reads 4.2k</span></div>
+        </div>
+      </article>
+
+      <article class="card post">
+        <a class="img-ph">cover_04.png</a>
+        <div>
+          <span class="tag cyan">.NET</span> <span class="tag plain">实战</span>
+          <h3><a href="post.html">.NET 跨平台本地库引入实战</a></h3>
+          <p>以真实项目为例，讲解在 .NET 中引入 C/C++ 本地库的跨平台实践，覆盖 Windows / Linux / macOS 三端。</p>
+          <div class="meta"><span>2026-01-15</span><span>reads 3.3k</span></div>
+        </div>
+      </article>
+    </section>
+
+    <aside class="aside">
+      <div class="card">
+        <h3><span class="dot"></span>分类索引</h3>
+        <a class="cat-item" href="blog.html">dotnet<span class="cnt">486</span></a>
+        <a class="cat-item" href="blog.html">wpf<span class="cnt">322</span></a>
+        <a class="cat-item" href="blog.html">blazor<span class="cnt">208</span></a>
+        <a class="cat-item" href="blog.html">avalonia<span class="cnt">176</span></a>
+        <a class="cat-item" href="blog.html">asp-net-core<span class="cnt">154</span></a>
+        <a class="cat-item" href="blog.html">open-source<span class="cnt">132</span></a>
+      </div>
+      <div class="card proj">
+        <h3><span class="dot"></span>开源项目</h3>
+        <p style="font-size:13.5px;color:var(--text-2)"><b style="color:var(--text)">Vex</b> — 免费开源的 .NET + Avalonia 跨平台 Markdown 编辑器。</p>
+        <div class="stars">★ 1.2k stars · MIT License</div>
+        <a class="btn" style="margin-top:14px" href="#">前往 GitHub ↗</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="cols">
+      <div style="max-width:320px">
+        <h4>CodeWF 码坊</h4>
+        <p>一个以中文内容为主的技术站点，分享 .NET 技术文章、开源项目说明和常用在线工具。</p>
+      </div>
+      <div><h4>内容</h4><ul><li><a href="blog.html">文章</a></li><li><a href="album.html">专题</a></li><li><a href="doc.html">文档</a></li><li><a href="timeline.html">时间线</a></li></ul></div>
+      <div><h4>工具</h4><ul><li><a href="tools.html">在线工具</a></li><li><a href="tool-detail.html">时间戳转换</a></li><li><a href="tool-detail.html">二维码生成</a></li></ul></div>
+      <div><h4>关于</h4><ul><li><a href="about.html">关于本站</a></li><li><a href="friends.html">友情链接</a></li><li><a href="about.html">赞助与捐赠</a></li></ul></div>
+    </div>
+    <div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div>
+  </div>
+</footer>
+<script>
+(function () {
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  // ── Hero 标题：循环打字机 ──
+  var phrases = ["代码工坊与军火库", "在线工具百宝箱", "AI 结对编程现场", "开源轮子制造车间"];
+  var typed = document.getElementById("typed"), pi = 0, ci = 0, deleting = false;
+  (function tick() {
+    var text = phrases[pi];
+    ci += deleting ? -1 : 1;
+    typed.textContent = text.slice(0, ci);
+    var delay = deleting ? 45 : 130;
+    if (!deleting && ci === text.length) { delay = 2400; deleting = true; }
+    else if (deleting && ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; delay = 500; }
+    setTimeout(tick, delay);
+  })();
+
+  // ── 终端：逐字打印站点情报 ──
+  // 每行为多个片段 [{t: 文本, c: 颜色类}]
+  var report = [
+    [{ t: "▸ ", c: "k" }, { t: "CodeWF 站点情报", c: "k" }, { t: "  ·  live", c: "c" }],
+    [{ t: "» 建站时间  ", c: "c" }, { t: "2019 年", c: "v" }, { t: " · 稳定运行 ", c: "c" }, { t: "7 年", c: "v" }],
+    [{ t: "» 文章总量  ", c: "c" }, { t: "1680+ 篇", c: "v" }, { t: " · 本周新增 ", c: "c" }, { t: "3 篇", c: "v" }],
+    [{ t: "» 专题系列  ", c: "c" }, { t: "30+ 个", c: "v" }, { t: " · 覆盖 WPF / Blazor / Avalonia", c: "s" }],
+    [{ t: "» 在线工具  ", c: "c" }, { t: "91 个", c: "v" }, { t: " · 100% 浏览器本地运行", c: "s" }],
+    [{ t: "» 开源项目  ", c: "c" }, { t: "Vex / CodeWF.Markdown / Toolbox", c: "v" }],
+    [{ t: "» GitHub Star  ", c: "c" }, { t: "1.2k+", c: "s" }, { t: " · QQ 交流群 ", c: "c" }, { t: "3 个", c: "s" }],
+    [{ t: "▸ ", c: "k" }, { t: "内容持续更新中，欢迎常来 …", c: "k" }]
+  ];
+  var body = document.getElementById("termBody");
+  var cursorHtml = '<span class="cursor"></span>';
+
+  async function run() {
+    while (true) {
+      body.innerHTML = "";
+      await sleep(600);
+      for (var r = 0; r < report.length; r++) {
+        var line = document.createElement("div");
+        body.appendChild(line);
+        for (var seg = 0; seg < report[r].length; seg++) {
+          var piece = report[r][seg];
+          var span = document.createElement("span");
+          if (piece.c) span.className = piece.c;
+          line.appendChild(span);
+          // 光标保持在行尾：每次追加字符后移到 span 之后
+          var cur = line.querySelector(".cursor");
+          if (!cur) { line.insertAdjacentHTML("beforeend", cursorHtml); cur = line.querySelector(".cursor"); }
+          for (var ch = 1; ch <= piece.t.length; ch++) {
+            span.textContent = piece.t.slice(0, ch);
+            line.appendChild(cur); // 光标始终最后
+            await sleep(38);
+          }
+        }
+        line.querySelector(".cursor") && line.querySelector(".cursor").remove();
+        await sleep(280);
+      }
+      // 尾行留下闪烁光标
+      var last = document.createElement("div");
+      body.appendChild(last);
+      last.innerHTML = '<span class="c">$ </span>' + cursorHtml;
+      await sleep(4200);
+    }
+  }
+  run();
+})();
+</script>
+</body>
+</html>

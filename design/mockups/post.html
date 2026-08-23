@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文章详情 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.layout { display: flex; gap: 28px; }
+.article { flex: 1; min-width: 0; padding: 38px 44px 32px; }
+.article h1 { font-size: 28px; line-height: 1.5; margin-top: 14px; }
+.head-meta { display: flex; gap: 18px; align-items: center; margin-top: 18px; padding-bottom: 20px; border-bottom: 1px dashed var(--line); }
+.author { display: flex; align-items: center; gap: 10px; }
+.author .ava { width: 36px; height: 36px; border-radius: 11px; background: linear-gradient(135deg, var(--neon), var(--cyan)); color: #04110c; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+.article .cover { width: 100%; height: 330px; margin: 24px 0; }
+.body { font-size: 15px; }
+.body h2 { font-size: 20px; margin: 34px 0 14px; display: flex; align-items: center; gap: 12px; }
+.body h2::before { content: "##"; font-family: var(--mono); font-size: 15px; color: var(--neon); opacity: .75; }
+.body h3 { font-size: 16.5px; margin: 24px 0 10px; display: flex; align-items: center; gap: 10px; }
+.body h3::before { content: "###"; font-family: var(--mono); font-size: 13px; color: var(--cyan); opacity: .7; }
+.body p { margin: 13px 0; color: var(--text-2); }
+.body pre {
+  background: #06090c; border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px 22px; font-family: var(--mono); font-size: 13px; line-height: 1.75;
+  margin: 18px 0; overflow-x: auto; color: #c9e8dc; position: relative;
+}
+.body pre::before {
+  content: "csharp"; position: absolute; top: 9px; right: 14px;
+  font-size: 10.5px; color: var(--text-3); border: 1px solid var(--line);
+  border-radius: 5px; padding: 1px 8px;
+}
+.body pre .k { color: #9d8fff; } .body pre .t { color: #5db8ff; } .body pre .s { color: #ffb340; } .body pre .c { color: #5e7570; }
+.body code.i { background: rgba(81,43,212,.1); border: 1px solid rgba(81,43,212,.22); border-radius: 6px; padding: 2px 8px; font-size: 12.5px; font-family: var(--mono); color: var(--neon); }
+.body blockquote { border-left: 3px solid var(--neon); background: var(--neon-soft); border-radius: 0 12px 12px 0; padding: 13px 20px; color: var(--text-2); margin: 16px 0; }
+.body .img-ph { width: 100%; height: 260px; margin: 18px 0; }
+.license { margin-top: 30px; padding: 15px 20px; border-radius: 12px; background: var(--glass); border: 1px dashed var(--line); font-family: var(--mono); font-size: 12.5px; color: var(--text-3); }
+.actions { display: flex; gap: 10px; margin-top: 22px; }
+.actions a { padding: 8px 19px; border-radius: 999px; border: 1px solid var(--line); background: var(--glass); font-size: 13px; color: var(--text-2); font-family: var(--mono); }
+.actions a:hover { border-color: var(--line-glow); color: var(--neon); }
+.prev-next { display: flex; gap: 14px; margin-top: 20px; }
+.prev-next a { flex: 1; padding: 15px 19px; border-radius: 12px; font-size: 13.5px; background: var(--glass); border: 1px solid var(--line); }
+.prev-next a b { display: block; color: var(--text-3); font-size: 11.5px; font-weight: 400; font-family: var(--mono); margin-bottom: 5px; }
+.prev-next a.next { text-align: right; }
+.aside { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 18px; position: sticky; top: 90px; align-self: start; }
+.aside .card { padding: 20px 22px; }
+.aside h3 { font-size: 13.5px; margin-bottom: 13px; display: flex; align-items: center; gap: 9px; font-family: var(--mono); }
+.toc li { padding: 6px 0 6px 15px; font-size: 13px; color: var(--text-2); border-left: 2px solid var(--line); }
+.toc li.cur { color: var(--neon); border-left-color: var(--neon); font-weight: 600; }
+.toc li.sub { padding-left: 32px; font-size: 12.5px; }
+.rel li { padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+.rel li:last-child { border: none; }
+.rel li a:hover { color: var(--neon); }
+.rel .vw { float: right; color: var(--text-3); font-family: var(--mono); font-size: 12px; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item active" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="breadcrumb">~/blog/avalonia <span style="color:var(--text-3)">/</span> <b>issues-with-avalonia-clipboard-and-datagrid</b></div>
+
+  <div class="layout">
+    <article class="card flat article">
+      <span class="tag cyan">.NET</span> <span class="tag">Avalonia UI</span> <span class="tag plain">C#</span>
+      <h1>Avalonia 剪贴板和 DataGrid 的问题</h1>
+      <div class="head-meta">
+        <div class="author"><span class="ava">D9</span><span><b style="font-size:13.5px">Dotnet9</b><br><span style="font-size:12px;color:var(--text-3);font-family:var(--mono)">owner</span></span></div>
+        <div class="meta" style="margin:0">
+          <span>published 2026-01-11 11:18</span><span>updated 01-11 12:23</span>
+          <span>reads 5143</span><span>comments 18</span><span>~3.2k words</span>
+        </div>
+      </div>
+
+      <div class="img-ph cover">cover · https://img1.dotnet9.com/2026/01/cover_03.png</div>
+
+      <div class="body">
+        <p>记录最近 Avalonia 桌面软件开发解决的两个问题：剪贴板复制崩溃、Tab 切换 DataGrid 卡顿，分析根因并给出解决方案。</p>
+
+        <h2>剪贴板复制崩溃</h2>
+        <p>在 Windows 上调用 <code class="i">Clipboard.SetTextAsync</code> 偶发崩溃，堆栈指向剪贴板打开失败。排查后发现是 Avalonia 的剪贴板实现与系统剪贴板监听软件冲突：</p>
+<pre><span class="c">// 重试 + 延迟释放，规避剪贴板占用冲突</span>
+<span class="k">for</span> (<span class="t">int</span> i = 0; i &lt; 3; i++)
+{
+    <span class="k">try</span>
+    {
+        <span class="k">await</span> clipboard.<span class="t">SetTextAsync</span>(text);
+        <span class="k">break</span>;
+    }
+    <span class="k">catch</span> (<span class="t">ClipboardException</span>)
+    {
+        <span class="k">await</span> <span class="t">Task</span>.<span class="t">Delay</span>(50);
+    }
+}</pre>
+
+        <h2>Tab 切换 DataGrid 卡顿</h2>
+        <p>大量行数据绑定 <code class="i">DataGrid</code> 时，TabControl 切换页签明显掉帧。原因是虚拟化被关闭导致一次性 measure 所有行：</p>
+        <blockquote>关键结论：保持 <code class="i">VirtualizationMode="Standard"</code>，并避免在 <code class="i">LoadingRow</code> 中做重量级操作。</blockquote>
+
+        <h3>定位过程</h3>
+        <p>使用 dotTrace 抓取切换页签时的采样，热点集中在 <code class="i">MeasureOverride</code>，确认是行容器全量布局……</p>
+        <div class="img-ph">figure 1 · performance flame graph</div>
+
+        <h3>解决方案</h3>
+        <p>通过附加行为在页签失活时冻结布局、切回时恢复，实测万行数据切换耗时从 900ms 降至 40ms。</p>
+      </div>
+
+      <div class="license">© 转载请保留原文链接 · https://codewf.com/post/issues-with-avalonia-clipboard-and-datagrid</div>
+
+      <div class="actions"><a>👍 36</a><a>💬 18</a><a>🔗 copy-link</a><a>★ star</a><a>⚑ report</a></div>
+
+      <div class="prev-next">
+        <a><b>← prev</b>2025 年度语言：C#</a>
+        <a class="next"><b>next →</b>.NET 跨平台本地库引入实战</a>
+      </div>
+    </article>
+
+    <aside class="aside">
+      <div class="card flat">
+        <h3><span class="dot"></span>TOC</h3>
+        <ul class="toc">
+          <li class="cur">剪贴板复制崩溃</li>
+          <li>Tab 切换 DataGrid 卡顿</li>
+          <li class="sub">定位过程</li>
+          <li class="sub">解决方案</li>
+          <li>总结</li>
+        </ul>
+      </div>
+      <div class="card flat">
+        <h3><span class="dot amber"></span>相关阅读</h3>
+        <ul class="rel">
+          <li><a href="#">CodeWF.Markdown：Avalonia 12 渲染控件</a><span class="vw">6.9k</span></li>
+          <li><a href="#">CodeWF.AvaloniaControls 新增 Guide 控件</a><span class="vw">2.7k</span></li>
+          <li><a href="#">CodeWF Toolbox：Avalonia + Prism 工具箱</a><span class="vw">6.5k</span></li>
+          <li><a href="#">枝见 Zhijian：Markdown 脑图编辑器</a><span class="vw">4.0k</span></li>
+        </ul>
+      </div>
+      <div class="card flat" style="background:linear-gradient(140deg,rgba(191,95,0,.1),rgba(139,92,246,.08))">
+        <h3><span class="dot amber"></span>支持站长</h3>
+        <p style="font-size:13px;color:var(--text-2)">如果文章对你有帮助，欢迎赞助一杯咖啡 ☕</p>
+        <a class="btn" style="margin-top:12px" href="about.html">前往捐赠</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+</body>
+</html>
