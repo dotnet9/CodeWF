@@ -23,6 +23,21 @@ export function GlobalSearch({
   const [items, setItems] = useState<SearchResultItem[]>([]);
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isEditing = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
+      if (((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") || (event.key === "/" && !isEditing)) {
+        event.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onShortcut);
+    return () => window.removeEventListener("keydown", onShortcut);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -86,6 +101,7 @@ export function GlobalSearch({
     >
       <Search size={16} aria-hidden="true" />
       <input
+        ref={inputRef}
         name="q"
         type="search"
         value={query}
@@ -97,7 +113,8 @@ export function GlobalSearch({
         aria-label={label}
         autoComplete="off"
       />
-      <button type="submit">{label}</button>
+      <kbd aria-hidden="true">Ctrl K</kbd>
+      <button type="submit" aria-label={label}>{label}</button>
       {open && items.length > 0 ? (
         <div className="search-suggest-panel">
           {items.map((item) => (

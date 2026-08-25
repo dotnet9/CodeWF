@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { api, resolveAssetUrl } from "@/api";
 import { CodeHighlighter } from "@/components/CodeHighlighter";
-import { ContentToc, PostPager, RelatedPosts } from "@/components/ContentToc";
+import { ArticleActions } from "@/components/ArticleActions";
+import { ContentToc, PostPager } from "@/components/ContentToc";
 import { HtmlContent } from "@/components/HtmlContent";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -64,12 +65,6 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
   const albumLinks = (post.albums ?? []).map((item) => ({ label: item, href: `/album/${encodeURIComponent(item)}` }));
   const tagLinks = (post.tags ?? []).map((item) => ({ label: item, href: `/tag/${encodeURIComponent(item)}` }));
   const topicLinks = [...categoryLinks, ...albumLinks, ...tagLinks].slice(0, 12);
-  const readingPathLinks = albumLinks.length > 0 ? albumLinks.slice(0, 3) : categoryLinks.slice(0, 3);
-  const readingPathTitle = albumLinks.length > 0 ? "继续阅读这个专题" : "继续看同类内容";
-  const readingPathDescription =
-    albumLinks.length > 0
-      ? "这篇文章已经放进专题路线，适合顺着同一主题继续读。"
-      : "这篇文章暂未归入专题，可以先从相关分类继续浏览。";
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -108,6 +103,11 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
         <SiteHeader locale={locale} site={site} categories={home.categories} albums={home.albums} latestPost={home.recentPosts[0]} />
         <main className="page-wrap">
           <ReadingProgress />
+          <div className="breadcrumb article-breadcrumb">
+            <span>~/blog/{post.categories?.[0] ?? "article"}</span>
+            <span aria-hidden="true">/</span>
+            <b>{post.slug}</b>
+          </div>
           <div className="article-layout">
             <div className="article-main">
               <article className="article-shell" itemScope itemType="https://schema.org/BlogPosting">
@@ -116,53 +116,48 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
                 <meta itemProp="datePublished" content={post.date ?? ""} />
                 <meta itemProp="dateModified" content={post.lastmod ?? post.date ?? ""} />
                 {cover ? <meta itemProp="image" content={cover} /> : null}
-                {cover ? (
-                  <div className="article-cover">
-                    <Image src={cover} alt="" fill sizes="(max-width: 920px) 100vw, 820px" priority />
-                  </div>
-                ) : null}
                 <header className="article-header">
-                  <div className="post-meta">
-                    <time dateTime={post.date} itemProp="datePublished">
-                      {formatDate(post.date, locale)}
-                    </time>
-                    {post.author ? <span itemProp="author">{post.author}</span> : null}
-                    {post.estimatedReadingMinutes ? <span>预计阅读 {post.estimatedReadingMinutes} 分钟</span> : null}
-                  </div>
-                  <h1 itemProp="headline">{post.title}</h1>
-                  <p itemProp="description">{post.description}</p>
-                  <div className="tag-row">
+                  <div className="tag-row article-topic-row">
                     {topicLinks.map((tag) => (
                       <Link href={withLocale(locale, tag.href)} key={`${tag.href}-${tag.label}`}>
                         {tag.label}
                       </Link>
                     ))}
                   </div>
-                  {readingPathLinks.length > 0 ? (
-                    <section className="article-series-panel" aria-label={readingPathTitle}>
-                      <div>
-                        <span className="card-kicker">连续阅读</span>
-                        <h2>{readingPathTitle}</h2>
-                        <p>{readingPathDescription}</p>
-                      </div>
-                      <div className="article-series-panel__links">
-                        {readingPathLinks.map((item) => (
-                          <Link href={withLocale(locale, item.href)} key={`${item.href}-${item.label}`}>
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </section>
-                  ) : null}
+                  <h1 itemProp="headline">{post.title}</h1>
+                  <div className="article-head-meta">
+                    <div className="article-author">
+                      <span className="article-author__avatar" aria-hidden="true">
+                        {(post.author ?? site.owner ?? "D9").slice(0, 2).toUpperCase()}
+                      </span>
+                      <span>
+                        <strong itemProp="author">{post.author ?? site.owner}</strong>
+                        <small>{site.ownerDesc ?? "CodeWF"}</small>
+                      </span>
+                    </div>
+                    <div className="post-meta article-meta-list">
+                      <span>
+                        published <time dateTime={post.date} itemProp="datePublished">{formatDate(post.date, locale)}</time>
+                      </span>
+                      {post.lastmod ? <span>updated <time dateTime={post.lastmod} itemProp="dateModified">{formatDate(post.lastmod, locale)}</time></span> : null}
+                      {post.estimatedReadingMinutes ? <span>~{post.estimatedReadingMinutes} min read</span> : null}
+                    </div>
+                  </div>
                 </header>
+                {cover ? (
+                  <div className="article-cover">
+                    <Image src={cover} alt="" fill sizes="(max-width: 920px) 100vw, 820px" priority />
+                  </div>
+                ) : null}
                 <section className="article-body" itemProp="articleBody">
                   <HtmlContent html={post.htmlContent} />
                 </section>
+                <div className="article-license">© 转载请保留原文链接 · {canonical}</div>
+                <ArticleActions />
               </article>
-              <RelatedPosts locale={locale} posts={post.relatedPosts ?? []} />
               <PostPager locale={locale} previous={post.previousPost} next={post.nextPost} />
             </div>
-            <ContentToc html={post.htmlContent} />
+            <ContentToc locale={locale} html={post.htmlContent} relatedPosts={post.relatedPosts ?? []} showSupport />
           </div>
           <CodeHighlighter />
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

@@ -25,24 +25,59 @@ export function extractToc(html?: string): TocItem[] {
   return result.filter((item) => item.text);
 }
 
-export function ContentToc({ html, title = "目录" }: { html?: string; title?: string }) {
+type ContentTocProps = {
+  locale?: Locale;
+  html?: string;
+  title?: string;
+  relatedPosts?: BlogPostBrief[];
+  showSupport?: boolean;
+};
+
+export function ContentToc({ locale = "zh-CN", html, title = "目录", relatedPosts = [], showSupport = false }: ContentTocProps) {
   const toc = extractToc(html);
-  if (toc.length === 0) {
+  if (toc.length === 0 && relatedPosts.length === 0 && !showSupport) {
     return null;
   }
 
   return (
     <aside className="article-aside">
-      <div className="toc-panel">
-        <h2>{title}</h2>
-        <nav aria-label="Table of contents">
-          {toc.map((item) => (
-            <a href={`#${item.id}`} className={`toc-level-${item.level}`} key={item.id}>
-              {item.text}
-            </a>
-          ))}
-        </nav>
-      </div>
+      {toc.length > 0 ? (
+        <div className="toc-panel article-aside__panel">
+          <h2>{title}</h2>
+          <nav aria-label="Table of contents">
+            {toc.map((item, index) => (
+              <a
+                href={`#${item.id}`}
+                className={`${`toc-level-${item.level}`} ${index === 0 ? "is-active" : ""}`.trim()}
+                aria-current={index === 0 ? "location" : undefined}
+                key={`${item.id}-${index}`}
+              >
+                {item.text}
+              </a>
+            ))}
+          </nav>
+        </div>
+      ) : null}
+      {relatedPosts.length > 0 ? (
+        <section className="article-related-panel article-aside__panel" aria-labelledby="article-related-title">
+          <h2 id="article-related-title">相关阅读</h2>
+          <ul className="article-related-list">
+            {relatedPosts.slice(0, 5).map((post) => (
+              <li key={post.url ?? post.slug ?? post.title}>
+                <Link href={withLocale(locale, post.url ?? "/post")}>{post.title}</Link>
+                {post.contextLabel ? <small>{post.contextLabel}</small> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {showSupport ? (
+        <section className="article-support-panel article-aside__panel" aria-labelledby="article-support-title">
+          <h2 id="article-support-title">支持站长</h2>
+          <p>如果文章对你有帮助，欢迎赞助一杯咖啡。</p>
+          <Link href={withLocale(locale, "/donation")}>前往捐赠</Link>
+        </section>
+      ) : null}
     </aside>
   );
 }
