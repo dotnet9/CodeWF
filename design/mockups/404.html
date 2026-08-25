@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.wrap { max-width: 760px; margin: 0 auto; }
+.page-head { margin: 36px 0 26px; display: flex; align-items: baseline; gap: 16px; }
+.page-head h1 { font-size: 26px; }
+.page-head .path { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+
+/* 深色控制台：与首页终端同一语言 */
+.term {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(81,43,212,.45); background: rgba(8,12,16,.94);
+  box-shadow: 0 20px 60px rgba(30,27,46,.5), 0 0 40px rgba(81,43,212,.16);
+}
+.term .bar { display: flex; align-items: center; gap: 8px; padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.03); }
+.term .bar i { width: 12px; height: 12px; border-radius: 50%; }
+.term .bar .r { background: #ff5f57; } .term .bar .y { background: #febc2e; } .term .bar .g { background: #28c840; }
+.term .bar .title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: #7d938c; }
+.term .body { padding: 30px 34px 34px; font-family: var(--mono); font-size: 14px; line-height: 2.2; }
+.term .c { color: #93a8a0; } .term .k { color: #00e5a0; } .term .s { color: #ffc766; } .term .e { color: #ff7b72; } .term .v { color: #6fc6ff; }
+.term .cursor { display: inline-block; width: 9px; height: 17px; background: #00e5a0; vertical-align: -3px; box-shadow: 0 0 10px #00e5a0; animation: blink 1.1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.code-404 {
+  font-family: var(--mono); font-size: 108px; font-weight: 800; line-height: 1;
+  letter-spacing: 6px; text-align: center; margin: 26px 0 10px;
+  background: linear-gradient(92deg, #512bd4 15%, #0078d4 55%, #8b5cf6 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: glitch 4s infinite;
+}
+@keyframes glitch {
+  0%, 88%, 100% { text-shadow: none; }
+  90% { text-shadow: -3px 0 rgba(255,95,87,.55), 3px 0 rgba(0,229,160,.55); }
+  92% { text-shadow: 3px 0 rgba(255,95,87,.55), -3px 0 rgba(0,229,160,.55); }
+  94% { text-shadow: none; }
+}
+.hint { text-align: center; color: #7d938c; font-family: var(--mono); font-size: 12.5px; margin-bottom: 26px; }
+.exits { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.exit { padding: 16px 18px; text-align: center; }
+.exit .ic { width: 38px; height: 38px; margin: 0 auto 9px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--neon-soft); border: 1px solid rgba(81,43,212,.25); color: var(--neon); font-size: 16px; }
+.exit b { font-size: 13.5px; display: block; }
+.exit span { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.tip { margin-top: 22px; text-align: center; font-family: var(--mono); font-size: 12.5px; color: var(--text-3); }
+.tip kbd { border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: var(--bg-2); font-size: 11px; color: var(--text-2); }
+@media (max-width: 640px) { .exits { grid-template-columns: repeat(2, 1fr); } .code-404 { font-size: 72px; } }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="wrap">
+    <div class="page-head"><h1>页面未找到</h1><span class="path">exit code 404</span></div>
+
+    <div class="term">
+      <div class="bar"><i class="r"></i><i class="y"></i><i class="g"></i><span class="title">codewf@dotnet9 — zsh</span></div>
+      <div class="body">
+        <div><span class="k">$</span> <span class="c">curl -I</span> <span class="v">https://codewf.com/the-page-you-wanted</span></div>
+        <div><span class="e">HTTP/1.1 404</span> <span class="c">· Not Found</span></div>
+        <div><span class="c">zsh: no such file or directory:</span> <span class="s">~/the-page-you-wanted</span></div>
+        <div><span class="c"># 可能是：链接已变更、文章已归档，或你手滑敲错了一个字符。</span></div>
+        <div id="suggest"><span class="k">$</span> <span class="cursor"></span></div>
+      </div>
+    </div>
+
+    <div class="code-404">404</div>
+    <div class="hint">// 别慌，路由迷路了，内容还在</div>
+
+    <div class="exits">
+      <a class="card exit" href="index.html"><span class="ic">⌂</span><b>回首页</b><span>cd ~</span></a>
+      <a class="card exit" href="blog.html"><span class="ic">#</span><b>逛文章</b><span>cd ~/blog</span></a>
+      <a class="card exit" href="tools.html"><span class="ic">$</span><b>开工具</b><span>cd ~/tool</span></a>
+      <a class="card exit" href="search.html"><span class="ic">⌕</span><b>搜一搜</b><span>grep -r …</span></a>
+    </div>
+
+    <p class="tip">快捷键 <kbd>/</kbd> 或 <kbd>Ctrl K</kbd> 直接唤起全站搜索</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+<script>
+(function () {
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  var lines = [
+    [{ t: "$ ", c: "k" }, { t: "codewf search ", c: "c" }, { t: "\"你想找的内容\"", c: "s" }, { t: " --site-wide", c: "c" }],
+    [{ t: "» ", c: "k" }, { t: "press ", c: "c" }, { t: "Ctrl+K", c: "v" }, { t: " or ", c: "c" }, { t: "/", c: "v" }, { t: " to search 1680+ posts…", c: "c" }]
+  ];
+  var box = document.getElementById("suggest");
+  var cursor = '<span class="cursor"></span>';
+  async function run() {
+    while (true) {
+      box.innerHTML = cursor;
+      await sleep(900);
+      for (var r = 0; r < lines.length; r++) {
+        var line = document.createElement("div");
+        box.appendChild(line);
+        for (var i = 0; i < lines[r].length; i++) {
+          var seg = lines[r][i];
+          var span = document.createElement("span");
+          if (seg.c) span.className = seg.c;
+          line.appendChild(span);
+          var cur = line.querySelector(".cursor");
+          if (!cur) { line.insertAdjacentHTML("beforeend", cursor); cur = line.querySelector(".cursor"); }
+          for (var ch = 1; ch <= seg.t.length; ch++) {
+            span.textContent = seg.t.slice(0, ch);
+            line.appendChild(cur);
+            await sleep(42);
+          }
+        }
+        line.querySelector(".cursor") && line.querySelector(".cursor").remove();
+        await sleep(300);
+      }
+      var last = document.createElement("div");
+      box.appendChild(last);
+      last.innerHTML = '<span class="k">$ </span>' + cursor;
+      await sleep(4600);
+    }
+  }
+  run();
+})();
+</script>
+<script src="shared.js" defer></script>
+</body>
+</html>

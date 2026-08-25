@@ -248,3 +248,61 @@ ul { list-style: none; }
   .row { flex-direction: column; align-items: stretch; }
   .footer .copy { flex-direction: column; gap: 6px; }
 }
+
+/* ============================================================
+   细节增强 · 选区色 / 导航滚动态 / 无障碍动效降级
+   ============================================================ */
+::selection { background: rgba(81, 43, 212, .22); }
+.navbar.scrolled { box-shadow: 0 6px 24px rgba(27, 27, 31, .09); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ============================================================
+   Ctrl K 命令面板（shared.js 动态挂载）
+   ============================================================ */
+.cmdk { position: fixed; inset: 0; z-index: 200; }
+.cmdk .mask { position: absolute; inset: 0; background: rgba(27, 27, 31, .42); backdrop-filter: blur(3px); }
+.cmdk .dlg {
+  position: relative; width: min(680px, calc(100vw - 40px)); margin: 13vh auto 0;
+  background: #fff; border: 1px solid var(--line-glow); border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(27, 27, 31, .35), 0 0 0 3px rgba(81, 43, 212, .10);
+  overflow: hidden; animation: cmdk-in .16s ease;
+}
+@keyframes cmdk-in {
+  from { opacity: 0; transform: translateY(-10px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+.cmdk .ibar { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); color: var(--text-3); }
+.cmdk .ibar input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 15px; font-family: var(--sans); color: var(--text);
+}
+.cmdk .ibar input::placeholder { color: var(--text-3); }
+.cmdk .ibar kbd { font-family: var(--mono); font-size: 11px; color: var(--text-3); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; background: var(--bg-2); }
+.cmdk .list { max-height: 46vh; overflow-y: auto; padding: 8px; }
+.cmdk .grp { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; color: var(--text-3); padding: 10px 14px 4px; }
+.cmdk .it {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; cursor: pointer;
+}
+.cmdk .it .ic {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 13px; color: var(--brand);
+  background: var(--brand-soft); border: 1px solid rgba(81, 43, 212, .22);
+}
+.cmdk .it .t { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmdk .it .t mark { background: none; color: var(--brand); font-weight: 700; }
+.cmdk .it .s { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--text-3); white-space: nowrap; }
+.cmdk .it.act, .cmdk .it:hover { background: var(--brand-soft); box-shadow: inset 0 0 0 1px rgba(81, 43, 212, .32); }
+.cmdk .it.act .t { color: var(--brand); font-weight: 600; }
+.cmdk .empty { padding: 36px 20px; text-align: center; color: var(--text-3); font-family: var(--mono); font-size: 13px; }
+.cmdk .empty small { font-size: 11.5px; opacity: .8; }
+.cmdk .fbar {
+  display: flex; gap: 18px; padding: 10px 20px; border-top: 1px solid var(--line);
+  background: var(--bg-2); font-family: var(--mono); font-size: 11px; color: var(--text-3);
+}

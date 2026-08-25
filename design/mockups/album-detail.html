@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一起学 Blazor 系列 · 专题 · CodeWF</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.page-head { margin: 36px 0 22px; display: flex; align-items: baseline; gap: 16px; }
+.page-head h1 { font-size: 30px; }
+.page-head .path { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+.layout { display: flex; gap: 26px; }
+.main { flex: 1; min-width: 0; }
+
+/* ── 专题头卡：渐变横幅 + 统计 ── */
+.head {
+  padding: 30px 34px; overflow: hidden; position: relative;
+  background: linear-gradient(120deg, rgba(81,43,212,.10), rgba(0,120,212,.06) 55%, transparent);
+}
+.head::after {
+  content: "BLAZOR"; position: absolute; right: -10px; bottom: -26px;
+  font-family: var(--mono); font-size: 92px; font-weight: 800; letter-spacing: 2px;
+  color: rgba(81,43,212,.06); pointer-events: none;
+}
+.head .no { font-family: var(--mono); font-size: 12.5px; color: var(--neon); }
+.head h2 { font-size: 26px; margin: 9px 0 8px; }
+.head p { font-size: 13.5px; color: var(--text-2); max-width: 620px; }
+.head .foot { display: flex; align-items: center; gap: 26px; margin-top: 20px; flex-wrap: wrap; }
+.head .foot b { font-family: var(--mono); font-size: 19px; display: block; }
+.head .foot span { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.head .foot .go { margin-left: auto; }
+
+/* ── 章节分组的学习路径 ── */
+.ch { margin-top: 34px; }
+.ch-title {
+  display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;
+  font-family: var(--mono);
+}
+.ch-title b { font-size: 14px; color: var(--brand); }
+.ch-title span { font-size: 16px; font-weight: 700; font-family: var(--sans); color: var(--text); }
+.ch-title .cnt { margin-left: auto; font-size: 11.5px; color: var(--text-3); }
+.ep { display: flex; align-items: center; gap: 16px; padding: 14px 20px; margin-bottom: 10px; }
+.ep .no {
+  font-family: var(--mono); font-size: 12px; color: var(--text-3);
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--glass); border: 1px solid var(--line);
+}
+.ep h4 { font-size: 14.5px; line-height: 1.5; }
+.ep h4 a:hover { color: var(--neon); }
+.ep .meta { margin-top: 4px; }
+.ep .tag { flex-shrink: 0; }
+.ep.start { border-color: rgba(81,43,212,.4); background: linear-gradient(120deg, rgba(81,43,212,.06), transparent 60%); }
+.ep.start .no { color: #fff; background: linear-gradient(135deg, #512bd4, #7a5af8); border: none; box-shadow: 0 4px 12px rgba(81,43,212,.35); }
+.ep .arrow { margin-left: auto; color: var(--text-3); font-family: var(--mono); transition: transform .15s; }
+.ep:hover .arrow { transform: translateX(3px); color: var(--neon); }
+
+.aside { width: 290px; flex-shrink: 0; display: flex; flex-direction: column; gap: 18px; position: sticky; top: 90px; align-self: start; }
+.aside .card { padding: 20px 22px; }
+.aside h3 { font-size: 13.5px; margin-bottom: 13px; display: flex; align-items: center; gap: 9px; font-family: var(--mono); }
+.prog-track { height: 8px; border-radius: 99px; background: var(--glass); border: 1px solid var(--line); overflow: hidden; }
+.prog-bar { height: 100%; width: 13%; border-radius: 99px; background: linear-gradient(90deg, #512bd4, #7a5af8); box-shadow: 0 0 10px rgba(81,43,212,.45); }
+.prog-meta { display: flex; justify-content: space-between; margin-top: 9px; font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
+.prog-meta b { color: var(--neon); }
+.last-read { margin-top: 16px; padding: 13px 16px; border-radius: 11px; background: var(--glass); border: 1px dashed var(--line); font-size: 12.5px; }
+.last-read small { font-family: var(--mono); color: var(--text-3); display: block; margin-bottom: 5px; }
+.rel li { padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; display: flex; gap: 9px; align-items: baseline; }
+.rel li:last-child { border: none; }
+.rel li a:hover { color: var(--neon); }
+.rel .cnt { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--text-3); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="navbar">
+  <div class="container inner">
+    <a class="brand" href="index.html"><span class="icon">码</span><span class="name">Code<em>WF</em></span></a>
+    <a class="nav-item" href="index.html">首页</a>
+    <a class="nav-item" href="blog.html">文章</a>
+    <a class="nav-item active" href="album.html">专题</a>
+    <a class="nav-item" href="doc.html">文档</a>
+    <a class="nav-item" href="tools.html">工具</a>
+    <a class="nav-item" href="timeline.html">时间线</a>
+    <a class="nav-item" href="friends.html">友链</a>
+    <a class="nav-item" href="about.html">关于</a>
+    <div class="nav-kbd">⌕ 全局搜索 <kbd>Ctrl K</kbd></div>
+    <div class="nav-lang"><span class="cur">中</span><span>EN</span><span>JA</span><span>繁</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="breadcrumb">~/album <span style="color:var(--text-3)">/</span> <b>learn-blazor-series</b></div>
+
+  <div class="layout">
+    <div class="main">
+      <!-- 专题头卡 -->
+      <section class="card flat head">
+        <span class="no">#01 · 已完结 · 2021-12 → 2021-12</span>
+        <h2>一起学 Blazor 系列</h2>
+        <p>Blazor 从基础到实战的系列学习文章：从初识 Blazor、组件与数据绑定，一路做到博客系统、认证授权与单元测试，跟着做完你也能写自己的 Blazor 应用。</p>
+        <span class="tag" style="margin-top:12px">Blazor</span> <span class="tag cyan">ASP.NET Core</span> <span class="tag plain">.NET 6</span> <span class="tag amber">实战</span>
+        <div class="foot">
+          <div><b>31</b><span>EPISODES</span></div>
+          <div><b>100<i style="font-style:normal;font-size:12px">%</i></b><span>COMPLETED</span></div>
+          <div><b>128.6k</b><span>TOTAL READS</span></div>
+          <a class="btn go" href="post.html">从第 1 篇开始 →</a>
+        </div>
+      </section>
+
+      <!-- CH.01 -->
+      <section class="ch">
+        <div class="ch-title"><b>CH.01</b><span>基础入门</span><span class="cnt">4 eps</span></div>
+        <a class="card ep start" href="post.html">
+          <span class="no">01</span>
+          <div>
+            <h4>(1/30)大家一起学Blazor：初见Blazor</h4>            <div class="meta"><span>2021-12-09</span><span>reads 9.1k</span></div>
+          </div>
+          <span class="tag">开始这里</span>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">02</span>
+          <div>
+            <h4>(2/30)大家一起学Blazor：网页和Blazor介绍</h4>            <div class="meta"><span>2021-12-09</span><span>reads 7.8k</span></div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">03</span>
+          <div>
+            <h4>(3/30)大家一起学Blazor：Blazor Server和Blazor WebAssembly的差异</h4>            <div class="meta"><span>2021-12-10</span><span>reads 8.6k</span></div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">04</span>
+          <div>
+            <h4>(4/30)大家一起学Blazor：Component及路由介绍</h4>            <div class="meta"><span>2021-12-10</span><span>reads 7.2k</span></div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+      </section>
+
+      <!-- CH.02 -->
+      <section class="ch">
+        <div class="ch-title"><b>CH.02</b><span>组件与数据绑定</span><span class="cnt">11 eps</span></div>
+        <a class="card ep" href="post.html">
+          <span class="no">05</span>
+          <div><h4>(5/30)大家一起学Blazor：依赖注入(Dependency Injection)</h4><div class="meta"><span>2021-12-11</span><span>reads 6.9k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">06</span>
+          <div><h4>(6/30)大家一起学Blazor：抽离C#代码</h4><div class="meta"><span>2021-12-12</span><span>reads 5.4k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">07</span>
+          <div><h4>(7/30)大家一起学Blazor：生命周期(Lifetime)</h4><div class="meta"><span>2021-12-13</span><span>reads 6.1k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">08</span>
+          <div><h4>(8/30)大家一起学Blazor：CSS样式修改和数据绑定详述</h4><div class="meta"><span>2021-12-13</span><span>reads 5.8k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">09</span>
+          <div><h4>(9/30)大家一起学Blazor：Parameters</h4><div class="meta"><span>2021-12-14</span><span>reads 5.2k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">10</span>
+          <div><h4>(10/30)大家一起学Blazor：Blog and Posts</h4><div class="meta"><span>2021-12-14</span><span>reads 4.7k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">11</span>
+          <div><h4>(11/30)大家一起学Blazor：Arbitrary属性</h4><div class="meta"><span>2021-12-15</span><span>reads 4.3k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">12</span>
+          <div><h4>(12/30)大家一起学Blazor：Cascading values and parameters</h4><div class="meta"><span>2021-12-15</span><span>reads 4.5k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">13</span>
+          <div><h4>(13/30)大家一起学Blazor：EventCallback, event from child to parent</h4><div class="meta"><span>2021-12-16</span><span>reads 4.9k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">14</span>
+          <div><h4>(14/30)大家一起学Blazor：JavaScript interop(互操作)</h4><div class="meta"><span>2021-12-16</span><span>reads 5.5k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">15</span>
+          <div><h4>(15/30)大家一起学Blazor：CSS isolation（隔离）</h4><div class="meta"><span>2021-12-18</span><span>reads 3.9k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+      </section>
+
+      <!-- CH.03 -->
+      <section class="ch">
+        <div class="ch-title"><b>CH.03</b><span>实战：博客系统</span><span class="cnt">5 eps</span></div>
+        <a class="card ep" href="post.html">
+          <span class="no">16</span>
+          <div><h4>(16/30)大家一起学Blazor：建立数据库</h4><div class="meta"><span>2021-12-18</span><span>reads 4.8k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">17</span>
+          <div><h4>(17/30)大家一起学Blazor：建立Blog和Post关联</h4><div class="meta"><span>2021-12-19</span><span>reads 4.2k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">18</span>
+          <div><h4>(18/30)大家一起学Blazor：修改Add()方法</h4><div class="meta"><span>2021-12-20</span><span>reads 3.6k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">19</span>
+          <div><h4>(19/30)大家一起学Blazor：图片上传</h4><div class="meta"><span>2021-12-21</span><span>reads 4.4k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">20</span>
+          <div><h4>(20/30)大家一起学Blazor：日志记录</h4><div class="meta"><span>2021-12-21</span><span>reads 3.3k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+      </section>
+
+      <!-- CH.04 -->
+      <section class="ch">
+        <div class="ch-title"><b>CH.04</b><span>认证与授权</span><span class="cnt">8 eps</span></div>
+        <a class="card ep" href="post.html">
+          <span class="no">21</span>
+          <div><h4>(21/30)大家一起学Blazor：ASP.NET Core Identity(1)</h4><div class="meta"><span>2021-12-22</span><span>reads 5.1k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">22</span>
+          <div><h4>(22/30)大家一起学Blazor：ASP.NET Core Identity(2)</h4><div class="meta"><span>2021-12-22</span><span>reads 4.6k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">23</span>
+          <div><h4>(23/30)大家一起学Blazor：ASP.NET Core Identity(3)</h4><div class="meta"><span>2021-12-23</span><span>reads 4.1k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">24</span>
+          <div><h4>(24/30)大家一起学Blazor：&lt;AuthorizeRouteView&gt;运用</h4><div class="meta"><span>2021-12-23</span><span>reads 4.7k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">25</span>
+          <div><h4>(25/30)大家一起学Blazor：添加角色功能</h4><div class="meta"><span>2021-12-23</span><span>reads 3.8k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">26</span>
+          <div><h4>(26/30)大家一起学Blazor：给用户分配角色</h4><div class="meta"><span>2021-12-24</span><span>reads 3.5k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">27</span>
+          <div><h4>(27/30)大家一起学Blazor：添加用户和Claim功能</h4><div class="meta"><span>2021-12-25</span><span>reads 3.7k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">28</span>
+          <div><h4>(28/30)大家一起学Blazor：Policy-based authorization</h4><div class="meta"><span>2021-12-25</span><span>reads 3.9k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+      </section>
+
+      <!-- CH.05 -->
+      <section class="ch">
+        <div class="ch-title"><b>CH.05</b><span>测试与收尾</span><span class="cnt">3 eps</span></div>
+        <a class="card ep" href="post.html">
+          <span class="no">29</span>
+          <div><h4>(29/30)大家一起学Blazor：Blazor单元测试</h4><div class="meta"><span>2021-12-25</span><span>reads 4.0k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">30</span>
+          <div><h4>(30/30)大家一起学Blazor：.NET 6 &lt;ErrorBoundary&gt;</h4><div class="meta"><span>2021-12-25</span><span>reads 3.6k</span></div></div>
+          <span class="arrow">→</span>
+        </a>
+        <a class="card ep" href="post.html">
+          <span class="no">31</span>
+          <div><h4>Blazor系列终结！</h4><div class="meta"><span>2021-12-30</span><span>reads 6.2k</span></div></div>
+          <span class="tag plain">完</span>
+          <span class="arrow">→</span>
+        </a>
+      </section>
+    </div>
+
+    <aside class="aside">
+      <div class="card flat">
+        <h3><span class="dot"></span>阅读进度</h3>
+        <div class="prog-track"><div class="prog-bar"></div></div>
+        <div class="prog-meta"><span><b>4</b> / 31 已读</span><span>13%</span></div>
+        <div class="last-read">
+          <small>LAST READ · 2026-08-20</small>
+          (4/30)大家一起学Blazor：Component及路由介绍
+          <a class="btn" style="margin-top:12px;padding:7px 18px;font-size:13px" href="post.html">继续阅读 →</a>
+        </div>
+      </div>
+      <div class="card flat">
+        <h3><span class="dot amber"></span>相关专题</h3>
+        <ul class="rel">
+          <li><a href="#">Blazor 组件库</a><span class="cnt">18 篇</span></li>
+          <li><a href="#">Blazor WebAssembly 实战</a><span class="cnt">12 篇</span></li>
+          <li><a href="#">ASP.NET Core 身份认证</a><span class="cnt">9 篇</span></li>
+          <li><a href="#">Avalonia UI 控件库</a><span class="cnt">14 篇</span></li>
+        </ul>
+      </div>
+      <a class="card flat" style="padding:16px 20px;text-align:center;font-family:var(--mono);font-size:12.5px;color:var(--text-3)" href="album.html">← cd ~/album · 返回全部专题</a>
+    </aside>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container"><div class="copy"><span>© 2019-2026 CodeWF · dotnet9.com</span><span>RSS · Sitemap · 粤ICP备xxxxxxxx号</span></div></div>
+</footer>
+<script src="shared.js" defer></script>
+</body>
+</html>
