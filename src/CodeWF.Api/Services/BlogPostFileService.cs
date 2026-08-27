@@ -24,16 +24,22 @@ public sealed partial class BlogPostFileService
         .UseBootstrap()
         .Build();
 
-    public async Task<BlogPost> ReadAsync(string markdownFilePath, string assetsRoot, string assetBaseUrl, string? metadataPath = null)
+    /// <summary>
+    /// Reads a blog post from disk. File reads are intentionally synchronous:
+    /// sequential async file reads across hundreds of posts create long async task
+    /// chains that have been observed to trigger StackOverflowException inside the
+    /// .NET runtime's async file I/O machinery (dotnet/runtime#113189 pattern).
+    /// </summary>
+    public BlogPost Read(string markdownFilePath, string assetsRoot, string assetBaseUrl, string? metadataPath = null)
     {
-        var markdown = await File.ReadAllTextAsync(markdownFilePath, Encoding.UTF8);
+        var markdown = File.ReadAllText(markdownFilePath, Encoding.UTF8);
         metadataPath ??= GetMetadataPath(markdownFilePath);
 
         string frontMatterText;
         string markdownContent;
         if (File.Exists(metadataPath))
         {
-            frontMatterText = await File.ReadAllTextAsync(metadataPath, Encoding.UTF8);
+            frontMatterText = File.ReadAllText(metadataPath, Encoding.UTF8);
             markdownContent = StripInlineFrontMatter(markdown).Trim();
         }
         else if (TrySplitInlineFrontMatter(markdown, out frontMatterText, out markdownContent))

@@ -26,8 +26,8 @@ public sealed class AdminOptions
 {
     public const string SectionName = "Admin";
 
-    public List<AdminAccountOptions> Read { get; set; } = [new()];
-    public List<AdminAccountOptions> Super { get; set; } = [new() { UserName = "admin" }];
+    public List<AdminAccountOptions> Read { get; set; } = [];
+    public List<AdminAccountOptions> Super { get; set; } = [];
 }
 
 public sealed class AdminAccountOptions

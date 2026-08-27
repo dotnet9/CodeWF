@@ -10,14 +10,14 @@ namespace CodeWF.Api.Tests;
 public sealed class BlogPostFileServiceTests
 {
     [Fact]
-    public async Task ReadAsync_ParsesSidecarMetadataAndMarkdown()
+    public void Read_ParsesSidecarMetadataAndMarkdown()
     {
         var root = CreateTempRoot();
         var directory = Path.Combine(root, "2026", "05");
         Directory.CreateDirectory(directory);
         var markdown = Path.Combine(directory, "hello-codewf.md");
-        await File.WriteAllTextAsync(markdown, "# Hello\n\nContent");
-        await File.WriteAllTextAsync(BlogPostFileService.GetMetadataPath(markdown), """
+        File.WriteAllText(markdown, "# Hello\n\nContent");
+        File.WriteAllText(BlogPostFileService.GetMetadataPath(markdown), """
 title: "Hello CodeWF"
 slug: "hello-codewf"
 description: "A test post"
@@ -29,7 +29,7 @@ tags:
 """);
 
         var service = new BlogPostFileService();
-        var post = await service.ReadAsync(markdown, root, "https://img1.dotnet9.com");
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
 
         Assert.Equal("Hello CodeWF", post.Title);
         Assert.Equal("hello-codewf", post.Slug);

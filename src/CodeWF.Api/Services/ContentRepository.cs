@@ -639,12 +639,12 @@ public sealed partial class ContentRepository
         });
 
     private Task<IReadOnlyList<BlogPost>> GetAllPostsAsync(string culture) =>
-        GetCachedAsync($"posts:{NormalizeCulture(culture)}", async () =>
+        GetCachedAsync($"posts:{NormalizeCulture(culture)}", () =>
         {
             var root = AssetsRoot();
             if (!Directory.Exists(root))
             {
-                return (IReadOnlyList<BlogPost>)[];
+                return Task.FromResult<IReadOnlyList<BlogPost>>([]);
             }
 
             var posts = new List<BlogPost>();
@@ -668,7 +668,7 @@ public sealed partial class ContentRepository
 
                     try
                     {
-                        var post = await postFiles.ReadAsync(localizedPath, root, siteOptions.CurrentValue.AssetBaseUrl, metadataPath);
+                        var post = postFiles.Read(localizedPath, root, siteOptions.CurrentValue.AssetBaseUrl, metadataPath);
                         posts.Add(post);
                     }
                     catch
@@ -678,10 +678,11 @@ public sealed partial class ContentRepository
                 }
             }
 
-            return posts
-                .OrderByDescending(static post => post.Date)
-                .ThenByDescending(static post => post.Lastmod)
-                .ToList();
+            return Task.FromResult<IReadOnlyList<BlogPost>>(
+                posts
+                    .OrderByDescending(static post => post.Date)
+                    .ThenByDescending(static post => post.Lastmod)
+                    .ToList());
         });
 
     private async Task<T?> ReadJsonAsync<T>(string culture, params string[] relativeSegments)
