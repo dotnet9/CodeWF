@@ -1,7 +1,6 @@
 import type {
   BlogPost,
   BlogPostBrief,
-  DocNode,
   FriendLinkItem,
   HomePageData,
   Locale,
@@ -84,8 +83,6 @@ export const api = {
   tags: (locale: LocaleInput) => getJson<{ name: string; postCount: number }[]>(`/tags?${query(locale)}`, []),
   tools: (locale: LocaleInput) => getJson<ToolNode[]>(`/tools?${query(locale)}`, []),
   tool: (locale: LocaleInput, slug: string) => getJson<ToolNode | null>(`/tools/${slug}?${query(locale)}`, null),
-  docs: (locale: LocaleInput) => getJson<DocNode[]>(`/docs?${query(locale)}`, []),
-  doc: (locale: LocaleInput, slug: string) => getJson<DocNode | null>(`/docs/${slug}?${query(locale)}`, null),
   markdownPage: (locale: LocaleInput, name: "about" | "donation" | "privacy") =>
     getJson<MarkdownPage>(`/pages/${name}?${query(locale)}`, {}),
   friendLinks: (locale: LocaleInput) => getJson<FriendLinkItem[]>(`/friend-links?${query(locale)}`, []),
@@ -98,7 +95,6 @@ export const api = {
       data: [],
       postCount: 0,
       toolCount: 0,
-      docCount: 0,
       isBlocked: false
     }),
   searchSuggestions: (locale: LocaleInput, q: string, take = 10) =>

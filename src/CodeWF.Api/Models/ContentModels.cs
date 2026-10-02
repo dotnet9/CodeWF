@@ -69,19 +69,6 @@ public sealed class ToolNode
     public List<ToolNode>? Children { get; set; }
 }
 
-public sealed class DocNode
-{
-    public string? Name { get; set; }
-    public string? Memo { get; set; }
-    public string? Slug { get; set; }
-    public string? Repository { get; set; }
-    public string? Content { get; set; }
-    public string? HtmlContent { get; set; }
-    public List<DocNode>? Children { get; set; }
-    public DocNode? PreviousDoc { get; set; }
-    public DocNode? NextDoc { get; set; }
-}
-
 public sealed class FriendLinkItem
 {
     public int Index { get; set; }
@@ -178,7 +165,6 @@ public sealed record PagedResult<T>(
 public enum SearchResultKind
 {
     Tool = 0,
-    Doc = 1,
     Post = 2
 }
 
@@ -202,7 +188,6 @@ public sealed record SearchResultPageData(
     int Total,
     IReadOnlyList<SearchResultItem> Data,
     int ToolCount,
-    int DocCount,
     int PostCount,
     bool IsBlocked = false,
     string? Notice = null);

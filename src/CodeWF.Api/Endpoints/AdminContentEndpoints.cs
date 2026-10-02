@@ -139,7 +139,6 @@ public static class AdminContentEndpoints
         name.ToLowerInvariant() switch
         {
             "tools" => ("tools", ["tools", "tools.json"]),
-            "navigation" or "doc-navigation" => ("navigation", ["doc", "navigation.json"]),
             "friend-links" => ("friend-links", ["friend-links.json"]),
             "timelines" => ("timelines", ["timelines.json"]),
             "blocked-search-keywords" => ("blocked-search-keywords", ["blocked-search-keywords.json"]),

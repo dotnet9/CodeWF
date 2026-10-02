@@ -78,7 +78,6 @@ public sealed partial class ContentRepository
             {
                 ["posts"] = posts.Count,
                 ["tools"] = FlattenTools(tools).Count(),
-                ["docs"] = FlattenDocs(await GetDocsAsync(culture)).Count(),
                 ["categories"] = categories.Count,
                 ["albums"] = albums.Count
             });
@@ -98,42 +97,6 @@ public sealed partial class ContentRepository
     {
         var tools = await GetToolsAsync(culture);
         return FlattenTools(tools).FirstOrDefault(tool => SlugEquals(tool.Slug, slug));
-    }
-
-    public Task<IReadOnlyList<DocNode>> GetDocsAsync(string culture) =>
-        GetCachedAsync($"docs:{NormalizeCulture(culture)}", async () =>
-            (IReadOnlyList<DocNode>)(await ReadJsonAsync<List<DocNode>>(culture, "site", "doc", "navigation.json") ?? []));
-
-    public async Task<DocNode?> GetDocAsync(string culture, string slug)
-    {
-        var docs = await GetDocsAsync(culture);
-        var found = FindDocNode(docs, slug, []);
-        if (found is null)
-        {
-            return null;
-        }
-
-        var (node, pathSegments) = found.Value;
-        var flatDocs = FlattenDocs(docs).ToList();
-        var currentIndex = flatDocs.FindIndex(item => SlugEquals(item.Slug, node.Slug));
-        var markdownPath = ResolveLocalizedPath(culture, Path.Combine(["site", "doc", .. pathSegments, $"{node.Slug}.md"]));
-        if (markdownPath is null || !File.Exists(markdownPath))
-        {
-            return CloneDocDetail(node, flatDocs, currentIndex);
-        }
-
-        var markdown = await File.ReadAllTextAsync(markdownPath, Encoding.UTF8);
-        return new DocNode
-        {
-            Name = node.Name,
-            Memo = node.Memo,
-            Slug = node.Slug,
-            Repository = node.Repository,
-            Content = markdown,
-            HtmlContent = postFiles.RenderMarkdown(markdown, markdownPath, AssetsRoot(), siteOptions.CurrentValue.AssetBaseUrl),
-            PreviousDoc = currentIndex > 0 ? ToDocSummary(flatDocs[currentIndex - 1]) : null,
-            NextDoc = currentIndex >= 0 && currentIndex < flatDocs.Count - 1 ? ToDocSummary(flatDocs[currentIndex + 1]) : null
-        };
     }
 
     public Task<IReadOnlyList<TaxonomyItem>> GetCategoriesAsync(string culture) =>
@@ -405,12 +368,11 @@ public sealed partial class ContentRepository
 
         var posts = (await GetAllPostsAsync(culture)).Where(static post => !post.Draft).ToList();
         var tools = FlattenTools(await GetToolsAsync(culture)).ToList();
-        var docs = FlattenDocs(await GetDocsAsync(culture)).ToList();
         var blockedGroup = FindBlockedSearchKeywordGroup(keyword, await GetBlockedSearchKeywordsAsync(culture));
 
         if (string.IsNullOrWhiteSpace(keyword))
         {
-            return new SearchResultPageData(pageIndex, pageSize, 0, [], tools.Count, docs.Count, posts.Count);
+            return new SearchResultPageData(pageIndex, pageSize, 0, [], tools.Count, posts.Count);
         }
 
         if (blockedGroup is not null)
@@ -421,7 +383,6 @@ public sealed partial class ContentRepository
                 0,
                 [],
                 tools.Count,
-                docs.Count,
                 posts.Count,
                 true,
                 string.IsNullOrWhiteSpace(blockedGroup.Memo)
@@ -440,11 +401,6 @@ public sealed partial class ContentRepository
             results.AddRange(tools.Select(tool => BuildSearchResult(tool, keyword)).Where(static item => item.Score > 0));
         }
 
-        if (kind is null or SearchResultKind.Doc)
-        {
-            results.AddRange(docs.Select(doc => BuildSearchResult(doc, keyword)).Where(static item => item.Score > 0));
-        }
-
         var ordered = results.OrderByDescending(static item => item.Score).ThenByDescending(static item => item.UpdatedAt).ToList();
         return new SearchResultPageData(
             pageIndex,
@@ -452,7 +408,6 @@ public sealed partial class ContentRepository
             ordered.Count,
             ordered.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
             tools.Count,
-            docs.Count,
             posts.Count);
     }
 
@@ -472,12 +427,10 @@ public sealed partial class ContentRepository
 
         var posts = (await GetAllPostsAsync(culture)).Where(static post => !post.Draft);
         var tools = FlattenTools(await GetToolsAsync(culture));
-        var docs = FlattenDocs(await GetDocsAsync(culture));
 
         var results = new List<SearchResultItem>();
         results.AddRange(posts.Select(post => BuildSearchResult(post, keyword)).Where(static item => item.Score > 0));
         results.AddRange(tools.Select(tool => BuildSearchResult(tool, keyword)).Where(static item => item.Score > 0));
-        results.AddRange(docs.Select(doc => BuildSearchResult(doc, keyword)).Where(static item => item.Score > 0));
 
         return results
             .OrderByDescending(static item => item.Score)
@@ -596,11 +549,6 @@ public sealed partial class ContentRepository
         foreach (var tool in FlattenTools(await GetToolsAsync(SiteOptions.DefaultCultureName)).Where(static tool => !string.IsNullOrWhiteSpace(tool.Slug)))
         {
             urls[$"{domain}/tool/{tool.Slug}"] = DateTime.UtcNow;
-        }
-
-        foreach (var doc in FlattenDocs(await GetDocsAsync(SiteOptions.DefaultCultureName)).Where(static doc => !string.IsNullOrWhiteSpace(doc.Slug)))
-        {
-            urls[$"{domain}/project/{doc.Slug}"] = DateTime.UtcNow;
         }
 
         var sb = new StringBuilder();
@@ -972,28 +920,6 @@ public sealed partial class ContentRepository
         return Math.Max(1, (int)Math.Ceiling((cjkCharacters + latinWords * 2) / 320d));
     }
 
-    private static DocNode CloneDocDetail(DocNode node, IReadOnlyList<DocNode> flatDocs, int currentIndex) =>
-        new()
-        {
-            Name = node.Name,
-            Memo = node.Memo,
-            Slug = node.Slug,
-            Repository = node.Repository,
-            Content = node.Content,
-            HtmlContent = node.HtmlContent,
-            PreviousDoc = currentIndex > 0 ? ToDocSummary(flatDocs[currentIndex - 1]) : null,
-            NextDoc = currentIndex >= 0 && currentIndex < flatDocs.Count - 1 ? ToDocSummary(flatDocs[currentIndex + 1]) : null
-        };
-
-    private static DocNode ToDocSummary(DocNode node) =>
-        new()
-        {
-            Name = node.Name,
-            Memo = node.Memo,
-            Slug = node.Slug,
-            Repository = node.Repository
-        };
-
     private static bool Contains(string? value, string keyword) =>
         value?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true;
 
@@ -1059,54 +985,6 @@ public sealed partial class ContentRepository
         }
     }
 
-    private static IEnumerable<DocNode> FlattenDocs(IEnumerable<DocNode> nodes)
-    {
-        foreach (var node in nodes)
-        {
-            if (!string.IsNullOrWhiteSpace(node.Slug) && node.Children is not { Count: > 0 })
-            {
-                yield return node;
-            }
-
-            if (node.Children is null)
-            {
-                continue;
-            }
-
-            foreach (var child in FlattenDocs(node.Children))
-            {
-                yield return child;
-            }
-        }
-    }
-
-    private static (DocNode Node, string[] PathSegments)? FindDocNode(IEnumerable<DocNode> nodes, string slug, string[] parents)
-    {
-        foreach (var node in nodes)
-        {
-            if (SlugEquals(node.Slug, slug) && node.Children is not { Count: > 0 })
-            {
-                return (node, parents);
-            }
-
-            if (node.Children is not { Count: > 0 })
-            {
-                continue;
-            }
-
-            var nextParents = string.IsNullOrWhiteSpace(node.Slug)
-                ? parents
-                : [.. parents, node.Slug!];
-            var found = FindDocNode(node.Children, slug, nextParents);
-            if (found is not null)
-            {
-                return found;
-            }
-        }
-
-        return null;
-    }
-
     private static SearchResultItem BuildSearchResult(BlogPost post, string keyword)
     {
         var content = post.Content ?? post.HtmlContent;
@@ -1160,24 +1038,6 @@ public sealed partial class ContentRepository
             Context = "工具",
             Slug = tool.Slug,
             SourcePath = tool.Repository,
-            UpdatedAt = null,
-            Score = score
-        };
-    }
-
-    private static SearchResultItem BuildSearchResult(DocNode doc, string keyword)
-    {
-        var score = Score(keyword, doc.Name, 80) + Score(keyword, doc.Memo, 30) + Score(keyword, doc.Slug, 20);
-        return new SearchResultItem
-        {
-            Kind = SearchResultKind.Doc,
-            Title = doc.Name ?? doc.Slug ?? "Doc",
-            Url = $"/project/{doc.Slug}",
-            Summary = doc.Memo,
-            MatchedSnippet = CreateSnippet(string.Join(' ', new[] { doc.Name, doc.Memo, doc.Slug }.Where(static value => !string.IsNullOrWhiteSpace(value))), keyword),
-            Context = "项目",
-            Slug = doc.Slug,
-            SourcePath = doc.Repository,
             UpdatedAt = null,
             Score = score
         };

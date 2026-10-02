@@ -47,18 +47,6 @@ export type ToolNode = {
   children?: ToolNode[];
 };
 
-export type DocNode = {
-  name?: string;
-  memo?: string;
-  slug?: string;
-  repository?: string;
-  content?: string;
-  htmlContent?: string;
-  children?: DocNode[];
-  previousDoc?: DocNode;
-  nextDoc?: DocNode;
-};
-
 export type FriendLinkItem = {
   index: number;
   title?: string;
@@ -103,7 +91,7 @@ export type PagedResult<T> = {
 };
 
 export type SearchResultItem = {
-  kind: "Tool" | "Doc" | "Post";
+  kind: "Tool" | "Post";
   title: string;
   url: string;
   summary?: string;
@@ -121,7 +109,6 @@ export type SearchResultPageData = {
   total: number;
   data: SearchResultItem[];
   toolCount: number;
-  docCount: number;
   postCount: number;
   isBlocked?: boolean;
   notice?: string;

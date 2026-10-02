@@ -4,6 +4,8 @@ import { dictionary, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
 
 const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:5001").replace(/\/$/, "");
+/** 文档站地址：通过环境变量配置，便于他人 clone 后使用自己的域名 */
+const DOC_SITE_URL = process.env.NEXT_PUBLIC_DOC_SITE_URL || "https://doc.codewf.com";
 
 export function SiteFooter({
   locale,
@@ -53,7 +55,7 @@ export function SiteFooter({
           <nav aria-label="Footer navigation">
             <h2>导航</h2>
             <Link href={withLocale(locale, "/post")}>{t.posts}</Link>
-            <Link href={withLocale(locale, "/project")}>{t.projects}</Link>
+            <a href={DOC_SITE_URL} target="_blank" rel="noreferrer">{t.projects}</a>
             <Link href={withLocale(locale, "/tool")}>{t.tools}</Link>
             <Link href={withLocale(locale, "/tag")}>{t.tags}</Link>
             <Link href={withLocale(locale, "/timeline")}>{t.timeline}</Link>

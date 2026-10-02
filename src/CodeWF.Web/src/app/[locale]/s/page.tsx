@@ -28,7 +28,6 @@ export default async function SearchPage({ params, searchParams }: LocalePagePro
           </div>
           <div className="page-banner__meta">
             <span className="meta-chip">工具 {results.toolCount}</span>
-            <span className="meta-chip">项目 {results.docCount}</span>
             <span className="meta-chip">文章 {results.postCount}</span>
           </div>
         </div>

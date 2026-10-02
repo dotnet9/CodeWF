@@ -71,15 +71,6 @@ public static class PublicContentEndpoints
             return tool is null ? Results.NotFound() : Results.Ok(tool);
         });
 
-        api.MapGet("/docs", async (HttpRequest request, ContentRepository repository) =>
-            Results.Ok(await repository.GetDocsAsync(RequestCulture(request))));
-
-        api.MapGet("/docs/{slug}", async (HttpRequest request, ContentRepository repository, string slug) =>
-        {
-            var doc = await repository.GetDocAsync(RequestCulture(request), slug);
-            return doc is null ? Results.NotFound() : Results.Ok(doc);
-        });
-
         api.MapGet("/pages/about", async (HttpRequest request, ContentRepository repository) =>
             Results.Ok(await repository.ReadSitePageAsync(RequestCulture(request), "about.md")));
 

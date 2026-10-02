@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatDate, withLocale } from "@/i18n";
-import type { BlogPostBrief, DocNode, Locale } from "@/types";
+import type { BlogPostBrief, Locale } from "@/types";
 
 type TocItem = {
   level: number;
@@ -136,35 +136,6 @@ export function RelatedPosts({ locale, posts }: { locale: Locale; posts: BlogPos
         ))}
       </div>
     </section>
-  );
-}
-
-export function DocPager({ locale, previous, next }: { locale: Locale; previous?: DocNode; next?: DocNode }) {
-  if (!previous && !next) {
-    return null;
-  }
-
-  return (
-    <nav className="content-pager" aria-label="Project navigation">
-      {previous ? (
-        <Link href={withLocale(locale, `/project/${previous.slug}`)} className="content-pager__item">
-          <span>上一篇</span>
-          <strong>{previous.name}</strong>
-          <small>{previous.memo}</small>
-        </Link>
-      ) : (
-        <span />
-      )}
-      {next ? (
-        <Link href={withLocale(locale, `/project/${next.slug}`)} className="content-pager__item content-pager__item--next">
-          <span>下一篇</span>
-          <strong>{next.name}</strong>
-          <small>{next.memo}</small>
-        </Link>
-      ) : (
-        <span />
-      )}
-    </nav>
   );
 }
 

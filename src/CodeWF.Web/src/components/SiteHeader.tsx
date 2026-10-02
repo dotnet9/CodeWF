@@ -7,6 +7,8 @@ import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
 
 const SITE_ICON_URL = "/logo.svg";
+/** 文档站地址：通过环境变量配置，便于他人 clone 后使用自己的域名 */
+const DOC_SITE_URL = process.env.NEXT_PUBLIC_DOC_SITE_URL || "https://doc.codewf.com";
 
 export function SiteHeader({
   locale,
@@ -19,16 +21,16 @@ export function SiteHeader({
   latestPost?: BlogPostBrief;
 }) {
   const pathname = usePathname();
-  const links = [
-    ["首页", "/"],
-    ["文章", "/post"],
-    ["专题", "/album"],
-    ["文档", "/doc"],
-    ["工具", "/tool"],
-    ["时间线", "/timeline"],
-    ["友链", "/friends"],
-    ["关于", "/about"]
-  ] as const;
+  const links: { label: string; href: string; external?: boolean }[] = [
+    { label: "首页", href: "/" },
+    { label: "文章", href: "/post" },
+    { label: "专题", href: "/album" },
+    { label: "文档", href: DOC_SITE_URL, external: true },
+    { label: "工具", href: "/tool" },
+    { label: "时间线", href: "/timeline" },
+    { label: "友链", href: "/friends" },
+    { label: "关于", href: "/about" }
+  ];
 
   return (
     <header className="site-header prototype-header">
@@ -38,7 +40,10 @@ export function SiteHeader({
       </Link>
 
       <nav className="main-nav prototype-nav" aria-label="主导航">
-        {links.map(([label, href]) => {
+        {links.map(({ label, href, external }) => {
+          if (external) {
+            return <a href={href} target="_blank" rel="noopener noreferrer" key={href}>{label}</a>;
+          }
           const localizedHref = withLocale(locale, href);
           const active = href === "/" ? pathname === localizedHref : Boolean(pathname?.startsWith(localizedHref));
           return <Link href={localizedHref} aria-current={active ? "page" : undefined} key={href}>{label}</Link>;

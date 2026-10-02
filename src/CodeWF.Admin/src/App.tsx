@@ -262,7 +262,6 @@ const JSON_RESOURCES: JsonEditorSpec[] = [
   { name: "friend-links", label: "友情链接", description: "页脚友情链接配置。", pathHint: "site/friend-links.json", kind: "links" },
   { name: "timelines", label: "时间线", description: "站点时间线条目。", pathHint: "site/timelines.json", kind: "timeline" },
   { name: "tools", label: "工具目录", description: "工具分类树。", pathHint: "site/tools/tools.json", kind: "tree", allowHidden: true },
-  { name: "navigation", label: "文档导航", description: "项目和文档树。", pathHint: "site/doc/navigation.json", kind: "tree" },
   { name: "blocked-search-keywords", label: "屏蔽词", description: "屏蔽搜索关键词分组。", pathHint: "site/blocked-search-keywords.json", kind: "blocked" },
   { name: "categories", label: "分类", description: "分类定义。", pathHint: "site/categories.json", kind: "taxonomy" },
   { name: "albums", label: "专题", description: "专题定义。", pathHint: "site/albums.json", kind: "taxonomy" }
@@ -742,7 +741,6 @@ function Overview({ culture, onJump, canWrite }: { culture: AdminLocale; onJump:
         {[
           ["文章", counts.posts ?? 0],
           ["工具", counts.tools ?? 0],
-          ["文档", counts.docs ?? 0],
           ["分类", counts.categories ?? 0],
           ["专题", counts.albums ?? 0]
         ].map(([label, value]) => (

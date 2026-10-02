@@ -9,7 +9,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: base, lastModified: new Date() },
     { url: `${base}/post`, lastModified: new Date() },
     { url: `${base}/tool`, lastModified: new Date() },
-    { url: `${base}/project`, lastModified: new Date() },
     ...posts.data.map((post) => ({
       url: `${base}${post.url ?? ""}`,
       lastModified: post.lastmod ? new Date(post.lastmod) : undefined

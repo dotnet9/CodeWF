@@ -4,7 +4,7 @@ import { Braces, Clock3, Hash, QrCode } from "lucide-react";
 import { api, resolveAssetUrl } from "@/api";
 import { HomeHero } from "@/components/HomeHero";
 import { formatDate, withLocale } from "@/i18n";
-import type { BlogPostBrief, DocNode, Locale, SiteInfo, ToolNode } from "@/types";
+import type { BlogPostBrief, Locale, SiteInfo, ToolNode } from "@/types";
 import type { LocalePageProps } from "./layout";
 
 const tickerItems = [
@@ -20,14 +20,13 @@ const tickerItems = [
 
 export default async function HomePage({ params }: LocalePageProps) {
   const { locale } = await params;
-  const [home, docs] = await Promise.all([api.home(locale), api.docs(locale)]);
+  const home = await api.home(locale);
   const posts = uniquePosts([...home.bannerPosts, ...home.recentPosts]);
   const latestPosts = home.recentPosts.slice(0, 3);
   const rankedPosts = posts.slice(0, 6);
   const featuredPost = posts[0];
   const streamPosts = posts.slice(1, 4);
   const tools = collectToolLeaves(home.tools).slice(0, 4);
-  const project = collectDocLeaves(docs)[0];
   const latestDate = latestPosts[0]?.lastmod ?? latestPosts[0]?.date;
   const yearsOnline = Math.max(1, new Date().getFullYear() - home.site.startYear);
 
@@ -113,16 +112,6 @@ export default async function HomePage({ params }: LocalePageProps) {
               ))}
             </div>
 
-            {project ? (
-              <div className="prototype-card prototype-project-card">
-                <h2 className="prototype-card-title"><span className="prototype-dot" />开源项目</h2>
-                <strong>{project.name}</strong>
-                <p>{project.memo ?? "查看项目说明、源码与使用方式。"}</p>
-                <Link className="prototype-button" href={withLocale(locale, `/project/${encodeURIComponent(project.slug ?? "")}`)}>
-                  查看项目 →
-                </Link>
-              </div>
-            ) : null}
           </aside>
         </div>
       </div>
@@ -209,18 +198,6 @@ function collectToolLeaves(nodes: ToolNode[]) {
   const visit = (items: ToolNode[]) => {
     for (const node of items) {
       if (node.hidden) continue;
-      if (node.children?.length) visit(node.children);
-      else if (node.slug) results.push(node);
-    }
-  };
-  visit(nodes);
-  return results;
-}
-
-function collectDocLeaves(nodes: DocNode[]) {
-  const results: DocNode[] = [];
-  const visit = (items: DocNode[]) => {
-    for (const node of items) {
       if (node.children?.length) visit(node.children);
       else if (node.slug) results.push(node);
     }
