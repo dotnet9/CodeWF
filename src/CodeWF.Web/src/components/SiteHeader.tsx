@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { withLocale } from "@/i18n";
 import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
+import { docSiteUrlFromLocation, docSiteUrlFromSite } from "@/lib/use-doc-site";
 
 const SITE_ICON_URL = "/logo.svg";
-/** 文档站地址：通过环境变量配置，便于他人 clone 后使用自己的域名 */
-const DOC_SITE_URL = process.env.NEXT_PUBLIC_DOC_SITE_URL || "https://doc.codewf.com";
 
 export function SiteHeader({
   locale,
@@ -21,11 +21,16 @@ export function SiteHeader({
   latestPost?: BlogPostBrief;
 }) {
   const pathname = usePathname();
+  // 文档站地址：SSR 用站点配置域名推导，水合后按访客实际域名切换
+  const [docSiteUrl, setDocSiteUrl] = useState(() => docSiteUrlFromSite(site));
+  useEffect(() => {
+    setDocSiteUrl(docSiteUrlFromLocation() ?? docSiteUrlFromSite(site));
+  }, [site]);
   const links: { label: string; href: string; external?: boolean }[] = [
     { label: "首页", href: "/" },
     { label: "文章", href: "/post" },
     { label: "专题", href: "/album" },
-    { label: "文档", href: DOC_SITE_URL, external: true },
+    { label: "文档", href: docSiteUrl, external: true },
     { label: "工具", href: "/tool" },
     { label: "时间线", href: "/timeline" },
     { label: "友链", href: "/friends" },

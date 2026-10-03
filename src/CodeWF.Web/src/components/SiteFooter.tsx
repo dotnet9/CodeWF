@@ -1,11 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ArrowUpRight, Github, Rss } from "lucide-react";
 import { dictionary, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
+import { docSiteUrlFromLocation, docSiteUrlFromSite } from "@/lib/use-doc-site";
 
 const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:5001").replace(/\/$/, "");
-/** 文档站地址：通过环境变量配置，便于他人 clone 后使用自己的域名 */
-const DOC_SITE_URL = process.env.NEXT_PUBLIC_DOC_SITE_URL || "https://doc.codewf.com";
 
 export function SiteFooter({
   locale,
@@ -17,6 +19,10 @@ export function SiteFooter({
   friendLinks: FriendLinkItem[];
 }) {
   const t = dictionary(locale);
+  const [docSiteUrl, setDocSiteUrl] = useState(() => docSiteUrlFromSite(site));
+  useEffect(() => {
+    setDocSiteUrl(docSiteUrlFromLocation() ?? docSiteUrlFromSite(site));
+  }, [site]);
   const year = new Date().getFullYear();
   const weChatImage = site.weChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg";
 
@@ -55,7 +61,7 @@ export function SiteFooter({
           <nav aria-label="Footer navigation">
             <h2>导航</h2>
             <Link href={withLocale(locale, "/post")}>{t.posts}</Link>
-            <a href={DOC_SITE_URL} target="_blank" rel="noreferrer">{t.projects}</a>
+            <a href={docSiteUrl} target="_blank" rel="noreferrer">{t.projects}</a>
             <Link href={withLocale(locale, "/tool")}>{t.tools}</Link>
             <Link href={withLocale(locale, "/tag")}>{t.tags}</Link>
             <Link href={withLocale(locale, "/timeline")}>{t.timeline}</Link>
