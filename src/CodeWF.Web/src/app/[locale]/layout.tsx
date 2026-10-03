@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { api } from "@/api";
+import GiscusComments from "@/components/GiscusComments";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { RouteTransitionShell } from "@/components/RouteTransitionShell";
@@ -58,6 +59,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         latestPost={home.recentPosts[0]}
       />
       <RouteTransitionShell>{children}</RouteTransitionShell>
+      <GiscusComments locale={locale} />
       <SiteFooter locale={locale} site={site} friendLinks={friendLinks} />
     </div>
   );

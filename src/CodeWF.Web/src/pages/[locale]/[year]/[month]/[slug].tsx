@@ -6,6 +6,7 @@ import { api, resolveAssetUrl } from "@/api";
 import { CodeHighlighter } from "@/components/CodeHighlighter";
 import { ArticleActions } from "@/components/ArticleActions";
 import { ContentToc, PostPager } from "@/components/ContentToc";
+import GiscusComments from "@/components/GiscusComments";
 import { HtmlContent } from "@/components/HtmlContent";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -156,6 +157,7 @@ const PostPage: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>>
                 <ArticleActions />
               </article>
               <PostPager locale={locale} previous={post.previousPost} next={post.nextPost} />
+              <GiscusComments locale={locale} />
             </div>
             <ContentToc locale={locale} html={post.htmlContent} relatedPosts={post.relatedPosts ?? []} showSupport />
           </div>

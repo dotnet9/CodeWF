@@ -5069,3 +5069,9 @@ img {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── 全站评论区（giscus） ─────────── */
+.site-comments { max-width: 1180px; margin: 0 auto; padding: 16px 24px 40px; }
+.site-comments__title { font-size: 18px; margin: 0 0 12px; }
+.site-comments__widget { min-height: 60px; }
+.site-comments__hint { color: #7c7c85; font-size: 12px; margin: 8px 0 0; }
