@@ -15,9 +15,9 @@ set "TEMP_API_PID_FILE=%PUBLISH_DIR%\publish-api.pid"
 
 echo.
 echo [CodeWF] Cleaning publish folders...
-if exist "%WEB_OUT%" rmdir /s /q "%WEB_OUT%"
-if exist "%ADMIN_OUT%" rmdir /s /q "%ADMIN_OUT%"
-if exist "%API_OUT%" rmdir /s /q "%API_OUT%"
+call :clean_dir "%WEB_OUT%" || goto :error
+call :clean_dir "%ADMIN_OUT%" || goto :error
+call :clean_dir "%API_OUT%" || goto :error
 mkdir "%WEB_OUT%" "%ADMIN_OUT%" "%API_OUT%" || goto :error
 
 call :sync_logo || goto :error
@@ -99,6 +99,21 @@ if exist "%TEMP_API_PID_FILE%" (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "Stop-Process -Id %%p -Force -ErrorAction SilentlyContinue"
   )
   del "%TEMP_API_PID_FILE%" >nul 2>nul
+)
+exit /b 0
+
+:clean_dir
+rem Bots request paths named after Windows reserved devices (con.*, nul.*, aux.* ...),
+rem which Next.js caches into .next\server\app. rmdir/del cannot remove such names,
+rem so fall back to the \\?\ prefix which bypasses Win32 device-name parsing.
+if not exist "%~1\" exit /b 0
+rmdir /s /q "%~1" 2>nul
+if not exist "%~1\" exit /b 0
+echo [CodeWF] Removing reserved-name leftovers in %~1 ...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Remove-Item -LiteralPath ('\\?\' + '%~1') -Recurse -Force -ErrorAction SilentlyContinue"
+if exist "%~1\" (
+  echo [CodeWF] Failed to clean %~1
+  exit /b 1
 )
 exit /b 0
 

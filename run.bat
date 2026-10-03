@@ -1,6 +1,11 @@
 @echo off
 setlocal
 
+rem Bootstrap .NET/Node into PATH for this script (and its child windows).
+rem Required when dotnet/npm are installed but the invoking shell overrides PATH.
+if exist "C:\Program Files\dotnet\dotnet.exe" set "PATH=C:\Program Files\dotnet;%PATH%"
+if exist "D:\Program Files\nodejs\npm.cmd" set "PATH=D:\Program Files\nodejs;%PATH%"
+
 set "ROOT=%~dp0"
 set "PUBLISH_DIR=%ROOT%publish"
 set "WEB_PROJECT=%ROOT%src\CodeWF.Web"
