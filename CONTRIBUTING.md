@@ -9,12 +9,11 @@ npm install
 dotnet restore CodeWF.slnx
 ```
 
-启动后端、前台和后台：
+启动后端与前台：
 
 ```powershell
 npm run dev:api
 npm run dev:frontend
-npm run dev:admin
 ```
 
 ## 质量检查
@@ -24,7 +23,6 @@ npm run dev:admin
 ```powershell
 dotnet test CodeWF.slnx
 npm run build:frontend
-npm run build:admin
 ```
 
 ## 合并请求规范
@@ -39,5 +37,4 @@ npm run build:admin
 
 - 后端使用 ASP.NET Core Minimal API 和服务类组织业务逻辑。
 - 前台使用 Next.js App Router。
-- 后台使用 React 和 Ant Design。
 - 源码和文档统一使用 UTF-8 编码。

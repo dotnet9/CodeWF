@@ -1,14 +1,15 @@
 # CodeWF
 
-CodeWF 是一个前后端分离的博客与在线工具网站。
+CodeWF 是一个前后端分离的 Markdown 博客站点。
 
 ## 项目结构
 
-- `src/CodeWF.Api`：ASP.NET Core Web API，负责读取文件型内容仓库、渲染 Markdown、提供公开内容接口、后台管理接口、RSS、站点地图，以及受限的 Git 维护接口。
-- `src/CodeWF.Web`：Next.js 前台站点，提供文章、项目、搜索、时间线、多语言内容和浏览器端工具页面。
-- `src/CodeWF.Admin`：React + Ant Design 后台管理端，用于维护文章、站点内容、资源文件和代码仓库。
-- `docs`：架构、迁移和运维文档。
-- `tests/CodeWF.Api.Tests`：后端内容解析与安全相关测试。
+- `src/CodeWF.Api`：ASP.NET Core Web API，负责读取文件型内容仓库、渲染 Markdown，提供公开内容接口、RSS 与站点地图。
+- `src/CodeWF.Web`：Next.js 前台站点，提供文章、专题、搜索、时间线与多语言内容。
+- `docs`：架构与迁移文档。
+- `tests/CodeWF.Api.Tests`：后端内容解析与渲染相关测试。
+
+在线工具已独立为工具箱站 `https://tools.codewf.com`（仓库 `dotnet9/Tools`），站点不再内置工具页面与后台管理端。
 
 默认资源仓库路径为：
 
@@ -16,7 +17,7 @@ CodeWF 是一个前后端分离的博客与在线工具网站。
 D:\wwwroot\img1.dotnet9.com
 ```
 
-多语言资源通过同名后缀文件加载，例如 `about.en.md`、`tools.ja.json`、`navigation.zh-tw.json`。缺少对应语言文件时，会回退到默认中文内容。
+多语言资源通过同名后缀文件加载，例如 `about.en.md`、`categories.ja.json`、`navigation.zh-tw.json`。缺少对应语言文件时，会回退到默认中文内容。
 
 ## 运行要求
 
@@ -33,18 +34,16 @@ npm install
 dotnet restore CodeWF.slnx
 ```
 
-启动后端、前台和后台：
+启动后端与前台：
 
 ```powershell
 npm run dev:api
 npm run dev:frontend
-npm run dev:admin
 ```
 
 默认访问地址：
 
 - 前台站点：`http://localhost:5000`
-- 后台管理端：`http://localhost:5001`
 - 后端接口：`http://localhost:5002`
 
 ## 配置说明
@@ -55,25 +54,20 @@ npm run dev:admin
 $env:Site__LocalAssetsDir = "D:\github\apps\Assets.Dotnet9"
 $env:Site__AssetBaseUrl = "https://img1.dotnet9.com"
 $env:Cors__AllowedOrigins__0 = "https://example.com"
-$env:Admin__Read__0__UserName = "reader"
-$env:Admin__Read__0__Password = "replace-with-a-secret"
-$env:Admin__Super__0__UserName = "admin"
-$env:Admin__Super__0__Password = "replace-with-a-strong-secret"
 ```
 
-后台管理端会使用登录会话访问受保护接口。生产环境必须替换默认开发账号，并明确配置允许跨域访问的来源。
+站点不提供后台管理端：文章与 JSON 资源直接以文件维护，改完提交到内容仓库即可。生产环境需明确配置允许跨域访问的来源。
 
 ## 构建与测试
 
 ```powershell
 dotnet test CodeWF.slnx
 npm run build:frontend
-npm run build:admin
 ```
 
 ## 安全要求
 
-不要在生产环境使用默认后台账号。安全问题报告方式和部署要求见 `SECURITY.md`。
+仓库已移除后台管理端与相关接口，不再提供登录入口。安全问题报告方式和部署要求见 `SECURITY.md`。
 
 ## 参与贡献
 

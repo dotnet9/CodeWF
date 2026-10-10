@@ -4,10 +4,8 @@ setlocal enabledelayedexpansion
 set "ROOT=%~dp0"
 set "PUBLISH_DIR=%ROOT%publish"
 set "WEB_PROJECT=%ROOT%src\CodeWF.Web"
-set "ADMIN_PROJECT=%ROOT%src\CodeWF.Admin"
 set "API_PROJECT=%ROOT%src\CodeWF.Api\CodeWF.Api.csproj"
 set "WEB_OUT=%PUBLISH_DIR%\web"
-set "ADMIN_OUT=%PUBLISH_DIR%\admin"
 set "API_OUT=%PUBLISH_DIR%\api"
 if not defined API_URL set "API_URL=http://localhost:5002"
 set "API_BASE_URL=%API_URL%/api"
@@ -16,9 +14,8 @@ set "TEMP_API_PID_FILE=%PUBLISH_DIR%\publish-api.pid"
 echo.
 echo [CodeWF] Cleaning publish folders...
 call :clean_dir "%WEB_OUT%" || goto :error
-call :clean_dir "%ADMIN_OUT%" || goto :error
 call :clean_dir "%API_OUT%" || goto :error
-mkdir "%WEB_OUT%" "%ADMIN_OUT%" "%API_OUT%" || goto :error
+mkdir "%WEB_OUT%" "%API_OUT%" || goto :error
 
 call :sync_logo || goto :error
 
@@ -59,24 +56,12 @@ copy /Y "%WEB_PROJECT%\tsconfig.json" "%WEB_OUT%\" >nul || goto :error
 copy /Y "%WEB_PROJECT%\next-env.d.ts" "%WEB_OUT%\" >nul || goto :error
 
 echo.
-echo [CodeWF] Building admin frontend...
-pushd "%ROOT%" || goto :error
-call npm run build:admin || goto :error
-popd
-
-echo.
-echo [CodeWF] Publishing admin frontend to publish\admin...
-robocopy "%ADMIN_PROJECT%\dist" "%ADMIN_OUT%" /E /NFL /NDL /NJH /NJS /NP
-if errorlevel 8 goto :error
-call :sync_published_logo || goto :error
-
 call :stop_temp_api
 
 echo.
 echo [CodeWF] Publish completed.
-echo   Web:   %WEB_OUT%
-echo   Admin: %ADMIN_OUT%
-echo   API:   %API_OUT%
+echo   Web: %WEB_OUT%
+echo   API: %API_OUT%
 echo.
 echo To run the published Next.js frontend, install production dependencies in publish\web and run:
 echo   npm install --omit=dev
@@ -120,17 +105,14 @@ exit /b 0
 :sync_logo
 echo [CodeWF] Syncing root logo files to frontend public folders...
 if not exist "%WEB_PROJECT%\public" mkdir "%WEB_PROJECT%\public" || exit /b 1
-if not exist "%ADMIN_PROJECT%\public" mkdir "%ADMIN_PROJECT%\public" || exit /b 1
 for %%f in (logo.svg logo.png logo.ico) do (
   if not exist "%ROOT%%%f" (
     echo [CodeWF] Missing root logo file: %ROOT%%%f
     exit /b 1
   )
   copy /Y "%ROOT%%%f" "%WEB_PROJECT%\public\%%f" >nul || exit /b 1
-  copy /Y "%ROOT%%%f" "%ADMIN_PROJECT%\public\%%f" >nul || exit /b 1
 )
 copy /Y "%ROOT%logo.ico" "%WEB_PROJECT%\public\favicon.ico" >nul || exit /b 1
-copy /Y "%ROOT%logo.ico" "%ADMIN_PROJECT%\public\favicon.ico" >nul || exit /b 1
 exit /b 0
 
 :sync_published_logo
@@ -141,12 +123,6 @@ if exist "%WEB_OUT%\" (
     copy /Y "%ROOT%%%f" "%WEB_OUT%\public\%%f" >nul || exit /b 1
   )
   copy /Y "%ROOT%logo.ico" "%WEB_OUT%\public\favicon.ico" >nul || exit /b 1
-)
-if exist "%ADMIN_OUT%\" (
-  for %%f in (logo.svg logo.png logo.ico) do (
-    copy /Y "%ROOT%%%f" "%ADMIN_OUT%\%%f" >nul || exit /b 1
-  )
-  copy /Y "%ROOT%logo.ico" "%ADMIN_OUT%\favicon.ico" >nul || exit /b 1
 )
 exit /b 0
 

@@ -9,30 +9,24 @@ if exist "D:\Program Files\nodejs\npm.cmd" set "PATH=D:\Program Files\nodejs;%PA
 set "ROOT=%~dp0"
 set "PUBLISH_DIR=%ROOT%publish"
 set "WEB_PROJECT=%ROOT%src\CodeWF.Web"
-set "ADMIN_PROJECT=%ROOT%src\CodeWF.Admin"
 set "WEB_OUT=%PUBLISH_DIR%\web"
-set "ADMIN_OUT=%PUBLISH_DIR%\admin"
 set "API_OUT=%PUBLISH_DIR%\api"
 
 if not defined WEB_PORT set "WEB_PORT=5000"
-if not defined ADMIN_PORT set "ADMIN_PORT=5001"
 if not defined API_PORT set "API_PORT=5002"
 if not defined API_URL set "API_URL=http://localhost:%API_PORT%"
 if not defined API_BASE_URL set "API_BASE_URL=%API_URL%/api"
-if not defined ADMIN_URL set "ADMIN_URL=/admin/"
 
 if /i "%~1"=="--api" goto :run_api
 if /i "%~1"=="--web" goto :run_web
-if /i "%~1"=="--admin" goto :run_admin
 if /i "%~1"=="--help" goto :help
 if /i "%~1"=="/?" goto :help
 
 echo.
 echo [CodeWF] One-click run
-echo   Web service:   http://localhost:%WEB_PORT%
-echo   Admin service: http://localhost:%ADMIN_PORT%/admin/
-echo   API service:   %API_URL%
-echo   Nginx paths:   /, /admin/, /api/
+echo   Web service: http://localhost:%WEB_PORT%
+echo   API service: %API_URL%
+echo   Nginx paths: /, /api/
 echo.
 
 where npm >nul 2>nul || (
@@ -50,7 +44,6 @@ call :sync_logo || goto :error
 
 if not exist "%WEB_OUT%\package.json" set "NEED_PUBLISH=1"
 if not exist "%API_OUT%\" set "NEED_PUBLISH=1"
-if not exist "%ADMIN_OUT%\index.html" set "NEED_PUBLISH=1"
 
 if defined NEED_PUBLISH (
   echo [CodeWF] Published output is missing. Running publish.bat...
@@ -71,14 +64,12 @@ echo.
 echo [CodeWF] Starting services in separate windows...
 start "CodeWF API" cmd /k ""%~f0" --api"
 start "CodeWF Web" cmd /k ""%~f0" --web"
-start "CodeWF Admin" cmd /k ""%~f0" --admin"
 
 echo.
 echo [CodeWF] Started.
-echo   Web service:   http://localhost:%WEB_PORT%
-echo   Admin service: http://localhost:%ADMIN_PORT%/admin/
-echo   API service:   %API_URL%
-echo   Nginx paths:   /, /admin/, /api/
+echo   Web service: http://localhost:%WEB_PORT%
+echo   API service: %API_URL%
+echo   Nginx paths: /, /api/
 echo.
 exit /b 0
 
@@ -100,17 +91,7 @@ exit /b %EXIT_CODE%
 echo [CodeWF] Starting Web on http://localhost:%WEB_PORT%...
 pushd "%WEB_OUT%" || exit /b 1
 set "API_BASE_URL=%API_BASE_URL%"
-set "NEXT_PUBLIC_ADMIN_URL=%ADMIN_URL%"
 call npm run start -- --port %WEB_PORT%
-set "EXIT_CODE=%ERRORLEVEL%"
-popd
-exit /b %EXIT_CODE%
-
-:run_admin
-echo [CodeWF] Starting Admin on http://localhost:%ADMIN_PORT%/admin/...
-call :ensure_node_modules || exit /b 1
-pushd "%ADMIN_PROJECT%" || exit /b 1
-call npm run preview -- --port %ADMIN_PORT% --outDir "%ADMIN_OUT%"
 set "EXIT_CODE=%ERRORLEVEL%"
 popd
 exit /b %EXIT_CODE%
@@ -131,17 +112,14 @@ exit /b 0
 :sync_logo
 echo [CodeWF] Syncing root logo files to frontend public folders...
 if not exist "%WEB_PROJECT%\public" mkdir "%WEB_PROJECT%\public" || exit /b 1
-if not exist "%ADMIN_PROJECT%\public" mkdir "%ADMIN_PROJECT%\public" || exit /b 1
 for %%f in (logo.svg logo.png logo.ico) do (
   if not exist "%ROOT%%%f" (
     echo [CodeWF] Missing root logo file: %ROOT%%%f
     exit /b 1
   )
   copy /Y "%ROOT%%%f" "%WEB_PROJECT%\public\%%f" >nul || exit /b 1
-  copy /Y "%ROOT%%%f" "%ADMIN_PROJECT%\public\%%f" >nul || exit /b 1
 )
 copy /Y "%ROOT%logo.ico" "%WEB_PROJECT%\public\favicon.ico" >nul || exit /b 1
-copy /Y "%ROOT%logo.ico" "%ADMIN_PROJECT%\public\favicon.ico" >nul || exit /b 1
 exit /b 0
 
 :sync_published_logo
@@ -152,12 +130,6 @@ if exist "%WEB_OUT%\" (
     copy /Y "%ROOT%%%f" "%WEB_OUT%\public\%%f" >nul || exit /b 1
   )
   copy /Y "%ROOT%logo.ico" "%WEB_OUT%\public\favicon.ico" >nul || exit /b 1
-)
-if exist "%ADMIN_OUT%\" (
-  for %%f in (logo.svg logo.png logo.ico) do (
-    copy /Y "%ROOT%%%f" "%ADMIN_OUT%\%%f" >nul || exit /b 1
-  )
-  copy /Y "%ROOT%logo.ico" "%ADMIN_OUT%\favicon.ico" >nul || exit /b 1
 )
 exit /b 0
 
@@ -171,11 +143,9 @@ echo Delete the publish folder before run.bat when you want a fresh publish.
 echo.
 echo Environment overrides:
 echo   WEB_PORT=5000
-echo   ADMIN_PORT=5001
 echo   API_PORT=5002
 echo   API_URL=http://localhost:5002
 echo   API_BASE_URL=http://localhost:5002/api
-echo   ADMIN_URL=/admin/
 exit /b 0
 
 :error
