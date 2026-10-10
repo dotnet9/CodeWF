@@ -64,7 +64,6 @@ public sealed partial class ContentRepository
             .Where(static post => post.Banner)
             .Take(3)
             .ToList();
-        var tools = await GetToolsAsync(culture);
         var categories = await GetCategoriesAsync(culture);
         var albums = await GetAlbumsAsync(culture);
         return new HomePageData(
@@ -73,11 +72,9 @@ public sealed partial class ContentRepository
             bannerPosts,
             categories,
             albums,
-            tools,
             new Dictionary<string, int>
             {
                 ["posts"] = posts.Count,
-                ["tools"] = FlattenTools(tools).Count(),
                 ["categories"] = categories.Count,
                 ["albums"] = albums.Count
             });
@@ -87,16 +84,6 @@ public sealed partial class ContentRepository
     {
         var localized = await ReadJsonAsync<Dictionary<string, string>>(culture, "site", "lang.json");
         return localized ?? new Dictionary<string, string>();
-    }
-
-    public Task<IReadOnlyList<ToolNode>> GetToolsAsync(string culture) =>
-        GetCachedAsync($"tools:{NormalizeCulture(culture)}", async () =>
-            (IReadOnlyList<ToolNode>)(await ReadJsonAsync<List<ToolNode>>(culture, "site", "tools", "tools.json") ?? []));
-
-    public async Task<ToolNode?> GetToolAsync(string culture, string slug)
-    {
-        var tools = await GetToolsAsync(culture);
-        return FlattenTools(tools).FirstOrDefault(tool => SlugEquals(tool.Slug, slug));
     }
 
     public Task<IReadOnlyList<TaxonomyItem>> GetCategoriesAsync(string culture) =>
@@ -141,150 +128,11 @@ public sealed partial class ContentRepository
         return new MarkdownPage(markdown, postFiles.RenderMarkdown(markdown, path, AssetsRoot(), siteOptions.CurrentValue.AssetBaseUrl));
     }
 
-    public async Task<EditableMarkdownResource> ReadMarkdownResourceAsync(string culture, string name, params string[] relativeSegments)
-    {
-        var path = ResolveLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
-        if (path is null || !File.Exists(path))
-        {
-            return new EditableMarkdownResource(name, string.Empty, null, null);
-        }
-
-        var markdown = await File.ReadAllTextAsync(path, Encoding.UTF8);
-        return new EditableMarkdownResource(
-            name,
-            path,
-            markdown,
-            postFiles.RenderMarkdown(markdown, path, AssetsRoot(), siteOptions.CurrentValue.AssetBaseUrl));
-    }
-
-    public async Task<EditableJsonResource> ReadJsonResourceAsync(string culture, string name, params string[] relativeSegments)
-    {
-        var path = ResolveLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
-        if (path is null || !File.Exists(path))
-        {
-            return new EditableJsonResource(name, string.Empty, null);
-        }
-
-        var json = await File.ReadAllTextAsync(path, Encoding.UTF8);
-        return new EditableJsonResource(name, path, json);
-    }
-
-    public async Task<AdminMutationResult> SaveMarkdownResourceAsync(string culture, string name, string content, params string[] relativeSegments)
-    {
-        var path = GetWritableLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
-        if (path is null)
-        {
-            return new AdminMutationResult(false, $"Invalid markdown resource path: {name}");
-        }
-
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await File.WriteAllTextAsync(path, NormalizeTextContent(content), Encoding.UTF8);
-        Invalidate();
-        return new AdminMutationResult(true, $"Saved {name}.");
-    }
-
-    public async Task<AdminMutationResult> SaveJsonResourceAsync(string culture, string name, string content, params string[] relativeSegments)
-    {
-        var path = GetWritableLocalizedPath(culture, Path.Combine(["site", .. relativeSegments]));
-        if (path is null)
-        {
-            return new AdminMutationResult(false, $"Invalid JSON resource path: {name}");
-        }
-
-        try
-        {
-            using var document = JsonDocument.Parse(content);
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            var formatted = JsonSerializer.Serialize(document.RootElement, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(path, formatted + Environment.NewLine, Encoding.UTF8);
-            Invalidate();
-            return new AdminMutationResult(true, $"Saved {name}.");
-        }
-        catch (JsonException ex)
-        {
-            return new AdminMutationResult(false, $"Invalid JSON for {name}: {ex.Message}");
-        }
-    }
-
-    public Task<AssetDirectoryData> GetAssetsAsync(string relativePath = "") =>
-        GetCachedAsync($"assets:{relativePath}", async () =>
-        {
-            var root = AssetsRoot();
-            if (!Directory.Exists(root))
-            {
-                return new AssetDirectoryData(root, string.Empty, []);
-            }
-
-            var fullPath = ResolveAssetDirectoryPath(relativePath);
-            if (fullPath is null || !Directory.Exists(fullPath))
-            {
-                return new AssetDirectoryData(root, string.Empty, []);
-            }
-
-            var entries = Directory.EnumerateFileSystemEntries(fullPath)
-                .Select(path =>
-                {
-                    var info = File.GetAttributes(path).HasFlag(FileAttributes.Directory)
-                        ? (FileSystemInfo)new DirectoryInfo(path)
-                        : new FileInfo(path);
-
-                    var relative = Path.GetRelativePath(root, path).Replace('\\', '/');
-                    return new AssetEntry(
-                        info.Name,
-                        relative,
-                        (info.Attributes & FileAttributes.Directory) != 0,
-                        info is FileInfo fileInfo ? fileInfo.Length : null,
-                        info.LastWriteTimeUtc);
-                })
-                .OrderByDescending(entry => entry.IsDirectory)
-                .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            return new AssetDirectoryData(root, GetRelativeAssetPath(fullPath), entries);
-        });
-
-    public async Task<AssetUploadResult> SaveAssetAsync(string relativePath, string fileName, Stream content)
-    {
-        var directory = ResolveAssetDirectoryPath(relativePath);
-        if (directory is null)
-        {
-            return new AssetUploadResult(false, "Invalid asset path.");
-        }
-
-        Directory.CreateDirectory(directory);
-        var target = Path.GetFullPath(Path.Combine(directory, Path.GetFileName(fileName)));
-        var root = AssetsRoot();
-        if (!target.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-        {
-            return new AssetUploadResult(false, "Invalid asset target path.");
-        }
-
-        await using var fileStream = File.Create(target);
-        await content.CopyToAsync(fileStream);
-        Invalidate();
-        return new AssetUploadResult(true, "Uploaded.", GetRelativeAssetPath(target));
-    }
-
-    public Task<AssetUploadResult> DeleteAssetAsync(string relativePath)
-    {
-        var fullPath = ResolveAssetPath(relativePath);
-        if (fullPath is null || !File.Exists(fullPath))
-        {
-            return Task.FromResult(new AssetUploadResult(false, "Asset not found."));
-        }
-
-        File.Delete(fullPath);
-        Invalidate();
-        return Task.FromResult(new AssetUploadResult(true, "Deleted.", GetRelativeAssetPath(fullPath)));
-    }
-
-    public async Task<IReadOnlyList<BlogPostBrief>> GetPostBriefsAsync(
-        string culture,
-        bool includeDrafts = false)
+    public async Task<IReadOnlyList<BlogPostBrief>> GetPostBriefsAsync(string culture)
     {
         var posts = await GetAllPostsAsync(culture);
         return posts
-            .Where(post => includeDrafts || !post.Draft)
+            .Where(static post => !post.Draft)
             .Select(ToBrief)
             .OrderByDescending(static post => post.Date)
             .ThenByDescending(static post => post.Lastmod)
@@ -298,12 +146,11 @@ public sealed partial class ContentRepository
         string? keyword = null,
         string? category = null,
         string? album = null,
-        string? tag = null,
-        bool includeDrafts = false)
+        string? tag = null)
     {
         pageIndex = Math.Max(1, pageIndex);
         pageSize = Math.Clamp(pageSize, 1, 100);
-        var query = (await GetPostBriefsAsync(culture, includeDrafts)).AsEnumerable();
+        var query = (await GetPostBriefsAsync(culture)).AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
@@ -343,16 +190,15 @@ public sealed partial class ContentRepository
         string culture,
         string slug,
         int? year = null,
-        int? month = null,
-        bool includeDrafts = false)
+        int? month = null)
     {
         var posts = await GetAllPostsAsync(culture);
         var post = posts.FirstOrDefault(post =>
-            (includeDrafts || !post.Draft)
+            !post.Draft
             && SlugEquals(post.Slug, slug)
             && (!year.HasValue || post.Year == year.Value)
             && (!month.HasValue || post.Month == month.Value));
-        return post is null ? null : EnrichPostDetail(post, posts.Where(item => includeDrafts || !item.Draft));
+        return post is null ? null : EnrichPostDetail(post, posts.Where(static item => !item.Draft));
     }
 
     public async Task<SearchResultPageData> SearchAsync(
@@ -367,12 +213,11 @@ public sealed partial class ContentRepository
         var keyword = query?.Trim();
 
         var posts = (await GetAllPostsAsync(culture)).Where(static post => !post.Draft).ToList();
-        var tools = FlattenTools(await GetToolsAsync(culture)).ToList();
         var blockedGroup = FindBlockedSearchKeywordGroup(keyword, await GetBlockedSearchKeywordsAsync(culture));
 
         if (string.IsNullOrWhiteSpace(keyword))
         {
-            return new SearchResultPageData(pageIndex, pageSize, 0, [], tools.Count, posts.Count);
+            return new SearchResultPageData(pageIndex, pageSize, 0, [], posts.Count);
         }
 
         if (blockedGroup is not null)
@@ -382,7 +227,6 @@ public sealed partial class ContentRepository
                 pageSize,
                 0,
                 [],
-                tools.Count,
                 posts.Count,
                 true,
                 string.IsNullOrWhiteSpace(blockedGroup.Memo)
@@ -396,18 +240,12 @@ public sealed partial class ContentRepository
             results.AddRange(posts.Select(post => BuildSearchResult(post, keyword)).Where(static item => item.Score > 0));
         }
 
-        if (kind is null or SearchResultKind.Tool)
-        {
-            results.AddRange(tools.Select(tool => BuildSearchResult(tool, keyword)).Where(static item => item.Score > 0));
-        }
-
         var ordered = results.OrderByDescending(static item => item.Score).ThenByDescending(static item => item.UpdatedAt).ToList();
         return new SearchResultPageData(
             pageIndex,
             pageSize,
             ordered.Count,
             ordered.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList(),
-            tools.Count,
             posts.Count);
     }
 
@@ -426,69 +264,15 @@ public sealed partial class ContentRepository
         }
 
         var posts = (await GetAllPostsAsync(culture)).Where(static post => !post.Draft);
-        var tools = FlattenTools(await GetToolsAsync(culture));
 
         var results = new List<SearchResultItem>();
         results.AddRange(posts.Select(post => BuildSearchResult(post, keyword)).Where(static item => item.Score > 0));
-        results.AddRange(tools.Select(tool => BuildSearchResult(tool, keyword)).Where(static item => item.Score > 0));
 
         return results
             .OrderByDescending(static item => item.Score)
             .ThenByDescending(static item => item.UpdatedAt)
             .Take(take)
             .ToList();
-    }
-
-    public async Task<AdminMutationResult> UpsertPostAsync(AdminPostRequest request, string? currentSlug = null)
-    {
-        if (string.IsNullOrWhiteSpace(request.Title))
-        {
-            return new AdminMutationResult(false, "Title is required.");
-        }
-
-        request.Slug = Slugify(string.IsNullOrWhiteSpace(request.Slug) ? request.Title : request.Slug);
-        request.Date ??= DateTime.Today;
-        request.Lastmod ??= DateTime.Now;
-
-        var root = AssetsRoot();
-        if (!Directory.Exists(root))
-        {
-            return new AdminMutationResult(false, $"Assets directory does not exist: {root}");
-        }
-
-        var targetPath = Path.Combine(root, request.Date.Value.Year.ToString("D4"), request.Date.Value.Month.ToString("D2"), $"{request.Slug}.md");
-        string? previousMarkdownPath = null;
-        if (!string.IsNullOrWhiteSpace(currentSlug))
-        {
-            previousMarkdownPath = (await GetPostAsync(SiteOptions.DefaultCultureName, currentSlug, includeDrafts: true))?.SourcePath;
-        }
-
-        await postFiles.WriteAsync(targetPath, request);
-
-        if (!string.IsNullOrWhiteSpace(previousMarkdownPath)
-            && !string.Equals(previousMarkdownPath, targetPath, StringComparison.OrdinalIgnoreCase))
-        {
-            DeleteFileIfExists(previousMarkdownPath);
-            DeleteFileIfExists(BlogPostFileService.GetMetadataPath(previousMarkdownPath));
-        }
-
-        Invalidate();
-        var saved = await GetPostAsync(SiteOptions.DefaultCultureName, request.Slug, includeDrafts: true);
-        return new AdminMutationResult(true, "Saved.", saved is null ? null : ToBrief(saved));
-    }
-
-    public async Task<bool> DeletePostAsync(string slug)
-    {
-        var post = await GetPostAsync(SiteOptions.DefaultCultureName, slug, includeDrafts: true);
-        if (post?.SourcePath is null)
-        {
-            return false;
-        }
-
-        DeleteFileIfExists(post.SourcePath);
-        DeleteFileIfExists(BlogPostFileService.GetMetadataPath(post.SourcePath));
-        Invalidate();
-        return true;
     }
 
     public async Task<string> GetRssAsync()
@@ -533,7 +317,6 @@ public sealed partial class ContentRepository
         {
             [$"{domain}/"] = DateTime.UtcNow,
             [$"{domain}/post"] = DateTime.UtcNow,
-            [$"{domain}/tool"] = DateTime.UtcNow,
             [$"{domain}/project"] = DateTime.UtcNow,
             [$"{domain}/about"] = DateTime.UtcNow
         };
@@ -544,11 +327,6 @@ public sealed partial class ContentRepository
             {
                 urls[$"{domain}{post.Url}"] = post.Lastmod ?? post.Date;
             }
-        }
-
-        foreach (var tool in FlattenTools(await GetToolsAsync(SiteOptions.DefaultCultureName)).Where(static tool => !string.IsNullOrWhiteSpace(tool.Slug)))
-        {
-            urls[$"{domain}/tool/{tool.Slug}"] = DateTime.UtcNow;
         }
 
         var sb = new StringBuilder();
@@ -671,64 +449,12 @@ public sealed partial class ContentRepository
         return File.Exists(defaultPath) ? defaultPath : null;
     }
 
-    private string? GetWritableLocalizedPath(string culture, string relativePath)
-    {
-        var root = AssetsRoot();
-        var defaultPath = Path.GetFullPath(Path.Combine(root, relativePath));
-        if (!defaultPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-        {
-            return null;
-        }
-
-        var normalized = NormalizeCulture(culture);
-        var suffix = CultureSuffix(normalized);
-        if (suffix is null)
-        {
-            return defaultPath;
-        }
-
-        var directory = Path.GetDirectoryName(defaultPath);
-        if (string.IsNullOrWhiteSpace(directory))
-        {
-            return null;
-        }
-
-        var extension = Path.GetExtension(defaultPath);
-        var fileName = Path.GetFileNameWithoutExtension(defaultPath);
-        return Path.Combine(directory, $"{fileName}.{suffix}{extension}");
-    }
-
-    private static string NormalizeTextContent(string content) =>
-        content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
-
     private string AssetsRoot()
     {
         var configured = siteOptions.CurrentValue.LocalAssetsDir;
         var expanded = Environment.ExpandEnvironmentVariables(configured);
         return Path.GetFullPath(expanded);
     }
-
-    private string? ResolveAssetPath(string relativePath)
-    {
-        var root = AssetsRoot();
-        var fullPath = Path.GetFullPath(Path.Combine(root, relativePath ?? string.Empty));
-        return fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase) ? fullPath : null;
-    }
-
-    private string? ResolveAssetDirectoryPath(string relativePath)
-    {
-        var root = AssetsRoot();
-        var fullPath = Path.GetFullPath(Path.Combine(root, relativePath ?? string.Empty));
-        if (!fullPath.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-        {
-            return null;
-        }
-
-        return fullPath;
-    }
-
-    private string GetRelativeAssetPath(string fullPath) =>
-        Path.GetRelativePath(AssetsRoot(), fullPath).Replace('\\', '/');
 
     private Task<T> GetCachedAsync<T>(string key, Func<Task<T>> factory) =>
         cache.GetOrCreateAsync($"{cacheVersion}:{key}", entry =>
@@ -959,32 +685,6 @@ public sealed partial class ContentRepository
     private static bool IsLocalizedSibling(string path) =>
         LocalizedSiblingRegex().IsMatch(Path.GetFileName(path));
 
-    private static IEnumerable<ToolNode> FlattenTools(IEnumerable<ToolNode> nodes)
-    {
-        foreach (var node in nodes)
-        {
-            if (node.Hidden)
-            {
-                continue;
-            }
-
-            if (!string.IsNullOrWhiteSpace(node.Slug))
-            {
-                yield return node;
-            }
-
-            if (node.Children is null)
-            {
-                continue;
-            }
-
-            foreach (var child in FlattenTools(node.Children))
-            {
-                yield return child;
-            }
-        }
-    }
-
     private static SearchResultItem BuildSearchResult(BlogPost post, string keyword)
     {
         var content = post.Content ?? post.HtmlContent;
@@ -1021,24 +721,6 @@ public sealed partial class ContentRepository
             Slug = post.Slug,
             SourcePath = post.SourcePath,
             UpdatedAt = post.Lastmod ?? post.Date,
-            Score = score
-        };
-    }
-
-    private static SearchResultItem BuildSearchResult(ToolNode tool, string keyword)
-    {
-        var score = Score(keyword, tool.Name, 80) + Score(keyword, tool.Memo, 30) + Score(keyword, tool.Slug, 20);
-        return new SearchResultItem
-        {
-            Kind = SearchResultKind.Tool,
-            Title = tool.Name ?? tool.Slug ?? "Tool",
-            Url = $"/tool/{tool.Slug}",
-            Summary = tool.Memo,
-            MatchedSnippet = CreateSnippet(string.Join(' ', new[] { tool.Name, tool.Memo, tool.Slug }.Where(static value => !string.IsNullOrWhiteSpace(value))), keyword),
-            Context = "工具",
-            Slug = tool.Slug,
-            SourcePath = tool.Repository,
-            UpdatedAt = null,
             Score = score
         };
     }
@@ -1118,15 +800,6 @@ public sealed partial class ContentRepository
         normalized = SlugDashRegex().Replace(normalized, "-");
         return normalized.Trim('-');
     }
-
-    private static void DeleteFileIfExists(string path)
-    {
-        if (File.Exists(path))
-        {
-            File.Delete(path);
-        }
-    }
-
     private static string Xml(string? value) => WebUtility.HtmlEncode(value ?? string.Empty);
 
     [GeneratedRegex(@"\.(en|ja|zh-tw)\.(md|yml|json)$", RegexOptions.IgnoreCase)]

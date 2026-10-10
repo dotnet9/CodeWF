@@ -7,7 +7,7 @@ public sealed class SiteOptions
 
     public string AppTitle { get; set; } = "CodeWF";
     public string Domain { get; set; } = "https://dotnet9.com";
-    public string Memo { get; set; } = ".NET articles and tools";
+    public string Memo { get; set; } = ".NET articles and projects";
     public string Owner { get; set; } = "dotnet9";
     public string? OwnerDesc { get; set; }
     public string? Favicon { get; set; }
@@ -20,20 +20,6 @@ public sealed class SiteOptions
     public string? WeChatImg { get; set; }
     public string DefaultCulture { get; set; } = DefaultCultureName;
     public List<string> SupportedCultures { get; set; } = ["zh-CN"];
-}
-
-public sealed class AdminOptions
-{
-    public const string SectionName = "Admin";
-
-    public List<AdminAccountOptions> Read { get; set; } = [];
-    public List<AdminAccountOptions> Super { get; set; } = [];
-}
-
-public sealed class AdminAccountOptions
-{
-    public string UserName { get; set; } = "codewf";
-    public string Password { get; set; } = "codewf.com";
 }
 
 public sealed class CorsOptions

@@ -62,15 +62,6 @@ public static class PublicContentEndpoints
         api.MapGet("/tags", async (HttpRequest request, ContentRepository repository) =>
             Results.Ok(await repository.GetTagsAsync(RequestCulture(request))));
 
-        api.MapGet("/tools", async (HttpRequest request, ContentRepository repository) =>
-            Results.Ok(await repository.GetToolsAsync(RequestCulture(request))));
-
-        api.MapGet("/tools/{slug}", async (HttpRequest request, ContentRepository repository, string slug) =>
-        {
-            var tool = await repository.GetToolAsync(RequestCulture(request), slug);
-            return tool is null ? Results.NotFound() : Results.Ok(tool);
-        });
-
         api.MapGet("/pages/about", async (HttpRequest request, ContentRepository repository) =>
             Results.Ok(await repository.ReadSitePageAsync(RequestCulture(request), "about.md")));
 
