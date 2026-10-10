@@ -3,7 +3,7 @@ import Link from "next/link";
 const exits = [
   { href: "/zh-CN", icon: "⌂", title: "回首页", command: "cd ~" },
   { href: "/zh-CN/post", icon: "#", title: "逛文章", command: "cd ~/blog" },
-  { href: "/zh-CN/tool", icon: "$", title: "开工具", command: "cd ~/tool" },
+  { href: "/zh-CN/album", icon: "$", title: "看专题", command: "cd ~/album" },
   { href: "/zh-CN/s", icon: "⌕", title: "搜一搜", command: "grep -r …" }
 ];
 
@@ -12,7 +12,7 @@ export default function NotFound() {
     <div className="not-found-shell">
       <header className="not-found-header">
         <Link className="brand" href="/zh-CN"><span className="brand-icon">码</span><span>Code<em>WF</em></span></Link>
-        <nav><Link href="/zh-CN">首页</Link><Link href="/zh-CN/post">文章</Link><Link href="/zh-CN/album">专题</Link><Link href="/zh-CN/tool">工具</Link><Link href="/zh-CN/about">关于</Link></nav>
+        <nav><Link href="/zh-CN">首页</Link><Link href="/zh-CN/post">文章</Link><Link href="/zh-CN/album">专题</Link><a href="https://tools.codewf.com" target="_blank" rel="noreferrer">工具</a><Link href="/zh-CN/about">关于</Link></nav>
       </header>
       <main className="not-found-page">
         <div className="not-found-heading"><h1>页面未找到</h1><span>exit code 404</span></div>

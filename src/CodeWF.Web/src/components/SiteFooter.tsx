@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Github, Rss } from "lucide-react";
+import { Github, Rss } from "lucide-react";
 import { dictionary, withLocale } from "@/i18n";
 import type { FriendLinkItem, Locale, SiteInfo } from "@/types";
-import { docSiteUrlFromLocation, docSiteUrlFromSite } from "@/lib/use-doc-site";
-
-const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:5001").replace(/\/$/, "");
+import { docSiteUrlFromLocation, docSiteUrlFromSite, toolsSiteUrlFromLocation, toolsSiteUrlFromSite } from "@/lib/use-doc-site";
 
 export function SiteFooter({
   locale,
@@ -20,8 +18,10 @@ export function SiteFooter({
 }) {
   const t = dictionary(locale);
   const [docSiteUrl, setDocSiteUrl] = useState(() => docSiteUrlFromSite(site));
+  const [toolsSiteUrl, setToolsSiteUrl] = useState(() => toolsSiteUrlFromSite(site));
   useEffect(() => {
     setDocSiteUrl(docSiteUrlFromLocation() ?? docSiteUrlFromSite(site));
+    setToolsSiteUrl(toolsSiteUrlFromLocation() ?? toolsSiteUrlFromSite(site));
   }, [site]);
   const year = new Date().getFullYear();
   const weChatImage = site.weChatImg ?? "https://img1.dotnet9.com/site/favicon/wechatpublic.jpg";
@@ -62,7 +62,7 @@ export function SiteFooter({
             <h2>导航</h2>
             <Link href={withLocale(locale, "/post")}>{t.posts}</Link>
             <a href={docSiteUrl} target="_blank" rel="noreferrer">{t.projects}</a>
-            <Link href={withLocale(locale, "/tool")}>{t.tools}</Link>
+            <a href={toolsSiteUrl} target="_blank" rel="noreferrer">{t.tools}</a>
             <Link href={withLocale(locale, "/tag")}>{t.tags}</Link>
             <Link href={withLocale(locale, "/timeline")}>{t.timeline}</Link>
           </nav>
@@ -99,9 +99,6 @@ export function SiteFooter({
             </a>
             <a href="https://github.com/dotnet9/CodeWF/issues" target="_blank" rel="noreferrer">
               {t.feedback}
-            </a>
-            <a href={ADMIN_URL} target="_blank" rel="noreferrer">
-              <ArrowUpRight size={15} /> {locale === "zh-CN" ? "后台" : "Admin"}
             </a>
             {site.remoteAssetsRepository ? (
               <a href={site.remoteAssetsRepository} target="_blank" rel="noreferrer">

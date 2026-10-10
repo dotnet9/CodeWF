@@ -15,7 +15,7 @@
     { g: "页面", t: "文章列表", s: "~/blog", h: "blog.html", quick: true },
     { g: "页面", t: "专题系列", s: "~/album", h: "album.html", quick: true },
     { g: "页面", t: "文档中心", s: "~/doc", h: "doc.html", quick: true },
-    { g: "页面", t: "在线工具", s: "~/tool · 91 tools", h: "tools.html", quick: true },
+    { g: "页面", t: "在线工具（工具箱站）", s: "tools.codewf.com", h: "https://tools.codewf.com", quick: true },
     { g: "页面", t: "建站时间线", s: "~/timeline", h: "timeline.html", quick: true },
     { g: "页面", t: "友情链接", s: "~/links", h: "friends.html", quick: true },
     { g: "页面", t: "关于本站", s: "~/about", h: "about.html", quick: true },

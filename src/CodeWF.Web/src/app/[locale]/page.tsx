@@ -33,6 +33,7 @@ export default async function HomePage({ params }: LocalePageProps) {
       <div className="prototype-container">
         <HomeHero
           locale={locale}
+          site={home.site}
           updatedAt={formatDate(latestDate, locale)}
           metrics={[
             { value: home.counts.posts ?? 0, suffix: "+", label: "ARTICLES" },

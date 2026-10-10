@@ -4,16 +4,22 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Wrench } from "lucide-react";
 import { withLocale } from "@/i18n";
-import type { Locale } from "@/types";
+import { toolsSiteUrlFromLocation, toolsSiteUrlFromSite } from "@/lib/use-doc-site";
+import type { Locale, SiteInfo } from "@/types";
 
 type Metric = { value: number; suffix?: string; label: string };
 const words = ["代码工坊", "灵感仓库", "实用工具箱"];
 
-export function HomeHero({ locale, updatedAt, metrics }: { locale: Locale; updatedAt: string; metrics: Metric[] }) {
+export function HomeHero({ locale, site, updatedAt, metrics }: { locale: Locale; site?: SiteInfo; updatedAt: string; metrics: Metric[] }) {
+  const [toolsSiteUrl, setToolsSiteUrl] = useState(() => toolsSiteUrlFromSite(site));
   const [wordIndex, setWordIndex] = useState(0);
   const [characterCount, setCharacterCount] = useState(words[0].length);
   const [deleting, setDeleting] = useState(false);
   const text = words[wordIndex].slice(0, characterCount);
+
+  useEffect(() => {
+    setToolsSiteUrl(toolsSiteUrlFromLocation() ?? toolsSiteUrlFromSite(site));
+  }, [site]);
 
   useEffect(() => {
     const word = words[wordIndex];
@@ -36,10 +42,10 @@ export function HomeHero({ locale, updatedAt, metrics }: { locale: Locale; updat
       <div className="prototype-hero__copy">
         <span className="prototype-status"><i />SYSTEM ONLINE · 更新于 {updatedAt || "今天"}</span>
         <h1>.NET 开发者的<br /><span>{text}</span><b aria-hidden="true">▌</b></h1>
-        <p>深度技术文章、浏览器本地运行的在线工具和系统化专题，覆盖 WPF、Avalonia、Blazor 与 AI 开发实践。</p>
+        <p>深度技术文章与系统化专题，覆盖 WPF、Avalonia、Blazor 与 AI 开发实践；常用在线工具已独立为工具箱站。</p>
         <div className="prototype-hero__actions">
           <Link className="prototype-button" href={withLocale(locale, "/post")}>开始阅读 <ArrowRight size={16} /></Link>
-          <Link className="prototype-button prototype-button--ghost" href={withLocale(locale, "/tool")}><Wrench size={16} /> 打开工具箱</Link>
+          <a className="prototype-button prototype-button--ghost" href={toolsSiteUrl} target="_blank" rel="noreferrer"><Wrench size={16} /> 打开工具箱</a>
         </div>
         <div className="prototype-metrics">
           {metrics.map((metric) => (
@@ -59,8 +65,7 @@ export function HomeHero({ locale, updatedAt, metrics }: { locale: Locale; updat
           <br />
           <p><span className="prompt">$</span> codewf stats --live</p>
           <p><span className="key">articles</span> <span className="value">{metrics[0]?.value ?? 0}</span></p>
-          <p><span className="key">tools</span> <span className="value">{metrics[1]?.value ?? 0}</span></p>
-          <p><span className="key">albums</span> <span className="value">{metrics[2]?.value ?? 0}</span></p>
+          <p><span className="key">albums</span> <span className="value">{metrics[1]?.value ?? 0}</span></p>
           <br />
           <p><span className="prompt">$</span> dotnet --info</p>
           <p><span className="string">Ready to build.</span> <span className="prototype-terminal__cursor" /></p>
