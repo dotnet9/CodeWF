@@ -80,30 +80,6 @@ public sealed partial class BlogPostFileService
         return blogPost;
     }
 
-    public async Task WriteAsync(string markdownFilePath, AdminPostRequest request)
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(markdownFilePath)!);
-        var post = new BlogPost
-        {
-            Title = request.Title?.Trim(),
-            Slug = request.Slug?.Trim(),
-            Description = request.Description?.Trim(),
-            Date = request.Date,
-            Lastmod = request.Lastmod,
-            Cover = request.Cover?.Trim(),
-            Banner = request.Banner,
-            Categories = NormalizeList(request.Categories),
-            Albums = NormalizeList(request.Albums),
-            Tags = NormalizeList(request.Tags),
-            Author = request.Author?.Trim(),
-            Copyright = request.Copyright?.Trim(),
-            Draft = request.Draft
-        };
-
-        await File.WriteAllTextAsync(GetMetadataPath(markdownFilePath), SerializeMetadata(post), Encoding.UTF8);
-        await File.WriteAllTextAsync(markdownFilePath, (request.Content ?? string.Empty).Trim() + Environment.NewLine, Encoding.UTF8);
-    }
-
     public static string BuildPostUrl(BlogPostBrief post)
     {
         var date = post.Date ?? DateTime.Today;
@@ -113,44 +89,12 @@ public sealed partial class BlogPostFileService
     public static string GetMetadataPath(string markdownFilePath) =>
         Path.ChangeExtension(markdownFilePath, MetadataExtension);
 
-    public static string SerializeMetadata(BlogPostBrief post)
-    {
-        var builder = new StringBuilder();
-
-        AppendString(builder, "title", post.Title);
-        AppendString(builder, "slug", post.Slug);
-        AppendString(builder, "description", post.Description);
-        AppendDate(builder, "date", post.Date);
-        AppendDate(builder, "lastmod", post.Lastmod);
-        AppendString(builder, "cover", post.Cover);
-        AppendBool(builder, "banner", post.Banner);
-        AppendStringList(builder, "categories", post.Categories);
-        AppendStringList(builder, "albums", post.Albums);
-        AppendStringList(builder, "tags", post.Tags);
-        AppendString(builder, "author", post.Author);
-        AppendString(builder, "copyright", post.Copyright);
-        AppendBool(builder, "draft", post.Draft);
-
-        return builder.ToString().TrimEnd() + Environment.NewLine;
-    }
-
     public string RenderMarkdown(string markdown, string? sourcePath = null, string? assetsRoot = null, string? assetBaseUrl = null)
     {
         var html = Markdown.ToHtml(markdown, MarkdownPipeline);
         return sourcePath is null || assetsRoot is null || assetBaseUrl is null
             ? html
             : MakeContentUrlsAbsolute(html, sourcePath, assetsRoot, assetBaseUrl);
-    }
-
-    private static List<string>? NormalizeList(IEnumerable<string>? values)
-    {
-        var items = values?
-            .Where(static value => !string.IsNullOrWhiteSpace(value))
-            .Select(static value => value.Trim())
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        return items is { Count: > 0 } ? items : null;
     }
 
     private static string StripInlineFrontMatter(string markdown) =>
@@ -188,41 +132,6 @@ public sealed partial class BlogPostFileService
     private static string NormalizeLineEndings(string value) =>
         value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
 
-    private static void AppendString(StringBuilder builder, string key, string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            builder.Append(key).Append(": ").AppendLine(Quote(value.Trim()));
-        }
-    }
-
-    private static void AppendDate(StringBuilder builder, string key, DateTime? value)
-    {
-        if (value.HasValue)
-        {
-            builder.Append(key).Append(": ").AppendLine(value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-        }
-    }
-
-    private static void AppendBool(StringBuilder builder, string key, bool value) =>
-        builder.Append(key).Append(": ").AppendLine(value ? "true" : "false");
-
-    private static void AppendStringList(StringBuilder builder, string key, IReadOnlyCollection<string>? values)
-    {
-        if (values is not { Count: > 0 })
-        {
-            return;
-        }
-
-        builder.AppendLine($"{key}:");
-        foreach (var value in values.Where(static item => !string.IsNullOrWhiteSpace(item)))
-        {
-            builder.Append("  - ").AppendLine(Quote(value.Trim()));
-        }
-    }
-
-    private static string Quote(string value) =>
-        $"\"{value.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal).Replace("\r", string.Empty, StringComparison.Ordinal).Replace("\n", "\\n", StringComparison.Ordinal)}\"";
 
     private static void ApplyDateFromPath(BlogPostBrief post, string markdownFilePath, string assetsRoot)
     {
