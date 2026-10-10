@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { withLocale } from "@/i18n";
 import type { BlogPostBrief, Locale, SiteInfo, TaxonomyItem } from "@/types";
 import { GlobalSearch } from "./GlobalSearch";
-import { docSiteUrlFromLocation, docSiteUrlFromSite } from "@/lib/use-doc-site";
+import { docSiteUrlFromLocation, docSiteUrlFromSite, toolsSiteUrlFromLocation, toolsSiteUrlFromSite } from "@/lib/use-doc-site";
 
 const SITE_ICON_URL = "/logo.svg";
 
@@ -21,17 +21,19 @@ export function SiteHeader({
   latestPost?: BlogPostBrief;
 }) {
   const pathname = usePathname();
-  // 文档站地址：SSR 用站点配置域名推导，水合后按访客实际域名切换
+  // 文档站 / 工具箱地址：SSR 用站点配置域名推导，水合后按访客实际域名切换
   const [docSiteUrl, setDocSiteUrl] = useState(() => docSiteUrlFromSite(site));
+  const [toolsSiteUrl, setToolsSiteUrl] = useState(() => toolsSiteUrlFromSite(site));
   useEffect(() => {
     setDocSiteUrl(docSiteUrlFromLocation() ?? docSiteUrlFromSite(site));
+    setToolsSiteUrl(toolsSiteUrlFromLocation() ?? toolsSiteUrlFromSite(site));
   }, [site]);
   const links: { label: string; href: string; external?: boolean }[] = [
     { label: "首页", href: "/" },
     { label: "文章", href: "/post" },
     { label: "专题", href: "/album" },
     { label: "文档", href: docSiteUrl, external: true },
-    { label: "工具", href: "/tool" },
+    { label: "工具", href: toolsSiteUrl, external: true },
     { label: "时间线", href: "/timeline" },
     { label: "友链", href: "/friends" },
     { label: "关于", href: "/about" }
