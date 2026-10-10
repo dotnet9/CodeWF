@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Braces, Clock3, Hash, QrCode } from "lucide-react";
 import { api, resolveAssetUrl } from "@/api";
 import { HomeHero } from "@/components/HomeHero";
 import { formatDate, withLocale } from "@/i18n";
-import type { BlogPostBrief, Locale, SiteInfo, ToolNode } from "@/types";
+import type { BlogPostBrief, Locale, SiteInfo } from "@/types";
 import type { LocalePageProps } from "./layout";
 
 const tickerItems = [
@@ -26,7 +25,6 @@ export default async function HomePage({ params }: LocalePageProps) {
   const rankedPosts = posts.slice(0, 6);
   const featuredPost = posts[0];
   const streamPosts = posts.slice(1, 4);
-  const tools = collectToolLeaves(home.tools).slice(0, 4);
   const latestDate = latestPosts[0]?.lastmod ?? latestPosts[0]?.date;
   const yearsOnline = Math.max(1, new Date().getFullYear() - home.site.startYear);
 
@@ -38,7 +36,6 @@ export default async function HomePage({ params }: LocalePageProps) {
           updatedAt={formatDate(latestDate, locale)}
           metrics={[
             { value: home.counts.posts ?? 0, suffix: "+", label: "ARTICLES" },
-            { value: home.counts.tools ?? 0, label: "TOOLS" },
             { value: home.albums.length, suffix: "+", label: "ALBUMS" },
             { value: yearsOnline, suffix: "yrs", label: `SINCE ${home.site.startYear}` }
           ]}
@@ -74,19 +71,6 @@ export default async function HomePage({ params }: LocalePageProps) {
             </ol>
           </div>
 
-          <div className="prototype-card prototype-bento__tools">
-            <h2 className="prototype-card-title"><span className="prototype-dot" />常用工具</h2>
-            <div className="prototype-tool-strip">
-              {tools.map((tool, index) => (
-                <Link href={withLocale(locale, `/tool/${encodeURIComponent(tool.slug ?? "")}`)} key={tool.slug}>
-                  <span>{toolIcon(index)}</span>{tool.name}
-                </Link>
-              ))}
-              <Link className="prototype-tool-strip__all" href={withLocale(locale, "/tool")}>
-                ./all-tools --count {home.counts.tools ?? 0} →
-              </Link>
-            </div>
-          </div>
         </section>
 
         <div className="prototype-content-layout">
@@ -173,12 +157,6 @@ function FeaturePost({ post, locale, site, featured = false }: { post: BlogPostB
   );
 }
 
-function toolIcon(index: number) {
-  const icons = [Clock3, Hash, Braces, QrCode];
-  const Icon = icons[index % icons.length];
-  return <Icon size={16} aria-hidden="true" />;
-}
-
 function uniquePosts(posts: BlogPostBrief[]) {
   const seen = new Set<string>();
   return posts.filter((post) => {
@@ -191,17 +169,4 @@ function uniquePosts(posts: BlogPostBrief[]) {
 
 function postKey(post: BlogPostBrief) {
   return post.slug ?? post.url ?? `${post.date}-${post.title}`;
-}
-
-function collectToolLeaves(nodes: ToolNode[]) {
-  const results: ToolNode[] = [];
-  const visit = (items: ToolNode[]) => {
-    for (const node of items) {
-      if (node.hidden) continue;
-      if (node.children?.length) visit(node.children);
-      else if (node.slug) results.push(node);
-    }
-  };
-  visit(nodes);
-  return results;
 }

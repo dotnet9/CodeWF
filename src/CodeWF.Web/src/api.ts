@@ -9,8 +9,7 @@ import type {
   SearchResultItem,
   SearchResultPageData,
   SiteInfo,
-  TaxonomyItem,
-  ToolNode
+  TaxonomyItem
 } from "./types";
 import { normalizeLocale } from "./i18n";
 
@@ -66,7 +65,6 @@ export const api = {
       bannerPosts: [],
       categories: [],
       albums: [],
-      tools: [],
       counts: {}
     }),
   posts: (locale: LocaleInput, values?: Record<string, string | number | undefined>) =>
@@ -81,8 +79,6 @@ export const api = {
   categories: (locale: LocaleInput) => getJson<TaxonomyItem[]>(`/categories?${query(locale)}`, []),
   albums: (locale: LocaleInput) => getJson<TaxonomyItem[]>(`/albums?${query(locale)}`, []),
   tags: (locale: LocaleInput) => getJson<{ name: string; postCount: number }[]>(`/tags?${query(locale)}`, []),
-  tools: (locale: LocaleInput) => getJson<ToolNode[]>(`/tools?${query(locale)}`, []),
-  tool: (locale: LocaleInput, slug: string) => getJson<ToolNode | null>(`/tools/${slug}?${query(locale)}`, null),
   markdownPage: (locale: LocaleInput, name: "about" | "donation" | "privacy") =>
     getJson<MarkdownPage>(`/pages/${name}?${query(locale)}`, {}),
   friendLinks: (locale: LocaleInput) => getJson<FriendLinkItem[]>(`/friend-links?${query(locale)}`, []),
@@ -94,7 +90,6 @@ export const api = {
       total: 0,
       data: [],
       postCount: 0,
-      toolCount: 0,
       isBlocked: false
     }),
   searchSuggestions: (locale: LocaleInput, q: string, take = 10) =>

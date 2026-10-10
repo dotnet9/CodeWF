@@ -38,15 +38,6 @@ export type TaxonomyItem = {
   postCount: number;
 };
 
-export type ToolNode = {
-  name?: string;
-  memo?: string;
-  slug?: string;
-  repository?: string;
-  hidden?: boolean;
-  children?: ToolNode[];
-};
-
 export type FriendLinkItem = {
   index: number;
   title?: string;
@@ -79,7 +70,6 @@ export type HomePageData = {
   bannerPosts: BlogPostBrief[];
   categories: TaxonomyItem[];
   albums: TaxonomyItem[];
-  tools: ToolNode[];
   counts: Record<string, number>;
 };
 
@@ -91,7 +81,7 @@ export type PagedResult<T> = {
 };
 
 export type SearchResultItem = {
-  kind: "Tool" | "Post";
+  kind: "Post";
   title: string;
   url: string;
   summary?: string;
@@ -108,7 +98,6 @@ export type SearchResultPageData = {
   pageSize: number;
   total: number;
   data: SearchResultItem[];
-  toolCount: number;
   postCount: number;
   isBlocked?: boolean;
   notice?: string;
