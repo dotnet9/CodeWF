@@ -1,0 +1,40 @@
+@using CodeWF.Web.Models
+
+<article class="prototype-card prototype-stream-post@(Featured ? " prototype-stream-post--featured" : string.Empty)">
+    <a class="prototype-stream-post__cover@(string.IsNullOrWhiteSpace(Post.Cover) ? " prototype-stream-post__cover--empty" : string.Empty)"
+       href="@(Post.Url ?? "/post")" aria-label="@(Post.Title ?? Post.Slug)">
+        @if (!string.IsNullOrWhiteSpace(Post.Cover))
+        {
+            <img src="@Post.Cover" alt="" loading="lazy" />
+        }
+        else
+        {
+            <span>@(Post.Categories?.FirstOrDefault() ?? "CodeWF")</span>
+        }
+    </a>
+    <div class="prototype-stream-post__body">
+        <div class="prototype-tags">
+            @foreach (var category in (Post.Categories ?? []).Take(3))
+            {
+                <a href="@($"/cat/{Uri.EscapeDataString(category)}")">@category</a>
+            }
+        </div>
+        <h2><a href="@(Post.Url ?? "/post")">@(string.IsNullOrWhiteSpace(Post.Title) ? Post.Slug : Post.Title)</a></h2>
+        @if (!string.IsNullOrWhiteSpace(Post.Description))
+        {
+            <p>@Post.Description</p>
+        }
+        <div class="prototype-meta">
+            @if (!string.IsNullOrWhiteSpace(Post.Author))
+            {
+                <span>@Post.Author</span>
+            }
+            <time datetime="@Post.Date?.ToString("yyyy-MM-dd")">@((Post.Lastmod ?? Post.Date)?.ToString("yyyy/MM/dd"))</time>
+        </div>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public BlogPostBrief Post { get; set; } = default!;
+    [Parameter] public bool Featured { get; set; }
+}

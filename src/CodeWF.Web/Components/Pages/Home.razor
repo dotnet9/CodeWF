@@ -7,107 +7,179 @@
     <meta name="description" content="@(HomeData?.Site.Memo ?? string.Empty)" />
 </HeadContent>
 
-@if (HomeData is null)
-{
-    <section class="page-shell"><p class="muted">加载中…</p></section>
-}
-else
-{
-    var latest = HomeData.RecentPosts.Take(3).ToList();
-    var recent = HomeData.RecentPosts.Skip(3).Take(6).ToList();
-
-    @if (HomeData.BannerPosts.Count > 0)
+<main class="prototype-home">
+    @if (HomeData is null)
     {
-        <section class="banner-carousel" id="banner-carousel" aria-label="精选文章">
-            <div class="banner-track">
-                @foreach (var post in HomeData.BannerPosts)
-                {
-                    <a class="banner-slide" href="@post.Url" style="background-image: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45)), url('@post.Cover')">
-                        <span class="banner-slide__title">@post.Title</span>
-                    </a>
-                }
-            </div>
-            <div class="banner-dots" role="tablist">
-                @for (var i = 0; i < HomeData.BannerPosts.Count; i++)
-                {
-                    <button type="button" class="banner-dot@(i == 0 ? " is-active" : "")" data-index="@i" aria-label="第 @(i + 1) 张"></button>
-                }
-            </div>
-        </section>
+        <div class="prototype-container"><p class="muted">加载中…</p></div>
     }
-
-    <section class="prototype-hero">
-        <div class="prototype-hero__copy">
-            <span class="prototype-status"><i></i>SYSTEM ONLINE · 更新于 @DateTime.Now.ToString("M月d日")</span>
-            <h1>.NET 开发者的<br /><span id="typewriter">代码工坊</span><b aria-hidden="true">▌</b></h1>
-            <p>深度技术文章与系统化专题，覆盖 WPF、Avalonia、Blazor 与 AI 开发实践；常用在线工具已独立为工具箱站。</p>
-            <div class="prototype-hero__actions">
-                <a class="prototype-button" href="/post">开始阅读 →</a>
-                <a class="prototype-button prototype-button--ghost" href="@ToolsSiteUrl" target="_blank" rel="noreferrer">打开工具箱</a>
-            </div>
-            <div class="prototype-metrics">
-                <div><strong>@HomeData.Counts.GetValueOrDefault("posts")</strong><span>篇文章</span></div>
-                <div><strong>@HomeData.Counts.GetValueOrDefault("categories")</strong><span>个分类</span></div>
-                <div><strong>@(DateTime.Now.Year - HomeData.Site.StartYear)<i>+</i></strong><span>年坚持</span></div>
-            </div>
-        </div>
-
-        <div class="prototype-terminal" aria-label="CodeWF 站点状态">
-            <div class="prototype-terminal__bar">
-                <i class="red"></i><i class="yellow"></i><i class="green"></i><span>codewf — 站点情报 · live</span>
-            </div>
-            <div class="prototype-terminal__body">
-                <p><span class="comment"># 检查站点状态</span></p>
-                <p><span class="prompt">$</span> curl codewf.com/api/health</p>
-                <p>{ "{ " }<span class="key">"status"</span>: <span class="string">"online"</span> { "}" }</p>
-                <br />
-                <p><span class="prompt">$</span> codewf stats --live</p>
-                <p><span class="key">articles</span> <span class="value">@HomeData.Counts.GetValueOrDefault("posts")</span></p>
-                <p><span class="key">categories</span> <span class="value">@HomeData.Counts.GetValueOrDefault("categories")</span></p>
-                <br />
-                <p><span class="prompt">$</span> dotnet --info</p>
-                <p><span class="string">Ready to build.</span> <span class="prototype-terminal__cursor"></span></p>
-            </div>
-        </div>
-    </section>
-
-    <section class="home-section">
-        <h2>最新文章</h2>
-        <div class="post-grid">
-            @foreach (var post in latest)
-            {
-                <PostCard Post="post" />
-            }
-        </div>
-        <p class="muted home-more"><a href="/post">浏览全部文章 →</a></p>
-    </section>
-
-    @if (recent.Count > 0)
+    else
     {
-        <section class="home-section">
-            <h2>近期更新</h2>
-            <div class="post-grid">
-                @foreach (var post in recent)
+        var posts = UniquePosts(HomeData.BannerPosts.Concat(HomeData.RecentPosts).ToList());
+        var latestPosts = HomeData.RecentPosts.Take(3).ToList();
+        var rankedPosts = posts.Take(6).ToList();
+        var featuredPost = posts.FirstOrDefault();
+        var streamPosts = posts.Skip(1).Take(3).ToList();
+        var yearsOnline = Math.Max(1, DateTime.Now.Year - HomeData.Site.StartYear);
+
+        <div class="prototype-container">
+            @if (HomeData.BannerPosts.Count > 0)
+            {
+                <section class="banner-carousel" id="banner-carousel" aria-label="精选文章">
+                    <div class="banner-track">
+                        @foreach (var post in HomeData.BannerPosts)
+                        {
+                            <a class="banner-slide" href="@post.Url" style="background-image: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45)), url('@post.Cover')">
+                                <span class="banner-slide__title">@post.Title</span>
+                            </a>
+                        }
+                    </div>
+                    <div class="banner-dots" role="tablist">
+                        @for (var i = 0; i < HomeData.BannerPosts.Count; i++)
+                        {
+                            <button type="button" class="banner-dot@(i == 0 ? " is-active" : "")" data-index="@i" aria-label="第 @(i + 1) 张"></button>
+                        }
+                    </div>
+                </section>
+            }
+
+            <section class="prototype-hero">
+                <div class="prototype-hero__copy">
+                    <span class="prototype-status"><i></i>SYSTEM ONLINE · 更新于 @DateTime.Now.ToString("M月d日")</span>
+                    <h1>.NET 开发者的<br /><span id="typewriter">代码工坊</span><b aria-hidden="true">▌</b></h1>
+                    <p>深度技术文章与系统化专题，覆盖 WPF、Avalonia、Blazor 与 AI 开发实践；常用在线工具已独立为工具箱站。</p>
+                    <div class="prototype-hero__actions">
+                        <a class="prototype-button" href="/post">开始阅读 →</a>
+                        <a class="prototype-button prototype-button--ghost" href="@ToolsSiteUrl" target="_blank" rel="noreferrer">打开工具箱</a>
+                    </div>
+                    <div class="prototype-metrics">
+                        <div><strong>@HomeData.Counts.GetValueOrDefault("posts")<i>+</i></strong><span>ARTICLES</span></div>
+                        <div><strong>@HomeData.Counts.GetValueOrDefault("albums")<i>+</i></strong><span>ALBUMS</span></div>
+                        <div><strong>@yearsOnline<i>yrs</i></strong><span>SINCE @HomeData.Site.StartYear</span></div>
+                    </div>
+                </div>
+
+                <div class="prototype-terminal" aria-label="CodeWF 站点状态">
+                    <div class="prototype-terminal__bar">
+                        <i class="red"></i><i class="yellow"></i><i class="green"></i><span>codewf — 站点情报 · live</span>
+                    </div>
+                    <div class="prototype-terminal__body">
+                        <p><span class="comment"># 检查站点状态</span></p>
+                        <p><span class="prompt">$</span> curl codewf.com/api/health</p>
+                        <p>{ "{ " }<span class="key">"status"</span>: <span class="string">"online"</span> { "}" }</p>
+                        <br />
+                        <p><span class="prompt">$</span> codewf stats --live</p>
+                        <p><span class="key">articles</span> <span class="value">@HomeData.Counts.GetValueOrDefault("posts")</span></p>
+                        <p><span class="key">categories</span> <span class="value">@HomeData.Counts.GetValueOrDefault("categories")</span></p>
+                        <br />
+                        <p><span class="prompt">$</span> dotnet --info</p>
+                        <p><span class="string">Ready to build.</span> <span class="prototype-terminal__cursor"></span></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="prototype-ticker" aria-label="热门技术方向">
+            <div class="prototype-ticker__track">
+                @foreach (var (topic, detail) in TickerItems.Concat(TickerItems))
                 {
-                    <PostCard Post="post" />
+                    <span><b>@topic</b> @detail</span>
                 }
             </div>
-        </section>
-    }
-
-    <section class="home-section">
-        <h2>分类索引</h2>
-        <div class="chip-row">
-            @foreach (var category in HomeData.Categories)
-            {
-                <a class="chip" href="@($"/cat/{Uri.EscapeDataString(category.Slug ?? category.Name)}")">@category.Name（@category.PostCount）</a>
-            }
         </div>
-    </section>
-}
+
+        <div class="prototype-container">
+            <section class="prototype-bento" aria-label="站点速览">
+                <div class="prototype-card prototype-bento__latest">
+                    <h2 class="prototype-card-title"><span class="prototype-dot"></span>最新文章<a href="/post">查看全部 →</a></h2>
+                    @{
+                        var lineIndex = 0;
+                    }
+                    @foreach (var post in latestPosts)
+                    {
+                        lineIndex++;
+                        <article class="prototype-latest-line">
+                            <span class="prototype-latest-line__index">@lineIndex.ToString("00")</span>
+                            <div>
+                                <h3><a href="@post.Url">@(string.IsNullOrWhiteSpace(post.Title) ? post.Slug : post.Title)</a></h3>
+                                <div class="prototype-meta">
+                                    <time datetime="@post.Date?.ToString("yyyy-MM-dd")">@((post.Lastmod ?? post.Date)?.ToString("yyyy/MM/dd"))</time>
+                                    <span>@string.Join(" / ", (post.Categories ?? []).Take(2))</span>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(post.Cover))
+                            {
+                                <a class="prototype-latest-line__cover" href="@post.Url" aria-label="@post.Title">
+                                    <img src="@post.Cover" alt="" loading="lazy" />
+                                </a>
+                            }
+                        </article>
+                    }
+                </div>
+
+                <div class="prototype-card prototype-bento__ranking">
+                    <h2 class="prototype-card-title"><span class="prototype-dot prototype-dot--amber"></span>精选热榜</h2>
+                    <ol class="prototype-ranking">
+                        @foreach (var (post, index) in rankedPosts.Select((p, i) => (p, i + 1)))
+                        {
+                            <li>
+                                <span>@index</span>
+                                <a href="@(post.Url ?? "/post")">@(string.IsNullOrWhiteSpace(post.Title) ? post.Slug : post.Title)</a>
+                            </li>
+                        }
+                    </ol>
+                </div>
+            </section>
+
+            <div class="prototype-content-layout">
+                <section class="prototype-article-list">
+                    <div class="prototype-section-title">
+                        精选文章
+                        <a href="/post">archive →</a>
+                    </div>
+                    @if (featuredPost is { } featured)
+                    {
+                        <FeaturePost post="featured" featured />
+                    }
+                    @foreach (var post in streamPosts)
+                    {
+                        <FeaturePost post="post" />
+                    }
+                    @if (posts.Count == 0)
+                    {
+                        <div class="empty-state">近期更新会在这里展示。</div>
+                    }
+                </section>
+
+                <aside class="prototype-home-aside">
+                    <div class="prototype-card prototype-category-card">
+                        <h2 class="prototype-card-title"><span class="prototype-dot"></span>分类索引</h2>
+                        @foreach (var category in HomeData.Categories.Take(7))
+                        {
+                            <a href="@($"/cat/{Uri.EscapeDataString(category.Slug ?? category.Name ?? string.Empty)}")">
+                                @category.Name<span>@category.PostCount</span>
+                            </a>
+                        }
+                    </div>
+                </aside>
+            </div>
+        </div>
+    }
+</main>
 
 @code {
     private HomePageData? HomeData;
+
+    private static readonly (string Topic, string Detail)[] TickerItems =
+    [
+        ("#.NET 10", "持续更新"),
+        ("#C#", "语言与工程实践"),
+        ("#Avalonia", "跨平台桌面"),
+        ("#Blazor", "全栈 Web UI"),
+        ("#AI 辅助开发", "实战记录"),
+        ("#WPF", "企业级桌面"),
+        ("#Open Source", "项目与组件"),
+        ("#CodeWF", "前后端分离"),
+    ];
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,6 +191,18 @@ else
         {
             HomeData = null;
         }
+    }
+
+    private static List<BlogPostBrief> UniquePosts(IEnumerable<BlogPostBrief> posts)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<BlogPostBrief>();
+        foreach (var post in posts)
+        {
+            var key = post.Slug ?? post.Url ?? $"{post.Date}-{post.Title}";
+            if (seen.Add(key)) result.Add(post);
+        }
+        return result;
     }
 
     private string ToolsSiteUrl => "https://tools.dotnet9.com";
