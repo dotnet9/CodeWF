@@ -105,6 +105,27 @@
         lightbox = null;
     }
 
+    // ---------- 首页打字机 ----------
+    function setupTypewriter() {
+        var el = $("#typewriter");
+        if (!el || el.__started) return;
+        el.__started = true;
+        var words = ["代码工坊", "灵感仓库", "实用工具箱"];
+        var wordIndex = 0, chars = words[0].length, deleting = false;
+        function tick() {
+            var word = words[wordIndex];
+            var delay = !deleting && chars === word.length ? 1800 : deleting && chars === 0 ? 260 : deleting ? 65 : 95;
+            window.setTimeout(function () {
+                if (!deleting && chars === word.length) { deleting = true; }
+                else if (deleting && chars === 0) { wordIndex = (wordIndex + 1) % words.length; deleting = false; }
+                else { chars += deleting ? -1 : 1; }
+                el.textContent = words[wordIndex].slice(0, chars);
+                tick();
+            }, delay);
+        }
+        tick();
+    }
+
     // ---------- 首页轮播 ----------
     function setupCarousel() {
         var carousel = $("#banner-carousel");
@@ -134,7 +155,7 @@
         }
     };
 
-    function init() { window.site.init(); setupCarousel(); }
+    function init() { window.site.init(); setupCarousel(); setupTypewriter(); }
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {

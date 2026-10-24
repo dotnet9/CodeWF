@@ -1,7 +1,6 @@
 @page "/"
 @using CodeWF.Web.Models
 @inject CodeWF.Web.Services.ContentRepository Repository
-@inject NavigationManager Navigation
 
 <PageTitle>@(HomeData?.Site.AppTitle ?? "CodeWF")</PageTitle>
 <HeadContent>
@@ -15,13 +14,11 @@
 else
 {
     var latest = HomeData.RecentPosts.Take(3).ToList();
-    var hot = HomeData.RecentPosts.Skip(3).Take(6).ToList();
-    
+    var recent = HomeData.RecentPosts.Skip(3).Take(6).ToList();
 
     @if (HomeData.BannerPosts.Count > 0)
     {
-        <!--banner:@HomeData.BannerPosts.Count-->
-    <section class="banner-carousel" id="banner-carousel" aria-label="精选文章">
+        <section class="banner-carousel" id="banner-carousel" aria-label="精选文章">
             <div class="banner-track">
                 @foreach (var post in HomeData.BannerPosts)
                 {
@@ -39,13 +36,38 @@ else
         </section>
     }
 
-    <section class="home-hero">
-        <h1>@HomeData.Site.AppTitle</h1>
-        <p>@HomeData.Site.Memo</p>
-        <div class="hero-metrics">
-            <span><b>@HomeData.Counts.GetValueOrDefault("posts")</b> 篇文章</span>
-            <span><b>@HomeData.Counts.GetValueOrDefault("albums")</b> 个专题</span>
-            <span><b>@DateTime.Now.Year - Home.Site.StartYear</b> 年坚持</span>
+    <section class="prototype-hero">
+        <div class="prototype-hero__copy">
+            <span class="prototype-status"><i></i>SYSTEM ONLINE · 更新于 @DateTime.Now.ToString("M月d日")</span>
+            <h1>.NET 开发者的<br /><span id="typewriter">代码工坊</span><b aria-hidden="true">▌</b></h1>
+            <p>深度技术文章与系统化专题，覆盖 WPF、Avalonia、Blazor 与 AI 开发实践；常用在线工具已独立为工具箱站。</p>
+            <div class="prototype-hero__actions">
+                <a class="prototype-button" href="/post">开始阅读 →</a>
+                <a class="prototype-button prototype-button--ghost" href="@ToolsSiteUrl" target="_blank" rel="noreferrer">打开工具箱</a>
+            </div>
+            <div class="prototype-metrics">
+                <div><strong>@HomeData.Counts.GetValueOrDefault("posts")</strong><span>篇文章</span></div>
+                <div><strong>@HomeData.Counts.GetValueOrDefault("categories")</strong><span>个分类</span></div>
+                <div><strong>@(DateTime.Now.Year - HomeData.Site.StartYear)<i>+</i></strong><span>年坚持</span></div>
+            </div>
+        </div>
+
+        <div class="prototype-terminal" aria-label="CodeWF 站点状态">
+            <div class="prototype-terminal__bar">
+                <i class="red"></i><i class="yellow"></i><i class="green"></i><span>codewf — 站点情报 · live</span>
+            </div>
+            <div class="prototype-terminal__body">
+                <p><span class="comment"># 检查站点状态</span></p>
+                <p><span class="prompt">$</span> curl codewf.com/api/health</p>
+                <p>{ "{ " }<span class="key">"status"</span>: <span class="string">"online"</span> { "}" }</p>
+                <br />
+                <p><span class="prompt">$</span> codewf stats --live</p>
+                <p><span class="key">articles</span> <span class="value">@HomeData.Counts.GetValueOrDefault("posts")</span></p>
+                <p><span class="key">categories</span> <span class="value">@HomeData.Counts.GetValueOrDefault("categories")</span></p>
+                <br />
+                <p><span class="prompt">$</span> dotnet --info</p>
+                <p><span class="string">Ready to build.</span> <span class="prototype-terminal__cursor"></span></p>
+            </div>
         </div>
     </section>
 
@@ -57,14 +79,15 @@ else
                 <PostCard Post="post" />
             }
         </div>
+        <p class="muted home-more"><a href="/post">浏览全部文章 →</a></p>
     </section>
 
-    @if (hot.Count > 0)
+    @if (recent.Count > 0)
     {
         <section class="home-section">
             <h2>近期更新</h2>
             <div class="post-grid">
-                @foreach (var post in hot)
+                @foreach (var post in recent)
                 {
                     <PostCard Post="post" />
                 }
@@ -80,7 +103,6 @@ else
                 <a class="chip" href="@($"/cat/{Uri.EscapeDataString(category.Slug ?? category.Name)}")">@category.Name（@category.PostCount）</a>
             }
         </div>
-        <p class="muted"><a href="/post">浏览全部文章 →</a></p>
     </section>
 }
 
@@ -98,4 +120,6 @@ else
             HomeData = null;
         }
     }
+
+    private string ToolsSiteUrl => "https://tools.dotnet9.com";
 }
