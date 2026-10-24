@@ -147,6 +147,33 @@
         restart();
     }
 
+    // ---------- giscus 全站评论（跟随 pathname） ----------
+    function initGiscus() {
+        var host = $("#giscus");
+        if (!host) return;
+        host.innerHTML = "";
+        var script = document.createElement("script");
+        script.src = "https://giscus.app/client.js";
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        var attrs = {
+            "data-repo": "dotnet9/CodeWF",
+            "data-repo-id": "R_kgDOLAiTcA",
+            "data-category": "General",
+            "data-category-id": "DIC_kwDOLAiTcM4DG9PS",
+            "data-mapping": "pathname",
+            "data-strict": "0",
+            "data-reactions-enabled": "1",
+            "data-emit-metadata": "0",
+            "data-input-position": "top",
+            "data-theme": "light",
+            "data-lang": "zh-CN",
+            "data-loading": "lazy"
+        };
+        Object.keys(attrs).forEach(function (k) { script.setAttribute(k, attrs[k]); });
+        host.appendChild(script);
+    }
+
     // ---------- 复制链接 ----------
     window.site = {
         init: function () { highlightCode(); buildToc(); setupProgress(); setupLightbox(); },
@@ -155,7 +182,7 @@
         }
     };
 
-    function init() { window.site.init(); setupCarousel(); setupTypewriter(); }
+    function init() { window.site.init(); setupCarousel(); setupTypewriter(); initGiscus(); }
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {

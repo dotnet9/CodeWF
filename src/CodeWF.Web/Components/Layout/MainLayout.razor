@@ -1,6 +1,6 @@
 @inherits MainLayoutComponent
 
-<div class="app-shell">
+<div class="site-shell" data-locale="zh-CN">
     <header class="site-header prototype-header">
         <a class="brand prototype-brand" href="/" aria-label="CodeWF">
             <img class="brand-icon" src="logo.svg" alt="" />
@@ -22,9 +22,17 @@
         </div>
     </header>
 
-    <main class="site-main">
+    <main>
         @Body
     </main>
+
+    <section class="site-comments" aria-label="评论">
+        <div class="site-comments__inner">
+            <h2 class="site-comments__title">评论</h2>
+            <div id="giscus" class="site-comments__widget"></div>
+            <p class="site-comments__hint">评论基于 GitHub Discussions，由 giscus 提供。</p>
+        </div>
+    </section>
 
     <section class="friend-links-shell" aria-label="Friend links">
         <div class="friend-links">
