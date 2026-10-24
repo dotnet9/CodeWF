@@ -105,6 +105,27 @@
         lightbox = null;
     }
 
+    // ---------- 首页轮播 ----------
+    function setupCarousel() {
+        var carousel = $("#banner-carousel");
+        if (!carousel) return;
+        var slides = carousel.querySelectorAll(".banner-slide");
+        var dots = carousel.querySelectorAll(".banner-dot");
+        if (slides.length < 2) { if (slides.length === 1) slides[0].classList.add("is-active"); return; }
+        var current = 0, timer = null;
+        function show(index) {
+            current = (index + slides.length) % slides.length;
+            slides.forEach(function (s, i) { s.classList.toggle("is-active", i === current); });
+            dots.forEach(function (d, i) { d.classList.toggle("is-active", i === current); });
+        }
+        function restart() { if (timer) clearInterval(timer); timer = setInterval(function () { show(current + 1); }, 5000); }
+        dots.forEach(function (d, i) { d.addEventListener("click", function () { show(i); restart(); }); });
+        carousel.addEventListener("mouseenter", function () { if (timer) clearInterval(timer); });
+        carousel.addEventListener("mouseleave", restart);
+        show(0);
+        restart();
+    }
+
     // ---------- 复制链接 ----------
     window.site = {
         init: function () { highlightCode(); buildToc(); setupProgress(); setupLightbox(); },
@@ -113,7 +134,7 @@
         }
     };
 
-    function init() { window.site.init(); }
+    function init() { window.site.init(); setupCarousel(); }
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {

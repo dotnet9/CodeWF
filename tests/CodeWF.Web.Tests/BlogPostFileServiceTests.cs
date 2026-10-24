@@ -204,6 +204,48 @@ banner: true
         return new ContentRepository(new TestOptionsMonitor<SiteOptions>(options), new MemoryCache(new MemoryCacheOptions()), new BlogPostFileService());
     }
 
+    [Fact]
+    public void Read_ParsesInlineFrontMatter_IncludingBanner()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "01");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "banner-post.md");
+        File.WriteAllText(markdown, """
+---
+title: "Banner Post"
+slug: "banner-post"
+date: 2026-01-15 10:00:00
+banner: true
+cover: https://img1.dotnet9.com/2026/01/cover.png
+---
+
+正文
+""");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        Assert.True(post.Banner, "banner: true 应被反序列化");
+        Assert.Equal("Banner Post", post.Title);
+        Assert.False(post.Draft);
+        Assert.Contains("正文", post.Content);
+    }
+
+    [Fact]
+    public async Task Diag_RealRepo_BannerPosts()
+    {
+        var root = @"D:\github\Apps\Assets.Dotnet9";
+        if (!Directory.Exists(root)) return; // 本机仓库存在时才诊断
+
+        var repository = CreateRepository(root);
+        var briefs = await repository.GetPostBriefsAsync("zh-CN");
+        var home = await repository.GetHomeAsync("zh-CN", 6);
+
+        Assert.True(briefs.Count > 0, $"briefs={briefs.Count}");
+        Assert.True(home.BannerPosts.Count > 0, $"bannerPosts={home.BannerPosts.Count}, bannerTrueInBriefs={briefs.Count(b => b.Banner)}, total={briefs.Count}");
+    }
+
     private sealed class TestOptionsMonitor<T> : IOptionsMonitor<T>
     {
         private readonly T value;

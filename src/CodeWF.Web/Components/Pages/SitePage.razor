@@ -25,8 +25,16 @@
 
     [Parameter] public string PageName { get; set; } = "about";
 
+    /// <summary>站点页面的实际文件段（大小写与目录与原站端点一致：site/pays/Donation.md 等）。</summary>
+    private string[] ContentSegments => PageName switch
+    {
+        "donation" => ["pays", "Donation.md"],
+        "privacy" => ["Privacy.md"],
+        _ => ["about.md"],
+    };
+
     protected override async Task OnInitializedAsync()
     {
-        try { Page = await Repository.ReadSitePageAsync("zh-CN", PageName); } catch { }
+        try { Page = await Repository.ReadSitePageAsync("zh-CN", ContentSegments); } catch { }
     }
 }

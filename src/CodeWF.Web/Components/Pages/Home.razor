@@ -16,7 +16,28 @@ else
 {
     var latest = HomeData.RecentPosts.Take(3).ToList();
     var hot = HomeData.RecentPosts.Skip(3).Take(6).ToList();
-    var featured = HomeData.BannerPosts.Take(4).ToList();
+    
+
+    @if (HomeData.BannerPosts.Count > 0)
+    {
+        <!--banner:@HomeData.BannerPosts.Count-->
+    <section class="banner-carousel" id="banner-carousel" aria-label="精选文章">
+            <div class="banner-track">
+                @foreach (var post in HomeData.BannerPosts)
+                {
+                    <a class="banner-slide" href="@post.Url" style="background-image: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45)), url('@post.Cover')">
+                        <span class="banner-slide__title">@post.Title</span>
+                    </a>
+                }
+            </div>
+            <div class="banner-dots" role="tablist">
+                @for (var i = 0; i < HomeData.BannerPosts.Count; i++)
+                {
+                    <button type="button" class="banner-dot@(i == 0 ? " is-active" : "")" data-index="@i" aria-label="第 @(i + 1) 张"></button>
+                }
+            </div>
+        </section>
+    }
 
     <section class="home-hero">
         <h1>@HomeData.Site.AppTitle</h1>
@@ -37,19 +58,6 @@ else
             }
         </div>
     </section>
-
-    @if (featured.Count > 0)
-    {
-        <section class="home-section">
-            <h2>精选专题</h2>
-            <div class="post-grid">
-                @foreach (var post in featured)
-                {
-                    <PostCard Post="post" />
-                }
-            </div>
-        </section>
-    }
 
     @if (hot.Count > 0)
     {
