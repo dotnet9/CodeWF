@@ -1,0 +1,148 @@
+/* CodeWF Blazor 版补充样式：site.css 之外新增/兜底的组件样式。 */
+
+/* ---------- 全局搜索（头部） ---------- */
+.global-search { position: relative; }
+.global-search input[type="search"] {
+    width: 180px; padding: 6px 12px; border: 1px solid var(--line, #ddd);
+    border-radius: 8px; background: var(--surface, #fff); color: inherit; font-size: 12.5px;
+}
+.global-search input[type="search"]:focus { outline: none; border-color: #512bd4; box-shadow: 0 0 0 3px rgba(81, 43, 212, .12); }
+.global-search__suggestions {
+    position: absolute; right: 0; top: calc(100% + 6px); min-width: 280px; max-width: 360px;
+    background: var(--surface, #fff); border: 1px solid var(--line, #ddd); border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .12); list-style: none; margin: 0; padding: 6px; z-index: 50;
+}
+.global-search__suggestions a { display: block; padding: 7px 10px; border-radius: 7px; color: inherit; text-decoration: none; font-size: 12.5px; }
+.global-search__suggestions a:hover { background: rgba(81, 43, 212, .08); }
+
+/* ---------- 通用页面骨架 ---------- */
+.page-shell { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
+.page-shell h1 { font-size: 26px; margin: 0 0 18px; }
+.muted { color: var(--muted, #777); font-size: 13px; }
+
+.list-filter { display: flex; gap: 8px; margin: 0 0 18px; }
+.list-filter input[type="search"] {
+    flex: 1; max-width: 360px; padding: 8px 12px; border: 1px solid var(--line, #ddd);
+    border-radius: 9px; background: var(--surface, #fff); color: inherit;
+}
+.list-filter button {
+    padding: 8px 18px; border: 1px solid #512bd4; background: #512bd4; color: #fff;
+    border-radius: 9px; cursor: pointer; font-weight: 600;
+}
+
+.post-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.post-card {
+    display: flex; flex-direction: column; border: 1px solid var(--line, #e4e4e7);
+    border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+    background: var(--surface, #fff); transition: transform .15s ease, box-shadow .15s ease;
+}
+.post-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 0, 0, .1); }
+.post-card__cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.post-card__body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.post-card__title { margin: 0; font-size: 15px; line-height: 1.5; }
+.post-card__desc { margin: 0; color: var(--muted, #777); font-size: 12.5px; line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post-card__meta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted, #999); }
+.post-card__date { font-variant-numeric: tabular-nums; }
+
+.chip, .chip-row .chip {
+    display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 99px;
+    background: rgba(81, 43, 212, .1); color: #512bd4; font-size: 11.5px; text-decoration: none;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.taxonomy-card {
+    display: flex; flex-direction: column; gap: 8px; padding: 18px;
+    border: 1px solid var(--line, #e4e4e7); border-radius: 14px; text-decoration: none; color: inherit;
+    background: var(--surface, #fff); transition: transform .15s ease, box-shadow .15s ease;
+}
+.taxonomy-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0, 0, 0, .1); }
+.taxonomy-card h2 { margin: 0; font-size: 16px; }
+.taxonomy-card p { margin: 0; color: var(--muted, #777); font-size: 12.5px; }
+
+/* ---------- 首页 Hero ---------- */
+.home-hero {
+    text-align: center; padding: 56px 20px 40px; border-radius: 18px; margin: 20px auto 8px;
+    max-width: 1080px;
+    background: radial-gradient(800px 300px at 20% -10%, rgba(81, 43, 212, .14), transparent 60%),
+        radial-gradient(700px 280px at 85% 0%, rgba(81, 43, 212, .1), transparent 55%);
+}
+.home-hero h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: -.5px; }
+.home-hero p { color: var(--muted, #777); margin: 0 0 18px; }
+.hero-metrics { display: flex; justify-content: center; gap: 28px; font-size: 13px; color: var(--muted, #777); }
+.hero-metrics b { color: #512bd4; font-size: 18px; }
+.home-section { max-width: 1080px; margin: 34px auto; padding: 0 20px; }
+.home-section h2 { font-size: 20px; margin: 0 0 14px; }
+
+/* ---------- 文章详情 ---------- */
+.post-page { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; position: relative; }
+.reading-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, #512bd4, #8b5cf6); z-index: 100; transition: width .1s linear;
+}
+.post-header h1 { font-size: 28px; line-height: 1.4; margin: 0 0 10px; }
+.post-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted, #777); font-size: 12.5px; margin: 0 0 24px; }
+.post-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 32px; }
+@media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; } .post-aside { display: none; } }
+
+.post-aside { position: sticky; top: 24px; align-self: start; }
+.content-toc h2 { font-size: 13px; opacity: .7; margin: 0 0 8px; }
+.toc-link { display: block; padding: 3px 0; font-size: 12.5px; color: var(--muted, #777); text-decoration: none; }
+.toc-link.is-l3 { padding-left: 14px; }
+.toc-link.is-l4 { padding-left: 28px; }
+.toc-link:hover { color: #512bd4; }
+.article-actions { margin-top: 18px; display: flex; gap: 8px; }
+.article-actions button {
+    padding: 7px 14px; border: 1px solid var(--line, #ddd); border-radius: 9px;
+    background: var(--surface, #fff); color: inherit; cursor: pointer; font-size: 12.5px;
+}
+
+.post-pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; border-top: 1px solid var(--line, #e4e4e7); padding-top: 16px; }
+.post-pager a { color: #512bd4; text-decoration: none; font-size: 13.5px; }
+
+.giscus-shell { margin-top: 48px; }
+
+/* ---------- 分页 ---------- */
+.pagination { display: flex; gap: 6px; justify-content: center; margin: 28px 0 8px; }
+.pagination__item {
+    min-width: 34px; padding: 6px 10px; text-align: center; border: 1px solid var(--line, #ddd);
+    border-radius: 9px; color: inherit; text-decoration: none; font-size: 13px;
+}
+.pagination__item.is-current { background: #512bd4; border-color: #512bd4; color: #fff; font-weight: 600; }
+
+/* ---------- 搜索结果 ---------- */
+.search-results { display: flex; flex-direction: column; gap: 12px; }
+.search-result { display: block; padding: 14px 16px; border: 1px solid var(--line, #e4e4e7); border-radius: 12px; text-decoration: none; color: inherit; }
+.search-result:hover { border-color: #512bd4; }
+.search-result h2 { margin: 0 0 6px; font-size: 15px; color: #512bd4; }
+.search-result p { margin: 0 0 4px; font-size: 12.5px; line-height: 1.7; }
+
+/* ---------- 时间线 ---------- */
+.timeline { display: flex; flex-direction: column; gap: 14px; }
+.timeline-item { display: flex; gap: 14px; padding: 12px 14px; border: 1px solid var(--line, #e4e4e7); border-radius: 12px; }
+.timeline-time { flex: none; font-variant-numeric: tabular-nums; color: #512bd4; font-size: 12.5px; padding-top: 2px; }
+.timeline-item b { font-size: 14px; }
+.timeline-item p { margin: 4px 0 0; color: var(--muted, #777); font-size: 12.5px; }
+
+/* ---------- 灯箱 ---------- */
+.lightbox {
+    position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, .82); backdrop-filter: blur(4px);
+}
+.lightbox__img { max-width: 92vw; max-height: 88vh; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); }
+.lightbox__close, .lightbox__nav {
+    position: absolute; border: 0; background: rgba(255, 255, 255, .14); color: #fff;
+    font-size: 26px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+}
+.lightbox__close { top: 18px; right: 18px; }
+.lightbox__prev { left: 18px; top: 50%; transform: translateY(-50%); }
+.lightbox__next { right: 18px; top: 50%; transform: translateY(-50%); }
+.lightbox__origin { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 12.5px; opacity: .8; }
+
+/* ---------- Blazor 错误条 ---------- */
+#blazor-error-ui {
+    display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+    background: #fee; color: #900; padding: 10px 16px; font-size: 13px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, .15);
+}
+#blazor-error-ui .reload, #blazor-error-ui .dismiss { margin-left: 10px; cursor: pointer; border: 1px solid currentColor; background: none; border-radius: 6px; padding: 2px 10px; color: inherit; }

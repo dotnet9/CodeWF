@@ -4,8 +4,7 @@
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
     <File Path="README-zh_CN.md" />
-    <File Path="package.json" />
   </Folder>
-  <Project Path="src\CodeWF.Api\CodeWF.Api.csproj" />
-  <Project Path="tests\CodeWF.Api.Tests\CodeWF.Api.Tests.csproj" />
+  <Project Path="src\CodeWF.Web\CodeWF.Web.csproj" />
+  <Project Path="tests\CodeWF.Web.Tests\CodeWF.Web.Tests.csproj" />
 </Solution>

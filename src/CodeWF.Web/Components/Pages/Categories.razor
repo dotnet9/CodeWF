@@ -1,0 +1,27 @@
+@page "/cat"
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>分类 - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>分类</h1>
+    <div class="card-grid">
+        @foreach (var category in CategoryItems)
+        {
+            <a class="taxonomy-card" href="@($"/cat/{Uri.EscapeDataString(category.Slug ?? category.Name)}")">
+                <h2>@category.Name</h2>
+                <p>@category.Memo</p>
+                <span class="chip">@category.PostCount 篇</span>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<TaxonomyItem> CategoryItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { CategoryItems = await Repository.GetCategoriesAsync("zh-CN"); } catch { }
+    }
+}

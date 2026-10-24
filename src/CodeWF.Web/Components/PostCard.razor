@@ -1,0 +1,20 @@
+<a class="post-card" href="@Post.Url">
+    @if (!string.IsNullOrEmpty(Cover))
+    {
+        <img class="post-card__cover" src="@Cover" alt="@Post.Title" loading="lazy" />
+    }
+    <div class="post-card__body">
+        <h3 class="post-card__title">@Post.Title</h3>
+        @if (!string.IsNullOrWhiteSpace(Post.Description))
+        {
+            <p class="post-card__desc">@Post.Description</p>
+        }
+        <div class="post-card__meta">
+            <span class="post-card__date">@DateText</span>
+            @foreach (var category in (Post.Categories ?? []).Take(3))
+            {
+                <span class="chip">@category</span>
+            }
+        </div>
+    </div>
+</a>

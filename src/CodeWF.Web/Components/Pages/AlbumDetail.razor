@@ -1,0 +1,42 @@
+@page "/album/{slug}"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>专题：@AlbumName - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>@AlbumName</h1>
+    <div class="post-grid">
+        @foreach (var post in Posts)
+        {
+            <PostCard Post="post" />
+        }
+    </div>
+    @if (Posts.Count == 0)
+    {
+        <p class="muted">该专题暂无文章。</p>
+    }
+    @if (Result is not null)
+    {
+        <Pagination T="BlogPostBrief" Result="Result" />
+    }
+</section>
+
+@code {
+    private PagedResult<BlogPostBrief>? Result;
+    private IReadOnlyList<BlogPostBrief> Posts = [];
+
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private string AlbumName => Uri.UnescapeDataString(Slug);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Result = await Repository.GetPagedPostsAsync("zh-CN", 1, 100, null, null, AlbumName, null);
+            Posts = Result.Data;
+        }
+        catch { }
+    }
+}

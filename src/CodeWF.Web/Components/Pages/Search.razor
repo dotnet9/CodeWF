@@ -1,0 +1,68 @@
+@page "/s"
+@using CodeWF.Web.Models
+@using Microsoft.AspNetCore.Components.Web
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>搜索 - CodeWF</PageTitle>
+<HeadContent><meta name="robots" content="noindex" /></HeadContent>
+
+<section class="page-shell">
+    <h1>搜索</h1>
+    <form class="list-filter" method="get">
+        <input type="search" name="q" value="@Query" placeholder="输入关键字…" />
+        <button type="submit">搜索</button>
+    </form>
+
+    @if (IsBlocked)
+    {
+        <p class="muted">@Notice</p>
+    }
+    else if (Result is not null)
+    {
+        <p class="muted">共 @Result.Total 条结果</p>
+        <div class="search-results">
+            @foreach (var item in Result.Data)
+            {
+                <a class="search-result" href="@item.Url">
+                    <h2>@item.Title</h2>
+                    <p>@item.Summary</p>
+                    @if (!string.IsNullOrWhiteSpace(item.MatchedSnippet))
+                    {
+                        <p class="muted">@item.Context</p>
+                    }
+                </a>
+            }
+        </div>
+        @if (Result.Total == 0)
+        {
+            <p class="muted">没有匹配的结果。</p>
+        }
+        <Pagination T="SearchResultItem" Result="Result" BasePath="/s" />
+    }
+</section>
+
+@code {
+    private PagedResult<SearchResultItem>? Result;
+    private bool IsBlocked;
+    private string? Notice;
+
+    [SupplyParameterFromQuery] public string? Q { get; set; }
+    [SupplyParameterFromQuery] public int? PageIndex { get; set; }
+
+    private string Query => Q ?? string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var data = await Repository.SearchAsync("zh-CN", Q, PageIndex ?? 1, 10);
+            Result = new PagedResult<SearchResultItem>(data.PageIndex, data.PageSize, data.Total, data.Data);
+            IsBlocked = data.IsBlocked;
+            Notice = data.Notice;
+        }
+        catch
+        {
+            Result = new PagedResult<SearchResultItem>(PageIndex ?? 1, 10, 0, []);
+        }
+    }
+}

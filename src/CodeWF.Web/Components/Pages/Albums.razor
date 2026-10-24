@@ -1,0 +1,27 @@
+@page "/album"
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>专题 - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>专题</h1>
+    <div class="card-grid">
+        @foreach (var album in AlbumItems)
+        {
+            <a class="taxonomy-card" href="@($"/album/{Uri.EscapeDataString(album.Slug ?? album.Name)}")">
+                <h2>@album.Name</h2>
+                <p>@album.Memo</p>
+                <span class="chip">@album.PostCount 篇</span>
+            </a>
+        }
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<TaxonomyItem> AlbumItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { AlbumItems = await Repository.GetAlbumsAsync("zh-CN"); } catch { }
+    }
+}

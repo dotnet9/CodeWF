@@ -1,0 +1,82 @@
+@inherits MainLayoutComponent
+
+<div class="app-shell">
+    <header class="site-header prototype-header">
+        <a class="brand prototype-brand" href="/" aria-label="CodeWF">
+            <img class="brand-icon" src="logo.svg" alt="" />
+            <span>Code<em>WF</em></span>
+        </a>
+
+        <nav class="main-nav prototype-nav" aria-label="主导航">
+            <NavLink href="/" Match="NavLinkMatch.All" aria-label="首页">首页</NavLink>
+            <NavLink href="/post" aria-label="文章">文章</NavLink>
+            <NavLink href="/album" aria-label="专题">专题</NavLink>
+            <a href="@DocSiteUrl" target="_blank" rel="noopener noreferrer">文档</a>
+            <a href="@ToolsSiteUrl" target="_blank" rel="noopener noreferrer">工具</a>
+            <NavLink href="/timeline" aria-label="时间线">时间线</NavLink>
+            <NavLink href="/friends" aria-label="友链">友链</NavLink>
+            <NavLink href="/about" aria-label="关于">关于</NavLink>
+        </nav>
+
+        <div class="header-actions prototype-header__actions">
+            <GlobalSearch Action="/s" />
+        </div>
+    </header>
+
+    <main class="site-main">
+        @Body
+    </main>
+
+    <section class="friend-links-shell" aria-label="Friend links">
+        <div class="friend-links">
+            <div class="friend-links__label">友情链接</div>
+            <div class="friend-links__grid">
+                @if (FriendLinks.Count > 0)
+                {
+                    foreach (var link in FriendLinks.OrderBy(l => l.Index))
+                    {
+                        <a href="@link.Link" target="_blank" rel="noreferrer" title="@(link.Description ?? link.Title)">@link.Title</a>
+                    }
+                }
+                else
+                {
+                    <span class="muted">友情链接暂未配置</span>
+                }
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <strong>@(Site?.AppTitle ?? "CodeWF")</strong>
+                <span>@(Site?.Memo ?? ".NET articles and projects")</span>
+                <span>&copy; @(Site?.StartYear ?? 2019)-@CurrentYear @(Site?.Owner ?? "dotnet9")</span>
+            </div>
+
+            <nav aria-label="Footer navigation">
+                <h2>导航</h2>
+                <a href="/post">文章</a>
+                <a href="@DocSiteUrl" target="_blank" rel="noreferrer">开源项目</a>
+                <a href="@ToolsSiteUrl" target="_blank" rel="noreferrer">在线工具</a>
+                <a href="/tag">标签</a>
+                <a href="/timeline">时间线</a>
+            </nav>
+
+            <nav aria-label="Community">
+                <h2>社区</h2>
+                <a href="https://www.cnblogs.com/Dotnet9-com" target="_blank" rel="noreferrer">博客园</a>
+                <a href="https://space.bilibili.com/470546606" target="_blank" rel="noreferrer">B 站</a>
+                <a href="https://github.com/dotnet9" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="/rss.xml" target="_blank" rel="noreferrer">RSS</a>
+            </nav>
+
+            <nav aria-label="About">
+                <h2>关于</h2>
+                <a href="/about">关于本站</a>
+                <a href="/donation">赞赏</a>
+                <a href="/privacy">隐私政策</a>
+            </nav>
+        </div>
+    </footer>
+</div>

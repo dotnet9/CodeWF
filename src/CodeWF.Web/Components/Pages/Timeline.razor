@@ -1,0 +1,34 @@
+@page "/timeline"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>时间线 - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>时间线</h1>
+    <div class="timeline">
+        @foreach (var item in Items)
+        {
+            <div class="timeline-item">
+                <span class="timeline-time">@item.Time</span>
+                <div>
+                    <b>@item.Title</b>
+                    <p>@item.Content</p>
+                </div>
+            </div>
+        }
+    </div>
+    @if (Items.Count == 0)
+    {
+        <p class="muted">暂无时间线数据。</p>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<TimelineItem> Items = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { Items = await Repository.GetTimelinesAsync("zh-CN"); } catch { }
+    }
+}

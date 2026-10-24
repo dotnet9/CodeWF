@@ -5,7 +5,7 @@ CodeWF 是一个前后端分离的 Markdown 博客站点。
 ## 项目结构
 
 - `src/CodeWF.Api`：ASP.NET Core Web API，负责读取文件型内容仓库、渲染 Markdown，提供公开内容接口、RSS 与站点地图。
-- `src/CodeWF.Web`：Next.js 前台站点，提供文章、专题、搜索、时间线与多语言内容。
+- `src/CodeWF.Web`：Blazor 前台站点，提供文章、专题、搜索、时间线与多语言内容。
 - `docs`：架构与迁移文档。
 - `tests/CodeWF.Api.Tests`：后端内容解析与渲染相关测试。
 

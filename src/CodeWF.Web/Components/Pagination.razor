@@ -1,0 +1,25 @@
+@typeparam T
+@if (Result.Total > Result.PageSize)
+{
+    <nav class="pagination" aria-label="分页">
+        @if (Result.PageIndex > 1)
+        {
+            <a class="pagination__item" href="@PageUrl(Result.PageIndex - 1)">‹</a>
+        }
+        @foreach (var page in Pages.Distinct().OrderBy(p => p))
+        {
+            if (page == Result.PageIndex)
+            {
+                <span class="pagination__item is-current">@(page)</span>
+            }
+            else
+            {
+                <a class="pagination__item" href="@PageUrl(page)">@(page)</a>
+            }
+        }
+        @if (Result.PageIndex < TotalPages)
+        {
+            <a class="pagination__item" href="@PageUrl(Result.PageIndex + 1)">›</a>
+        }
+    </nav>
+}

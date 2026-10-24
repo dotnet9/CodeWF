@@ -1,0 +1,80 @@
+@using CodeWF.Web.Services
+@inject ContentRepository Repository
+@rendermode InteractiveServer
+
+<div class="global-search">
+    <input type="search" name="q" value="@Query" placeholder="全局搜索" aria-label="搜索"
+           autocomplete="off" @oninput="OnInput" @bind:after="OnCommitted" />
+    @if (Suggestions.Count > 0)
+    {
+        <ul class="global-search__suggestions" role="listbox">
+            @foreach (var suggestion in Suggestions)
+            {
+                <li>
+                    <a href="@suggestion.Url" @onclick="CloseSuggestions">@suggestion.Title</a>
+                </li>
+            }
+        </ul>
+    }
+    else if (!string.IsNullOrWhiteSpace(Query) && Searched)
+    {
+        <ul class="global-search__suggestions"><li class="muted">无建议</li></ul>
+    }
+</div>
+
+@code {
+    private const string SearchAction = "/s";
+
+    private string Query { get; set; } = string.Empty;
+    private IReadOnlyList<SearchResultItem> Suggestions = [];
+    private bool Searched;
+    private PeriodicTimer? debounce;
+    private Task? debounceLoop;
+
+    [Parameter] public string Action { get; set; } = SearchAction;
+
+    private void OnInput(ChangeEventArgs args)
+    {
+        Query = args.Value?.ToString() ?? string.Empty;
+        RestartDebounce();
+    }
+
+    private void OnCommitted()
+    {
+        if (!string.IsNullOrWhiteSpace(Query))
+        {
+            Navigation.NavigateTo($"{Action}?q={Uri.EscapeDataString(Query)}");
+        }
+    }
+
+    [Inject] public NavigationManager Navigation { get; set; } = default!;
+
+    /// <summary>220ms 防抖后拉取搜索建议（与原 GlobalSearch 组件口径一致）。</summary>
+    private void RestartDebounce()
+    {
+        debounce?.Dispose();
+        debounce = new PeriodicTimer(TimeSpan.FromMilliseconds(220));
+        debounceLoop?.Dispose();
+        debounceLoop = Task.Run(async () =>
+        {
+            try
+            {
+                await debounce!.WaitForNextTickAsync();
+                var query = Query;
+                var items = await Repository.GetSearchSuggestionsAsync("zh-CN", query, 8);
+                await InvokeAsync(() =>
+                {
+                    if (Query == query)
+                    {
+                        Suggestions = items;
+                        Searched = true;
+                        StateHasChanged();
+                    }
+                });
+            }
+            catch { /* 防抖循环终止 */ }
+        });
+    }
+
+    private void CloseSuggestions() => Suggestions = [];
+}

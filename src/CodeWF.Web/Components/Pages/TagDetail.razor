@@ -1,0 +1,42 @@
+@page "/tag/{name}"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>标签：@TagName - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>@TagName</h1>
+    <div class="post-grid">
+        @foreach (var post in Posts)
+        {
+            <PostCard Post="post" />
+        }
+    </div>
+    @if (Posts.Count == 0)
+    {
+        <p class="muted">该标签暂无文章。</p>
+    }
+    @if (Result is not null)
+    {
+        <Pagination T="BlogPostBrief" Result="Result" />
+    }
+</section>
+
+@code {
+    private PagedResult<BlogPostBrief>? Result;
+    private IReadOnlyList<BlogPostBrief> Posts = [];
+
+    [Parameter] public string Name { get; set; } = string.Empty;
+
+    private string TagName => Uri.UnescapeDataString(Name);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Result = await Repository.GetPagedPostsAsync("zh-CN", 1, 100, null, null, null, TagName);
+            Posts = Result.Data;
+        }
+        catch { }
+    }
+}

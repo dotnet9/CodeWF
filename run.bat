@@ -1,154 +1,19 @@
 @echo off
 setlocal
-
-rem Bootstrap .NET/Node into PATH for this script (and its child windows).
-rem Required when dotnet/npm are installed but the invoking shell overrides PATH.
-if exist "C:\Program Files\dotnet\dotnet.exe" set "PATH=C:\Program Files\dotnet;%PATH%"
-if exist "D:\Program Files\nodejs\npm.cmd" set "PATH=D:\Program Files\nodejs;%PATH%"
-
 set "ROOT=%~dp0"
-set "PUBLISH_DIR=%ROOT%publish"
-set "WEB_PROJECT=%ROOT%src\CodeWF.Web"
-set "WEB_OUT=%PUBLISH_DIR%\web"
-set "API_OUT=%PUBLISH_DIR%\api"
+set "OUT=%ROOT%publish\web"
 
 if not defined WEB_PORT set "WEB_PORT=5000"
-if not defined API_PORT set "API_PORT=5002"
-if not defined API_URL set "API_URL=http://localhost:%API_PORT%"
-if not defined API_BASE_URL set "API_BASE_URL=%API_URL%/api"
 
-if /i "%~1"=="--api" goto :run_api
-if /i "%~1"=="--web" goto :run_web
-if /i "%~1"=="--help" goto :help
-if /i "%~1"=="/?" goto :help
-
-echo.
-echo [CodeWF] One-click run
-echo   Web service: http://localhost:%WEB_PORT%
-echo   API service: %API_URL%
-echo   Nginx paths: /, /api/
-echo.
-
-where npm >nul 2>nul || (
-  echo [CodeWF] npm was not found. Install Node.js 22+ first.
-  exit /b 1
+if not exist "%OUT%\CodeWF.Web.dll" (
+  echo [CodeWF] Publish output is missing. Running publish.bat...
+  call "%ROOT%publish.bat" || exit /b 1
 )
 
-where dotnet >nul 2>nul || (
-  echo [CodeWF] dotnet was not found. Install .NET 10 SDK or Runtime first.
-  exit /b 1
-)
-
-call :ensure_node_modules || goto :error
-call :sync_logo || goto :error
-
-if not exist "%WEB_OUT%\package.json" set "NEED_PUBLISH=1"
-if not exist "%API_OUT%\" set "NEED_PUBLISH=1"
-
-if defined NEED_PUBLISH (
-  echo [CodeWF] Published output is missing. Running publish.bat...
-  call "%ROOT%publish.bat" || goto :error
-) else (
-  echo [CodeWF] Existing publish output found. Skipping publish.
-  call :sync_published_logo || goto :error
-)
-
-if not exist "%WEB_OUT%\node_modules\next\" (
-  echo [CodeWF] Installing production dependencies for published frontend...
-  pushd "%WEB_OUT%" || goto :error
-  call npm install --omit=dev --package-lock=false || (popd & goto :error)
-  popd
-)
-
-echo.
-echo [CodeWF] Starting services in separate windows...
-start "CodeWF API" cmd /k ""%~f0" --api"
-start "CodeWF Web" cmd /k ""%~f0" --web"
-
-echo.
-echo [CodeWF] Started.
-echo   Web service: http://localhost:%WEB_PORT%
-echo   API service: %API_URL%
-echo   Nginx paths: /, /api/
-echo.
-exit /b 0
-
-:run_api
-echo [CodeWF] Starting API on %API_URL%...
-pushd "%API_OUT%" || exit /b 1
-set "ASPNETCORE_URLS=%API_URL%"
+echo [CodeWF] Starting http://localhost:%WEB_PORT% ...
+pushd "%OUT%"
+set "ASPNETCORE_URLS=http://localhost:%WEB_PORT%"
 set "ASPNETCORE_ENVIRONMENT=Production"
-if exist "CodeWF.Api.exe" (
-  CodeWF.Api.exe
-) else (
-  dotnet CodeWF.Api.dll
-)
-set "EXIT_CODE=%ERRORLEVEL%"
+dotnet CodeWF.Web.dll
 popd
-exit /b %EXIT_CODE%
-
-:run_web
-echo [CodeWF] Starting Web on http://localhost:%WEB_PORT%...
-pushd "%WEB_OUT%" || exit /b 1
-set "API_BASE_URL=%API_BASE_URL%"
-call npm run start -- --port %WEB_PORT%
-set "EXIT_CODE=%ERRORLEVEL%"
-popd
-exit /b %EXIT_CODE%
-
-:ensure_node_modules
-where npm >nul 2>nul || (
-  echo [CodeWF] npm was not found. Install Node.js 22+ first.
-  exit /b 1
-)
-if not exist "%ROOT%node_modules\" (
-  echo [CodeWF] Installing workspace dependencies...
-  pushd "%ROOT%" || exit /b 1
-  call npm install || (popd & exit /b 1)
-  popd
-)
 exit /b 0
-
-:sync_logo
-echo [CodeWF] Syncing root logo files to frontend public folders...
-if not exist "%WEB_PROJECT%\public" mkdir "%WEB_PROJECT%\public" || exit /b 1
-for %%f in (logo.svg logo.png logo.ico) do (
-  if not exist "%ROOT%%%f" (
-    echo [CodeWF] Missing root logo file: %ROOT%%%f
-    exit /b 1
-  )
-  copy /Y "%ROOT%%%f" "%WEB_PROJECT%\public\%%f" >nul || exit /b 1
-)
-copy /Y "%ROOT%logo.ico" "%WEB_PROJECT%\public\favicon.ico" >nul || exit /b 1
-exit /b 0
-
-:sync_published_logo
-echo [CodeWF] Syncing root logo files to published output...
-if exist "%WEB_OUT%\" (
-  if not exist "%WEB_OUT%\public" mkdir "%WEB_OUT%\public" || exit /b 1
-  for %%f in (logo.svg logo.png logo.ico) do (
-    copy /Y "%ROOT%%%f" "%WEB_OUT%\public\%%f" >nul || exit /b 1
-  )
-  copy /Y "%ROOT%logo.ico" "%WEB_OUT%\public\favicon.ico" >nul || exit /b 1
-)
-exit /b 0
-
-:help
-echo Usage:
-echo   run.bat
-echo.
-echo If publish output exists, run.bat starts it directly.
-echo If publish output is missing, run.bat runs publish.bat first.
-echo Delete the publish folder before run.bat when you want a fresh publish.
-echo.
-echo Environment overrides:
-echo   WEB_PORT=5000
-echo   API_PORT=5002
-echo   API_URL=http://localhost:5002
-echo   API_BASE_URL=http://localhost:5002/api
-exit /b 0
-
-:error
-echo.
-echo [CodeWF] Run failed.
-exit /b 1

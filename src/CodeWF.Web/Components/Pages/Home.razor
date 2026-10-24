@@ -1,0 +1,93 @@
+@page "/"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+@inject NavigationManager Navigation
+
+<PageTitle>@(HomeData?.Site.AppTitle ?? "CodeWF")</PageTitle>
+<HeadContent>
+    <meta name="description" content="@(HomeData?.Site.Memo ?? string.Empty)" />
+</HeadContent>
+
+@if (HomeData is null)
+{
+    <section class="page-shell"><p class="muted">加载中…</p></section>
+}
+else
+{
+    var latest = HomeData.RecentPosts.Take(3).ToList();
+    var hot = HomeData.RecentPosts.Skip(3).Take(6).ToList();
+    var featured = HomeData.BannerPosts.Take(4).ToList();
+
+    <section class="home-hero">
+        <h1>@HomeData.Site.AppTitle</h1>
+        <p>@HomeData.Site.Memo</p>
+        <div class="hero-metrics">
+            <span><b>@HomeData.Counts.GetValueOrDefault("posts")</b> 篇文章</span>
+            <span><b>@HomeData.Counts.GetValueOrDefault("albums")</b> 个专题</span>
+            <span><b>@DateTime.Now.Year - Home.Site.StartYear</b> 年坚持</span>
+        </div>
+    </section>
+
+    <section class="home-section">
+        <h2>最新文章</h2>
+        <div class="post-grid">
+            @foreach (var post in latest)
+            {
+                <PostCard Post="post" />
+            }
+        </div>
+    </section>
+
+    @if (featured.Count > 0)
+    {
+        <section class="home-section">
+            <h2>精选专题</h2>
+            <div class="post-grid">
+                @foreach (var post in featured)
+                {
+                    <PostCard Post="post" />
+                }
+            </div>
+        </section>
+    }
+
+    @if (hot.Count > 0)
+    {
+        <section class="home-section">
+            <h2>近期更新</h2>
+            <div class="post-grid">
+                @foreach (var post in hot)
+                {
+                    <PostCard Post="post" />
+                }
+            </div>
+        </section>
+    }
+
+    <section class="home-section">
+        <h2>分类索引</h2>
+        <div class="chip-row">
+            @foreach (var category in HomeData.Categories)
+            {
+                <a class="chip" href="@($"/cat/{Uri.EscapeDataString(category.Slug ?? category.Name)}")">@category.Name（@category.PostCount）</a>
+            }
+        </div>
+        <p class="muted"><a href="/post">浏览全部文章 →</a></p>
+    </section>
+}
+
+@code {
+    private HomePageData? HomeData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            HomeData = await Repository.GetHomeAsync("zh-CN", 12);
+        }
+        catch
+        {
+            HomeData = null;
+        }
+    }
+}

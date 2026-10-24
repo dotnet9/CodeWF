@@ -1,0 +1,31 @@
+@page "/friends"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>友链 - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>友情链接</h1>
+    <div class="card-grid">
+        @foreach (var link in Links.OrderBy(l => l.Index))
+        {
+            <a class="taxonomy-card" href="@link.Link" target="_blank" rel="noreferrer">
+                <h2>@link.Title</h2>
+                <p>@link.Description</p>
+            </a>
+        }
+    </div>
+    @if (Links.Count == 0)
+    {
+        <p class="muted">友情链接暂未配置。</p>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<FriendLinkItem> Links = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { Links = await Repository.GetFriendLinksAsync("zh-CN"); } catch { }
+    }
+}

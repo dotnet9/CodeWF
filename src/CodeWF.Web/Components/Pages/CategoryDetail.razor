@@ -1,0 +1,42 @@
+@page "/cat/{slug}"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>分类：@CategoryName - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>@CategoryName</h1>
+    <div class="post-grid">
+        @foreach (var post in Posts)
+        {
+            <PostCard Post="post" />
+        }
+    </div>
+    @if (Posts.Count == 0)
+    {
+        <p class="muted">该分类暂无文章。</p>
+    }
+    @if (Result is not null)
+    {
+        <Pagination T="BlogPostBrief" Result="Result" />
+    }
+</section>
+
+@code {
+    private PagedResult<BlogPostBrief>? Result;
+    private IReadOnlyList<BlogPostBrief> Posts = [];
+
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private string CategoryName => Uri.UnescapeDataString(Slug);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Result = await Repository.GetPagedPostsAsync("zh-CN", 1, 100, null, CategoryName, null, null);
+            Posts = Result.Data;
+        }
+        catch { }
+    }
+}

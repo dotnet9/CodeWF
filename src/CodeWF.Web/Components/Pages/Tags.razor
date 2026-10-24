@@ -1,0 +1,23 @@
+@page "/tag"
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>标签 - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <h1>标签</h1>
+    <div class="chip-row">
+        @foreach (var tag in TagItems)
+        {
+            <a class="chip" href="@($"/tag/{Uri.EscapeDataString(tag.Name)}")">@tag.Name（@tag.PostCount）</a>
+        }
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<TagItem> TagItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { TagItems = await Repository.GetTagsAsync("zh-CN"); } catch { }
+    }
+}

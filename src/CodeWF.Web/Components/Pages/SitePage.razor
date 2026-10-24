@@ -1,0 +1,32 @@
+@page "/{pageName:regex(^(about|donation|privacy)$)}"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>@PageTitleText - CodeWF</PageTitle>
+
+<section class="page-shell">
+    <div class="rich-content">
+        @((MarkupString)(Page?.HtmlContent ?? string.Empty))
+    </div>
+    @if (Page is null)
+    {
+        <p class="muted">加载中…</p>
+    }
+</section>
+
+@code {
+    private MarkdownPage? Page;
+    private string PageTitleText => PageName switch
+    {
+        "donation" => "赞赏",
+        "privacy" => "隐私政策",
+        _ => "关于本站",
+    };
+
+    [Parameter] public string PageName { get; set; } = "about";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { Page = await Repository.ReadSitePageAsync("zh-CN", PageName); } catch { }
+    }
+}

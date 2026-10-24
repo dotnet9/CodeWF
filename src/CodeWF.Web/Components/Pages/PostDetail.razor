@@ -1,0 +1,123 @@
+@page "/{year:int}/{month:int}/{slug}"
+@using System.Text.Json
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>@(Post?.Title ?? "文章") - CodeWF</PageTitle>
+<HeadContent>
+    <meta name="description" content="@(Post?.Description ?? string.Empty)" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="@(Post?.Title ?? string.Empty)" />
+    <meta property="og:description" content="@(Post?.Description ?? string.Empty)" />
+    @if (!string.IsNullOrWhiteSpace(Post?.Cover))
+    {
+        <meta property="og:image" content="@Post!.Cover" />
+    }
+    <link rel="canonical" href="@Canonical" />
+    @if (Post is not null)
+    {
+        <script type="application/ld+json">
+        @JsonSerializer.Serialize(new
+        {
+            Type = "BlogPosting",
+            Headline = Post.Title,
+            Description = Post.Description,
+            DatePublished = Post.Date?.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+            DateModified = Post.Lastmod?.ToString("yyyy-MM-ddTHH:mm:sszzz"),
+            Author = new { Type = "Person", Name = string.IsNullOrWhiteSpace(Post.Author) ? "Dotnet9" : Post.Author },
+            MainEntityOfPage = Canonical
+        }, JsonOptions)
+        </script>
+    }
+</HeadContent>
+
+@if (Post is null)
+{
+    <section class="page-shell"><p class="muted">加载中…</p></section>
+}
+else
+{
+    <article class="post-page">
+        <div class="reading-progress" id="reading-progress"></div>
+        <header class="post-header">
+            <h1>@Post.Title</h1>
+            <p class="post-meta">
+                <span>@(Post.Date?.ToString("yyyy-MM-dd HH:mm"))</span>
+                <span>@(string.IsNullOrWhiteSpace(Post.Author) ? "Dotnet9" : Post.Author)</span>
+                <span>约 @Post.EstimatedReadingMinutes 分钟</span>
+                @foreach (var category in Post.Categories ?? [])
+                {
+                    <span class="chip">@category</span>
+                }
+            </p>
+        </header>
+
+        <div class="post-layout">
+            <div class="rich-content" id="rich-content">
+                @((MarkupString)Post.HtmlContent)
+            </div>
+
+            <aside class="post-aside">
+                <nav class="content-toc" aria-label="目录">
+                    <h2>目录</h2>
+                    <div id="toc-body"></div>
+                </nav>
+                <div class="article-actions">
+                    <button type="button" onclick="window.site.copyLink()">复制链接</button>
+                </div>
+            </aside>
+        </div>
+
+        <nav class="post-pager">
+            @if (Post.PreviousPost is { } previous)
+            {
+                <a href="@previous.Url">← @previous.Title</a>
+            }
+            @if (Post.NextPost is { } next)
+            {
+                <a href="@next.Url">@next.Title →</a>
+            }
+        </nav>
+
+        <section class="giscus-shell">
+            <div id="giscus"></div>
+        </section>
+    </article>
+}
+
+@code {
+    private BlogPost? Post;
+    private string Canonical => Navigation.Uri;
+
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
+    [Parameter] public int Year { get; set; }
+    [Parameter] public int Month { get; set; }
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Post = await Repository.GetPostAsync("zh-CN", Slug, Year, Month);
+        }
+        catch
+        {
+            Post = null;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && Post is not null)
+        {
+            Navigation.LocationChanged += OnLocationChanged;
+        }
+    }
+
+    private void OnLocationChanged(object? sender, EventArgs args) => Dispose();
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

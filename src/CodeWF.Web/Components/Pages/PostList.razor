@@ -1,0 +1,54 @@
+@page "/post"
+@using CodeWF.Web.Models
+@inject CodeWF.Web.Services.ContentRepository Repository
+
+<PageTitle>文章 - CodeWF</PageTitle>
+<HeadContent><meta name="description" content="全部文章列表，支持按分类、标签、关键字过滤。" /></HeadContent>
+
+<section class="page-shell">
+    <h1>文章</h1>
+    <form class="list-filter" method="get">
+        <input type="search" name="keyword" value="@Keyword" placeholder="标题 / 描述过滤…" />
+        <button type="submit">过滤</button>
+    </form>
+
+    <div class="post-grid">
+        @foreach (var post in Result?.Data ?? [])
+        {
+            <PostCard Post="post" />
+        }
+    </div>
+
+    @if (Result is not null && Result.Total == 0)
+    {
+        <p class="muted">没有匹配的文章。</p>
+    }
+
+    @if (Result is not null)
+    {
+        <Pagination T="BlogPostBrief" Result="Result" />
+    }
+</section>
+
+@code {
+    private PagedResult<BlogPostBrief>? Result;
+    private IReadOnlyList<TaxonomyItem> Categories = [];
+    private IReadOnlyList<TagItem> Tags = [];
+
+    [SupplyParameterFromQuery] public int? PageIndex { get; set; }
+    [SupplyParameterFromQuery] public string? Keyword { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Result = await Repository.GetPagedPostsAsync("zh-CN", PageIndex ?? 1, 12, Keyword, null, null, null);
+            Categories = await Repository.GetCategoriesAsync("zh-CN");
+            Tags = await Repository.GetTagsAsync("zh-CN");
+        }
+        catch
+        {
+            Result = new PagedResult<BlogPostBrief>(PageIndex ?? 1, 12, 0, []);
+        }
+    }
+}
