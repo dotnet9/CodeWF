@@ -22,6 +22,9 @@ public sealed partial class BlogPostFileService
         .UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
         .UseAutoLinks()
         .UseBootstrap()
+        // 不用 UseYamlFrontMatter：其解析器在首行 --- 无闭合行时会把整篇吞进
+        // front matter 块渲染成空，比漏切更狠；front matter 裁决统一走
+        // TrySplitInlineFrontMatter（失败模式全部是"按正文渲染"，从不吃内容）
         .Build();
 
     /// <summary>
@@ -91,7 +94,7 @@ public sealed partial class BlogPostFileService
 
     public string RenderMarkdown(string markdown, string? sourcePath = null, string? assetsRoot = null, string? assetBaseUrl = null)
     {
-        var html = Markdown.ToHtml(markdown, MarkdownPipeline);
+        var html = Markdown.ToHtml(StripInlineFrontMatter(markdown), MarkdownPipeline);
         return sourcePath is null || assetsRoot is null || assetBaseUrl is null
             ? html
             : MakeContentUrlsAbsolute(html, sourcePath, assetsRoot, assetBaseUrl);
@@ -106,28 +109,47 @@ public sealed partial class BlogPostFileService
         body = markdown;
 
         var normalized = NormalizeLineEndings(markdown);
-        if (!normalized.StartsWith("---\n", StringComparison.Ordinal))
+        var lines = normalized.Split('\n');
+
+        // 开分隔行容忍尾随空白；不严格匹配时整篇按正文处理（正文可能以分隔线开头）。
+        if (lines[0].Trim() != "---")
         {
             return false;
         }
 
-        var endMarker = normalized.IndexOf("\n---\n", 4, StringComparison.Ordinal);
-        var markerLength = "\n---\n".Length;
-        if (endMarker < 0 && normalized.EndsWith("\n---", StringComparison.Ordinal))
+        var close = -1;
+        for (var i = 1; i < lines.Length; i++)
         {
-            endMarker = normalized.Length - "\n---".Length;
-            markerLength = "\n---".Length;
+            if (lines[i].Trim() == "---")
+            {
+                close = i;
+                break;
+            }
         }
 
-        if (endMarker < 0)
+        if (close < 0)
         {
             return false;
         }
 
-        frontMatter = normalized[4..endMarker].Trim();
-        body = normalized[(endMarker + markerLength)..].TrimStart('\n');
+        var candidate = lines[1..close];
+        // 候选块里必须至少有一行 "key:"，否则视为正文里夹着的两根分隔线：
+        // 首行 --- 不代表它就是元数据开头，直认会把中间的正文整块吞进元数据再丢弃。
+        if (!candidate.Any(IsYamlKeyLine))
+        {
+            return false;
+        }
+
+        frontMatter = string.Join('\n', candidate).Trim();
+        body = string.Join('\n', lines[(close + 1)..]).TrimStart('\n');
         return true;
     }
+
+    private static bool IsYamlKeyLine(string line) =>
+        YamlKeyLineRegex().IsMatch(line.TrimStart());
+
+    [GeneratedRegex("^[A-Za-z][\\w-]*\\s*:")]
+    private static partial Regex YamlKeyLineRegex();
 
     private static string NormalizeLineEndings(string value) =>
         value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');

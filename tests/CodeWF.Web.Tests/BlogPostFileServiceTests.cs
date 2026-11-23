@@ -246,6 +246,77 @@ cover: https://img1.dotnet9.com/2026/01/cover.png
         Assert.True(home.BannerPosts.Count > 0, $"bannerPosts={home.BannerPosts.Count}, bannerTrueInBriefs={briefs.Count(b => b.Banner)}, total={briefs.Count}");
     }
 
+    [Fact]
+    public void Read_ClosingDelimiterWithTrailingWhitespace_StillSplitsFrontMatter()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "03");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "sloppy-close.md");
+        // 闭合分隔行带尾随空格：旧实现字节精确匹配 "\n---\n" 会整体漏切，
+        // YAML 渲染成 hr + setext 标题并泄进搜索索引
+        File.WriteAllText(markdown, "---\ntitle: \"Sloppy Close\"\nslug: sloppy-close\ndate: 2026-03-01 10:00:00\n--- \n\n正文\n");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        Assert.Equal("Sloppy Close", post.Title);
+        Assert.Contains("正文", post.Content);
+        Assert.DoesNotContain("title:", post.Content);
+    }
+
+    [Fact]
+    public void Read_OpeningDelimiterWithTrailingWhitespace_StillSplitsFrontMatter()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "03");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "sloppy-open.md");
+        File.WriteAllText(markdown, "--- \ntitle: \"Sloppy Open\"\nslug: sloppy-open\ndate: 2026-03-02 10:00:00\n---\n\n正文\n");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        Assert.Equal("Sloppy Open", post.Title);
+        Assert.Contains("正文", post.Content);
+    }
+
+    [Fact]
+    public void Read_DocStartingWithRule_IsNotSwallowedAsFrontMatter()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "03");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "rule-opener.md");
+        // 首行 --- 但并非 front matter（无 key: 行）：旧实现会把两根分隔线
+        // 之间的正文整块吞进元数据再静默丢弃
+        File.WriteAllText(markdown, "---\n这一段是正文散文。\n---\n\n## 真小节\n\n后续内容。\n");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        Assert.Contains("这一段是正文散文。", post.Content);
+        Assert.Contains("后续内容。", post.Content);
+        Assert.Contains("这一段是正文散文。", post.HtmlContent);
+    }
+
+    [Fact]
+    public void Read_UnclosedOpeningRule_KeepsWholeFileAsContent()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "03");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "unclosed.md");
+        File.WriteAllText(markdown, "---\ntitle: 未闭合\n\n正文段落。\n");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        // 无闭合行不认 front matter，整篇保留为正文（slug 走文件名兜底）
+        Assert.Contains("正文段落。", post.Content);
+        Assert.Equal("unclosed", post.Slug);
+    }
+
     private sealed class TestOptionsMonitor<T> : IOptionsMonitor<T>
     {
         private readonly T value;
