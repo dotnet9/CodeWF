@@ -1,9 +1,7 @@
 @page "/{year:int}/{month:int}/{slug}"
 @using System.Text.Json
-@using Microsoft.AspNetCore.Http
 @using CodeWF.Web.Models
 @inject CodeWF.Web.Services.ContentRepository Repository
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpAccessor
 @inject NavigationManager Navigation
 @implements IDisposable
 
@@ -119,11 +117,11 @@ else
             Post = null;
         }
 
-        // 草稿或 slug 不存在：渲染 404 内容并返回 404 状态码（此前停在“加载中…”误导抓取与读者）。
+        // 草稿或 slug 不存在：重定向到独立 404 页（此前停在“加载中…”误导读者与抓取；
+        // 组件内直接设状态码会被框架吞掉渲染正文只回 JSON，故走路由跳转）。
         if (Post is null)
         {
-            _missing = true;
-            HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
+            Navigation.NavigateTo("/404", forceLoad: true);
         }
     }
 

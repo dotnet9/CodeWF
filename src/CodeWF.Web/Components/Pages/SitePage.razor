@@ -1,25 +1,13 @@
 @page "/{pageName:regex(^(about|donation|privacy)$)}"
 @using CodeWF.Web.Models
-@using Microsoft.AspNetCore.Http
 @inject CodeWF.Web.Services.ContentRepository Repository
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpAccessor
+@inject NavigationManager Navigation
 
 <PageTitle>@PageTitleText - CodeWF</PageTitle>
 
 @if (Page is null)
 {
-    if (_missing)
-    {
-        HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
-        <section class="page-shell">
-            <h1>404</h1>
-            <p class="muted">页面不存在或已下架，返回<a href="/">首页</a>。</p>
-        </section>
-    }
-    else
-    {
-        <section class="page-shell"><p class="muted">加载中…</p></section>
-    }
+    <section class="page-shell"><p class="muted">加载中…</p></section>
 }
 else
 {
@@ -55,11 +43,10 @@ else
     {
         try { Page = await Repository.ReadSitePageAsync("zh-CN", ContentSegments); } catch { }
 
-        // 站点页缺失：渲染 404 内容并返回 404 状态码（此前停在“加载中…”）。
+        // 站点页缺失：重定向到独立 404 页（同 PostDetail，组件内设状态码会吞渲染正文）。
         if (Page is null)
         {
-            _missing = true;
-            HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
+            Navigation.NavigateTo("/404", forceLoad: true);
         }
     }
 }
