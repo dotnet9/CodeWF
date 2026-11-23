@@ -1,11 +1,13 @@
 @page "/{year:int}/{month:int}/{slug}"
 @using System.Text.Json
+@using Microsoft.AspNetCore.Http
 @using CodeWF.Web.Models
 @inject CodeWF.Web.Services.ContentRepository Repository
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpAccessor
 @inject NavigationManager Navigation
 @implements IDisposable
 
-<PageTitle>@(Post?.Title ?? "文章") - CodeWF</PageTitle>
+<PageTitle>@(_missing ? "页面不存在" : Post?.Title ?? "文章") - CodeWF</PageTitle>
 <HeadContent>
     <meta name="description" content="@(Post?.Description ?? string.Empty)" />
     <meta property="og:type" content="article" />
@@ -35,7 +37,17 @@
 
 @if (Post is null)
 {
-    <section class="page-shell"><p class="muted">加载中…</p></section>
+    if (_missing)
+    {
+        <section class="page-shell">
+            <h1>404</h1>
+            <p class="muted">文章不存在或尚未发布，返回<a href="/">首页</a>。</p>
+        </section>
+    }
+    else
+    {
+        <section class="page-shell"><p class="muted">加载中…</p></section>
+    }
 }
 else
 {
@@ -94,6 +106,8 @@ else
     [Parameter] public int Month { get; set; }
     [Parameter] public string Slug { get; set; } = string.Empty;
 
+    private bool _missing;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -103,6 +117,13 @@ else
         catch
         {
             Post = null;
+        }
+
+        // 草稿或 slug 不存在：渲染 404 内容并返回 404 状态码（此前停在“加载中…”误导抓取与读者）。
+        if (Post is null)
+        {
+            _missing = true;
+            HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
         }
     }
 

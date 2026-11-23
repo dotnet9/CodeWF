@@ -1,18 +1,34 @@
 @page "/{pageName:regex(^(about|donation|privacy)$)}"
 @using CodeWF.Web.Models
+@using Microsoft.AspNetCore.Http
 @inject CodeWF.Web.Services.ContentRepository Repository
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpAccessor
 
 <PageTitle>@PageTitleText - CodeWF</PageTitle>
 
-<section class="page-shell">
-    <div class="rich-content">
-        @((MarkupString)(Page?.HtmlContent ?? string.Empty))
-    </div>
-    @if (Page is null)
+@if (Page is null)
+{
+    if (_missing)
     {
-        <p class="muted">加载中…</p>
+        HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
+        <section class="page-shell">
+            <h1>404</h1>
+            <p class="muted">页面不存在或已下架，返回<a href="/">首页</a>。</p>
+        </section>
     }
-</section>
+    else
+    {
+        <section class="page-shell"><p class="muted">加载中…</p></section>
+    }
+}
+else
+{
+    <section class="page-shell">
+        <div class="rich-content">
+            @((MarkupString)(Page?.HtmlContent ?? string.Empty))
+        </div>
+    </section>
+}
 
 @code {
     private MarkdownPage? Page;
@@ -33,8 +49,17 @@
         _ => ["about.md"],
     };
 
+    private bool _missing;
+
     protected override async Task OnInitializedAsync()
     {
         try { Page = await Repository.ReadSitePageAsync("zh-CN", ContentSegments); } catch { }
+
+        // 站点页缺失：渲染 404 内容并返回 404 状态码（此前停在“加载中…”）。
+        if (Page is null)
+        {
+            _missing = true;
+            HttpAccessor.HttpContext?.Response.StatusCode = StatusCodes.Status404NotFound;
+        }
     }
 }

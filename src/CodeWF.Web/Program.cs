@@ -11,6 +11,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<BlogPostFileService>();
 builder.Services.AddSingleton<ContentRepository>();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddOutputCache(options =>
 {
     options.AddBasePolicy(policy => policy.Expire(TimeSpan.FromMinutes(10)));
