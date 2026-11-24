@@ -71,6 +71,7 @@ public sealed partial class BlogPostFileService
             markdownFilePath,
             assetsRoot,
             assetBaseUrl);
+        blogPost.Cover = MakeCoverUrlAbsolute(blogPost.Cover, assetBaseUrl);
         blogPost.SourcePath = markdownFilePath;
 
         if (string.IsNullOrWhiteSpace(blogPost.Slug))
@@ -205,6 +206,22 @@ public sealed partial class BlogPostFileService
         || url.StartsWith("#", StringComparison.Ordinal)
         || url.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
         || url.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// front matter 的 cover 允许写资产库相对路径（如 2026/11/x.png），
+    /// 统一拼接 CDN 基址——图片域名变更时只改 AssetBaseUrl 配置，文章不用动。
+    /// </summary>
+    private static string? MakeCoverUrlAbsolute(string? cover, string assetBaseUrl)
+    {
+        if (string.IsNullOrWhiteSpace(cover)
+            || string.IsNullOrWhiteSpace(assetBaseUrl)
+            || IsAbsoluteOrSpecialUrl(cover))
+        {
+            return cover;
+        }
+
+        return $"{assetBaseUrl.TrimEnd('/')}/{cover.TrimStart('/')}";
+    }
 
     [GeneratedRegex("(?<attr>src|href)=(?<quote>[\"'])(?<url>.*?)(\\k<quote>)", RegexOptions.IgnoreCase)]
     private static partial Regex HtmlUrlAttributeRegex();

@@ -264,6 +264,37 @@ outdatedLinkText: "查看最新解读"
     }
 
     [Fact]
+    public void Read_NormalizesCoverUrl_AbsoluteFormsStayUntouched()
+    {
+        var root = CreateTempRoot();
+
+        var relative = WritePostWithCover(root, "rel-cover", "cover: 2026/01/rel-cover.png");
+        var absolute = WritePostWithCover(root, "abs-cover", "cover: https://img1.dotnet9.com/2026/01/abs-cover.png");
+        var rooted = WritePostWithCover(root, "rooted-cover", "cover: /images/rooted-cover.png");
+
+        var service = new BlogPostFileService();
+
+        // 资产库相对路径 → 拼 CDN 基址（域名可换，文章零改动）
+        Assert.Equal("https://img1.dotnet9.com/2026/01/rel-cover.png",
+            service.Read(relative, root, "https://img1.dotnet9.com").Cover);
+        // 已是绝对 URL → 原样保留
+        Assert.Equal("https://img1.dotnet9.com/2026/01/abs-cover.png",
+            service.Read(absolute, root, "https://img1.dotnet9.com").Cover);
+        // 站点根相对（/ 开头）→ 语义与正文 URL 一致，原样保留
+        Assert.Equal("/images/rooted-cover.png",
+            service.Read(rooted, root, "https://img1.dotnet9.com").Cover);
+    }
+
+    private static string WritePostWithCover(string root, string slug, string coverLine)
+    {
+        var directory = Path.Combine(root, "2026", "01");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, $"{slug}.md");
+        File.WriteAllText(markdown, $"---\ntitle: \"{slug}\"\nslug: \"{slug}\"\ndate: 2026-01-10 10:00:00\n{coverLine}\n---\n\n正文\n");
+        return markdown;
+    }
+
+    [Fact]
     public async Task Diag_RealRepo_BannerPosts()
     {
         var root = @"D:\github\Apps\Assets.Dotnet9";
