@@ -10,6 +10,10 @@ public class BlogPostBrief
     public DateTime? Lastmod { get; set; }
     public string? Copyright { get; set; }
     public bool Banner { get; set; }
+    public bool Outdated { get; set; }
+    public string? OutdatedMessage { get; set; }
+    public string? OutdatedLink { get; set; }
+    public string? OutdatedLinkText { get; set; }
     public string? Author { get; set; }
     public string? LastModifyUser { get; set; }
     public string? OriginalTitle { get; set; }

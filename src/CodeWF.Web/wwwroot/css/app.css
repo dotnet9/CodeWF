@@ -82,6 +82,16 @@
 }
 .post-header h1 { font-size: 28px; line-height: 1.4; margin: 0 0 10px; }
 .post-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted, #777); font-size: 12.5px; margin: 0 0 24px; }
+.post-outdated {
+    margin: 0 0 24px; padding: 14px 18px; border: 1px solid rgba(217, 119, 6, .35);
+    border-left: 3px solid #d97706; border-radius: 10px;
+    background: rgba(217, 119, 6, .08); font-size: 13.5px; line-height: 1.7;
+}
+.post-outdated p { margin: 0 0 4px; }
+.post-outdated__head { font-weight: 600; color: #b45309; }
+.post-outdated__text { color: inherit; }
+.post-outdated__link { color: #b45309; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.post-outdated__link:hover { color: #92400e; }
 .post-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 32px; }
 @media (max-width: 900px) { .post-layout { grid-template-columns: 1fr; } .post-aside { display: none; } }
 

@@ -233,6 +233,37 @@ cover: https://img1.dotnet9.com/2026/01/cover.png
     }
 
     [Fact]
+    public void Read_ParsesInlineFrontMatter_OutdatedFields()
+    {
+        var root = CreateTempRoot();
+        var directory = Path.Combine(root, "2026", "09");
+        Directory.CreateDirectory(directory);
+        var markdown = Path.Combine(directory, "outdated-post.md");
+        File.WriteAllText(markdown, """
+---
+title: "Outdated Post"
+slug: "outdated-post"
+date: 2026-09-23 19:59:14
+outdated: true
+outdatedMessage: "结论已被后续文章更新"
+outdatedLink: /2026/11/newer-post
+outdatedLinkText: "查看最新解读"
+---
+
+正文
+""");
+
+        var service = new BlogPostFileService();
+        var post = service.Read(markdown, root, "https://img1.dotnet9.com");
+
+        Assert.True(post.Outdated, "outdated: true 应被反序列化");
+        Assert.Equal("结论已被后续文章更新", post.OutdatedMessage);
+        Assert.Equal("/2026/11/newer-post", post.OutdatedLink);
+        Assert.Equal("查看最新解读", post.OutdatedLinkText);
+        Assert.Contains("正文", post.Content);
+    }
+
+    [Fact]
     public async Task Diag_RealRepo_BannerPosts()
     {
         var root = @"D:\github\Apps\Assets.Dotnet9";

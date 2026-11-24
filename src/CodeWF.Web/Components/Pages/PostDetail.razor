@@ -64,6 +64,18 @@ else
             </p>
         </header>
 
+        @if (Post.Outdated)
+        {
+            <aside class="post-outdated" role="note">
+                <p class="post-outdated__head">⚠️ 本文内容已过时</p>
+                <p class="post-outdated__text">@(string.IsNullOrWhiteSpace(Post.OutdatedMessage) ? "本文部分结论可能已被后续文章更新，请以最新内容为准。" : Post.OutdatedMessage)</p>
+                @if (!string.IsNullOrWhiteSpace(Post.OutdatedLink))
+                {
+                    <a class="post-outdated__link" href="@Post.OutdatedLink">@(string.IsNullOrWhiteSpace(Post.OutdatedLinkText) ? "查看最新文章 →" : Post.OutdatedLinkText)</a>
+                }
+            </aside>
+        }
+
         <div class="post-layout">
             <div class="rich-content" id="rich-content">
                 @((MarkupString)Post.HtmlContent)
